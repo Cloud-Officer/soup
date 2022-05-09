@@ -96,7 +96,7 @@ jobs:
         github_token: "${{secrets.GITHUB_TOKEN}}"
   ruby_unit_tests:
     name: Ruby Unit Tests
-    runs-on: ubuntu-latest
+    runs-on: macos-11
     needs:
     - variables
     - actionlint
