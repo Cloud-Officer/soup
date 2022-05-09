@@ -7,7 +7,7 @@
 # frozen_string_literal: true
 
 require 'bundler'
-require 'cocoapods-core'
+require 'cocoapods-core' if RUBY_PLATFORM =~ /darwin/i
 require 'httparty'
 require 'inquirer'
 require 'json'
@@ -170,6 +170,8 @@ begin
 
       when 'Podfile.lock'
         next if options[:skip_cocoapods]
+
+        next unless RUBY_PLATFORM =~ /darwin/i
 
         package_manager_file = Pod::Lockfile.from_file(Pathname.new(file))
         source = Pod::Source.new("#{Dir.home}/.cocoapods/repos/trunk")
