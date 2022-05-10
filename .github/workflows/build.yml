@@ -14,7 +14,7 @@ name: Build
 env:
   RUBY-BUNDLER-CACHE: 'true'
   RUBY-VERSION: '3.1'
-  XCODE-VERSION: 'xcode-latest'
+  XCODE-VERSION: 'latest'
 jobs:
   variables:
     name: Prepare Variables
