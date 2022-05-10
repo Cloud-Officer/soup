@@ -128,7 +128,7 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
-  bundler (>= 2.3.0)
+  bundler (>= 2.2.0)
   cocoapods (>= 1.11.0)
   httparty (>= 0.20.0)
   inquirer (>= 0.2.0)
