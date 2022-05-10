@@ -19,7 +19,7 @@ choices.
 ## Installation
 
 You can run `bundle install` and then run the command `soup` or you can install the latest via homebrew
-with `brew install cloud-officer/brew/soup`.
+with `brew install cloud-officer/ci/soup`.
 
 ## Usage
 
