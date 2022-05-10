@@ -1,0 +1,4 @@
+extends: relaxed
+rules:
+  trailing-spaces: disable
+  line-length: disable
