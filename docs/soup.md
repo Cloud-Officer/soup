@@ -17,7 +17,7 @@
 | soup | Ruby | cocoapods-search | 1.0.1 | MIT | Search for pods. | <https://github.com/CocoaPods/cocoapods-search> | 2022-05-10 | Low | Dependency | Dependency |
 | soup | Ruby | cocoapods-trunk | 1.6.0 | MIT | Interact with trunk.cocoapods.org | <https://github.com/CocoaPods/cocoapods-trunk> | 2022-05-10 | Low | Dependency | Dependency |
 | soup | Ruby | cocoapods-try | 1.2.0 | MIT | CocoaPods plugin which allows to quickly try the demo project of a Pod. | <https://github.com/cocoapods/cocoapods-try> | 2022-05-10 | Low | Dependency | Dependency |
-| soup | Ruby | colored2 | 3.1.2 | MIT | This is a heavily modified fork of http://github.com/defunkt/colored gem, with many | <http://github.com/kigster/colored2> | 2022-05-10 | Low | Dependency | Dependency |
+| soup | Ruby | colored2 | 3.1.2 | MIT | This is a heavily modified fork of <http://github.com/defunkt/colored> gem, with many | <http://github.com/kigster/colored2> | 2022-05-10 | Low | Dependency | Dependency |
 | soup | Ruby | concurrent-ruby | 1.1.10 | MIT | Modern concurrency tools including agents, futures, promises, thread pools, actors, supervisors, and more. | <http://www.concurrent-ruby.com> | 2022-05-10 | Low | Dependency | Dependency |
 | soup | Ruby | escape | 0.0.4 |  | ... | <http://www.a-k-r.org/escape/> | 2022-05-10 | Low | Dependency | Dependency |
 | soup | Ruby | ethon | 0.15.0 | MIT | Very lightweight libcurl wrapper. | <https://github.com/typhoeus/ethon> | 2022-05-10 | Low | Dependency | Dependency |

@@ -115,10 +115,10 @@ begin
           soup.file = file
           soup.repository = repository
           soup.language = 'PHP'
-          soup.version = package['version']
+          soup.version = package['version'].strip
           soup.license = package['license'].first.tr('()', '  ').strip.split.first
-          soup.description = package['description']
-          soup.website = package['homepage']
+          soup.description = package['description'].split(/\n|\. /).first.gsub(%r{((?:f|ht)tps?:/\S+)}, '<\1>')
+          soup.website = package['homepage'].strip
           detected_soups[soup.package] = soup
         end
 
@@ -141,7 +141,7 @@ begin
           soup.language = 'Ruby'
           soup.version = package.version.to_s.strip
           soup.license = package_details['licenses'].first.strip if package_details['licenses']&.first
-          soup.description = package_details['info'].split(/\n|\. /).first
+          soup.description = package_details['info'].split(/\n|\. /).first.gsub(%r{((?:f|ht)tps?:/\S+)}, '<\1>')
           soup.website = package_details['homepage_uri'].strip
           detected_soups[soup.package] = soup
         end
@@ -163,7 +163,7 @@ begin
           soup.language = 'Swift'
           soup.version = package['state']['version'].strip
           soup.license = package_details['license']['spdx_id'].strip
-          soup.description = package_details['description'].split(/\n|\. /).first
+          soup.description = package_details['description'].split(/\n|\. /).first.gsub(%r{((?:f|ht)tps?:/\S+)}, '<\1>')
           soup.website = package_details['html_url'].strip
           detected_soups[soup.package] = soup
         end
@@ -194,7 +194,7 @@ begin
           soup.language = 'Swift'
           soup.version = package_details['cocoapods_version'].strip
           soup.license = package_details['license']['type'].strip
-          soup.description = package_details['description'].split(/\n|\. /).first
+          soup.description = package_details['description'].split(/\n|\. /).first.gsub(%r{((?:f|ht)tps?:/\S+)}, '<\1>')
           soup.website = package_details['homepage'].strip
           detected_soups[soup.package] = soup
         end
@@ -215,7 +215,7 @@ begin
           soup.language = 'Python'
           soup.version = version.strip
           soup.license = package_details['info']['license'].strip
-          soup.description = package_details['summary'].split(/\n|\. /).first
+          soup.description = package_details['summary'].split(/\n|\. /).first.gsub(%r{((?:f|ht)tps?:/\S+)}, '<\1>')
           soup.website = package_details['home_page'].strip
           detected_soups[soup.package] = soup
         end

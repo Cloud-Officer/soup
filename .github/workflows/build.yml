@@ -109,6 +109,7 @@ jobs:
       matrix:
         os:
         - macos-latest
+        - ubuntu-latest
     steps:
     - name: Setup
       uses: cloud-officer/ci-actions/setup@master

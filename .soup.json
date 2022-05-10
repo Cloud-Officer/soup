@@ -200,7 +200,7 @@
     "package": "colored2",
     "version": "3.1.2",
     "license": "MIT",
-    "description": "This is a heavily modified fork of http://github.com/defunkt/colored gem, with many",
+    "description": "This is a heavily modified fork of <http://github.com/defunkt/colored> gem, with many",
     "website": "http://github.com/kigster/colored2",
     "last_verified_at": "2022-05-10",
     "risk_level": "Low",
