@@ -14,7 +14,7 @@ name: Build
 env:
   RUBY-BUNDLER-CACHE: 'false'
   RUBY-VERSION: '3.1'
-  XCODE-VERSION: 'latest'
+  XCODE-VERSION: latest
 jobs:
   variables:
     name: Prepare Variables
