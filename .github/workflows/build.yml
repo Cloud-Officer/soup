@@ -114,8 +114,6 @@ jobs:
       uses: cloud-officer/ci-actions/setup@master
       if: "${{needs.variables.outputs.SKIP_LICENSES != '1' || needs.variables.outputs.SKIP_TESTS != '1'}}"
       with:
-        ruby-version: "${{env.RUBY-VERSION}}"
-        ruby-bundler-cache: "${{env.RUBY-BUNDLER-CACHE}}"
         xcode-version: "${{env.XCODE-VERSION}}"
     - name: Bundler
       shell: bash
