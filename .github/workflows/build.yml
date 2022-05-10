@@ -115,11 +115,13 @@ jobs:
       uses: cloud-officer/ci-actions/setup@master
       if: "${{needs.variables.outputs.SKIP_LICENSES != '1' || needs.variables.outputs.SKIP_TESTS != '1'}}"
       with:
+        ruby-version: "${{env.RUBY-VERSION}}"
+        ruby-bundler-cache: "${{env.RUBY-BUNDLER-CACHE}}"
         xcode-version: "${{env.XCODE-VERSION}}"
     - name: Bundler
       shell: bash
       if: "${{needs.variables.outputs.SKIP_LICENSES != '1' || needs.variables.outputs.SKIP_TESTS != '1'}}"
-      run: bundle install
+      run: echo "The bundle install was done at setup step."
     - name: RSpec
       shell: bash
       if: "${{needs.variables.outputs.SKIP_TESTS != '1'}}"
