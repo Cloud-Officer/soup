@@ -7,7 +7,10 @@
 # frozen_string_literal: true
 
 require 'bundler'
-require 'cocoapods-core' if RUBY_PLATFORM =~ /darwin/i
+if RUBY_PLATFORM =~ /darwin/i
+  require 'cocoapods-core'
+  puts('Cocoapods loaded')
+end
 require 'httparty'
 require 'inquirer'
 require 'json'

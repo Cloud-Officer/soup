@@ -3,7 +3,10 @@
 source 'https://rubygems.org'
 
 gem 'bundler', '>= 2.3.0'
-gem 'cocoapods-core', '>= 1.11.0' if RUBY_PLATFORM =~ /darwin/i
+if RUBY_PLATFORM =~ /darwin/i
+  gem 'cocoapods-core', '>= 1.11.0'
+  puts('Cocoapods installed')
+end
 gem 'httparty', '>= 0.20.0'
 gem 'inquirer', '>= 0.2.0'
 gem 'json', '>= 2.6.0'
