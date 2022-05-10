@@ -12,7 +12,7 @@ name: Build
     types:
     - created
 env:
-  RUBY-BUNDLER-CACHE: 'true'
+  RUBY-BUNDLER-CACHE: 'false'
   RUBY-VERSION: '3.1'
   XCODE-VERSION: 'latest'
 jobs:
@@ -121,7 +121,9 @@ jobs:
     - name: Bundler
       shell: bash
       if: "${{needs.variables.outputs.SKIP_LICENSES != '1' || needs.variables.outputs.SKIP_TESTS != '1'}}"
-      run: echo "The bundle install was done at setup step."
+      run: |
+        bundle config unset deployment
+        bundle install
     - name: RSpec
       shell: bash
       if: "${{needs.variables.outputs.SKIP_TESTS != '1'}}"
