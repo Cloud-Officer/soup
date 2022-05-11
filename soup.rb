@@ -29,7 +29,6 @@ SOUP_CACHE_FILE = '.soup.json'
 class Soup
   def initialize(package)
     @file = ''
-    @repository = ''
     @language = ''
     @package = package
     @version = ''
@@ -44,11 +43,10 @@ class Soup
   end
 
   # accessor get and set method
-  attr_accessor :file, :repository, :language, :package, :version, :license, :description, :website, :last_verified_at, :risk_level, :requirements, :verification_reasoning, :dependency
+  attr_accessor :file, :language, :package, :version, :license, :description, :website, :last_verified_at, :risk_level, :requirements, :verification_reasoning, :dependency
 
   def as_json(_options = {})
     {
-      repository: @repository,
       language: @language,
       package: @package,
       version: @version,
@@ -101,7 +99,6 @@ begin
   end
 
   detected_soups = {}
-  repository = Dir.pwd.split('/').last
 
   PACKAGE_MANAGERS.each do |package_file|
     Dir.glob("#{Dir.pwd}/**/#{package_file}") do |file|
@@ -115,7 +112,6 @@ begin
         package_manager_lock_file['packages'].each do |package|
           soup = Soup.new(package['name'])
           soup.file = file
-          soup.repository = repository
           soup.language = 'PHP'
           soup.version = package['version']&.strip
           soup.license = package['license']&.first&.tr('()', '  ')&.strip&.split&.first
@@ -141,7 +137,6 @@ begin
           package_details = JSON.parse(response.body)
           soup = Soup.new(package.name)
           soup.file = file
-          soup.repository = repository
           soup.language = 'Ruby'
           soup.version = package&.version&.to_s&.strip
           soup.license = package_details['licenses']&.first&.strip
@@ -164,7 +159,6 @@ begin
           package_details = JSON.parse(response.body)
           soup = Soup.new(package['identity'])
           soup.file = file
-          soup.repository = repository
           soup.language = 'Swift'
           soup.version = package['state']['version']&.strip
           soup.license = package_details['license']['spdx_id']&.strip
@@ -197,7 +191,6 @@ begin
 
           soup = Soup.new(pod)
           soup.file = file
-          soup.repository = repository
           soup.language = 'Swift'
           soup.version = package_details['cocoapods_version']&.strip
           soup.license = package_details['license']['type']&.strip
@@ -219,7 +212,6 @@ begin
           package_details = JSON.parse(response.body)
           soup = Soup.new(package)
           soup.file = file
-          soup.repository = repository
           soup.language = 'Python'
           soup.version = version&.strip
           soup.license = package_details['info']['license']&.strip
@@ -245,7 +237,7 @@ begin
         {}
       end
 
-    soup_md = "# Software of Unknown Provenance\n\n| **Repository** | **Language** | **Package** | **Version** | **License** | **Description** | **Website** | **Last Verified** | **Risk Level** | **Requirements** | **Verification Reasoning** |\n| :---: | :---: | :--- | :---: | :---: | :--- | :--- | :---: | :---: | :--- | :--- |\n"
+    soup_md = "# Software of Unknown Provenance\n\n| **Language** | **Package** | **Version** | **License** | **Description** | **Website** | **Last Verified** | **Risk Level** | **Requirements** | **Verification Reasoning** |\n| :---: | :--- | :---: | :---: | :--- | :--- | :---: | :---: | :--- | :--- |\n"
   end
 
   detected_soups.each do |package, soup|
@@ -300,7 +292,7 @@ begin
     raise("Missing information for #{soup.package}!") if soup.risk_level.empty? or soup.requirements.empty? or soup.verification_reasoning.empty?
 
     soup.last_verified_at = Time.now.strftime('%Y-%m-%d').to_s
-    soup_md += "| #{soup.repository} | #{soup.language} | #{soup.package} | #{soup.version} | #{soup.license} | #{soup.description} | <#{soup.website}> | #{soup.last_verified_at} | #{soup.risk_level} | #{soup.requirements} | #{soup.verification_reasoning} |\n"
+    soup_md += "| #{soup.language} | #{soup.package} | #{soup.version} | #{soup.license} | #{soup.description} | <#{soup.website}> | #{soup.last_verified_at} | #{soup.risk_level} | #{soup.requirements} | #{soup.verification_reasoning} |\n"
   end
 
   if options[:soup]
