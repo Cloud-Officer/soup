@@ -40,10 +40,11 @@ class Soup
     @risk_level = ''
     @requirements = ''
     @verification_reasoning = ''
+    @dependency = false
   end
 
   # accessor get and set method
-  attr_accessor :file, :repository, :language, :package, :version, :license, :description, :website, :last_verified_at, :risk_level, :requirements, :verification_reasoning
+  attr_accessor :file, :repository, :language, :package, :version, :license, :description, :website, :last_verified_at, :risk_level, :requirements, :verification_reasoning, :dependency
 
   def as_json(_options = {})
     {
@@ -108,9 +109,10 @@ begin
       when 'composer.lock'
         next if options[:skip_composer]
 
-        package_manager_file = JSON.parse(File.read(file))
+        package_manager_lock_file = JSON.parse(File.read(file))
+        package_manager_file = File.read(file.gsub('lock', 'json'))
 
-        package_manager_file['packages'].each do |package|
+        package_manager_lock_file['packages'].each do |package|
           soup = Soup.new(package['name'])
           soup.file = file
           soup.repository = repository
@@ -119,6 +121,7 @@ begin
           soup.license = package['license']&.first&.tr('()', '  ')&.strip&.split&.first
           soup.description = package['description']&.split(/\n|\. /)&.first&.gsub(%r{((?:f|ht)tps?:/\S+)}, '<\1>')
           soup.website = package['homepage']&.strip
+          soup.dependency = !package_manager_file.include?(soup.package)
           detected_soups[soup.package] = soup
         end
 
@@ -126,10 +129,11 @@ begin
         next if options[:skip_bundler]
 
         Dir.chdir(File.dirname(file)) do
-          package_manager_file = Bundler::LockfileParser.new(Bundler.read_file(file))
+          package_manager_lock_file = Bundler::LockfileParser.new(Bundler.read_file(file))
+          package_manager_file = File.read(file.gsub('.lock', ''))
         end
 
-        package_manager_file.specs.each do |package|
+        package_manager_lock_file.specs.each do |package|
           response = HTTParty.get("https://api.rubygems.org/api/v2/rubygems/#{package.name}/versions/#{package.version}.json")
 
           raise(response.message) unless response.code == 200
@@ -143,15 +147,16 @@ begin
           soup.license = package_details['licenses']&.first&.strip
           soup.description = package_details['info']&.split(/\n|\. /)&.first&.gsub(%r{((?:f|ht)tps?:/\S+)}, '<\1>')
           soup.website = package_details['homepage_uri']&.strip
+          soup.dependency = !package_manager_file.include?(soup.package)
           detected_soups[soup.package] = soup
         end
 
       when 'Package.resolved'
         next if options[:skip_spm]
 
-        package_manager_file = JSON.parse(File.read(file))
+        package_manager_lock_file = JSON.parse(File.read(file))
 
-        package_manager_file['pins'].each do |package|
+        package_manager_lock_file['pins'].each do |package|
           response = HTTParty.get("https://api.github.com/repos/#{package['location'].gsub('git@github.com:', '').gsub('https://github.com/', '').gsub('.git', '')}")
 
           next unless response.code == 200
@@ -165,6 +170,7 @@ begin
           soup.license = package_details['license']['spdx_id']&.strip
           soup.description = package_details['description']&.split(/\n|\. /)&.first&.gsub(%r{((?:f|ht)tps?:/\S+)}, '<\1>')
           soup.website = package_details['html_url']&.strip
+          soup.dependency = false
           detected_soups[soup.package] = soup
         end
 
@@ -173,13 +179,14 @@ begin
 
         next unless RUBY_PLATFORM =~ /darwin/i
 
-        package_manager_file = Pod::Lockfile.from_file(Pathname.new(file))
+        package_manager_lock_file = Pod::Lockfile.from_file(Pathname.new(file))
+        package_manager_file = File.read(file.gsub('.lock', ''))
         source = Pod::Source.new("#{Dir.home}/.cocoapods/repos/trunk")
 
-        _key, pods = package_manager_file.pods_by_spec_repo.first
+        _key, pods = package_manager_lock_file.pods_by_spec_repo.first
 
         pods.each do |pod|
-          version = Semantic::Version.new(package_manager_file.version(pod).version)
+          version = Semantic::Version.new(package_manager_lock_file.version(pod).version)
           version.patch = 0 if version.patch != 0
 
           begin
@@ -196,6 +203,7 @@ begin
           soup.license = package_details['license']['type']&.strip
           soup.description = package_details['description']&.split(/\n|\. /)&.first&.gsub(%r{((?:f|ht)tps?:/\S+)}, '<\1>')
           soup.website = package_details['homepage']&.strip
+          soup.dependency = !package_manager_file.include?(soup.package)
           detected_soups[soup.package] = soup
         end
 
@@ -215,8 +223,9 @@ begin
           soup.language = 'Python'
           soup.version = version&.strip
           soup.license = package_details['info']['license']&.strip
-          soup.description = package_details['summary']&.split(/\n|\. /)&.first&.gsub(%r{((?:f|ht)tps?:/\S+)}, '<\1>')
-          soup.website = package_details['home_page']&.strip
+          soup.description = package_details['info']['summary']&.split(/\n|\. /)&.first&.gsub(%r{((?:f|ht)tps?:/\S+)}, '<\1>')
+          soup.website = package_details['info']['home_page']&.strip
+          soup.dependency = false
           detected_soups[soup.package] = soup
         end
 
@@ -264,6 +273,12 @@ begin
       soup.verification_reasoning = cached_soups[package]['verification_reasoning']
     end
 
+    if soup.dependency
+      soup.risk_level = RISK_LEVELS[0]
+      soup.requirements = 'Dependency'
+      soup.verification_reasoning = 'Dependency'
+    end
+
     if soup.risk_level.empty?
       raise("No risk level found for #{soup.package}!") if options[:no_prompt]
 
@@ -289,6 +304,7 @@ begin
   end
 
   if options[:soup]
+    Dir.mkdir('docs') unless Dir.exist?('docs')
     File.write(SOUP_CACHE_FILE, JSON.pretty_generate(detected_soups))
     File.write(SOUP_FILE, soup_md)
   end
