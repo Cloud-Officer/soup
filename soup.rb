@@ -14,7 +14,7 @@ require 'json'
 require 'optparse'
 require 'semantic'
 
-LICENSES = %w[Apache BSD BSL Boost Copyright HPND ISC MIT NOASSERTION Python zlib].freeze
+LICENSES = %w[Apache BSD BSL Boost Copyright HPND ISC MIT NOASSERTION PSF Python zlib].freeze
 PACKAGE_MANAGERS = %w[composer.lock Gemfile.lock Package.resolved Podfile.lock requirements.txt].freeze
 RISK_LEVELS = %w[Low Medium High].freeze
 RISK_LEVELS_SCREEN =
@@ -28,6 +28,8 @@ SOUP_CACHE_FILE = '.soup.json'
 
 class Soup
   def initialize(package)
+    raise('No package specified!') if package.nil?
+
     @file = ''
     @language = ''
     @package = package
@@ -150,21 +152,47 @@ begin
         next if options[:skip_spm]
 
         package_manager_lock_file = JSON.parse(File.read(file))
+        package_manager_lock_file = package_manager_lock_file['object'] if package_manager_lock_file['object']
+        package_manager_file =
+          if File.exist?(file.gsub('resolved', 'swift'))
+            File.read(file.gsub('resolved', 'swift'))
+          else
+            File.read("#{file.split('.').first}.xcodeproj/project.pbxproj")
+          end
+
+        headers =
+          if ENV.fetch('GITHUB_TOKEN', '').empty?
+            nil
+          else
+            {
+              headers: { Authorization: ENV.fetch('GITHUB_TOKEN', '').to_s }
+            }
+          end
 
         package_manager_lock_file['pins'].each do |package|
-          response = HTTParty.get("https://api.github.com/repos/#{package['location'].gsub('git@github.com:', '').gsub('https://github.com/', '').gsub('.git', '')}")
+          location = package['location'] || package['repositoryURL']
+          url = "https://api.github.com/repos/#{location.gsub('git@github.com:', '').gsub('https://github.com/', '').gsub('.git', '')}"
+
+          response =
+            if headers
+              HTTParty.get(url, headers)
+            else
+              HTTParty.get(url)
+            end
+
+          raise("Error: #{response.message}! Please set GITHUB_TOKEN.") if response.message.include?('rate limit')
 
           next unless response.code == 200
 
           package_details = JSON.parse(response.body)
-          soup = Soup.new(package['identity'])
+          soup = Soup.new(package_details['name'])
           soup.file = file
           soup.language = 'Swift'
           soup.version = package['state']['version']&.strip
           soup.license = package_details['license']['spdx_id']&.strip
           soup.description = package_details['description']&.split(/\n|\. /)&.first&.gsub(%r{((?:f|ht)tps?:/\S+)}, '<\1>')
           soup.website = package_details['html_url']&.strip
-          soup.dependency = false
+          soup.dependency = !package_manager_file.include?(soup.package)
           detected_soups[soup.package] = soup
         end
 
@@ -174,7 +202,7 @@ begin
         next unless RUBY_PLATFORM =~ /darwin/i
 
         package_manager_lock_file = Pod::Lockfile.from_file(Pathname.new(file))
-        package_manager_file = File.read(file.gsub('.lock', ''))
+        package_manager_file = File.read(file.gsub('.lock', '')).gsub('/', '')
         source = Pod::Source.new("#{Dir.home}/.cocoapods/repos/trunk")
 
         _key, pods = package_manager_lock_file.pods_by_spec_repo.first
@@ -192,7 +220,7 @@ begin
           soup = Soup.new(pod)
           soup.file = file
           soup.language = 'Swift'
-          soup.version = package_details['cocoapods_version']&.strip
+          soup.version = package_details['version']&.strip
           soup.license = package_details['license']['type']&.strip
           soup.description = package_details['description']&.split(/\n|\. /)&.first&.gsub(%r{((?:f|ht)tps?:/\S+)}, '<\1>')
           soup.website = package_details['homepage']&.strip
@@ -205,6 +233,9 @@ begin
 
         File.open(file, 'r').each_line do |line|
           package, version = line.split(/==/)
+
+          next if package.strip.empty?
+
           response = HTTParty.get("https://pypi.python.org/pypi/#{package}/json")
 
           raise(response.message) unless response.code == 200
@@ -239,6 +270,8 @@ begin
 
     soup_md = "# Software of Unknown Provenance\n\n| **Language** | **Package** | **Version** | **License** | **Description** | **Website** | **Last Verified** | **Risk Level** | **Requirements** | **Verification Reasoning** |\n| :---: | :--- | :---: | :---: | :--- | :--- | :---: | :---: | :--- | :--- |\n"
   end
+
+  detected_soups = detected_soups.sort.to_h
 
   detected_soups.each do |package, soup|
     if options[:licenses] && !soup.license.nil? && !soup.license.empty?
