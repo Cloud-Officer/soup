@@ -125,6 +125,7 @@ begin
 
       when 'Gemfile.lock'
         next if options[:skip_bundler]
+
         package_manager_lock_file = {}
         package_manager_file = ''
 
@@ -167,7 +168,7 @@ begin
             nil
           else
             {
-              headers: { Authorization: "token #{ENV.fetch('GITHUB_TOKEN', '').to_s}" }
+              headers: { Authorization: "token #{ENV.fetch('GITHUB_TOKEN', '')}" }
             }
           end
 
