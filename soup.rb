@@ -14,7 +14,7 @@ require 'json'
 require 'optparse'
 require 'semantic'
 
-LICENSES = %w[Apache BSD BSL Boost Copyright HPND ISC MIT NOASSERTION PSF Python zlib].freeze
+LICENSES = %w[Apache BSD BSL Boost HPND ISC MIT PSF Python zlib].freeze
 PACKAGE_MANAGERS = %w[composer.lock Gemfile.lock Package.resolved Podfile.lock requirements.txt].freeze
 RISK_LEVELS = %w[Low Medium High].freeze
 RISK_LEVELS_SCREEN =
@@ -125,6 +125,8 @@ begin
 
       when 'Gemfile.lock'
         next if options[:skip_bundler]
+        package_manager_lock_file = {}
+        package_manager_file = ''
 
         Dir.chdir(File.dirname(file)) do
           package_manager_lock_file = Bundler::LockfileParser.new(Bundler.read_file(file))
@@ -140,7 +142,7 @@ begin
           soup = Soup.new(package.name)
           soup.file = file
           soup.language = 'Ruby'
-          soup.version = package&.version&.to_s&.strip
+          soup.version = package.version&.to_s&.strip
           soup.license = package_details['licenses']&.first&.strip
           soup.description = package_details['info']&.split(/\n|\. /)&.first&.gsub(%r{((?:f|ht)tps?:/\S+)}, '<\1>')
           soup.website = package_details['homepage_uri']&.strip
@@ -165,7 +167,7 @@ begin
             nil
           else
             {
-              headers: { Authorization: ENV.fetch('GITHUB_TOKEN', '').to_s }
+              headers: { Authorization: "token #{ENV.fetch('GITHUB_TOKEN', '').to_s}" }
             }
           end
 
@@ -205,10 +207,10 @@ begin
         package_manager_file = File.read(file.gsub('.lock', '')).gsub('/', '')
         source = Pod::Source.new("#{Dir.home}/.cocoapods/repos/trunk")
 
-        _key, pods = package_manager_lock_file.pods_by_spec_repo.first
+        _key, pods = package_manager_lock_file&.pods_by_spec_repo&.first
 
         pods.each do |pod|
-          version = Semantic::Version.new(package_manager_lock_file.version(pod).version)
+          version = Semantic::Version.new(package_manager_lock_file&.version(pod)&.version)
           version.patch = 0 if version.patch != 0
 
           begin
@@ -220,10 +222,10 @@ begin
           soup = Soup.new(pod)
           soup.file = file
           soup.language = 'Swift'
-          soup.version = package_details['version']&.strip
+          soup.version = package_details['version'].strip
           soup.license = package_details['license']['type']&.strip
-          soup.description = package_details['description']&.split(/\n|\. /)&.first&.gsub(%r{((?:f|ht)tps?:/\S+)}, '<\1>')
-          soup.website = package_details['homepage']&.strip
+          soup.description = package_details['description'].split(/\n|\. /)&.first&.gsub(%r{((?:f|ht)tps?:/\S+)}, '<\1>')
+          soup.website = package_details['homepage'].strip
           soup.dependency = !package_manager_file.include?(soup.package)
           detected_soups[soup.package] = soup
         end
@@ -259,6 +261,8 @@ begin
   end
 
   exit_code = 0
+  cached_soups = {}
+  soup_md = ''
 
   if options[:soup]
     cached_soups =
@@ -293,6 +297,7 @@ begin
     next unless options[:soup]
 
     if cached_soups[package]
+      soup.last_verified_at = cached_soups[package]['last_verified_at']
       soup.risk_level = cached_soups[package]['risk_level']
       soup.requirements = cached_soups[package]['requirements']
       soup.verification_reasoning = cached_soups[package]['verification_reasoning']
@@ -324,7 +329,7 @@ begin
 
     raise("Missing information for #{soup.package}!") if soup.risk_level.empty? or soup.requirements.empty? or soup.verification_reasoning.empty?
 
-    soup.last_verified_at = Time.now.strftime('%Y-%m-%d').to_s
+    soup.last_verified_at = Time.now.strftime('%Y-%m-%d').to_s if soup.last_verified_at.empty?
     soup_md += "| #{soup.language} | #{soup.package} | #{soup.version} | #{soup.license} | #{soup.description} | <#{soup.website}> | #{soup.last_verified_at} | #{soup.risk_level} | #{soup.requirements} | #{soup.verification_reasoning} |\n"
   end
 
