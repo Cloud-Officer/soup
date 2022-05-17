@@ -14,7 +14,7 @@ require 'json'
 require 'optparse'
 require 'semantic'
 
-LICENSES = %w[Apache BSD BSL Boost HPND ISC MIT PSF Python zlib].freeze
+LICENSES = %w[Apache BSD BSL Boost Copyright HPND ISC MIT PSF Python zlib].freeze
 PACKAGE_MANAGERS = %w[composer.lock Gemfile.lock Package.resolved Podfile.lock requirements.txt].freeze
 RISK_LEVELS = %w[Low Medium High].freeze
 RISK_LEVELS_SCREEN =
@@ -187,6 +187,9 @@ begin
           next unless response.code == 200
 
           package_details = JSON.parse(response.body)
+
+          next if package_details['private']
+
           soup = Soup.new(package_details['name'])
           soup.file = file
           soup.language = 'Swift'
