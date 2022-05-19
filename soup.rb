@@ -14,7 +14,7 @@ require 'json'
 require 'optparse'
 require 'semantic'
 
-LICENSES = %w[Apache BSD BSL Boost Copyright HPND ISC MIT PSF Python zlib].freeze
+LICENSES = %w[Apache BSD BSL Boost Copyright HPND ISC MIT PSF Python zlib]
 PACKAGE_MANAGERS = %w[composer.lock Gemfile.lock Package.resolved Podfile.lock requirements.txt].freeze
 RISK_LEVELS = %w[Low Medium High].freeze
 RISK_LEVELS_SCREEN =
@@ -101,6 +101,7 @@ begin
   end
 
   detected_soups = {}
+  LICENSES.map!(&:downcase)
 
   PACKAGE_MANAGERS.each do |package_file|
     Dir.glob("#{Dir.pwd}/**/#{package_file}") do |file|
@@ -286,7 +287,7 @@ begin
       found = false
 
       LICENSES.each do |license|
-        if soup.license.include?(license)
+        if soup.license.downcase.include?(license)
           found = true
           break
         end
@@ -294,7 +295,7 @@ begin
 
       unless found
         puts("Invalid license #{soup.license} found in #{soup.file} in package #{soup.package}!")
-        exit_code = 1
+        exit_code = 1 if soup.license != 'NOASSERTION'
       end
     end
 
