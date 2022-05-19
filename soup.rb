@@ -14,7 +14,6 @@ require 'json'
 require 'optparse'
 require 'semantic'
 
-LICENSES = %w[Apache BSD BSL Boost Copyright HPND ISC MIT PSF Python zlib]
 PACKAGE_MANAGERS = %w[composer.lock Gemfile.lock Package.resolved Podfile.lock requirements.txt].freeze
 RISK_LEVELS = %w[Low Medium High].freeze
 RISK_LEVELS_SCREEN =
@@ -101,7 +100,7 @@ begin
   end
 
   detected_soups = {}
-  LICENSES.map!(&:downcase)
+  LICENSES = %w[Apache BSD BSL Boost Copyright HPND ISC MIT PSF Python zlib].map!(&:downcase)
 
   PACKAGE_MANAGERS.each do |package_file|
     Dir.glob("#{Dir.pwd}/**/#{package_file}") do |file|
