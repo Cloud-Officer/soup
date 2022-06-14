@@ -11,6 +11,7 @@ module SOUP
       main_file = File.read(file.gsub('lock', 'json'))
 
       lock_file['packages'].each do |php_package|
+        puts("Checking #{php_package['name']} #{php_package['version']}...")
         package = Package.new(php_package['name'])
         package.file = file
         package.language = 'PHP'

@@ -17,6 +17,7 @@ module SOUP
       pods.each do |pod|
         version = Semantic::Version.new(lock_file&.version(pod)&.version)
         version.patch = 0 if version.patch != 0
+        puts("Checking #{pod} #{version}...")
 
         begin
           package_details = source.specification(pod.gsub('/', '').gsub('Only', ''), version).attributes_hash

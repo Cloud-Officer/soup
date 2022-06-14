@@ -27,6 +27,7 @@ module SOUP
         end
 
       lock_file['pins'].each do |pin|
+        puts("Checking #{pin['identity']} #{pin['state']['version']}...")
         location = pin['location'] || pin['repositoryURL']
         url = "https://api.github.com/repos/#{location.gsub('git@github.com:', '').gsub('https://github.com/', '').gsub('.git', '')}"
 

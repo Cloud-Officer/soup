@@ -13,6 +13,7 @@ module SOUP
 
         next if pip_package.strip.empty?
 
+        puts("Checking #{pip_package} #{version&.strip}...")
         response = HTTParty.get("https://pypi.python.org/pypi/#{pip_package}/json")
 
         raise(response.message) unless response.code == 200
