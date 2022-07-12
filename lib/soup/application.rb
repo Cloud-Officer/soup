@@ -46,7 +46,7 @@ module SOUP
 
       PACKAGE_MANAGERS.each do |package_file|
         Dir.glob("#{Dir.pwd}/**/#{package_file}") do |file|
-          next if file.start_with?('vendor/')
+          next if file.include?('/vendor/')
 
           puts("Reading file #{file}...")
 
