@@ -46,6 +46,10 @@ module SOUP
 
       PACKAGE_MANAGERS.each do |package_file|
         Dir.glob("#{Dir.pwd}/**/#{package_file}") do |file|
+          next if file.start_with?('vendor/')
+
+          puts("Reading file #{file}...")
+
           case File.basename(file)
           when 'composer.lock'
             next if @options.skip_composer
@@ -79,8 +83,6 @@ module SOUP
           end
         end
       end
-
-      @detected_packages = @detected_packages.sort.to_h
     end
 
     def read_cached_packages
