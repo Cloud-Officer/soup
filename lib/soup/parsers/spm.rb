@@ -14,7 +14,7 @@ module SOUP
         if File.exist?(file.gsub('resolved', 'swift'))
           File.read(file.gsub('resolved', 'swift'))
         else
-          File.read("#{file.split('.').first}.xcodeproj/project.pbxproj")
+          File.read("#{file.split('Tuist').first}Tuist/Dependencies.swift")
         end
 
       headers =
@@ -27,7 +27,7 @@ module SOUP
         end
 
       lock_file['pins'].each do |pin|
-        puts("Checking #{pin['identity']} #{pin['state']['version']}...")
+        puts("Checking #{pin['identity'] || pin['package']} #{pin['state']['version']}...")
         location = pin['location'] || pin['repositoryURL']
         url = "https://api.github.com/repos/#{location.gsub('git@github.com:', '').gsub('https://github.com/', '').gsub('.git', '')}"
 
