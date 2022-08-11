@@ -13,9 +13,15 @@ module SOUP
       main_file =
         if File.exist?(file.gsub('resolved', 'swift'))
           File.read(file.gsub('resolved', 'swift'))
-        else
+        elsif File.exist?("#{file.split('Tuist').first}Tuist/Dependencies.swift")
           File.read("#{file.split('Tuist').first}Tuist/Dependencies.swift")
+        elsif File.exist?("#{file.split('.').first}.xcodeproj/project.pbxproj")
+          File.read("#{file.split('.').first}.xcodeproj/project.pbxproj")
+        else
+          nil
         end
+
+      raise('No main file found!') if main_file.nil?
 
       headers =
         if ENV.fetch('GITHUB_TOKEN', '').empty?
