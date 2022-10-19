@@ -9,6 +9,8 @@ module SOUP
   class PIPParser
     def parse(file, packages)
       File.open(file, 'r').each_line do |line|
+        next if line.include?('#')
+
         pip_package, version = line.split(/==/)
 
         next if pip_package.strip.empty?

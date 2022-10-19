@@ -17,8 +17,6 @@ module SOUP
           File.read("#{file.split('Tuist').first}Tuist/Dependencies.swift")
         elsif File.exist?("#{file.split('.').first}.xcodeproj/project.pbxproj")
           File.read("#{file.split('.').first}.xcodeproj/project.pbxproj")
-        else
-          nil
         end
 
       raise('No main file found!') if main_file.nil?
