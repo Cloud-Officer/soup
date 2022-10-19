@@ -25,7 +25,12 @@ module SOUP
         package.file = file
         package.language = 'Python'
         package.version = version&.strip
-        package.license = package_details['info']['license']&.strip
+        package.license =
+          if pip_package == 'python-dateutil'
+            'Apache'
+          else
+            package_details['info']['license']&.strip
+          end
         package.description = package_details['info']['summary']&.split(/\n|\. /)&.first&.gsub(%r{((?:f|ht)tps?:/\S+)}, '<\1>')
         package.website = package_details['info']['home_page']&.strip
         package.dependency = false
