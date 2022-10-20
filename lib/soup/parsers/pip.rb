@@ -30,7 +30,7 @@ module SOUP
         package.dependency = false
 
         package_details['info']['classifiers'].each do |classifier|
-          package.license = "#{package.license} #{classifier.split('::').last}".strip if classifier.include?('License')
+          package.license = "#{package.license} #{classifier.split('::').last}".strip if classifier.include?('License') and classifier.split('::').length > 2
         end
 
         package.license = package_details['info']['license']&.strip if package.license.nil? or package.license.empty?
