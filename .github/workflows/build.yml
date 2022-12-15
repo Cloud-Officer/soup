@@ -124,4 +124,4 @@ jobs:
     - name: RSpec
       shell: bash
       if: "${{needs.variables.outputs.SKIP_TESTS != '1'}}"
-      run: "./soup.rb --soup"
+      run: "./bin/soup.rb --soup"
