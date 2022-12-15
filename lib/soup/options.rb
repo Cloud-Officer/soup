@@ -10,7 +10,7 @@ module SOUP
       @argv = argv
       @parser = OptionParser.new
       @cache_file = '.soup.json'
-      @licenses_check = true
+      @licenses_check = false
       @licenses_file = "#{__dir__}/../../conf/licenses.json"
       @markdown_file = './docs/soup.md'
       @no_prompt = false
@@ -19,7 +19,7 @@ module SOUP
       @skip_composer = false
       @skip_pip = false
       @skip_spm = false
-      @soup_check = true
+      @soup_check = false
 
       setup_parser
     end
@@ -28,6 +28,12 @@ module SOUP
 
     def parse
       @parser.parse!(@argv)
+
+      if !@licenses_check and !@soup_check
+        @licenses_check = true
+        @soup_check = true
+      end
+
       self
     end
 
