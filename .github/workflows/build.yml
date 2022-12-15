@@ -18,7 +18,7 @@ env:
 jobs:
   variables:
     name: Prepare Variables
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     outputs:
       BUILD_NAME: "${{steps.variables.outputs.BUILD_NAME}}"
       BUILD_VERSION: "${{steps.variables.outputs.BUILD_VERSION}}"
@@ -41,10 +41,10 @@ jobs:
         ssh-key: "${{secrets.SSH_KEY}}"
   actionlint:
     name: Github Actions Linter
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs:
     - variables
-    if: "${{(github.event_name == 'pull_request') || (github.event_name == 'pull_request_target')}}"
+    if: "${{github.event_name == 'pull_request' || github.event_name == 'pull_request_target'}}"
     steps:
     - name: Actionlint
       id: actionlint
@@ -55,10 +55,10 @@ jobs:
         github_token: "${{secrets.GITHUB_TOKEN}}"
   markdownlint:
     name: Markdown Linter
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs:
     - variables
-    if: "${{(github.event_name == 'pull_request') || (github.event_name == 'pull_request_target')}}"
+    if: "${{github.event_name == 'pull_request' || github.event_name == 'pull_request_target'}}"
     steps:
     - name: Markdownlint
       id: markdownlint
@@ -69,10 +69,10 @@ jobs:
         github_token: "${{secrets.GITHUB_TOKEN}}"
   rubocop:
     name: Ruby Linter
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs:
     - variables
-    if: "${{(github.event_name == 'pull_request') || (github.event_name == 'pull_request_target')}}"
+    if: "${{github.event_name == 'pull_request' || github.event_name == 'pull_request_target'}}"
     steps:
     - name: Rubocop
       id: rubocop
@@ -83,10 +83,10 @@ jobs:
         github_token: "${{secrets.GITHUB_TOKEN}}"
   yamllint:
     name: YAML Linter
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs:
     - variables
-    if: "${{(github.event_name == 'pull_request') || (github.event_name == 'pull_request_target')}}"
+    if: "${{github.event_name == 'pull_request' || github.event_name == 'pull_request_target'}}"
     steps:
     - name: Yamllint
       id: yamllint
@@ -100,11 +100,7 @@ jobs:
     runs-on: "${{ matrix.os }}"
     needs:
     - variables
-    - actionlint
-    - markdownlint
-    - rubocop
-    - yamllint
-    if: "${{always() && ((needs.variables.outputs.SKIP_LICENSES != '1') || (needs.variables.outputs.SKIP_TESTS != '1')) && needs.actionlint.result != 'failure' && needs.markdownlint.result != 'failure' && needs.rubocop.result != 'failure' && needs.yamllint.result != 'failure'}}"
+    if: "${{needs.variables.outputs.SKIP_LICENSES != '1' || needs.variables.outputs.SKIP_TESTS != '1'}}"
     strategy:
       matrix:
         os:
@@ -112,19 +108,20 @@ jobs:
         - ubuntu-latest
     steps:
     - name: Setup
+      id: setup
       uses: cloud-officer/ci-actions/setup@master
-      if: "${{(needs.variables.outputs.SKIP_LICENSES != '1') || (needs.variables.outputs.SKIP_TESTS != '1')}}"
+      if: "${{needs.variables.outputs.SKIP_LICENSES != '1' || needs.variables.outputs.SKIP_TESTS != '1'}}"
       with:
         ruby-version: "${{env.RUBY-VERSION}}"
         ruby-bundler-cache: "${{env.RUBY-BUNDLER-CACHE}}"
         xcode-version: "${{env.XCODE-VERSION}}"
     - name: Bundler
       shell: bash
-      if: "${{(needs.variables.outputs.SKIP_LICENSES != '1') || (needs.variables.outputs.SKIP_TESTS != '1')}}"
+      if: "${{needs.variables.outputs.SKIP_LICENSES != '1' || needs.variables.outputs.SKIP_TESTS != '1'}}"
       run: |
         bundle config unset deployment
         bundle install
     - name: RSpec
       shell: bash
-      if: "${{(needs.variables.outputs.SKIP_TESTS != '1')}}"
+      if: "${{needs.variables.outputs.SKIP_TESTS != '1'}}"
       run: "./soup.rb --soup"
