@@ -13,6 +13,8 @@ require_relative 'parsers/pip'
 require_relative 'parsers/spm'
 require_relative 'status'
 
+DEPENDENCY_TEXT = 'Dependency'
+
 module SOUP
   # Represents an instance of a soup application. This is the entry point for all invocations of soup from the command line.
   class Application
@@ -45,7 +47,7 @@ module SOUP
       parser = GenericParser.new
 
       PACKAGE_MANAGERS.each do |package_file|
-        Dir.glob("#{Dir.pwd}/**/#{package_file}") do |file|
+        Dir.glob("#{Dir.pwd}/**/#{package_file}").each do |file|
           next if file.include?('/vendor/')
 
           puts("Reading file #{file}...")
@@ -129,26 +131,38 @@ module SOUP
 
         if package.dependency
           package.risk_level = RISK_LEVELS[0]
-          package.requirements = 'Dependency'
-          package.verification_reasoning = 'Dependency'
+          package.requirements = DEPENDENCY_TEXT
+          package.verification_reasoning = DEPENDENCY_TEXT
         end
 
         if package.risk_level.empty?
-          raise("No risk level found for #{package.package}!") if @options.no_prompt
+          if @options.auto_reply
+            package.risk_level = RISK_LEVELS[0]
+          else
+            raise("No risk level found for #{package.package}!") if @options.no_prompt
 
-          package.risk_level = RISK_LEVELS[Ask.list("Enter risk level for package #{package.package}", RISK_LEVELS_SCREEN)]
+            package.risk_level = RISK_LEVELS[Ask.list("Enter risk level for package #{package.package}", RISK_LEVELS_SCREEN)]
+          end
         end
 
         if package.requirements.empty?
-          raise("No requirements found for #{package.package}!") if @options.no_prompt
+          if @options.auto_reply
+            package.requirements = DEPENDENCY_TEXT
+          else
+            raise("No requirements found for #{package.package}!") if @options.no_prompt
 
-          package.requirements = Ask.input("Enter requirements for package #{package.package}")
+            package.requirements = Ask.input("Enter requirements for package #{package.package}")
+          end
         end
 
         if package.verification_reasoning.empty?
-          raise("No verification reasoning found for #{package.package}!") if @options.no_prompt
+          if @options.auto_reply
+            package.verification_reasoning = DEPENDENCY_TEXT
+          else
+            raise("No verification reasoning found for #{package.package}!") if @options.no_prompt
 
-          package.verification_reasoning = Ask.input("Enter verification reasoning for package #{package.package}")
+            package.verification_reasoning = Ask.input("Enter verification reasoning for package #{package.package}")
+          end
         end
 
         raise("Missing information for #{package.package}!") if package.risk_level.empty? or package.requirements.empty? or package.verification_reasoning.empty?

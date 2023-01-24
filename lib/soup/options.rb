@@ -20,11 +20,12 @@ module SOUP
       @skip_pip = false
       @skip_spm = false
       @soup_check = false
+      @auto_reply = false
 
       setup_parser
     end
 
-    attr_reader :cache_file, :licenses_check, :licenses_file, :markdown_file, :no_prompt, :skip_bundler, :skip_cocoapods, :skip_composer, :skip_pip, :skip_spm, :soup_check
+    attr_reader :cache_file, :licenses_check, :licenses_file, :markdown_file, :no_prompt, :skip_bundler, :skip_cocoapods, :skip_composer, :skip_pip, :skip_spm, :soup_check, :auto_reply
 
     def parse
       @parser.parse!(@argv)
@@ -86,6 +87,10 @@ module SOUP
 
       @parser.on('', '--soup', 'Check for missing information and generate the soup.md file') do
         @soup_check = true
+      end
+
+      @parser.on('', '--auto_reply', 'Auto reply to questions prompt') do
+        @auto_reply = true
       end
 
       @parser.on_tail('-h', '--help', 'Show this message') do
