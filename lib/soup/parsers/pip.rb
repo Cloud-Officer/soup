@@ -11,7 +11,7 @@ module SOUP
       File.open(file, 'r').each_line do |line|
         next if line.include?('#')
 
-        pip_package, version = line.split(/==/)[0].strip
+        pip_package, version = line.strip.split(/==/)
 
         next if pip_package.strip.empty?
 
