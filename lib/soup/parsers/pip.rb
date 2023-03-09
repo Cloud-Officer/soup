@@ -9,13 +9,15 @@ module SOUP
   class PIPParser
     def parse(file, packages)
       File.open(file, 'r').each_line do |line|
+        next if line.empty?
+
         next if line.include?('#')
 
         pip_package, version = line.strip.split(/==/)
 
         next if pip_package.strip.empty?
 
-        puts("Checking #{pip_package} #{version&.strip}...")
+        puts("Checking #{pip_package} #{version}...")
         response = HTTParty.get("https://pypi.python.org/pypi/#{pip_package}/json")
 
         raise(response.message) unless response.code == 200
@@ -24,7 +26,7 @@ module SOUP
         package = Package.new(pip_package)
         package.file = file
         package.language = 'Python'
-        package.version = version&.strip
+        package.version = version
         package.description = package_details['info']['summary']&.split(/\n|\. /)&.first&.gsub(%r{((?:f|ht)tps?:/\S+)}, '<\1>')
         package.website = package_details['info']['home_page']&.strip
         package.dependency = false
