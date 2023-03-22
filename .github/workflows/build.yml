@@ -13,8 +13,8 @@ name: Build
     - created
 env:
   RUBY-BUNDLER-CACHE: 'false'
-  RUBY-VERSION: '3.2'
-  XCODE-VERSION: '14.1'
+  RUBY-VERSION: 3.2.1
+  XCODE-VERSION: 14.2
 jobs:
   variables:
     name: Prepare Variables
