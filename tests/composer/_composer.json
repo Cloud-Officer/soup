@@ -1,0 +1,407 @@
+{
+    "name": "ugroupmedia/pnp-api",
+    "license": "MIT",
+    "type": "proprietary",
+    "description": "PNP_API Project",
+    "autoload": {
+        "psr-4": {
+            "App\\": [
+                "src",
+                "app/api/src",
+                "app/grpc/src"
+            ],
+            "Omnipay\\PaypalOrder\\": "src.bundles/omnipay-paypal/src",
+            "Omnipay\\StripeOrder\\": "src.bundles/omnipay-stripe/src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": { "Tests\\": "tests/" }
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/supersmile2009/swizzle.git"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/ugroupmedia/pnp-php-sdk.git"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/ugroupmedia/swoole-bundle.git"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/ugroupmedia/ugm-php-swoole-grpc-bundle.git"
+        }
+    ],
+    "require": {
+        "php": ">=8.1",
+        "ext-amqp": "*",
+        "ext-apcu": "*",
+        "ext-bcmath": "*",
+        "ext-curl": "*",
+        "ext-dom": "*",
+        "ext-gd": "*",
+        "ext-imap": "*",
+        "ext-intl": "*",
+        "ext-mbstring": "*",
+        "ext-mysqli": "*",
+        "ext-openssl": "*",
+        "ext-openswoole": "*",
+        "ext-pcntl": "*",
+        "ext-pdo": "*",
+        "ext-redis": "*",
+        "ext-zend-opcache": "*",
+        "ext-zip": "*",
+        "a2lix/translation-form-bundle": "^3.2",
+        "aporat/store-receipt-validator": "^4.2",
+        "aws/aws-sdk-php": "^3.235",
+        "aws/aws-sdk-php-symfony": "^2.5",
+        "caseyamcl/guzzle_retry_middleware": "^2.7",
+        "cocur/slugify": "^4.2",
+        "constup/aws-secrets-bundle": "^1",
+        "cweagans/composer-patches": "^1.7",
+        "dasprid/enum": "^1.0",
+        "dms/dms-filter-bundle": "^v5.1.0",
+        "doctrine/collections": "^1.8",
+        "doctrine/data-fixtures": "^1.5",
+        "doctrine/doctrine-bundle": "^2.7",
+        "doctrine/doctrine-migrations-bundle": "^3.2",
+        "doctrine/orm": "^2.12",
+        "doctrine/sql-formatter": "^1.1",
+        "dragonmantank/cron-expression": "^3.3",
+        "draw/aws-tool-kit": "^0.9.22",
+        "draw/doctrine-extra": "^0.9.22",
+        "draw/framework-extra-bundle": "^0.9.22",
+        "draw/log": "^0.9.24",
+        "draw/messenger": "^0.9.22",
+        "draw/process": "^0.9.22",
+        "draw/security": "^0.9.26",
+        "draw/sonata-integration-bundle": "^0.9.22",
+        "draw/workflow": "^0.9.26",
+        "ekino/newrelic-bundle": "^2.4",
+        "endroid/qr-code-bundle": "^4.1",
+        "enqueue/amqp-ext": "^0.10.9",
+        "enqueue/enqueue-bundle": "^0.10.16",
+        "enqueue/job-queue": "dev-master#bd5348db19a11417b7cea4030dbcbfda0a09f4cf",
+        "facebook/php-business-sdk": "^14.0",
+        "friendsofsymfony/ckeditor-bundle": "^2.4",
+        "friendsofsymfony/http-cache-bundle": "^2.13",
+        "friendsofsymfony/rest-bundle": "^3.3",
+        "gedmo/doctrine-extensions": "^3.8",
+        "geoip2/geoip2": "^2.13",
+        "google/common-protos": "^1.4",
+        "grpc/grpc": "^1.42",
+        "guzzlehttp/guzzle": "^7.5",
+        "guzzlehttp/psr7": "^2.4",
+        "handcraftedinthealps/rest-routing-bundle": "^1.0",
+        "imagine/imagine": "^1.3",
+        "jms/serializer": "^3.18",
+        "jms/serializer-bundle": "^5.2",
+        "k911/swoole-bundle": "dev-openswoole",
+        "knplabs/doctrine-behaviors": "^2.5",
+        "knplabs/gaufrette": "^0.10",
+        "knplabs/knp-gaufrette-bundle": "^0.7",
+        "laupifrpar/pusher-bundle": "^6.1",
+        "league/csv": "^9.8",
+        "liip/imagine-bundle": "^2.8",
+        "mhujer/jms-serializer-uuid": "^3.3",
+        "moneyphp/money": "^3.1",
+        "namshi/jose": "^7.2",
+        "omnipay/manual": "^3.0",
+        "omnipay/paypal": "^3.0",
+        "omnipay/stripe": "^3.2",
+        "paypal/paypal-checkout-sdk": "^1.0.1",
+        "php-http/cache-plugin": "^1.7",
+        "php-http/client-common": "^2.5",
+        "php-http/guzzle7-adapter": "^1.0",
+        "php-http/httplug": "^2.3",
+        "php-http/httplug-bundle": "^1.26",
+        "phpdocumentor/reflection-docblock": "^5.3",
+        "phpoffice/phpspreadsheet": "^1.23",
+        "ramsey/uuid-doctrine": "^2.0",
+        "scienta/doctrine-json-functions": "^5.1",
+        "secit-pl/imap-bundle": "^2.0",
+        "sendgrid/sendgrid": "^8.0",
+        "sensio/framework-extra-bundle": "^6.2",
+        "snc/redis-bundle": "^4.3",
+        "sonata-project/admin-bundle": "^4.18",
+        "sonata-project/block-bundle": "^4.17",
+        "sonata-project/doctrine-orm-admin-bundle": "^4.7",
+        "sonata-project/media-bundle": "^4.5",
+        "sonata-project/user-bundle": "^5.3",
+        "stocker4all/luhn-mod-n": "^0.1.0",
+        "stof/doctrine-extensions-bundle": "^1.7",
+        "stripe/stripe-php": "^9.7",
+        "symfony/asset": "^5.4",
+        "symfony/browser-kit": "^5.4",
+        "symfony/cache": "^5.4",
+        "symfony/console": "^5.4",
+        "symfony/debug-bundle": "^5.4",
+        "symfony/dependency-injection": "^5.4",
+        "symfony/doctrine-bridge": "^5.4",
+        "symfony/dotenv": "^5.4",
+        "symfony/error-handler": "^5.4",
+        "symfony/event-dispatcher": "^5.4",
+        "symfony/expression-language": "^5.4",
+        "symfony/flex": "^1.19",
+        "symfony/form": "^5.4",
+        "symfony/framework-bundle": "^5.4",
+        "symfony/http-foundation": "^5.4",
+        "symfony/http-kernel": "^5.4",
+        "symfony/intl": "^5.4",
+        "symfony/lock": "^5.4",
+        "symfony/mailer": "^5.4",
+        "symfony/monolog-bridge": "^5.4",
+        "symfony/monolog-bundle": "^3.8",
+        "symfony/options-resolver": "^5.4",
+        "symfony/process": "^5.4",
+        "symfony/property-access": "^5.4",
+        "symfony/property-info": "^5.4",
+        "symfony/proxy-manager-bridge": "^5.4",
+        "symfony/routing": "^5.4",
+        "symfony/security-bundle": "^5.4",
+        "symfony/sendgrid-mailer": "^5.4",
+        "symfony/serializer": "^5.4",
+        "symfony/stopwatch": "^5.4",
+        "symfony/translation": "^5.4",
+        "symfony/twig-bridge": "^5.4",
+        "symfony/twig-bundle": "^5.4",
+        "symfony/validator": "^5.4",
+        "symfony/web-profiler-bundle": "^5.4",
+        "symfony/workflow": "^5.4",
+        "symfony/yaml": "^5.4",
+        "toflar/psr6-symfony-http-cache-store": "^3.0",
+        "twig/twig": "^3.3",
+        "twilio/sdk": "^6.41",
+        "ugroupmedia/pnp-php-sdk": "^1.11.13",
+        "ugroupmedia/swoole-grpc-bundle": "^2.0",
+        "upscale/swoole-reflection": "^1.4",
+        "webonaute/doctrine-datalocking-bundle": "^2.0",
+        "webonaute/doctrine-mysql-extra": "^1.2",
+        "yokai/sonata-workflow": "^0.7.0"
+    },
+    "conflict": {
+        "sonata-project/doctrine-orm-admin-bundle": "4.8.0",
+        "symfony/symfony": "*"
+    },
+    "replace": {
+        "guzzle/guzzle": "*",
+        "egeloen/ckeditor-bundle": "*",
+        "paragonie/random_compat": "*",
+        "symfony/polyfill-intl-icu": "1.99",
+        "symfony/polyfill-intl-idn": "1.99",
+        "symfony/polyfill-mbstring": "1.99",
+        "symfony/polyfill-php54": "1.99",
+        "symfony/polyfill-php55": "1.99",
+        "symfony/polyfill-php56": "1.99",
+        "symfony/polyfill-php70": "1.99",
+        "symfony/polyfill-php71": "1.99",
+        "symfony/polyfill-php72": "1.99",
+        "symfony/polyfill-php73": "1.99",
+        "symfony/polyfill-php80": "1.99",
+        "symfony/polyfill-php81": "1.99",
+        "symfony/polyfill-iconv": "1.99",
+        "symfony/polyfill-ctype": "1.99",
+        "behat/transliterator": "*",
+        "ezyang/htmlpurifier": "*"
+    },
+    "require-dev": {
+        "ext-simplexml": "*",
+        "bamarni/composer-bin-plugin": "^1.8",
+        "dms/phpunit-arraysubset-asserts": "^0.4.0",
+        "doctrine/doctrine-fixtures-bundle": "^3.4",
+        "draw/tester-bundle": "^0.9.13",
+        "friendsofphp/php-cs-fixer": "^3.11.0",
+        "johnkary/phpunit-speedtrap": "^4.0",
+        "khanamiryan/qrcode-detector-decoder": "^2.0",
+        "phpspec/prophecy-phpunit": "^2.0",
+        "phpunit/phpunit": "^9.5",
+        "swoft/swoole-ide-helper": "^4.4",
+        "symfony/maker-bundle": "^1.41",
+        "symfony/phpunit-bridge": "^6.0"
+    },
+    "scripts": {
+        "post-install-cmd": [
+            "bin/api ckeditor:install --clear=drop",
+            "bin/api assets:install public"
+        ],
+        "test": [
+            "@test:reset",
+            "@test:run"
+        ],
+        "test:reset": [
+            "@test:database:setup",
+            "bin/api doctrine:fixtures:load --no-interaction --env=test",
+            "bin/api app:stripe:sync-products --env=test",
+            "bin/api enqueue:setup-broker --env=test",
+            "bin/api cache:clear --env=test",
+            "bin/api app:twig:cache --env=test",
+            "bin/grpc app:twig:cache --env=test"
+        ],
+        "test:run": [
+            "Composer\\Config::disableProcessTimeout",
+            "vendor/bin/phpunit -c phpunit.xml"
+        ],
+        "test:run:coverage": [
+            "Composer\\Config::disableProcessTimeout",
+            "vendor/bin/phpunit -c phpunit.xml --coverage-html ./build/logs/report"
+        ],
+        "test:database:setup": [
+            "Composer\\Config::disableProcessTimeout",
+            "bin/api doctrine:database:drop --if-exists --no-interaction --force --env=test",
+            "bin/api doctrine:database:create --no-interaction --env=test",
+            "mysql -h $DB_HOST -P $DB_PORT -u root pnp < ./sql-snippet/setup-dump.sql",
+            "bin/api messenger:setup-transports --no-interaction --env=test",
+            "bin/api doctrine:migrations:migrate --no-interaction --allow-no-migration --quiet --env=test"
+        ],
+        "test:database:setup-dump": [
+            "@test:database:setup",
+            "mysqldump -h $DB_HOST -P $DB_PORT -u root pnp > ./sql-snippet/setup-dump.sql"
+        ],
+        "linter": [
+            "@linter:php-cs-fixer",
+            "@linter:phpstan"
+        ],
+        "linter:php-cs-fixer": [
+            "Composer\\Config::disableProcessTimeout",
+            "vendor/bin/php-cs-fixer fix -v"
+        ],
+        "linter:phpstan": [
+            "vendor/bin/phpstan analyse"
+        ],
+        "phpstan:generate-baseline": [
+            "Composer\\Config::disableProcessTimeout",
+            "vendor/bin/phpstan analyse --generate-baseline"
+        ],
+        "migrations:migrate": [
+            "bin/api doctrine:migrations:migrate --env=test"
+        ],
+        "migrations:diff": [
+            "bin/api doctrine:migrations:diff --formatted --env=test"
+        ],
+        "beta:deploy:api": [
+            "Composer\\Config::disableProcessTimeout",
+            "deploy --environment beta --profile ugm --instance api"
+        ],
+        "beta:deploy:grpc": [
+            "Composer\\Config::disableProcessTimeout",
+            "deploy --environment beta --profile ugm --instance grpc"
+        ],
+        "beta:deploy:worker": [
+            "Composer\\Config::disableProcessTimeout",
+            "deploy --environment beta --profile ugm --instance worker"
+        ],
+        "rc:deploy:api": [
+            "Composer\\Config::disableProcessTimeout",
+            "deploy --environment rc --profile ugm --instance api"
+        ],
+        "rc:deploy:grpc": [
+            "Composer\\Config::disableProcessTimeout",
+            "deploy --environment rc --profile ugm --instance grpc"
+        ],
+        "rc:deploy:worker": [
+            "Composer\\Config::disableProcessTimeout",
+            "deploy --environment rc --profile ugm --instance worker"
+        ],
+        "prod:deploy:api": [
+            "Composer\\Config::disableProcessTimeout",
+            "deploy --environment prod --profile ugm --instance api"
+        ],
+        "prod:deploy:grpc": [
+            "Composer\\Config::disableProcessTimeout",
+            "deploy --environment prod --profile ugm --instance grpc"
+        ],
+        "prod:deploy:worker": [
+            "Composer\\Config::disableProcessTimeout",
+            "deploy --environment prod --profile ugm --instance worker"
+        ]
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "config": {
+        "discard-changes": true,
+        "sort-packages": true,
+        "preferred-install": {
+            "*": "source"
+        },
+        "platform": {
+            "ext-swoole": "4.4.17"
+        },
+        "allow-plugins": {
+            "cweagans/composer-patches": true,
+            "symfony/flex": true,
+            "endroid/installer": true,
+            "bamarni/composer-bin-plugin": true
+        }
+    },
+    "extra": {
+        "bamarni-bin": {
+            "forward-command": true,
+            "target-directory": "sbin"
+        },
+        "symfony": {
+            "allow-contrib": false,
+            "require": "^5.4"
+        },
+        "symfony-web-dir": "public",
+        "symfony-var-dir": "var",
+        "symfony-assets-install": "hard",
+        "branch-alias": {
+            "dev-master": "8.3-dev"
+        },
+        "enable-patching": true,
+        "patches": {
+            "a2lix/auto-form-bundle": {
+                "respect user config and fields order": "https://gist.githubusercontent.com/ArtemBrovko/55f8b795ea0658fce49deca3363898fd/raw/1d4b0fa8ed1a4e1f83e0b27c4cbf302fcb99fe8b/a2lix_auto-form-bundle.patch"
+            },
+            "doctrine/orm": {
+                "original entity data fix": "https://github.com/supersmile2009/doctrine2/commit/f3e5df454859489cd0dcde7987b6da9707f95a06.patch"
+            },
+            "enqueue/amqp-ext": {
+                "Support connection name parameter": "https://github.com/supersmile2009/amqp-ext/commit/08a1326a82dabc7ea4873afbff0dcb8a5b55a815.patch"
+            },
+            "enqueue/amqp-tools": {
+                "Support connection name parameter": "https://github.com/supersmile2009/amqp-tools/commit/0742ee44a5bb118dd656ffc070f686da081f0ffa.patch"
+            },
+            "enqueue/enqueue": {
+                "catch Throwable instead of Exception": "https://github.com/Webonaute/enqueue/commit/1f6194d21ba986bdd98015d09a031e83350325b6.patch",
+                "Improve driver selection": "https://github.com/supersmile2009/enqueue/commit/58de176daf6c990fa81cfee03f1f3a758e9dc364.patch",
+                "add debug log": "https://github.com/Webonaute/enqueue/commit/6790a8518d9883fddc708a9dd44918de8c387f53.patch",
+                "add more debug log": "https://github.com/Webonaute/enqueue/commit/06e5a7133992775702899ebfa3bb43c431e578a9.patch"
+            },
+            "enqueue/job-queue": {
+                "add delay before calculate job status": "https://github.com/Webonaute/job-queue/commit/bab00903c98e649b4e1be83f7dc3552baebb26a8.patch",
+                "fix json_array type for json": "patches/enqueue-job-queue-doctrine-mapping-job-orm-xml.patch"
+            },
+            "jms/serializer": {
+                "add mixed types": "https://github.com/supersmile2009/serializer/commit/b504f4c81117ecce73e9965e01da8586573d0cfe.patch"
+            },
+            "knplabs/doctrine-behaviors": {
+                "fix long unique index name": "patches/knplabs-doctrine-behaviors-src-event-subscriber-translatable-event-subscriber.patch"
+            },
+            "sonata-project/admin-bundle": {
+                "duplicate add in collection": "patches/sonata-project-admin-bundle-src-manipulator-objectmanipulator-php.patch",
+                "collection inline table header attributes": "https://github.com/supersmile2009/SonataAdminBundle/commit/d0dcb21e7aa82080e3dbb2b1e447aad295b38193.patch",
+                "add model link type and collection improvement": "https://gist.githubusercontent.com/ArtemBrovko/66d511b35b34e3a4936855a32f4ac8dd/raw/e9798f5f1aa4ebda525fb81ea37256a65923d7f3/model-link.patch",
+                "remove final from getClass": "https://github.com/supersmile2009/SonataAdminBundle/commit/c26d06e5f5d84735d5d93b799a5288c25352ed2f.patch"
+            },
+            "sonata-project/formatter-bundle": {
+                "fix for 5.x branch": "https://gist.githubusercontent.com/ArtemBrovko/0eeeb9ba255ea9b409a48a3fada2d4f5/raw/daf6b6bad44db83008351fe5a02d11553e8683f4/SonataFormatterBundle.patch"
+            },
+            "sonata-project/user-bundle": {
+                "remove final from UserManager": "https://github.com/Miloud-H/SonataUserBundle/commit/5807d1c635a90f979e1a044db424eb847f804ef1.patch"
+            },
+            "snc/redis-bundle": {
+                "remove strict type until phpredis extension >= 5.3.3": "https://github.com/Webonaute/SncRedisBundle/commit/fdc2947f77f9f283f452acc11625af7e554aa059.patch"
+            },
+            "spiral/roadrunner-grpc": {
+                "add MethodInterface" : "https://github.com/supersmile2009/roadrunner-grpc/commit/c9d1270eedee4a5b237f3ff5677a9cb2778e49b7.patch"
+            },
+            "symfony/twig-bridge": {
+                "fix missing button help block": "https://gist.githubusercontent.com/ArtemBrovko/f5452bada70b00d103986cff571bd0ed/raw/79feb446413c67935ee7da796a55b37419c9d8e5/POR-774.patch"
+            }
+        }
+    }
+}

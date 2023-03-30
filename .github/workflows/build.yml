@@ -124,4 +124,18 @@ jobs:
     - name: RSpec
       shell: bash
       if: "${{needs.variables.outputs.SKIP_TESTS != '1'}}"
-      run: "./bin/soup.rb --soup"
+      run: |
+        ./bin/soup.rb --soup
+        pushd tests/composer
+        mv _composer.json composer.json
+        mv _composer.lock composer.lock
+        ../../bin/soup.rb
+        popd
+        pushd tests/pip
+        mv _requirements.txt requirements.txt
+        ../../bin/soup.rb
+        popd
+
+        brew update
+        brew install markdownlint-cli
+        markdownlint . --ignore '{**/vendor/**,**/node_modules/**,**/Libraries/**}'
