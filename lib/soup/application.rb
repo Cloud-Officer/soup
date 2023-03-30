@@ -176,6 +176,7 @@ module SOUP
       return unless @options.soup_check
 
       File.write(@options.cache_file, JSON.pretty_generate(@detected_packages))
+      FileUtils.mkdir_p(File.dirname(@options.markdown_file))
       File.write(@options.markdown_file, @markdown)
     end
   end

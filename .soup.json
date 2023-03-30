@@ -2,7 +2,7 @@
   "CFPropertyList": {
     "language": "Ruby",
     "package": "CFPropertyList",
-    "version": "3.0.5",
+    "version": "3.0.6",
     "license": "MIT",
     "description": "This is a module to read, write and manipulate both binary and XML property lists as defined by apple.",
     "website": "https://github.com/ckruse/CFPropertyList",
@@ -14,7 +14,7 @@
   "activesupport": {
     "language": "Ruby",
     "package": "activesupport",
-    "version": "6.1.7",
+    "version": "7.0.4.3",
     "license": "MIT",
     "description": "A toolkit of support libraries and Ruby core extensions extracted from the Rails framework",
     "website": "https://rubyonrails.org",
@@ -86,7 +86,7 @@
   "cocoapods": {
     "language": "Ruby",
     "package": "cocoapods",
-    "version": "1.11.3",
+    "version": "1.12.0",
     "license": "MIT",
     "description": "CocoaPods manages library dependencies for your Xcode project.",
     "website": "https://github.com/CocoaPods/CocoaPods",
@@ -98,7 +98,7 @@
   "cocoapods-core": {
     "language": "Ruby",
     "package": "cocoapods-core",
-    "version": "1.11.3",
+    "version": "1.12.0",
     "license": "MIT",
     "description": "The CocoaPods-Core gem provides support to work with the models of CocoaPods.",
     "website": "https://github.com/CocoaPods/CocoaPods",
@@ -194,7 +194,7 @@
   "concurrent-ruby": {
     "language": "Ruby",
     "package": "concurrent-ruby",
-    "version": "1.1.10",
+    "version": "1.2.2",
     "license": "MIT",
     "description": "Modern concurrency tools including agents, futures, promises, thread pools, actors, supervisors, and more.",
     "website": "http://www.concurrent-ruby.com",
@@ -278,7 +278,7 @@
   "httparty": {
     "language": "Ruby",
     "package": "httparty",
-    "version": "0.20.0",
+    "version": "0.21.0",
     "license": "MIT",
     "description": "Makes http fun! Also, makes consuming restful web services dead easy.",
     "website": "https://github.com/jnunemaker/httparty",
@@ -335,26 +335,14 @@
     "requirements": "Used to read package manager and cache files.",
     "verification_reasoning": "Very popular on rubygems.org"
   },
-  "mime-types": {
+  "mini_mime": {
     "language": "Ruby",
-    "package": "mime-types",
-    "version": "3.4.1",
+    "package": "mini_mime",
+    "version": "1.1.2",
     "license": "MIT",
-    "description": "The mime-types library provides a library and registry for information about",
-    "website": "https://github.com/mime-types/ruby-mime-types/",
-    "last_verified_at": "2022-05-10",
-    "risk_level": "Low",
-    "requirements": "Dependency",
-    "verification_reasoning": "Dependency"
-  },
-  "mime-types-data": {
-    "language": "Ruby",
-    "package": "mime-types-data",
-    "version": "3.2022.0105",
-    "license": "MIT",
-    "description": "mime-types-data provides a registry for information about MIME media type",
-    "website": "https://github.com/mime-types/mime-types-data/",
-    "last_verified_at": "2022-05-10",
+    "description": "A lightweight mime type lookup toy",
+    "website": "https://github.com/discourse/mini_mime",
+    "last_verified_at": "2023-03-30",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -362,7 +350,7 @@
   "minitest": {
     "language": "Ruby",
     "package": "minitest",
-    "version": "5.16.3",
+    "version": "5.18.0",
     "license": "MIT",
     "description": "minitest provides a complete suite of testing facilities supporting",
     "website": "https://github.com/seattlerb/minitest",
@@ -434,7 +422,7 @@
   "optparse": {
     "language": "Ruby",
     "package": "optparse",
-    "version": "0.3.0",
+    "version": "0.3.1",
     "license": "Ruby",
     "description": "OptionParser is a class for command-line option analysis.",
     "website": "https://github.com/ruby/optparse",
@@ -458,7 +446,7 @@
   "parser": {
     "language": "Ruby",
     "package": "parser",
-    "version": "3.1.3.0",
+    "version": "3.2.1.1",
     "license": "MIT",
     "description": "A Ruby parser written in pure Ruby.",
     "website": "https://github.com/whitequark/parser",
@@ -494,7 +482,7 @@
   "regexp_parser": {
     "language": "Ruby",
     "package": "regexp_parser",
-    "version": "2.6.1",
+    "version": "2.7.0",
     "license": "MIT",
     "description": "A library for tokenizing, lexing, and parsing Ruby regular expressions.",
     "website": "https://github.com/ammar/regexp_parser",
@@ -518,7 +506,7 @@
   "rubocop": {
     "language": "Ruby",
     "package": "rubocop",
-    "version": "1.40.0",
+    "version": "1.48.1",
     "license": "MIT",
     "description": "    RuboCop is a Ruby code style checking and code formatting tool.",
     "website": "https://rubocop.org/",
@@ -530,7 +518,7 @@
   "rubocop-ast": {
     "language": "Ruby",
     "package": "rubocop-ast",
-    "version": "1.24.0",
+    "version": "1.27.0",
     "license": "MIT",
     "description": "    RuboCop's Node and NodePattern classes.",
     "website": "https://www.rubocop.org/",
@@ -554,7 +542,7 @@
   "ruby-progressbar": {
     "language": "Ruby",
     "package": "ruby-progressbar",
-    "version": "1.11.0",
+    "version": "1.13.0",
     "license": "MIT",
     "description": "Ruby/ProgressBar is an extremely flexible text progress bar library for Ruby",
     "website": "https://github.com/jfelchner/ruby-progressbar",
@@ -626,7 +614,7 @@
   "tzinfo": {
     "language": "Ruby",
     "package": "tzinfo",
-    "version": "2.0.5",
+    "version": "2.0.6",
     "license": "MIT",
     "description": "TZInfo provides access to time zone data and allows times to be converted using time zone rules.",
     "website": "https://tzinfo.github.io",
@@ -638,7 +626,7 @@
   "unicode-display_width": {
     "language": "Ruby",
     "package": "unicode-display_width",
-    "version": "2.3.0",
+    "version": "2.4.2",
     "license": "MIT",
     "description": "[Unicode 15.0.0] Determines the monospace display width of a string using EastAsianWidth.txt, Unicode general category, and other data.",
     "website": "https://github.com/janlelis/unicode-display_width",
@@ -654,18 +642,6 @@
     "license": "MIT",
     "description": "Xcodeproj lets you create and modify Xcode projects from Ruby",
     "website": "https://github.com/cocoapods/xcodeproj",
-    "last_verified_at": "2022-05-10",
-    "risk_level": "Low",
-    "requirements": "Dependency",
-    "verification_reasoning": "Dependency"
-  },
-  "zeitwerk": {
-    "language": "Ruby",
-    "package": "zeitwerk",
-    "version": "2.6.6",
-    "license": "MIT",
-    "description": "    Zeitwerk implements constant autoloading with Ruby semantics",
-    "website": "https://github.com/fxn/zeitwerk",
     "last_verified_at": "2022-05-10",
     "risk_level": "Low",
     "requirements": "Dependency",
