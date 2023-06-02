@@ -12,6 +12,7 @@ require_relative 'parsers/composer'
 require_relative 'parsers/generic'
 require_relative 'parsers/pip'
 require_relative 'parsers/spm'
+require_relative 'parsers/yarn'
 require_relative 'status'
 
 DEPENDENCY_TEXT = 'Dependency'
@@ -80,6 +81,11 @@ module SOUP
             next if @options.skip_pip
 
             parser.parse(PIPParser.new, file, @detected_packages)
+
+          when 'yarn.lock'
+            next if @options.skip_yarn
+
+            parser.parse(YarnParser.new, file, @detected_packages)
 
           else
             raise("Unknown file #{File.basename(file)}!")

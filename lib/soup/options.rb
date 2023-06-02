@@ -11,7 +11,7 @@ module SOUP
       @parser = OptionParser.new
       @cache_file = '.soup.json'
       @licenses_check = false
-      @licenses_file = "#{__dir__}/../../conf/licenses.json"
+      @licenses_file = "#{__dir__}/../../config/licenses.json"
       @markdown_file = './docs/soup.md'
       @no_prompt = false
       @skip_bundler = false
@@ -19,13 +19,14 @@ module SOUP
       @skip_composer = false
       @skip_pip = false
       @skip_spm = false
+      @skip_yarn = false
       @soup_check = false
       @auto_reply = false
 
       setup_parser
     end
 
-    attr_reader :cache_file, :licenses_check, :licenses_file, :markdown_file, :no_prompt, :skip_bundler, :skip_cocoapods, :skip_composer, :skip_pip, :skip_spm, :soup_check, :auto_reply
+    attr_reader :cache_file, :licenses_check, :licenses_file, :markdown_file, :no_prompt, :skip_bundler, :skip_cocoapods, :skip_composer, :skip_pip, :skip_yarn, :skip_spm, :soup_check, :auto_reply
 
     def parse
       @parser.parse!(@argv)
@@ -82,6 +83,10 @@ module SOUP
       end
 
       @parser.on('', '--skip_spm', 'Ignore Swift/SPM/Package.swift/Package.resolved even if detected') do
+        @skip_spm = true
+      end
+
+      @parser.on('', '--skip_yarn', 'Ignore JS/Yarn/package.json/yarn.lock even if detected') do
         @skip_spm = true
       end
 
