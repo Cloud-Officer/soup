@@ -14,7 +14,7 @@
   "activesupport": {
     "language": "Ruby",
     "package": "activesupport",
-    "version": "7.0.4.3",
+    "version": "7.0.5",
     "license": "MIT",
     "description": "A toolkit of support libraries and Ruby core extensions extracted from the Rails framework",
     "website": "https://rubyonrails.org",
@@ -26,7 +26,7 @@
   "addressable": {
     "language": "Ruby",
     "package": "addressable",
-    "version": "2.8.1",
+    "version": "2.8.4",
     "license": "Apache-2.0",
     "description": "Addressable is an alternative implementation to the URI implementation that is",
     "website": "https://github.com/sporkmonger/addressable",
@@ -86,7 +86,7 @@
   "cocoapods": {
     "language": "Ruby",
     "package": "cocoapods",
-    "version": "1.12.0",
+    "version": "1.12.1",
     "license": "MIT",
     "description": "CocoaPods manages library dependencies for your Xcode project.",
     "website": "https://github.com/CocoaPods/CocoaPods",
@@ -98,7 +98,7 @@
   "cocoapods-core": {
     "language": "Ruby",
     "package": "cocoapods-core",
-    "version": "1.12.0",
+    "version": "1.12.1",
     "license": "MIT",
     "description": "The CocoaPods-Core gem provides support to work with the models of CocoaPods.",
     "website": "https://github.com/CocoaPods/CocoaPods",
@@ -302,7 +302,7 @@
   "i18n": {
     "language": "Ruby",
     "package": "i18n",
-    "version": "1.12.0",
+    "version": "1.13.0",
     "license": "MIT",
     "description": "New wave Internationalization support for Ruby.",
     "website": "https://github.com/ruby-i18n/i18n",
@@ -434,7 +434,7 @@
   "parallel": {
     "language": "Ruby",
     "package": "parallel",
-    "version": "1.22.1",
+    "version": "1.23.0",
     "license": "MIT",
     "description": "Run any kind of code in parallel processes",
     "website": "https://github.com/grosser/parallel",
@@ -446,7 +446,7 @@
   "parser": {
     "language": "Ruby",
     "package": "parser",
-    "version": "3.2.1.1",
+    "version": "3.2.2.1",
     "license": "MIT",
     "description": "A Ruby parser written in pure Ruby.",
     "website": "https://github.com/whitequark/parser",
@@ -482,7 +482,7 @@
   "regexp_parser": {
     "language": "Ruby",
     "package": "regexp_parser",
-    "version": "2.7.0",
+    "version": "2.8.0",
     "license": "MIT",
     "description": "A library for tokenizing, lexing, and parsing Ruby regular expressions.",
     "website": "https://github.com/ammar/regexp_parser",
@@ -506,7 +506,7 @@
   "rubocop": {
     "language": "Ruby",
     "package": "rubocop",
-    "version": "1.48.1",
+    "version": "1.51.0",
     "license": "MIT",
     "description": "    RuboCop is a Ruby code style checking and code formatting tool.",
     "website": "https://rubocop.org/",
@@ -518,7 +518,7 @@
   "rubocop-ast": {
     "language": "Ruby",
     "package": "rubocop-ast",
-    "version": "1.27.0",
+    "version": "1.29.0",
     "license": "MIT",
     "description": "    RuboCop's Node and NodePattern classes.",
     "website": "https://www.rubocop.org/",
@@ -646,5 +646,17 @@
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
+  },
+  "yarn_lock_parser": {
+    "language": "Ruby",
+    "package": "yarn_lock_parser",
+    "version": "0.1.0",
+    "license": "MIT",
+    "description": "Parser for yarn.lock files.",
+    "website": "https://rubygems.org/yarn_lock_parser",
+    "last_verified_at": "2023-06-08",
+    "risk_level": "Low",
+    "requirements": "Read yarn lock file",
+    "verification_reasoning": "Popular gem"
   }
 }

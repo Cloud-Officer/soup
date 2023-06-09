@@ -13,7 +13,7 @@ name: Build
     - created
 env:
   RUBY-BUNDLER-CACHE: 'false'
-  RUBY-VERSION: 3.2.1
+  RUBY-VERSION: 3.2.2
   XCODE-VERSION: 14.2
 jobs:
   variables:
@@ -30,6 +30,7 @@ jobs:
       DEPLOY_MACOS: "${{steps.variables.outputs.DEPLOY_MACOS}}"
       DEPLOY_TVOS: "${{steps.variables.outputs.DEPLOY_TVOS}}"
       SKIP_LICENSES: "${{steps.variables.outputs.SKIP_LICENSES}}"
+      SKIP_LINTERS: "${{steps.variables.outputs.SKIP_LINTERS}}"
       SKIP_TESTS: "${{steps.variables.outputs.SKIP_TESTS}}"
       UPDATE_PACKAGES: "${{steps.variables.outputs.UPDATE_PACKAGES}}"
       LINTERS: "${{steps.variables.outputs.LINTERS}}"
@@ -44,7 +45,7 @@ jobs:
     runs-on: ubuntu-22.04
     needs:
     - variables
-    if: "${{github.event_name == 'pull_request' || github.event_name == 'pull_request_target'}}"
+    if: "${{needs.variables.outputs.SKIP_LINTERS != '1' && (github.event_name == 'pull_request' || github.event_name == 'pull_request_target')}}"
     steps:
     - name: Actionlint
       id: actionlint
@@ -58,7 +59,7 @@ jobs:
     runs-on: ubuntu-22.04
     needs:
     - variables
-    if: "${{github.event_name == 'pull_request' || github.event_name == 'pull_request_target'}}"
+    if: "${{needs.variables.outputs.SKIP_LINTERS != '1' && (github.event_name == 'pull_request' || github.event_name == 'pull_request_target')}}"
     steps:
     - name: Markdownlint
       id: markdownlint
@@ -72,7 +73,7 @@ jobs:
     runs-on: ubuntu-22.04
     needs:
     - variables
-    if: "${{github.event_name == 'pull_request' || github.event_name == 'pull_request_target'}}"
+    if: "${{needs.variables.outputs.SKIP_LINTERS != '1' && (github.event_name == 'pull_request' || github.event_name == 'pull_request_target')}}"
     steps:
     - name: Rubocop
       id: rubocop
@@ -86,7 +87,7 @@ jobs:
     runs-on: ubuntu-22.04
     needs:
     - variables
-    if: "${{github.event_name == 'pull_request' || github.event_name == 'pull_request_target'}}"
+    if: "${{needs.variables.outputs.SKIP_LINTERS != '1' && (github.event_name == 'pull_request' || github.event_name == 'pull_request_target')}}"
     steps:
     - name: Yamllint
       id: yamllint
@@ -100,7 +101,7 @@ jobs:
     runs-on: "${{ matrix.os }}"
     needs:
     - variables
-    if: "${{needs.variables.outputs.SKIP_LICENSES != '1' || needs.variables.outputs.SKIP_TESTS != '1'}}"
+    if: "${{needs.variables.outputs.SKIP_TESTS != '1'}}"
     strategy:
       matrix:
         os:
@@ -126,14 +127,13 @@ jobs:
       if: "${{needs.variables.outputs.SKIP_TESTS != '1'}}"
       run: |
         ./bin/soup.rb --soup
-        pushd tests/composer
+        pushd tests
         mv _composer.json composer.json
         mv _composer.lock composer.lock
-        ../../bin/soup.rb
-        popd
-        pushd tests/pip
+        mv _package.json package.json
         mv _requirements.txt requirements.txt
-        ../../bin/soup.rb
+        mv _yarn.lock yarn.lock
+        ../bin/soup.rb
         popd
 
         if [ "${RUNNER_OS}" == "Linux" ]; then
