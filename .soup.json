@@ -302,7 +302,7 @@
   "i18n": {
     "language": "Ruby",
     "package": "i18n",
-    "version": "1.13.0",
+    "version": "1.14.1",
     "license": "MIT",
     "description": "New wave Internationalization support for Ruby.",
     "website": "https://github.com/ruby-i18n/i18n",
@@ -446,7 +446,7 @@
   "parser": {
     "language": "Ruby",
     "package": "parser",
-    "version": "3.2.2.1",
+    "version": "3.2.2.3",
     "license": "MIT",
     "description": "A Ruby parser written in pure Ruby.",
     "website": "https://github.com/whitequark/parser",
@@ -463,6 +463,18 @@
     "description": "PublicSuffix can parse and decompose a domain name into top level domain, domain and subdomains.",
     "website": "https://simonecarletti.com/code/publicsuffix-ruby",
     "last_verified_at": "2022-05-10",
+    "risk_level": "Low",
+    "requirements": "Dependency",
+    "verification_reasoning": "Dependency"
+  },
+  "racc": {
+    "language": "Ruby",
+    "package": "racc",
+    "version": "1.7.0",
+    "license": "Ruby",
+    "description": "Racc is a LALR(1) parser generator.",
+    "website": "https://github.com/ruby/racc",
+    "last_verified_at": "2023-06-09",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -506,7 +518,7 @@
   "rubocop": {
     "language": "Ruby",
     "package": "rubocop",
-    "version": "1.51.0",
+    "version": "1.52.0",
     "license": "MIT",
     "description": "    RuboCop is a Ruby code style checking and code formatting tool.",
     "website": "https://rubocop.org/",
