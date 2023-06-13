@@ -494,7 +494,7 @@
   "regexp_parser": {
     "language": "Ruby",
     "package": "regexp_parser",
-    "version": "2.8.0",
+    "version": "2.8.1",
     "license": "MIT",
     "description": "A library for tokenizing, lexing, and parsing Ruby regular expressions.",
     "website": "https://github.com/ammar/regexp_parser",
@@ -518,7 +518,7 @@
   "rubocop": {
     "language": "Ruby",
     "package": "rubocop",
-    "version": "1.52.0",
+    "version": "1.52.1",
     "license": "MIT",
     "description": "    RuboCop is a Ruby code style checking and code formatting tool.",
     "website": "https://rubocop.org/",
