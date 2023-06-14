@@ -16,9 +16,7 @@ module SOUP
         line = line.slice(0, line.index(';')) if line.include?(';')
         pip_package, version = line.strip.split(/==/)
 
-        next if pip_package.strip.empty?
-
-        next if version.strip.empty?
+        next if pip_package&.strip&.empty?
 
         puts("Checking #{pip_package} #{version}...")
         response = HTTParty.get("https://pypi.python.org/pypi/#{pip_package}/json")
