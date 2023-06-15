@@ -8,12 +8,14 @@ module SOUP
   class Options
     def initialize(argv = [])
       @argv = argv
-      @parser = OptionParser.new
+      @auto_reply = false
       @cache_file = '.soup.json'
+      @ignored_folders = []
       @licenses_check = false
       @licenses_file = "#{__dir__}/../../config/licenses.json"
       @markdown_file = './docs/soup.md'
       @no_prompt = false
+      @parser = OptionParser.new
       @skip_bundler = false
       @skip_cocoapods = false
       @skip_composer = false
@@ -21,12 +23,11 @@ module SOUP
       @skip_spm = false
       @skip_yarn = false
       @soup_check = false
-      @auto_reply = false
 
       setup_parser
     end
 
-    attr_reader :cache_file, :licenses_check, :licenses_file, :markdown_file, :no_prompt, :skip_bundler, :skip_cocoapods, :skip_composer, :skip_pip, :skip_yarn, :skip_spm, :soup_check, :auto_reply
+    attr_reader :auto_reply, :ignored_folders, :licenses_check, :licenses_file, :markdown_file, :no_prompt, :skip_bundler, :skip_cocoapods, :skip_composer, :skip_pip, :skip_spm, :skip_yarn, :soup_check, :cache_file
 
     def parse
       @parser.parse!(@argv)
@@ -46,19 +47,23 @@ module SOUP
       @parser.separator('')
       @parser.separator('options')
 
-      @parser.on('', '--cache_file', 'Path to cached file') do |file|
+      @parser.on('', '--cache_file file', 'Path to cached file') do |file|
         @cache_file = file
+      end
+
+      @parser.on('', '--ignored_folders ignored_folders', 'Comma separated list of folders to ignore') do |folders|
+        @ignored_folders = folders.split(',')
       end
 
       @parser.on('', '--licenses', 'Check for open source licenses compliance') do
         @licenses_check = true
       end
 
-      @parser.on('', '--licenses_file', 'Path to authorized licenses file') do |file|
+      @parser.on('', '--licenses_file file', 'Path to authorized licenses file') do |file|
         @licenses_file = file
       end
 
-      @parser.on('', '--markdown_file', 'Path to generated markdown file') do |file|
+      @parser.on('', '--markdown_file file', 'Path to generated markdown file') do |file|
         @markdown_file = file
       end
 

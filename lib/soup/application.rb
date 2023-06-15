@@ -52,6 +52,11 @@ module SOUP
         Dir.glob("#{Dir.pwd}/**/#{package_file}").each do |file|
           next if file.include?('/vendor/')
 
+          if @options.ignored_folders.any? { |folder| File.fnmatch?(File.join(File.expand_path(folder), '**'), file) }
+            puts("Skipping file #{file} because it is in an ignored folder.")
+            next
+          end
+
           puts("Reading file #{file}...")
 
           case File.basename(file)
