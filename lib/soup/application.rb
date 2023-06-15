@@ -129,7 +129,7 @@ module SOUP
             end
           end
 
-          found = true if exceptions.include?(package.name)
+          found = true if exceptions.include?(package.package)
 
           unless found
             puts("Invalid license #{package.license} found in #{package.file} in package #{package.package}!")
