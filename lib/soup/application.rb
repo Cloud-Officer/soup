@@ -116,6 +116,7 @@ module SOUP
 
     def check_packages
       licenses = JSON.parse(File.read(@options.licenses_file)).map!(&:downcase)
+      exceptions = JSON.parse(File.read(@options.exceptions_file))
 
       @detected_packages.each do |name, package|
         if @options.licenses_check && !package.license.nil? && !package.license.empty?
@@ -127,6 +128,8 @@ module SOUP
               break
             end
           end
+
+          found = true if exceptions.include?(package.name)
 
           unless found
             puts("Invalid license #{package.license} found in #{package.file} in package #{package.package}!")
