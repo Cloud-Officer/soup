@@ -10,6 +10,7 @@ module SOUP
       @argv = argv
       @auto_reply = false
       @cache_file = '.soup.json'
+      @exceptions_file = "#{__dir__}/../../config/exceptions.json"
       @ignored_folders = []
       @licenses_check = false
       @licenses_file = "#{__dir__}/../../config/licenses.json"
@@ -27,7 +28,7 @@ module SOUP
       setup_parser
     end
 
-    attr_reader :auto_reply, :ignored_folders, :licenses_check, :licenses_file, :markdown_file, :no_prompt, :skip_bundler, :skip_cocoapods, :skip_composer, :skip_pip, :skip_spm, :skip_yarn, :soup_check, :cache_file
+    attr_reader :auto_reply, :exceptions_file, :ignored_folders, :licenses_check, :licenses_file, :markdown_file, :no_prompt, :skip_bundler, :skip_cocoapods, :skip_composer, :skip_pip, :skip_spm, :skip_yarn, :soup_check, :cache_file
 
     def parse
       @parser.parse!(@argv)
@@ -49,6 +50,10 @@ module SOUP
 
       @parser.on('', '--cache_file file', 'Path to cached file') do |file|
         @cache_file = file
+      end
+
+      @parser.on('', '--exceptions_file file', 'Path to exception file') do |file|
+        @exceptions_file = file
       end
 
       @parser.on('', '--ignored_folders ignored_folders', 'Comma separated list of folders to ignore') do |folders|
