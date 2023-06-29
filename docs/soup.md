@@ -3,7 +3,7 @@
 | **Language** | **Package** | **Version** | **License** | **Description** | **Website** | **Last Verified** | **Risk Level** | **Requirements** | **Verification Reasoning** |
 | :---: | :--- | :---: | :---: | :--- | :--- | :---: | :---: | :--- | :--- |
 | Ruby | CFPropertyList | 3.0.6 | MIT | This is a module to read, write and manipulate both binary and XML property lists as defined by apple. | <https://github.com/ckruse/CFPropertyList> | 2022-05-10 | Low | Dependency | Dependency |
-| Ruby | activesupport | 7.0.5 | MIT | A toolkit of support libraries and Ruby core extensions extracted from the Rails framework | <https://rubyonrails.org> | 2022-05-10 | Low | Dependency | Dependency |
+| Ruby | activesupport | 7.0.5.1 | MIT | A toolkit of support libraries and Ruby core extensions extracted from the Rails framework | <https://rubyonrails.org> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | addressable | 2.8.4 | Apache-2.0 | Addressable is an alternative implementation to the URI implementation that is | <https://github.com/sporkmonger/addressable> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | algoliasearch | 1.27.5 | MIT | A simple Ruby client for the algolia.com REST API | <https://www.algolia.com/doc/api-client/ruby/getting-started/> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | ast | 2.4.2 | MIT | A library for working with Abstract Syntax Trees. | <https://whitequark.github.io/ast/> | 2022-05-10 | Low | Dependency | Dependency |
@@ -30,8 +30,9 @@
 | Ruby | i18n | 1.14.1 | MIT | New wave Internationalization support for Ruby. | <https://github.com/ruby-i18n/i18n> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | inquirer | 0.2.1 | Apache v2 | Interactive user prompts on CLI for ruby. | <https://github.com/arlimus/inquirer.rb> | 2022-05-10 | Low | Interactive user prompts on CLI for ruby. | Very popular on rubygems.org |
 | Ruby | json | 2.6.3 | Ruby | A JSON implementation as a JRuby extension. | <http://flori.github.io/json/> | 2022-05-10 | Low | Used to read package manager and cache files. | Very popular on rubygems.org |
+| Ruby | language_server-protocol | 3.17.0.3 | MIT | A Language Server Protocol SDK | <https://github.com/mtsmfm/language_server-protocol-ruby> | 2023-06-29 | Low | Dependency | Dependency |
 | Ruby | mini_mime | 1.1.2 | MIT | A lightweight mime type lookup toy | <https://github.com/discourse/mini_mime> | 2023-03-30 | Low | Dependency | Dependency |
-| Ruby | minitest | 5.18.0 | MIT | minitest provides a complete suite of testing facilities supporting | <https://github.com/seattlerb/minitest> | 2022-05-10 | Low | Dependency | Dependency |
+| Ruby | minitest | 5.18.1 | MIT | minitest provides a complete suite of testing facilities supporting | <https://github.com/minitest/minitest> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | molinillo | 0.8.0 | MIT | Provides support for dependency resolution | <https://github.com/CocoaPods/Molinillo> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | multi_xml | 0.6.0 | MIT | Provides swappable XML backends utilizing LibXML, Nokogiri, Ox, or REXML. | <https://github.com/sferik/multi_xml> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | nanaimo | 0.3.0 | MIT | A library for (de)serialization of ASCII Plists. | <https://github.com/CocoaPods/Nanaimo> | 2022-05-10 | Low | Dependency | Dependency |
@@ -45,7 +46,7 @@
 | Ruby | rainbow | 3.1.1 | MIT | Colorize printed text on ANSI terminals | <https://github.com/sickill/rainbow> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | regexp_parser | 2.8.1 | MIT | A library for tokenizing, lexing, and parsing Ruby regular expressions. | <https://github.com/ammar/regexp_parser> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | rexml | 3.2.5 | BSD-2-Clause | An XML toolkit for Ruby | <https://github.com/ruby/rexml> | 2022-05-10 | Low | Dependency | Dependency |
-| Ruby | rubocop | 1.52.1 | MIT |     RuboCop is a Ruby code style checking and code formatting tool. | <https://rubocop.org/> | 2022-05-10 | Low | Used to lint ruby code in project. | Very popular on rubygems.org |
+| Ruby | rubocop | 1.53.1 | MIT |     RuboCop is a Ruby code style checking and code formatting tool. | <https://rubocop.org/> | 2022-05-10 | Low | Used to lint ruby code in project. | Very popular on rubygems.org |
 | Ruby | rubocop-ast | 1.29.0 | MIT |     RuboCop's Node and NodePattern classes. | <https://www.rubocop.org/> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | ruby-macho | 2.5.1 | MIT | A library for viewing and manipulating Mach-O files in Ruby. | <https://github.com/Homebrew/ruby-macho> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | ruby-progressbar | 1.13.0 | MIT | Ruby/ProgressBar is an extremely flexible text progress bar library for Ruby | <https://github.com/jfelchner/ruby-progressbar> | 2022-05-10 | Low | Dependency | Dependency |
