@@ -14,7 +14,7 @@ module SOUP
         next if line.include?('#')
 
         line = line.slice(0, line.index(';')) if line.include?(';')
-        pip_package, version = line.strip.split(/==/)
+        pip_package, version = line.strip.split('==')
 
         next if pip_package&.strip&.empty?
 
