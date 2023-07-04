@@ -14,7 +14,7 @@
   "activesupport": {
     "language": "Ruby",
     "package": "activesupport",
-    "version": "7.0.5.1",
+    "version": "7.0.6",
     "license": "MIT",
     "description": "A toolkit of support libraries and Ruby core extensions extracted from the Rails framework",
     "website": "https://rubyonrails.org",
@@ -530,7 +530,7 @@
   "rubocop": {
     "language": "Ruby",
     "package": "rubocop",
-    "version": "1.53.1",
+    "version": "1.54.1",
     "license": "MIT",
     "description": "    RuboCop is a Ruby code style checking and code formatting tool.",
     "website": "https://rubocop.org/",
