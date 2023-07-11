@@ -144,7 +144,7 @@ jobs:
         mv _composer.json composer.json
         mv _composer.lock composer.lock
         mv _package.json package.json
-        mv _requirements.txt requirements.txt
+        mv _requirements._txt requirements.txt
         mv _yarn.lock yarn.lock
         ../bin/soup.rb
         popd
