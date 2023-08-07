@@ -26,7 +26,7 @@
   "addressable": {
     "language": "Ruby",
     "package": "addressable",
-    "version": "2.8.4",
+    "version": "2.8.5",
     "license": "Apache-2.0",
     "description": "Addressable is an alternative implementation to the URI implementation that is",
     "website": "https://github.com/sporkmonger/addressable",
@@ -362,7 +362,7 @@
   "minitest": {
     "language": "Ruby",
     "package": "minitest",
-    "version": "5.18.1",
+    "version": "5.19.0",
     "license": "MIT",
     "description": "minitest provides a complete suite of testing facilities supporting",
     "website": "https://github.com/minitest/minitest",
@@ -518,7 +518,7 @@
   "rexml": {
     "language": "Ruby",
     "package": "rexml",
-    "version": "3.2.5",
+    "version": "3.2.6",
     "license": "BSD-2-Clause",
     "description": "An XML toolkit for Ruby",
     "website": "https://github.com/ruby/rexml",
@@ -530,7 +530,7 @@
   "rubocop": {
     "language": "Ruby",
     "package": "rubocop",
-    "version": "1.54.1",
+    "version": "1.55.1",
     "license": "MIT",
     "description": "    RuboCop is a Ruby code style checking and code formatting tool.",
     "website": "https://rubocop.org/",
