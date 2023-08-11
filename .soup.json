@@ -14,7 +14,7 @@
   "activesupport": {
     "language": "Ruby",
     "package": "activesupport",
-    "version": "7.0.6",
+    "version": "7.0.7",
     "license": "MIT",
     "description": "A toolkit of support libraries and Ruby core extensions extracted from the Rails framework",
     "website": "https://rubyonrails.org",
@@ -67,6 +67,18 @@
     "description": "A simple gem to atomically write files",
     "website": "https://github.com/segiddins/atomos",
     "last_verified_at": "2022-05-10",
+    "risk_level": "Low",
+    "requirements": "Dependency",
+    "verification_reasoning": "Dependency"
+  },
+  "base64": {
+    "language": "Ruby",
+    "package": "base64",
+    "version": "0.1.1",
+    "license": "Ruby",
+    "description": "Support for encoding and decoding binary data using a Base64 representation.",
+    "website": "https://github.com/ruby/base64",
+    "last_verified_at": "2023-08-11",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -350,9 +362,9 @@
   "mini_mime": {
     "language": "Ruby",
     "package": "mini_mime",
-    "version": "1.1.2",
+    "version": "1.1.5",
     "license": "MIT",
-    "description": "A lightweight mime type lookup toy",
+    "description": "A minimal mime type library",
     "website": "https://github.com/discourse/mini_mime",
     "last_verified_at": "2023-03-30",
     "risk_level": "Low",
@@ -530,7 +542,7 @@
   "rubocop": {
     "language": "Ruby",
     "package": "rubocop",
-    "version": "1.55.1",
+    "version": "1.56.0",
     "license": "MIT",
     "description": "    RuboCop is a Ruby code style checking and code formatting tool.",
     "website": "https://rubocop.org/",
