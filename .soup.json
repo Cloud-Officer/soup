@@ -374,7 +374,7 @@
   "minitest": {
     "language": "Ruby",
     "package": "minitest",
-    "version": "5.19.0",
+    "version": "5.20.0",
     "license": "MIT",
     "description": "minitest provides a complete suite of testing facilities supporting",
     "website": "https://github.com/minitest/minitest",
