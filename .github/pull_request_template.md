@@ -27,6 +27,9 @@ Put an `x` in the boxes that apply (no space around the brackets). This is simpl
 - [ ] I have added necessary architecture and public interface documentation
 - [ ] Complex database migration required (with downtime)
 - [ ] Reprocessing of existing data required
+- [ ] Change have an impact on personal identifiable information (PII)
+- [ ] Change have an impact on CCPA/GDPR/PIPEDA or other privacy regulations
+- [ ] Change have an impact on CIS benchmarks or security requirements or risk threat/vulnerability
 
 ## Further comments (if required)
 
