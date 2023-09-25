@@ -98,7 +98,7 @@
   "cocoapods": {
     "language": "Ruby",
     "package": "cocoapods",
-    "version": "1.12.1",
+    "version": "1.13.0",
     "license": "MIT",
     "description": "CocoaPods manages library dependencies for your Xcode project.",
     "website": "https://github.com/CocoaPods/CocoaPods",
@@ -110,7 +110,7 @@
   "cocoapods-core": {
     "language": "Ruby",
     "package": "cocoapods-core",
-    "version": "1.12.1",
+    "version": "1.13.0",
     "license": "MIT",
     "description": "The CocoaPods-Core gem provides support to work with the models of CocoaPods.",
     "website": "https://github.com/CocoaPods/CocoaPods",
@@ -242,7 +242,7 @@
   "ffi": {
     "language": "Ruby",
     "package": "ffi",
-    "version": "1.15.5",
+    "version": "1.16.1",
     "license": "BSD-3-Clause",
     "description": "Ruby FFI library",
     "website": "https://github.com/ffi/ffi/wiki",
@@ -674,7 +674,7 @@
   "xcodeproj": {
     "language": "Ruby",
     "package": "xcodeproj",
-    "version": "1.22.0",
+    "version": "1.23.0",
     "license": "MIT",
     "description": "Xcodeproj lets you create and modify Xcode projects from Ruby",
     "website": "https://github.com/cocoapods/xcodeproj",
