@@ -22,7 +22,7 @@
 | Ruby | concurrent-ruby | 1.2.2 | MIT | Modern concurrency tools including agents, futures, promises, thread pools, actors, supervisors, and more. | <http://www.concurrent-ruby.com> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | escape | 0.0.4 |  | ... | <http://www.a-k-r.org/escape/> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | ethon | 0.16.0 | MIT | Very lightweight libcurl wrapper. | <https://github.com/typhoeus/ethon> | 2022-05-10 | Low | Dependency | Dependency |
-| Ruby | ffi | 1.16.1 | BSD-3-Clause | Ruby FFI library | <https://github.com/ffi/ffi/wiki> | 2022-05-10 | Low | Dependency | Dependency |
+| Ruby | ffi | 1.16.2 | BSD-3-Clause | Ruby FFI library | <https://github.com/ffi/ffi/wiki> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | fourflusher | 2.3.1 | MIT | A library for interacting with Xcode simulators. | <https://github.com/neonichu/fourflusher> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | fuzzy_match | 2.0.4 |  | Find a needle in a haystack using string similarity and (optionally) regexp rules | <https://github.com/seamusabshere/fuzzy_match> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | gh_inspector | 1.1.3 | MIT | Search through GitHub issues for your project for existing issues about a Ruby Error. | <https://github.com/orta/gh_inspector> | 2022-05-10 | Low | Dependency | Dependency |
