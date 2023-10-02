@@ -662,9 +662,9 @@
   "unicode-display_width": {
     "language": "Ruby",
     "package": "unicode-display_width",
-    "version": "2.4.2",
+    "version": "2.5.0",
     "license": "MIT",
-    "description": "[Unicode 15.0.0] Determines the monospace display width of a string using EastAsianWidth.txt, Unicode general category, and other data.",
+    "description": "[Unicode 15.1.0] Determines the monospace display width of a string using EastAsianWidth.txt, Unicode general category, and other data.",
     "website": "https://github.com/janlelis/unicode-display_width",
     "last_verified_at": "2022-05-10",
     "risk_level": "Low",
