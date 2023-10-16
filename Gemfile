@@ -2,7 +2,7 @@
 
 source 'https://rubygems.org'
 
-gem 'activesupport', '7.0.8' # see https://stackoverflow.com/questions/77236339/after-updating-cocoapods-to-1-13-0-it-throws-error
+gem 'activesupport', '7.1.1' # see https://stackoverflow.com/questions/77236339/after-updating-cocoapods-to-1-13-0-it-throws-error
 gem 'bundler', '>= 2.3.0'
 gem 'cocoapods', '1.12' if RUBY_PLATFORM =~ /darwin/i # see https://stackoverflow.com/questions/77236339/after-updating-cocoapods-to-1-13-0-it-throws-error
 gem 'httparty', '>= 0.20.0'
