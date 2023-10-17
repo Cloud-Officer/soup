@@ -23,9 +23,14 @@ What types of changes does your code introduce? Put an `x` in the boxes that app
 Put an `x` in the boxes that apply (no space around the brackets). This is simply a reminder of what we are going to look for before merging your code.
 -->
 
-- [ ] I have added tests that prove my fix is effective or that my feature works
-- [ ] I have added necessary architecture and public interface documentation
-- [ ] Complex database migration required (with downtime)
+- [ ] Unit tests added to validate my fix/feature
+- [ ] Architecture of the system, hardware, and external software interfaces is documented
+- [ ] The SOUP file lists the name, version, role and risk associated with each library
+- [ ] Hazardous items are highlighted, risk controls are documented, performance safeguards are defined and safety-centric architecture choices are explained
+- [ ] The role of each software unit is defined, along with its API, data format, database schema and interface
+- [ ] Critical algorithms related to safety or safeguards are explained
+- [ ] AI data pre-processing, data splits, model architecture, feature selection and training parameters are defined
+- [ ] Complex database migration required with downtime
 - [ ] Reprocessing of existing data required
 - [ ] Change have an impact on personal identifiable information (PII)
 - [ ] Change have an impact on CCPA/GDPR/PIPEDA or other privacy regulations

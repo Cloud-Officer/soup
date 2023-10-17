@@ -10,8 +10,8 @@
 | Ruby | atomos | 0.1.3 | MIT | A simple gem to atomically write files | <https://github.com/segiddins/atomos> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | base64 | 0.1.1 | Ruby | Support for encoding and decoding binary data using a Base64 representation. | <https://github.com/ruby/base64> | 2023-08-11 | Low | Dependency | Dependency |
 | Ruby | claide | 1.1.0 | MIT | A small command-line interface framework. | <https://github.com/CocoaPods/CLAide> | 2022-05-10 | Low | Dependency | Dependency |
-| Ruby | cocoapods | 1.13.0 | MIT | CocoaPods manages library dependencies for your Xcode project. | <https://github.com/CocoaPods/CocoaPods> | 2022-05-10 | Low | Used to read Podfile | Same package used by CocoaPods |
-| Ruby | cocoapods-core | 1.13.0 | MIT | The CocoaPods-Core gem provides support to work with the models of CocoaPods. | <https://github.com/CocoaPods/CocoaPods> | 2022-05-10 | Low | Dependency | Dependency |
+| Ruby | cocoapods | 1.12.0 | MIT | CocoaPods manages library dependencies for your Xcode project. | <https://github.com/CocoaPods/CocoaPods> | 2022-05-10 | Low | Used to read Podfile | Same package used by CocoaPods |
+| Ruby | cocoapods-core | 1.12.0 | MIT | The CocoaPods-Core gem provides support to work with the models of CocoaPods. | <https://github.com/CocoaPods/CocoaPods> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | cocoapods-deintegrate | 1.0.5 | MIT | A CocoaPods plugin to remove and de-integrate CocoaPods from your project. | <https://github.com/kylef/cocoapods-deintegrate> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | cocoapods-downloader | 1.6.3 | MIT | A small library for downloading files from remotes in a folder. | <https://github.com/CocoaPods/cocoapods-downloader> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | cocoapods-plugins | 1.0.0 | MIT |                          This CocoaPods plugin shows information about all available CocoaPods plugins | <https://github.com/cocoapods/cocoapods-plugins> | 2022-05-10 | Low | Dependency | Dependency |
@@ -22,7 +22,7 @@
 | Ruby | concurrent-ruby | 1.2.2 | MIT | Modern concurrency tools including agents, futures, promises, thread pools, actors, supervisors, and more. | <http://www.concurrent-ruby.com> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | escape | 0.0.4 |  | ... | <http://www.a-k-r.org/escape/> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | ethon | 0.16.0 | MIT | Very lightweight libcurl wrapper. | <https://github.com/typhoeus/ethon> | 2022-05-10 | Low | Dependency | Dependency |
-| Ruby | ffi | 1.16.2 | BSD-3-Clause | Ruby FFI library | <https://github.com/ffi/ffi/wiki> | 2022-05-10 | Low | Dependency | Dependency |
+| Ruby | ffi | 1.16.3 | BSD-3-Clause | Ruby FFI library | <https://github.com/ffi/ffi/wiki> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | fourflusher | 2.3.1 | MIT | A library for interacting with Xcode simulators. | <https://github.com/neonichu/fourflusher> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | fuzzy_match | 2.0.4 |  | Find a needle in a haystack using string similarity and (optionally) regexp rules | <https://github.com/seamusabshere/fuzzy_match> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | gh_inspector | 1.1.3 | MIT | Search through GitHub issues for your project for existing issues about a Ruby Error. | <https://github.com/orta/gh_inspector> | 2022-05-10 | Low | Dependency | Dependency |
@@ -41,13 +41,13 @@
 | Ruby | netrc | 0.11.0 | MIT | This library can read and update netrc files, preserving formatting including comments and whitespace. | <https://github.com/geemus/netrc> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | optparse | 0.3.1 | Ruby | OptionParser is a class for command-line option analysis. | <https://github.com/ruby/optparse> | 2022-05-10 | Low | Used to parse command line arguments. | Very popular on rubygems.org |
 | Ruby | parallel | 1.23.0 | MIT | Run any kind of code in parallel processes | <https://github.com/grosser/parallel> | 2022-05-10 | Low | Dependency | Dependency |
-| Ruby | parser | 3.2.2.3 | MIT | A Ruby parser written in pure Ruby. | <https://github.com/whitequark/parser> | 2022-05-10 | Low | Dependency | Dependency |
+| Ruby | parser | 3.2.2.4 | MIT | A Ruby parser written in pure Ruby. | <https://github.com/whitequark/parser> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | public_suffix | 4.0.7 | MIT | PublicSuffix can parse and decompose a domain name into top level domain, domain and subdomains. | <https://simonecarletti.com/code/publicsuffix-ruby> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | racc | 1.7.1 | Ruby | Racc is a LALR(1) parser generator. | <https://github.com/ruby/racc> | 2023-06-09 | Low | Dependency | Dependency |
 | Ruby | rainbow | 3.1.1 | MIT | Colorize printed text on ANSI terminals | <https://github.com/sickill/rainbow> | 2022-05-10 | Low | Dependency | Dependency |
-| Ruby | regexp_parser | 2.8.1 | MIT | A library for tokenizing, lexing, and parsing Ruby regular expressions. | <https://github.com/ammar/regexp_parser> | 2022-05-10 | Low | Dependency | Dependency |
+| Ruby | regexp_parser | 2.8.2 | MIT | A library for tokenizing, lexing, and parsing Ruby regular expressions. | <https://github.com/ammar/regexp_parser> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | rexml | 3.2.6 | BSD-2-Clause | An XML toolkit for Ruby | <https://github.com/ruby/rexml> | 2022-05-10 | Low | Dependency | Dependency |
-| Ruby | rubocop | 1.56.4 | MIT | RuboCop is a Ruby code style checking and code formatting tool. | <https://rubocop.org/> | 2022-05-10 | Low | Used to lint ruby code in project. | Very popular on rubygems.org |
+| Ruby | rubocop | 1.57.1 | MIT | RuboCop is a Ruby code style checking and code formatting tool. | <https://rubocop.org/> | 2022-05-10 | Low | Used to lint ruby code in project. | Very popular on rubygems.org |
 | Ruby | rubocop-ast | 1.29.0 | MIT |     RuboCop's Node and NodePattern classes. | <https://www.rubocop.org/> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | ruby-macho | 2.5.1 | MIT | A library for viewing and manipulating Mach-O files in Ruby. | <https://github.com/Homebrew/ruby-macho> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | ruby-progressbar | 1.13.0 | MIT | Ruby/ProgressBar is an extremely flexible text progress bar library for Ruby | <https://github.com/jfelchner/ruby-progressbar> | 2022-05-10 | Low | Dependency | Dependency |
