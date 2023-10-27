@@ -3,23 +3,26 @@
 | **Language** | **Package** | **Version** | **License** | **Description** | **Website** | **Last Verified** | **Risk Level** | **Requirements** | **Verification Reasoning** |
 | :---: | :--- | :---: | :---: | :--- | :--- | :---: | :---: | :--- | :--- |
 | Ruby | CFPropertyList | 3.0.6 | MIT | This is a module to read, write and manipulate both binary and XML property lists as defined by apple. | <https://github.com/ckruse/CFPropertyList> | 2022-05-10 | Low | Dependency | Dependency |
-| Ruby | activesupport | 7.0.8 | MIT | A toolkit of support libraries and Ruby core extensions extracted from the Rails framework | <https://rubyonrails.org> | 2022-05-10 | Low | Dependency | Dependency |
+| Ruby | activesupport | 7.1.1 | MIT | A toolkit of support libraries and Ruby core extensions extracted from the Rails framework | <https://rubyonrails.org> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | addressable | 2.8.5 | Apache-2.0 | Addressable is an alternative implementation to the URI implementation that is | <https://github.com/sporkmonger/addressable> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | algoliasearch | 1.27.5 | MIT | A simple Ruby client for the algolia.com REST API | <https://www.algolia.com/doc/api-client/ruby/getting-started/> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | ast | 2.4.2 | MIT | A library for working with Abstract Syntax Trees. | <https://whitequark.github.io/ast/> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | atomos | 0.1.3 | MIT | A simple gem to atomically write files | <https://github.com/segiddins/atomos> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | base64 | 0.1.1 | Ruby | Support for encoding and decoding binary data using a Base64 representation. | <https://github.com/ruby/base64> | 2023-08-11 | Low | Dependency | Dependency |
+| Ruby | bigdecimal | 3.1.4 | Ruby | This library provides arbitrary-precision decimal floating-point number class. | <https://github.com/ruby/bigdecimal> | 2023-10-26 | Low | Dependency | Dependency |
 | Ruby | claide | 1.1.0 | MIT | A small command-line interface framework. | <https://github.com/CocoaPods/CLAide> | 2022-05-10 | Low | Dependency | Dependency |
-| Ruby | cocoapods | 1.12.0 | MIT | CocoaPods manages library dependencies for your Xcode project. | <https://github.com/CocoaPods/CocoaPods> | 2022-05-10 | Low | Used to read Podfile | Same package used by CocoaPods |
-| Ruby | cocoapods-core | 1.12.0 | MIT | The CocoaPods-Core gem provides support to work with the models of CocoaPods. | <https://github.com/CocoaPods/CocoaPods> | 2022-05-10 | Low | Dependency | Dependency |
+| Ruby | cocoapods | 1.14.2 | MIT | CocoaPods manages library dependencies for your Xcode project. | <https://github.com/CocoaPods/CocoaPods> | 2022-05-10 | Low | Used to read Podfile | Same package used by CocoaPods |
+| Ruby | cocoapods-core | 1.14.2 | MIT | The CocoaPods-Core gem provides support to work with the models of CocoaPods. | <https://github.com/CocoaPods/CocoaPods> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | cocoapods-deintegrate | 1.0.5 | MIT | A CocoaPods plugin to remove and de-integrate CocoaPods from your project. | <https://github.com/kylef/cocoapods-deintegrate> | 2022-05-10 | Low | Dependency | Dependency |
-| Ruby | cocoapods-downloader | 1.6.3 | MIT | A small library for downloading files from remotes in a folder. | <https://github.com/CocoaPods/cocoapods-downloader> | 2022-05-10 | Low | Dependency | Dependency |
+| Ruby | cocoapods-downloader | 2.0 | MIT | A small library for downloading files from remotes in a folder. | <https://github.com/CocoaPods/cocoapods-downloader> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | cocoapods-plugins | 1.0.0 | MIT |                          This CocoaPods plugin shows information about all available CocoaPods plugins | <https://github.com/cocoapods/cocoapods-plugins> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | cocoapods-search | 1.0.1 | MIT | Search for pods. | <https://github.com/CocoaPods/cocoapods-search> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | cocoapods-trunk | 1.6.0 | MIT | Interact with trunk.cocoapods.org | <https://github.com/CocoaPods/cocoapods-trunk> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | cocoapods-try | 1.2.0 | MIT | CocoaPods plugin which allows to quickly try the demo project of a Pod. | <https://github.com/cocoapods/cocoapods-try> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | colored2 | 3.1.2 | MIT | This is a heavily modified fork of <http://github.com/defunkt/colored> gem, with many | <http://github.com/kigster/colored2> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | concurrent-ruby | 1.2.2 | MIT | Modern concurrency tools including agents, futures, promises, thread pools, actors, supervisors, and more. | <http://www.concurrent-ruby.com> | 2022-05-10 | Low | Dependency | Dependency |
+| Ruby | connection_pool | 2.4.1 | MIT | Generic connection pool for Ruby | <https://github.com/mperham/connection_pool> | 2023-10-26 | Low | Dependency | Dependency |
+| Ruby | drb | 2.1.1 | Ruby | Distributed object system for Ruby | <https://github.com/ruby/drb> | 2023-10-26 | Low | Dependency | Dependency |
 | Ruby | escape | 0.0.4 |  | ... | <http://www.a-k-r.org/escape/> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | ethon | 0.16.0 | MIT | Very lightweight libcurl wrapper. | <https://github.com/typhoeus/ethon> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | ffi | 1.16.3 | BSD-3-Clause | Ruby FFI library | <https://github.com/ffi/ffi/wiki> | 2022-05-10 | Low | Dependency | Dependency |
@@ -36,6 +39,7 @@
 | Ruby | minitest | 5.20.0 | MIT | minitest provides a complete suite of testing facilities supporting | <https://github.com/minitest/minitest> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | molinillo | 0.8.0 | MIT | Provides support for dependency resolution | <https://github.com/CocoaPods/Molinillo> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | multi_xml | 0.6.0 | MIT | Provides swappable XML backends utilizing LibXML, Nokogiri, Ox, or REXML. | <https://github.com/sferik/multi_xml> | 2022-05-10 | Low | Dependency | Dependency |
+| Ruby | mutex_m | 0.1.2 | Ruby | Mixin to extend objects to be handled like a Mutex. | <https://github.com/ruby/mutex_m> | 2023-10-26 | Low | Dependency | Dependency |
 | Ruby | nanaimo | 0.3.0 | MIT | A library for (de)serialization of ASCII Plists. | <https://github.com/CocoaPods/Nanaimo> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | nap | 1.1.0 | MIT |     Nap is a really simple REST library | <https://github.com/Fingertips/nap> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | netrc | 0.11.0 | MIT | This library can read and update netrc files, preserving formatting including comments and whitespace. | <https://github.com/geemus/netrc> | 2022-05-10 | Low | Dependency | Dependency |
@@ -47,10 +51,11 @@
 | Ruby | rainbow | 3.1.1 | MIT | Colorize printed text on ANSI terminals | <https://github.com/sickill/rainbow> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | regexp_parser | 2.8.2 | MIT | A library for tokenizing, lexing, and parsing Ruby regular expressions. | <https://github.com/ammar/regexp_parser> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | rexml | 3.2.6 | BSD-2-Clause | An XML toolkit for Ruby | <https://github.com/ruby/rexml> | 2022-05-10 | Low | Dependency | Dependency |
-| Ruby | rubocop | 1.57.1 | MIT | RuboCop is a Ruby code style checking and code formatting tool. | <https://rubocop.org/> | 2022-05-10 | Low | Used to lint ruby code in project. | Very popular on rubygems.org |
-| Ruby | rubocop-ast | 1.29.0 | MIT |     RuboCop's Node and NodePattern classes. | <https://www.rubocop.org/> | 2022-05-10 | Low | Dependency | Dependency |
+| Ruby | rubocop | 1.57.2 | MIT | RuboCop is a Ruby code style checking and code formatting tool. | <https://rubocop.org/> | 2022-05-10 | Low | Used to lint ruby code in project. | Very popular on rubygems.org |
+| Ruby | rubocop-ast | 1.30.0 | MIT |     RuboCop's Node and NodePattern classes. | <https://www.rubocop.org/> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | ruby-macho | 2.5.1 | MIT | A library for viewing and manipulating Mach-O files in Ruby. | <https://github.com/Homebrew/ruby-macho> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | ruby-progressbar | 1.13.0 | MIT | Ruby/ProgressBar is an extremely flexible text progress bar library for Ruby | <https://github.com/jfelchner/ruby-progressbar> | 2022-05-10 | Low | Dependency | Dependency |
+| Ruby | ruby2_keywords | 0.0.5 | Ruby | Shim library for Module#ruby2_keywords | <https://github.com/ruby/ruby2_keywords> | 2023-10-26 | Low | Dependency | Dependency |
 | Ruby | semantic | 1.6.1 | MIT | Semantic Version utility class for parsing, storing, and comparing versions | <https://github.com/jlindsey/semantic> | 2022-05-10 | Low | Used to manipulate package versions. | Very popular on rubygems.org |
 | Ruby | sync | 0.5.0 | BSD-2-Clause | A module that provides a two-phase lock with a counter. | <https://github.com/ruby/sync> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | term-ansicolor | 1.7.1 | Apache-2.0 | This library uses ANSI escape sequences to control the attributes of terminal output | <http://flori.github.com/term-ansicolor> | 2022-05-10 | Low | Dependency | Dependency |

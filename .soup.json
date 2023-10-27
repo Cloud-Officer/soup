@@ -14,7 +14,7 @@
   "activesupport": {
     "language": "Ruby",
     "package": "activesupport",
-    "version": "7.0.8",
+    "version": "7.1.1",
     "license": "MIT",
     "description": "A toolkit of support libraries and Ruby core extensions extracted from the Rails framework",
     "website": "https://rubyonrails.org",
@@ -83,6 +83,18 @@
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
   },
+  "bigdecimal": {
+    "language": "Ruby",
+    "package": "bigdecimal",
+    "version": "3.1.4",
+    "license": "Ruby",
+    "description": "This library provides arbitrary-precision decimal floating-point number class.",
+    "website": "https://github.com/ruby/bigdecimal",
+    "last_verified_at": "2023-10-26",
+    "risk_level": "Low",
+    "requirements": "Dependency",
+    "verification_reasoning": "Dependency"
+  },
   "claide": {
     "language": "Ruby",
     "package": "claide",
@@ -98,7 +110,7 @@
   "cocoapods": {
     "language": "Ruby",
     "package": "cocoapods",
-    "version": "1.12.0",
+    "version": "1.14.2",
     "license": "MIT",
     "description": "CocoaPods manages library dependencies for your Xcode project.",
     "website": "https://github.com/CocoaPods/CocoaPods",
@@ -110,7 +122,7 @@
   "cocoapods-core": {
     "language": "Ruby",
     "package": "cocoapods-core",
-    "version": "1.12.0",
+    "version": "1.14.2",
     "license": "MIT",
     "description": "The CocoaPods-Core gem provides support to work with the models of CocoaPods.",
     "website": "https://github.com/CocoaPods/CocoaPods",
@@ -134,7 +146,7 @@
   "cocoapods-downloader": {
     "language": "Ruby",
     "package": "cocoapods-downloader",
-    "version": "1.6.3",
+    "version": "2.0",
     "license": "MIT",
     "description": "A small library for downloading files from remotes in a folder.",
     "website": "https://github.com/CocoaPods/cocoapods-downloader",
@@ -211,6 +223,30 @@
     "description": "Modern concurrency tools including agents, futures, promises, thread pools, actors, supervisors, and more.",
     "website": "http://www.concurrent-ruby.com",
     "last_verified_at": "2022-05-10",
+    "risk_level": "Low",
+    "requirements": "Dependency",
+    "verification_reasoning": "Dependency"
+  },
+  "connection_pool": {
+    "language": "Ruby",
+    "package": "connection_pool",
+    "version": "2.4.1",
+    "license": "MIT",
+    "description": "Generic connection pool for Ruby",
+    "website": "https://github.com/mperham/connection_pool",
+    "last_verified_at": "2023-10-26",
+    "risk_level": "Low",
+    "requirements": "Dependency",
+    "verification_reasoning": "Dependency"
+  },
+  "drb": {
+    "language": "Ruby",
+    "package": "drb",
+    "version": "2.1.1",
+    "license": "Ruby",
+    "description": "Distributed object system for Ruby",
+    "website": "https://github.com/ruby/drb",
+    "last_verified_at": "2023-10-26",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -407,6 +443,18 @@
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
   },
+  "mutex_m": {
+    "language": "Ruby",
+    "package": "mutex_m",
+    "version": "0.1.2",
+    "license": "Ruby",
+    "description": "Mixin to extend objects to be handled like a Mutex.",
+    "website": "https://github.com/ruby/mutex_m",
+    "last_verified_at": "2023-10-26",
+    "risk_level": "Low",
+    "requirements": "Dependency",
+    "verification_reasoning": "Dependency"
+  },
   "nanaimo": {
     "language": "Ruby",
     "package": "nanaimo",
@@ -542,7 +590,7 @@
   "rubocop": {
     "language": "Ruby",
     "package": "rubocop",
-    "version": "1.57.1",
+    "version": "1.57.2",
     "license": "MIT",
     "description": "RuboCop is a Ruby code style checking and code formatting tool.",
     "website": "https://rubocop.org/",
@@ -554,7 +602,7 @@
   "rubocop-ast": {
     "language": "Ruby",
     "package": "rubocop-ast",
-    "version": "1.29.0",
+    "version": "1.30.0",
     "license": "MIT",
     "description": "    RuboCop's Node and NodePattern classes.",
     "website": "https://www.rubocop.org/",
@@ -583,6 +631,18 @@
     "description": "Ruby/ProgressBar is an extremely flexible text progress bar library for Ruby",
     "website": "https://github.com/jfelchner/ruby-progressbar",
     "last_verified_at": "2022-05-10",
+    "risk_level": "Low",
+    "requirements": "Dependency",
+    "verification_reasoning": "Dependency"
+  },
+  "ruby2_keywords": {
+    "language": "Ruby",
+    "package": "ruby2_keywords",
+    "version": "0.0.5",
+    "license": "Ruby",
+    "description": "Shim library for Module#ruby2_keywords",
+    "website": "https://github.com/ruby/ruby2_keywords",
+    "last_verified_at": "2023-10-26",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
