@@ -542,7 +542,7 @@
   "racc": {
     "language": "Ruby",
     "package": "racc",
-    "version": "1.7.1",
+    "version": "1.7.2",
     "license": "Ruby",
     "description": "Racc is a LALR(1) parser generator.",
     "website": "https://github.com/ruby/racc",
