@@ -74,7 +74,7 @@
   "base64": {
     "language": "Ruby",
     "package": "base64",
-    "version": "0.1.1",
+    "version": "0.2.0",
     "license": "Ruby",
     "description": "Support for encoding and decoding binary data using a Base64 representation.",
     "website": "https://github.com/ruby/base64",
@@ -242,7 +242,7 @@
   "drb": {
     "language": "Ruby",
     "package": "drb",
-    "version": "2.1.1",
+    "version": "2.2.0",
     "license": "Ruby",
     "description": "Distributed object system for Ruby",
     "website": "https://github.com/ruby/drb",
@@ -446,7 +446,7 @@
   "mutex_m": {
     "language": "Ruby",
     "package": "mutex_m",
-    "version": "0.1.2",
+    "version": "0.2.0",
     "license": "Ruby",
     "description": "Mixin to extend objects to be handled like a Mutex.",
     "website": "https://github.com/ruby/mutex_m",
@@ -494,7 +494,7 @@
   "optparse": {
     "language": "Ruby",
     "package": "optparse",
-    "version": "0.3.1",
+    "version": "0.4.0",
     "license": "Ruby",
     "description": "OptionParser is a class for command-line option analysis.",
     "website": "https://github.com/ruby/optparse",
@@ -542,7 +542,7 @@
   "racc": {
     "language": "Ruby",
     "package": "racc",
-    "version": "1.7.2",
+    "version": "1.7.3",
     "license": "Ruby",
     "description": "Racc is a LALR(1) parser generator.",
     "website": "https://github.com/ruby/racc",

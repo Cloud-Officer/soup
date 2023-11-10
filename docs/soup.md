@@ -8,7 +8,7 @@
 | Ruby | algoliasearch | 1.27.5 | MIT | A simple Ruby client for the algolia.com REST API | <https://www.algolia.com/doc/api-client/ruby/getting-started/> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | ast | 2.4.2 | MIT | A library for working with Abstract Syntax Trees. | <https://whitequark.github.io/ast/> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | atomos | 0.1.3 | MIT | A simple gem to atomically write files | <https://github.com/segiddins/atomos> | 2022-05-10 | Low | Dependency | Dependency |
-| Ruby | base64 | 0.1.1 | Ruby | Support for encoding and decoding binary data using a Base64 representation. | <https://github.com/ruby/base64> | 2023-08-11 | Low | Dependency | Dependency |
+| Ruby | base64 | 0.2.0 | Ruby | Support for encoding and decoding binary data using a Base64 representation. | <https://github.com/ruby/base64> | 2023-08-11 | Low | Dependency | Dependency |
 | Ruby | bigdecimal | 3.1.4 | Ruby | This library provides arbitrary-precision decimal floating-point number class. | <https://github.com/ruby/bigdecimal> | 2023-10-26 | Low | Dependency | Dependency |
 | Ruby | claide | 1.1.0 | MIT | A small command-line interface framework. | <https://github.com/CocoaPods/CLAide> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | cocoapods | 1.14.2 | MIT | CocoaPods manages library dependencies for your Xcode project. | <https://github.com/CocoaPods/CocoaPods> | 2022-05-10 | Low | Used to read Podfile | Same package used by CocoaPods |
@@ -22,7 +22,7 @@
 | Ruby | colored2 | 3.1.2 | MIT | This is a heavily modified fork of <http://github.com/defunkt/colored> gem, with many | <http://github.com/kigster/colored2> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | concurrent-ruby | 1.2.2 | MIT | Modern concurrency tools including agents, futures, promises, thread pools, actors, supervisors, and more. | <http://www.concurrent-ruby.com> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | connection_pool | 2.4.1 | MIT | Generic connection pool for Ruby | <https://github.com/mperham/connection_pool> | 2023-10-26 | Low | Dependency | Dependency |
-| Ruby | drb | 2.1.1 | Ruby | Distributed object system for Ruby | <https://github.com/ruby/drb> | 2023-10-26 | Low | Dependency | Dependency |
+| Ruby | drb | 2.2.0 | Ruby | Distributed object system for Ruby | <https://github.com/ruby/drb> | 2023-10-26 | Low | Dependency | Dependency |
 | Ruby | escape | 0.0.4 |  | ... | <http://www.a-k-r.org/escape/> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | ethon | 0.16.0 | MIT | Very lightweight libcurl wrapper. | <https://github.com/typhoeus/ethon> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | ffi | 1.16.3 | BSD-3-Clause | Ruby FFI library | <https://github.com/ffi/ffi/wiki> | 2022-05-10 | Low | Dependency | Dependency |
@@ -39,15 +39,15 @@
 | Ruby | minitest | 5.20.0 | MIT | minitest provides a complete suite of testing facilities supporting | <https://github.com/minitest/minitest> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | molinillo | 0.8.0 | MIT | Provides support for dependency resolution | <https://github.com/CocoaPods/Molinillo> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | multi_xml | 0.6.0 | MIT | Provides swappable XML backends utilizing LibXML, Nokogiri, Ox, or REXML. | <https://github.com/sferik/multi_xml> | 2022-05-10 | Low | Dependency | Dependency |
-| Ruby | mutex_m | 0.1.2 | Ruby | Mixin to extend objects to be handled like a Mutex. | <https://github.com/ruby/mutex_m> | 2023-10-26 | Low | Dependency | Dependency |
+| Ruby | mutex_m | 0.2.0 | Ruby | Mixin to extend objects to be handled like a Mutex. | <https://github.com/ruby/mutex_m> | 2023-10-26 | Low | Dependency | Dependency |
 | Ruby | nanaimo | 0.3.0 | MIT | A library for (de)serialization of ASCII Plists. | <https://github.com/CocoaPods/Nanaimo> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | nap | 1.1.0 | MIT |     Nap is a really simple REST library | <https://github.com/Fingertips/nap> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | netrc | 0.11.0 | MIT | This library can read and update netrc files, preserving formatting including comments and whitespace. | <https://github.com/geemus/netrc> | 2022-05-10 | Low | Dependency | Dependency |
-| Ruby | optparse | 0.3.1 | Ruby | OptionParser is a class for command-line option analysis. | <https://github.com/ruby/optparse> | 2022-05-10 | Low | Used to parse command line arguments. | Very popular on rubygems.org |
+| Ruby | optparse | 0.4.0 | Ruby | OptionParser is a class for command-line option analysis. | <https://github.com/ruby/optparse> | 2022-05-10 | Low | Used to parse command line arguments. | Very popular on rubygems.org |
 | Ruby | parallel | 1.23.0 | MIT | Run any kind of code in parallel processes | <https://github.com/grosser/parallel> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | parser | 3.2.2.4 | MIT | A Ruby parser written in pure Ruby. | <https://github.com/whitequark/parser> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | public_suffix | 4.0.7 | MIT | PublicSuffix can parse and decompose a domain name into top level domain, domain and subdomains. | <https://simonecarletti.com/code/publicsuffix-ruby> | 2022-05-10 | Low | Dependency | Dependency |
-| Ruby | racc | 1.7.2 | Ruby | Racc is a LALR(1) parser generator. | <https://github.com/ruby/racc> | 2023-06-09 | Low | Dependency | Dependency |
+| Ruby | racc | 1.7.3 | Ruby | Racc is a LALR(1) parser generator. | <https://github.com/ruby/racc> | 2023-06-09 | Low | Dependency | Dependency |
 | Ruby | rainbow | 3.1.1 | MIT | Colorize printed text on ANSI terminals | <https://github.com/sickill/rainbow> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | regexp_parser | 2.8.2 | MIT | A library for tokenizing, lexing, and parsing Ruby regular expressions. | <https://github.com/ammar/regexp_parser> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | rexml | 3.2.6 | BSD-2-Clause | An XML toolkit for Ruby | <https://github.com/ruby/rexml> | 2022-05-10 | Low | Dependency | Dependency |
