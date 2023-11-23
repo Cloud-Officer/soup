@@ -110,7 +110,7 @@
   "cocoapods": {
     "language": "Ruby",
     "package": "cocoapods",
-    "version": "1.14.2",
+    "version": "1.14.3",
     "license": "MIT",
     "description": "CocoaPods manages library dependencies for your Xcode project.",
     "website": "https://github.com/CocoaPods/CocoaPods",
@@ -122,7 +122,7 @@
   "cocoapods-core": {
     "language": "Ruby",
     "package": "cocoapods-core",
-    "version": "1.14.2",
+    "version": "1.14.3",
     "license": "MIT",
     "description": "The CocoaPods-Core gem provides support to work with the models of CocoaPods.",
     "website": "https://github.com/CocoaPods/CocoaPods",
@@ -146,7 +146,7 @@
   "cocoapods-downloader": {
     "language": "Ruby",
     "package": "cocoapods-downloader",
-    "version": "2.0",
+    "version": "2.1",
     "license": "MIT",
     "description": "A small library for downloading files from remotes in a folder.",
     "website": "https://github.com/CocoaPods/cocoapods-downloader",
@@ -698,7 +698,7 @@
   "typhoeus": {
     "language": "Ruby",
     "package": "typhoeus",
-    "version": "1.4.0",
+    "version": "1.4.1",
     "license": "MIT",
     "description": "Like a modern code version of the mythical beast with 100 serpent heads, Typhoeus runs HTTP requests in parallel while cleanly encapsulating handling logic.",
     "website": "https://github.com/typhoeus/typhoeus",

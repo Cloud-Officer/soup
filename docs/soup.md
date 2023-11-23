@@ -11,10 +11,10 @@
 | Ruby | base64 | 0.2.0 | Ruby | Support for encoding and decoding binary data using a Base64 representation. | <https://github.com/ruby/base64> | 2023-08-11 | Low | Dependency | Dependency |
 | Ruby | bigdecimal | 3.1.4 | Ruby | This library provides arbitrary-precision decimal floating-point number class. | <https://github.com/ruby/bigdecimal> | 2023-10-26 | Low | Dependency | Dependency |
 | Ruby | claide | 1.1.0 | MIT | A small command-line interface framework. | <https://github.com/CocoaPods/CLAide> | 2022-05-10 | Low | Dependency | Dependency |
-| Ruby | cocoapods | 1.14.2 | MIT | CocoaPods manages library dependencies for your Xcode project. | <https://github.com/CocoaPods/CocoaPods> | 2022-05-10 | Low | Used to read Podfile | Same package used by CocoaPods |
-| Ruby | cocoapods-core | 1.14.2 | MIT | The CocoaPods-Core gem provides support to work with the models of CocoaPods. | <https://github.com/CocoaPods/CocoaPods> | 2022-05-10 | Low | Dependency | Dependency |
+| Ruby | cocoapods | 1.14.3 | MIT | CocoaPods manages library dependencies for your Xcode project. | <https://github.com/CocoaPods/CocoaPods> | 2022-05-10 | Low | Used to read Podfile | Same package used by CocoaPods |
+| Ruby | cocoapods-core | 1.14.3 | MIT | The CocoaPods-Core gem provides support to work with the models of CocoaPods. | <https://github.com/CocoaPods/CocoaPods> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | cocoapods-deintegrate | 1.0.5 | MIT | A CocoaPods plugin to remove and de-integrate CocoaPods from your project. | <https://github.com/kylef/cocoapods-deintegrate> | 2022-05-10 | Low | Dependency | Dependency |
-| Ruby | cocoapods-downloader | 2.0 | MIT | A small library for downloading files from remotes in a folder. | <https://github.com/CocoaPods/cocoapods-downloader> | 2022-05-10 | Low | Dependency | Dependency |
+| Ruby | cocoapods-downloader | 2.1 | MIT | A small library for downloading files from remotes in a folder. | <https://github.com/CocoaPods/cocoapods-downloader> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | cocoapods-plugins | 1.0.0 | MIT |                          This CocoaPods plugin shows information about all available CocoaPods plugins | <https://github.com/cocoapods/cocoapods-plugins> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | cocoapods-search | 1.0.1 | MIT | Search for pods. | <https://github.com/CocoaPods/cocoapods-search> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | cocoapods-trunk | 1.6.0 | MIT | Interact with trunk.cocoapods.org | <https://github.com/CocoaPods/cocoapods-trunk> | 2022-05-10 | Low | Dependency | Dependency |
@@ -60,7 +60,7 @@
 | Ruby | sync | 0.5.0 | BSD-2-Clause | A module that provides a two-phase lock with a counter. | <https://github.com/ruby/sync> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | term-ansicolor | 1.7.1 | Apache-2.0 | This library uses ANSI escape sequences to control the attributes of terminal output | <http://flori.github.com/term-ansicolor> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | tins | 1.32.1 | MIT | All the stuff that isn't good/big enough for a real library. | <https://github.com/flori/tins> | 2022-05-10 | Low | Dependency | Dependency |
-| Ruby | typhoeus | 1.4.0 | MIT | Like a modern code version of the mythical beast with 100 serpent heads, Typhoeus runs HTTP requests in parallel while cleanly encapsulating handling logic. | <https://github.com/typhoeus/typhoeus> | 2022-05-10 | Low | Dependency | Dependency |
+| Ruby | typhoeus | 1.4.1 | MIT | Like a modern code version of the mythical beast with 100 serpent heads, Typhoeus runs HTTP requests in parallel while cleanly encapsulating handling logic. | <https://github.com/typhoeus/typhoeus> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | tzinfo | 2.0.6 | MIT | TZInfo provides access to time zone data and allows times to be converted using time zone rules. | <https://tzinfo.github.io> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | unicode-display_width | 2.5.0 | MIT | [Unicode 15.1.0] Determines the monospace display width of a string using EastAsianWidth.txt, Unicode general category, and other data. | <https://github.com/janlelis/unicode-display_width> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | xcodeproj | 1.23.0 | MIT | Xcodeproj lets you create and modify Xcode projects from Ruby | <https://github.com/cocoapods/xcodeproj> | 2022-05-10 | Low | Dependency | Dependency |
