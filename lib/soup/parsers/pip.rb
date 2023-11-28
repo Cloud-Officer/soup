@@ -8,6 +8,13 @@ require_relative '../package'
 module SOUP
   class PIPParser
     def parse(file, packages)
+      main_file =
+        if File.exist?(file.gsub('.txt', '.in'))
+          File.read(file.gsub('.txt', '.in'))
+        else
+          ''
+        end
+
       File.open(file, 'r').each_line do |line|
         next if line.strip.empty?
 
@@ -30,7 +37,7 @@ module SOUP
         package.version = version
         package.description = package_details['info']['summary']&.split(/\n|\. /)&.first&.gsub(%r{((?:f|ht)tps?:/\S+)}, '<\1>')
         package.website = package_details['info']['home_page']&.strip
-        package.dependency = false
+        package.dependency = !main_file.include?(package.package)
 
         package_details['info']['classifiers'].each do |classifier|
           package.license = "#{package.license} #{classifier.split('::').last}".strip if classifier.include?('License') and classifier.split('::').length > 2
