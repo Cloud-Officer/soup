@@ -374,10 +374,10 @@
   "json": {
     "language": "Ruby",
     "package": "json",
-    "version": "2.6.3",
+    "version": "2.7.0",
     "license": "Ruby",
     "description": "A JSON implementation as a JRuby extension.",
-    "website": "http://flori.github.io/json/",
+    "website": "https://flori.github.io/json",
     "last_verified_at": "2022-05-10",
     "risk_level": "Low",
     "requirements": "Used to read package manager and cache files.",
@@ -590,7 +590,7 @@
   "rubocop": {
     "language": "Ruby",
     "package": "rubocop",
-    "version": "1.57.2",
+    "version": "1.58.0",
     "license": "MIT",
     "description": "RuboCop is a Ruby code style checking and code formatting tool.",
     "website": "https://rubocop.org/",

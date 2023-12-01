@@ -147,14 +147,14 @@ module SOUP
         end
 
         if package.dependency
-          package.risk_level = RISK_LEVELS[0]
+          package.risk_level = RISK_LEVELS.first
           package.requirements = DEPENDENCY_TEXT
           package.verification_reasoning = DEPENDENCY_TEXT
         end
 
         if package.risk_level.empty?
           if @options.auto_reply
-            package.risk_level = RISK_LEVELS[0]
+            package.risk_level = RISK_LEVELS.first
           else
             raise("No risk level found for #{package.package}!") if @options.no_prompt
 
