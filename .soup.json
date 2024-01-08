@@ -518,7 +518,7 @@
   "parser": {
     "language": "Ruby",
     "package": "parser",
-    "version": "3.2.2.4",
+    "version": "3.3.0.2",
     "license": "MIT",
     "description": "A Ruby parser written in pure Ruby.",
     "website": "https://github.com/whitequark/parser",
@@ -566,7 +566,7 @@
   "regexp_parser": {
     "language": "Ruby",
     "package": "regexp_parser",
-    "version": "2.8.3",
+    "version": "2.9.0",
     "license": "MIT",
     "description": "A library for tokenizing, lexing, and parsing Ruby regular expressions.",
     "website": "https://github.com/ammar/regexp_parser",
