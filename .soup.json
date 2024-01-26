@@ -518,7 +518,7 @@
   "parser": {
     "language": "Ruby",
     "package": "parser",
-    "version": "3.3.0.4",
+    "version": "3.3.0.5",
     "license": "MIT",
     "description": "A Ruby parser written in pure Ruby.",
     "website": "https://github.com/whitequark/parser",
@@ -590,7 +590,7 @@
   "rubocop": {
     "language": "Ruby",
     "package": "rubocop",
-    "version": "1.60.1",
+    "version": "1.60.2",
     "license": "MIT",
     "description": "RuboCop is a Ruby code style checking and code formatting tool.",
     "website": "https://rubocop.org/",

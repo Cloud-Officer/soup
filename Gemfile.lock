@@ -92,7 +92,7 @@ GEM
     netrc (0.11.0)
     optparse (0.4.0)
     parallel (1.24.0)
-    parser (3.3.0.4)
+    parser (3.3.0.5)
       ast (~> 2.4.1)
       racc
     public_suffix (4.0.7)
@@ -100,7 +100,7 @@ GEM
     rainbow (3.1.1)
     regexp_parser (2.9.0)
     rexml (3.2.6)
-    rubocop (1.60.1)
+    rubocop (1.60.2)
       json (~> 2.3)
       language_server-protocol (>= 3.17.0)
       parallel (~> 1.10)
