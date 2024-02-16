@@ -2,7 +2,7 @@
   "CFPropertyList": {
     "language": "Ruby",
     "package": "CFPropertyList",
-    "version": "3.0.6",
+    "version": "3.0.7",
     "license": "MIT",
     "description": "This is a module to read, write and manipulate both binary and XML property lists as defined by apple.",
     "website": "https://github.com/ckruse/CFPropertyList",
@@ -487,6 +487,18 @@
     "description": "This library can read and update netrc files, preserving formatting including comments and whitespace.",
     "website": "https://github.com/geemus/netrc",
     "last_verified_at": "2022-05-10",
+    "risk_level": "Low",
+    "requirements": "Dependency",
+    "verification_reasoning": "Dependency"
+  },
+  "nkf": {
+    "language": "Ruby",
+    "package": "nkf",
+    "version": "0.2.0",
+    "license": "Ruby",
+    "description": "Ruby extension for Network Kanji Filter",
+    "website": "https://github.com/ruby/nkf",
+    "last_verified_at": "2024-02-15",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
