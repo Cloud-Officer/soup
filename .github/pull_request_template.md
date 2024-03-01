@@ -12,6 +12,7 @@ What types of changes does your code introduce? Put an `x` in the boxes that app
 - [ ] New feature (non-breaking change which adds functionality)
 - [ ] Refactoring (no functional changes, no api changes)
 - [ ] Build related changes
+- [ ] Security related changes (updates to dependencies, libraries or security patches)
 - [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)
 - [ ] Code style update (formatting, renaming)
 - [ ] Documentation update
