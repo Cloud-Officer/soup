@@ -31,7 +31,7 @@
 | Ruby | gh_inspector | 1.1.3 | MIT | Search through GitHub issues for your project for existing issues about a Ruby Error. | <https://github.com/orta/gh_inspector> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | httparty | 0.21.0 | MIT | Makes http fun! Also, makes consuming restful web services dead easy. | <https://github.com/jnunemaker/httparty> | 2022-05-10 | Low | Makes http fun! Also, makes consuming restful web services dead easy. | Very popular on rubygems.org |
 | Ruby | httpclient | 2.8.3 | ruby | gives something like the functionality of libwww-perl (LWP) in Ruby | <https://github.com/nahi/httpclient> | 2022-05-10 | Low | Dependency | Dependency |
-| Ruby | i18n | 1.14.1 | MIT | New wave Internationalization support for Ruby. | <https://github.com/ruby-i18n/i18n> | 2022-05-10 | Low | Dependency | Dependency |
+| Ruby | i18n | 1.14.4 | MIT | New wave Internationalization support for Ruby. | <https://github.com/ruby-i18n/i18n> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | inquirer | 0.2.1 | Apache v2 | Interactive user prompts on CLI for ruby. | <https://github.com/arlimus/inquirer.rb> | 2022-05-10 | Low | Interactive user prompts on CLI for ruby. | Very popular on rubygems.org |
 | Ruby | json | 2.7.1 | Ruby | A JSON implementation as a JRuby extension. | <https://flori.github.io/json> | 2022-05-10 | Low | Used to read package manager and cache files. | Very popular on rubygems.org |
 | Ruby | language_server-protocol | 3.17.0.3 | MIT | A Language Server Protocol SDK | <https://github.com/mtsmfm/language_server-protocol-ruby> | 2023-06-29 | Low | Dependency | Dependency |
@@ -52,7 +52,7 @@
 | Ruby | rainbow | 3.1.1 | MIT | Colorize printed text on ANSI terminals | <https://github.com/sickill/rainbow> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | regexp_parser | 2.9.0 | MIT | A library for tokenizing, lexing, and parsing Ruby regular expressions. | <https://github.com/ammar/regexp_parser> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | rexml | 3.2.6 | BSD-2-Clause | An XML toolkit for Ruby | <https://github.com/ruby/rexml> | 2022-05-10 | Low | Dependency | Dependency |
-| Ruby | rubocop | 1.61.0 | MIT | RuboCop is a Ruby code style checking and code formatting tool. | <https://rubocop.org/> | 2022-05-10 | Low | Used to lint ruby code in project. | Very popular on rubygems.org |
+| Ruby | rubocop | 1.62.0 | MIT | RuboCop is a Ruby code style checking and code formatting tool. | <https://rubocop.org/> | 2022-05-10 | Low | Used to lint ruby code in project. | Very popular on rubygems.org |
 | Ruby | rubocop-ast | 1.31.1 | MIT |     RuboCop's Node and NodePattern classes. | <https://www.rubocop.org/> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | ruby-macho | 2.5.1 | MIT | A library for viewing and manipulating Mach-O files in Ruby. | <https://github.com/Homebrew/ruby-macho> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | ruby-progressbar | 1.13.0 | MIT | Ruby/ProgressBar is an extremely flexible text progress bar library for Ruby | <https://github.com/jfelchner/ruby-progressbar> | 2022-05-10 | Low | Dependency | Dependency |
