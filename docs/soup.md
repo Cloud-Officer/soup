@@ -9,7 +9,7 @@
 | Ruby | ast | 2.4.2 | MIT | A library for working with Abstract Syntax Trees. | <https://whitequark.github.io/ast/> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | atomos | 0.1.3 | MIT | A simple gem to atomically write files | <https://github.com/segiddins/atomos> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | base64 | 0.2.0 | Ruby | Support for encoding and decoding binary data using a Base64 representation. | <https://github.com/ruby/base64> | 2023-08-11 | Low | Dependency | Dependency |
-| Ruby | bigdecimal | 3.1.6 | Ruby | This library provides arbitrary-precision decimal floating-point number class. | <https://github.com/ruby/bigdecimal> | 2023-10-26 | Low | Dependency | Dependency |
+| Ruby | bigdecimal | 3.1.7 | Ruby | This library provides arbitrary-precision decimal floating-point number class. | <https://github.com/ruby/bigdecimal> | 2023-10-26 | Low | Dependency | Dependency |
 | Ruby | claide | 1.1.0 | MIT | A small command-line interface framework. | <https://github.com/CocoaPods/CLAide> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | cocoapods | 1.15.2 | MIT | CocoaPods manages library dependencies for your Xcode project. | <https://github.com/CocoaPods/CocoaPods> | 2022-05-10 | Low | Used to read Podfile | Same package used by CocoaPods |
 | Ruby | cocoapods-core | 1.15.2 | MIT | The CocoaPods-Core gem provides support to work with the models of CocoaPods. | <https://github.com/CocoaPods/CocoaPods> | 2022-05-10 | Low | Dependency | Dependency |
@@ -36,7 +36,7 @@
 | Ruby | json | 2.7.1 | Ruby | A JSON implementation as a JRuby extension. | <https://flori.github.io/json> | 2022-05-10 | Low | Used to read package manager and cache files. | Very popular on rubygems.org |
 | Ruby | language_server-protocol | 3.17.0.3 | MIT | A Language Server Protocol SDK | <https://github.com/mtsmfm/language_server-protocol-ruby> | 2023-06-29 | Low | Dependency | Dependency |
 | Ruby | mini_mime | 1.1.5 | MIT | A minimal mime type library | <https://github.com/discourse/mini_mime> | 2023-03-30 | Low | Dependency | Dependency |
-| Ruby | minitest | 5.22.2 | MIT | minitest provides a complete suite of testing facilities supporting | <https://github.com/minitest/minitest> | 2022-05-10 | Low | Dependency | Dependency |
+| Ruby | minitest | 5.22.3 | MIT | minitest provides a complete suite of testing facilities supporting | <https://github.com/minitest/minitest> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | molinillo | 0.8.0 | MIT | Provides support for dependency resolution | <https://github.com/CocoaPods/Molinillo> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | multi_xml | 0.6.0 | MIT | Provides swappable XML backends utilizing LibXML, Nokogiri, Ox, or REXML. | <https://github.com/sferik/multi_xml> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | mutex_m | 0.2.0 | Ruby | Mixin to extend objects to be handled like a Mutex. | <https://github.com/ruby/mutex_m> | 2023-10-26 | Low | Dependency | Dependency |
@@ -52,13 +52,13 @@
 | Ruby | rainbow | 3.1.1 | MIT | Colorize printed text on ANSI terminals | <https://github.com/sickill/rainbow> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | regexp_parser | 2.9.0 | MIT | A library for tokenizing, lexing, and parsing Ruby regular expressions. | <https://github.com/ammar/regexp_parser> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | rexml | 3.2.6 | BSD-2-Clause | An XML toolkit for Ruby | <https://github.com/ruby/rexml> | 2022-05-10 | Low | Dependency | Dependency |
-| Ruby | rubocop | 1.62.0 | MIT | RuboCop is a Ruby code style checking and code formatting tool. | <https://rubocop.org/> | 2022-05-10 | Low | Used to lint ruby code in project. | Very popular on rubygems.org |
-| Ruby | rubocop-ast | 1.31.1 | MIT |     RuboCop's Node and NodePattern classes. | <https://www.rubocop.org/> | 2022-05-10 | Low | Dependency | Dependency |
+| Ruby | rubocop | 1.62.1 | MIT | RuboCop is a Ruby code style checking and code formatting tool. | <https://rubocop.org/> | 2022-05-10 | Low | Used to lint ruby code in project. | Very popular on rubygems.org |
+| Ruby | rubocop-ast | 1.31.2 | MIT |     RuboCop's Node and NodePattern classes. | <https://www.rubocop.org/> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | ruby-macho | 2.5.1 | MIT | A library for viewing and manipulating Mach-O files in Ruby. | <https://github.com/Homebrew/ruby-macho> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | ruby-progressbar | 1.13.0 | MIT | Ruby/ProgressBar is an extremely flexible text progress bar library for Ruby | <https://github.com/jfelchner/ruby-progressbar> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | semantic | 1.6.1 | MIT | Semantic Version utility class for parsing, storing, and comparing versions | <https://github.com/jlindsey/semantic> | 2022-05-10 | Low | Used to manipulate package versions. | Very popular on rubygems.org |
 | Ruby | sync | 0.5.0 | BSD-2-Clause | A module that provides a two-phase lock with a counter. | <https://github.com/ruby/sync> | 2022-05-10 | Low | Dependency | Dependency |
-| Ruby | term-ansicolor | 1.7.1 | Apache-2.0 | This library uses ANSI escape sequences to control the attributes of terminal output | <http://flori.github.com/term-ansicolor> | 2022-05-10 | Low | Dependency | Dependency |
+| Ruby | term-ansicolor | 1.7.2 | Apache-2.0 | This library uses ANSI escape sequences to control the attributes of terminal output | <http://flori.github.com/term-ansicolor> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | tins | 1.32.1 | MIT | All the stuff that isn't good/big enough for a real library. | <https://github.com/flori/tins> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | typhoeus | 1.4.1 | MIT | Like a modern code version of the mythical beast with 100 serpent heads, Typhoeus runs HTTP requests in parallel while cleanly encapsulating handling logic. | <https://github.com/typhoeus/typhoeus> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | tzinfo | 2.0.6 | MIT | TZInfo provides access to time zone data and allows times to be converted using time zone rules. | <https://tzinfo.github.io> | 2022-05-10 | Low | Dependency | Dependency |
