@@ -86,7 +86,7 @@
   "bigdecimal": {
     "language": "Ruby",
     "package": "bigdecimal",
-    "version": "3.1.6",
+    "version": "3.1.7",
     "license": "Ruby",
     "description": "This library provides arbitrary-precision decimal floating-point number class.",
     "website": "https://github.com/ruby/bigdecimal",
@@ -410,7 +410,7 @@
   "minitest": {
     "language": "Ruby",
     "package": "minitest",
-    "version": "5.22.2",
+    "version": "5.22.3",
     "license": "MIT",
     "description": "minitest provides a complete suite of testing facilities supporting",
     "website": "https://github.com/minitest/minitest",
@@ -602,7 +602,7 @@
   "rubocop": {
     "language": "Ruby",
     "package": "rubocop",
-    "version": "1.62.0",
+    "version": "1.62.1",
     "license": "MIT",
     "description": "RuboCop is a Ruby code style checking and code formatting tool.",
     "website": "https://rubocop.org/",
@@ -614,7 +614,7 @@
   "rubocop-ast": {
     "language": "Ruby",
     "package": "rubocop-ast",
-    "version": "1.31.1",
+    "version": "1.31.2",
     "license": "MIT",
     "description": "    RuboCop's Node and NodePattern classes.",
     "website": "https://www.rubocop.org/",
@@ -674,7 +674,7 @@
   "term-ansicolor": {
     "language": "Ruby",
     "package": "term-ansicolor",
-    "version": "1.7.1",
+    "version": "1.7.2",
     "license": "Apache-2.0",
     "description": "This library uses ANSI escape sequences to control the attributes of terminal output",
     "website": "http://flori.github.com/term-ansicolor",
