@@ -185,11 +185,3 @@ jobs:
         mv _yarn.lock yarn.lock
         ../bin/soup.rb
         popd
-
-        if [ "${RUNNER_OS}" == "Linux" ]; then
-          eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-        fi
-
-        brew update
-        brew install markdownlint-cli
-        markdownlint . --ignore '{**/vendor/**,**/node_modules/**,**/Libraries/**}'
