@@ -1,4 +1,14 @@
-# Software of Unknown Provenance (SOUP)
+# Software of Unknown Provenance (SOUP) [![Build](https://github.com/Cloud-Officer/soup/actions/workflows/build.yml/badge.svg)](https://github.com/Cloud-Officer/soup/actions/workflows/build.yml)
+
+## Table of Contents
+
+* [Introduction](#introduction)
+* [Installation](#installation)
+* [Usage](#usage)
+  * [Examples](#examples)
+* [Contributing](#contributing)
+
+## Introduction
 
 The IEC 62304 standard requires you to document your SOUP, which is short for Software of Unknown Provenance. In human language,
 those are the third-party libraries you’re using in your code. This tool helps produce that list and also check for any
@@ -67,7 +77,7 @@ packages and you run this tool many times. In this case
 simply create a [Github personal access token](https://github.com/settings/tokens) and set it in the `GITHUB_TOKEN`
 environment variable.
 
-## Examples
+### Examples
 
 Only check for licenses.
 
@@ -86,3 +96,24 @@ Only check if list of soup is completed without prompting.
 ```bash
 soup --soup --no_prompt
 ```
+
+## Contributing
+
+We love your input! We want to make contributing to this project as easy and transparent as possible, whether it's:
+
+* Reporting a bug
+* Discussing the current state of the code
+* Submitting a fix
+* Proposing new features
+* Becoming a maintainer
+
+Pull requests are the best way to propose changes to the codebase. We actively welcome your pull requests:
+
+1. Fork the repo and create your branch from `master`.
+2. If you've added code that should be tested, add tests. Ensure the test suite passes.
+3. Update the documentation.
+4. Make sure your code lints.
+5. Issue that pull request!
+
+When you submit code changes, your submissions are understood to be under the same [License](license) that covers the
+project. Feel free to contact the maintainers if that's a concern.
