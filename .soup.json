@@ -506,7 +506,7 @@
   "optparse": {
     "language": "Ruby",
     "package": "optparse",
-    "version": "0.4.0",
+    "version": "0.5.0",
     "license": "Ruby",
     "description": "OptionParser is a class for command-line option analysis.",
     "website": "https://github.com/ruby/optparse",
@@ -602,7 +602,7 @@
   "rubocop": {
     "language": "Ruby",
     "package": "rubocop",
-    "version": "1.63.1",
+    "version": "1.63.2",
     "license": "MIT",
     "description": "RuboCop is a Ruby code style checking and code formatting tool.",
     "website": "https://rubocop.org/",
@@ -674,7 +674,7 @@
   "term-ansicolor": {
     "language": "Ruby",
     "package": "term-ansicolor",
-    "version": "1.7.2",
+    "version": "1.8.0",
     "license": "Apache-2.0",
     "description": "This library uses ANSI escape sequences to control the attributes of terminal output",
     "website": "http://flori.github.com/term-ansicolor",
@@ -686,7 +686,7 @@
   "tins": {
     "language": "Ruby",
     "package": "tins",
-    "version": "1.32.1",
+    "version": "1.33.0",
     "license": "MIT",
     "description": "All the stuff that isn't good/big enough for a real library.",
     "website": "https://github.com/flori/tins",
