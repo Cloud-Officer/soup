@@ -602,7 +602,7 @@
   "rubocop": {
     "language": "Ruby",
     "package": "rubocop",
-    "version": "1.63.2",
+    "version": "1.63.3",
     "license": "MIT",
     "description": "RuboCop is a Ruby code style checking and code formatting tool.",
     "website": "https://rubocop.org/",
