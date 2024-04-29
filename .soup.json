@@ -239,6 +239,18 @@
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
   },
+  "csv": {
+    "language": "Ruby",
+    "package": "csv",
+    "version": "3.3.0",
+    "license": "Ruby",
+    "description": "The CSV library provides a complete interface to CSV files and data",
+    "website": "https://github.com/ruby/csv",
+    "last_verified_at": "2024-04-29",
+    "risk_level": "Low",
+    "requirements": "Dependency",
+    "verification_reasoning": "Dependency"
+  },
   "drb": {
     "language": "Ruby",
     "package": "drb",
@@ -326,7 +338,7 @@
   "httparty": {
     "language": "Ruby",
     "package": "httparty",
-    "version": "0.21.0",
+    "version": "0.22.0",
     "license": "MIT",
     "description": "Makes http fun! Also, makes consuming restful web services dead easy.",
     "website": "https://github.com/jnunemaker/httparty",
@@ -530,7 +542,7 @@
   "parser": {
     "language": "Ruby",
     "package": "parser",
-    "version": "3.3.0.5",
+    "version": "3.3.1.0",
     "license": "MIT",
     "description": "A Ruby parser written in pure Ruby.",
     "website": "https://github.com/whitequark/parser",
@@ -602,7 +614,7 @@
   "rubocop": {
     "language": "Ruby",
     "package": "rubocop",
-    "version": "1.63.3",
+    "version": "1.63.4",
     "license": "MIT",
     "description": "RuboCop is a Ruby code style checking and code formatting tool.",
     "website": "https://rubocop.org/",
@@ -614,7 +626,7 @@
   "rubocop-ast": {
     "language": "Ruby",
     "package": "rubocop-ast",
-    "version": "1.31.2",
+    "version": "1.31.3",
     "license": "MIT",
     "description": "    RuboCop's Node and NodePattern classes.",
     "website": "https://www.rubocop.org/",
