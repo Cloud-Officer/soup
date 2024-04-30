@@ -8,6 +8,9 @@ name: Build
     - reopened
     - synchronize
   push:
+    branches:
+    - master
+    - "[0-9]*"
   release:
     types:
     - created
