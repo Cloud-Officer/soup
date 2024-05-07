@@ -10,6 +10,7 @@ require_relative 'parsers/bundler'
 require_relative 'parsers/cocoapods'
 require_relative 'parsers/composer'
 require_relative 'parsers/generic'
+require_relative 'parsers/npm'
 require_relative 'parsers/pip'
 require_relative 'parsers/spm'
 require_relative 'parsers/yarn'
@@ -76,6 +77,11 @@ module SOUP
             next if @options.skip_spm
 
             parser.parse(SPMParser.new, file, @detected_packages)
+
+          when 'package-lock.json'
+            next if @options.skip_npm
+
+            parser.parse(NPMParser.new, file, @detected_packages)
 
           when 'Podfile.lock'
             next if @options.skip_cocoapods

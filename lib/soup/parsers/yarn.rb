@@ -16,7 +16,7 @@ module SOUP
 
         next if main_file.include?("#{js_package[:name]}\": \"file:vendor")
 
-        response = HTTParty.get("https://registry.npmjs.org//#{js_package[:name]}")
+        response = HTTParty.get("https://registry.npmjs.org/#{js_package[:name]}")
 
         raise(response.message) unless response.code == 200
 

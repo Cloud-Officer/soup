@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module SOUP
-  PACKAGE_MANAGERS = %w[composer.lock Gemfile.lock Package.resolved Podfile.lock requirements.txt yarn.lock].freeze
+  PACKAGE_MANAGERS = %w[composer.lock Gemfile.lock Package.resolved package-lock.json Podfile.lock requirements.txt yarn.lock].freeze
   RISK_LEVELS = %w[Low Medium High].freeze
   RISK_LEVELS_SCREEN =
     [
