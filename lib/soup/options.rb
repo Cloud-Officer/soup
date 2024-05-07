@@ -20,6 +20,7 @@ module SOUP
       @skip_bundler = false
       @skip_cocoapods = false
       @skip_composer = false
+      @skip_npm = false
       @skip_pip = false
       @skip_spm = false
       @skip_yarn = false
@@ -28,7 +29,7 @@ module SOUP
       setup_parser
     end
 
-    attr_reader :auto_reply, :exceptions_file, :ignored_folders, :licenses_check, :licenses_file, :markdown_file, :no_prompt, :skip_bundler, :skip_cocoapods, :skip_composer, :skip_pip, :skip_spm, :skip_yarn, :soup_check, :cache_file
+    attr_reader :auto_reply, :exceptions_file, :ignored_folders, :licenses_check, :licenses_file, :markdown_file, :no_prompt, :skip_bundler, :skip_cocoapods, :skip_composer, :skip_npm, :skip_pip, :skip_spm, :skip_yarn, :soup_check, :cache_file
 
     def parse
       @parser.parse!(@argv)
@@ -86,6 +87,10 @@ module SOUP
 
       @parser.on('', '--skip_composer', 'Ignore PHP/Composer/composer.json/composer.lock even if detected') do
         @skip_composer = true
+      end
+
+      @parser.on('', '--skip_npm', 'Ignore JS/NPM/package.json/package-lock.json even if detected') do
+        @skip_spm = true
       end
 
       @parser.on('', '--skip_pip', 'Ignore Python/PIP/requirements.txt even if detected') do
