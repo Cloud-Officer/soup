@@ -12,6 +12,8 @@ module SOUP
       all_packages.each do |key, value|
         next if key.empty?
 
+        next if value['dev']
+
         name = key.split('node_modules/').last
         puts("Checking #{name} #{value['version']}...")
         response = HTTParty.get("https://registry.npmjs.org/#{name}")
