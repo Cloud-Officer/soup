@@ -191,6 +191,12 @@ module SOUP
         raise("Missing information for #{package.package}!") if package.risk_level.empty? or package.requirements.empty? or package.verification_reasoning.empty?
 
         package.last_verified_at = Time.now.strftime('%Y-%m-%d').to_s if package.last_verified_at.empty?
+
+        if package.description
+          package.description = package.description.gsub('|', '')
+          package.description = package.description.gsub('  ', ' ')
+        end
+
         @markdown += "| #{package.language} | #{package.package} | #{package.version} | #{package.license} | #{package.description} | <#{package.website}> | #{package.last_verified_at} | #{package.risk_level} | #{package.requirements} | #{package.verification_reasoning} |\n"
       end
     end
