@@ -26,7 +26,7 @@ module SOUP
         next if pip_package&.strip&.empty?
 
         puts("Checking #{pip_package} #{version}...")
-        response = HTTParty.get("https://pypi.python.org/pypi/#{pip_package}/json")
+        response = RequestWithTimeoutAndRetries.get_with_retries("https://pypi.python.org/pypi/#{pip_package}/json")
 
         raise(response.message) unless response.code == 200
 
@@ -45,6 +45,23 @@ module SOUP
 
         package.license = package_details['info']['license']&.strip if package.license.nil? or package.license.empty?
         packages[package.package] = package
+      end
+    end
+  end
+
+  class RequestWithTimeoutAndRetries
+    include HTTParty
+    default_options.update(timeout: 5)
+
+    def self.get_with_retries(url, options = {}, max_retries = 3)
+      retries = 0
+      begin
+        get(url, options)
+      rescue Net::OpenTimeout, Net::ReadTimeout => e
+        raise(e) if retries >= max_retries
+
+        retries += 1
+        retry
       end
     end
   end
