@@ -10,6 +10,7 @@ require_relative 'parsers/bundler'
 require_relative 'parsers/cocoapods'
 require_relative 'parsers/composer'
 require_relative 'parsers/generic'
+require_relative 'parsers/gradle'
 require_relative 'parsers/npm'
 require_relative 'parsers/pip'
 require_relative 'parsers/spm'
@@ -63,6 +64,11 @@ module SOUP
           puts("Reading file #{file}...")
 
           case File.basename(file)
+          when 'buildscript-gradle.lockfile'
+            next if @options.skip_gradle
+
+            parser.parse(GradleParser.new, file, @detected_packages)
+
           when 'composer.lock'
             next if @options.skip_composer
 
