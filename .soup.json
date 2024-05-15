@@ -515,6 +515,18 @@
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
   },
+  "nokogiri": {
+    "language": "Ruby",
+    "package": "nokogiri",
+    "version": "1.16.5",
+    "license": "MIT",
+    "description": "Nokogiri (鋸) makes it easy and painless to work with XML and HTML from Ruby",
+    "website": "https://nokogiri.org",
+    "last_verified_at": "2024-05-15",
+    "risk_level": "Low",
+    "requirements": "XML parser",
+    "verification_reasoning": "Most popular library"
+  },
   "optparse": {
     "language": "Ruby",
     "package": "optparse",
