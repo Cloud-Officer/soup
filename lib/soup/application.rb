@@ -69,6 +69,11 @@ module SOUP
 
             parser.parse(GradleParser.new, file, @detected_packages)
 
+          when 'composer.lock'
+            next if @options.skip_composer
+
+            parser.parse(ComposerParser.new, file, @detected_packages)
+
           when 'Gemfile.lock'
             next if @options.skip_bundler
 
