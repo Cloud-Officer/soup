@@ -11,9 +11,8 @@ name: Build
     branches:
     - master
     - "[0-9]*"
-  release:
-    types:
-    - created
+    tags:
+    - "**"
 env:
   RUBY-BUNDLER-CACHE: 'false'
   RUBY-VERSION: 3.2.2
