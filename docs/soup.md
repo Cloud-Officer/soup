@@ -54,7 +54,7 @@
 | Ruby | rainbow | 3.1.1 | MIT | Colorize printed text on ANSI terminals | <https://github.com/sickill/rainbow> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | regexp_parser | 2.9.2 | MIT | A library for tokenizing, lexing, and parsing Ruby regular expressions. | <https://github.com/ammar/regexp_parser> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | rexml | 3.2.8 | BSD-2-Clause | An XML toolkit for Ruby | <https://github.com/ruby/rexml> | 2022-05-10 | Low | Dependency | Dependency |
-| Ruby | rubocop | 1.63.5 | MIT | RuboCop is a Ruby code style checking and code formatting tool. | <https://rubocop.org/> | 2022-05-10 | Low | Used to lint ruby code in project. | Very popular on rubygems.org |
+| Ruby | rubocop | 1.64.0 | MIT | RuboCop is a Ruby code style checking and code formatting tool. | <https://rubocop.org/> | 2022-05-10 | Low | Used to lint ruby code in project. | Very popular on rubygems.org |
 | Ruby | rubocop-ast | 1.31.3 | MIT |   RuboCop's Node and NodePattern classes. | <https://www.rubocop.org/> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | ruby-macho | 2.5.1 | MIT | A library for viewing and manipulating Mach-O files in Ruby. | <https://github.com/Homebrew/ruby-macho> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | ruby-progressbar | 1.13.0 | MIT | Ruby/ProgressBar is an extremely flexible text progress bar library for Ruby | <https://github.com/jfelchner/ruby-progressbar> | 2022-05-10 | Low | Dependency | Dependency |
