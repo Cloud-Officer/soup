@@ -201,6 +201,7 @@ module SOUP
         if package.description
           package.description = package.description.gsub('|', '')
           package.description = package.description.gsub('  ', ' ')
+          package.description = package.description.gsub(/<.*>/, 'HTML text removed. Please check the website.')
         end
 
         @markdown += "| #{package.language} | #{package.package} | #{package.version} | #{package.license} | #{package.description} | <#{package.website}> | #{package.last_verified_at} | #{package.risk_level} | #{package.requirements} | #{package.verification_reasoning} |\n"
