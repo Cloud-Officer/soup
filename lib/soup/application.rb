@@ -92,7 +92,7 @@ module SOUP
           when 'Podfile.lock'
             next if @options.skip_cocoapods
 
-            next unless RUBY_PLATFORM =~ /darwin/i
+            next unless RUBY_PLATFORM.match?(/darwin/i)
 
             parser.parse(CocoaPodsParser.new, file, @detected_packages)
 
@@ -199,7 +199,7 @@ module SOUP
         package.last_verified_at = Time.now.strftime('%Y-%m-%d').to_s if package.last_verified_at.empty?
 
         if package.description
-          package.description = package.description.gsub('|', '')
+          package.description = package.description.delete('|')
           package.description = package.description.gsub('  ', ' ')
           package.description = package.description.gsub(/<.*>/, 'HTML text removed. Please check the website.')
         end

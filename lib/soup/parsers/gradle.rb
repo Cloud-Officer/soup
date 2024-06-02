@@ -34,7 +34,7 @@ module SOUP
           website = package_details['home_page']
         else
           REPOSITORY_URLS.each do |url|
-            response = HTTParty.get("#{url}/#{group_id.gsub('.', '/')}/#{artifact_id}/#{version}/#{artifact_id}-#{version}.pom")
+            response = HTTParty.get("#{url}/#{group_id.tr('.', '/')}/#{artifact_id}/#{version}/#{artifact_id}-#{version}.pom")
 
             next unless response.code == 200
 

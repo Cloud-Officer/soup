@@ -36,7 +36,7 @@ module SOUP
         package.version = value['version']
         package.license = package_details['license']
         package.license = 'NOASSERTION' if package.license&.include?('Unlicense')
-        package.description = package_details['description']&.gsub(%r{((?:f|ht)tps?:/\S+)}, '<\1>')&.gsub('_', '')&.gsub('[', '')&.gsub(']', '')&.gsub('!', '')&.gsub('|', '')
+        package.description = package_details['description']&.gsub(%r{((?:f|ht)tps?:/\S+)}, '<\1>')&.delete('_')&.delete('[')&.delete(']')&.delete('!')&.delete('|')
         package.website = package_details['homepage']
         package.dependency = !main_file.include?(name)
         packages[package.package] = package
