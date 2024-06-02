@@ -290,7 +290,7 @@
   "ffi": {
     "language": "Ruby",
     "package": "ffi",
-    "version": "1.16.3",
+    "version": "1.17.0",
     "license": "BSD-3-Clause",
     "description": "Ruby FFI library",
     "website": "https://github.com/ffi/ffi/wiki",
