@@ -2,7 +2,7 @@
 
 require 'active_support'
 require 'active_support/core_ext'
-require 'cocoapods-core' if RUBY_PLATFORM =~ /darwin/i
+require 'cocoapods-core' if RUBY_PLATFORM.match?(/darwin/i)
 require 'semantic'
 
 require_relative '../package'
@@ -11,7 +11,7 @@ module SOUP
   class CocoaPodsParser
     def parse(file, packages)
       lock_file = Pod::Lockfile.from_file(Pathname.new(file))
-      main_file = File.read(file.gsub('.lock', '')).gsub('/', '')
+      main_file = File.read(file.gsub('.lock', '')).delete('/')
       source = Pod::Source.new("#{Dir.home}/.cocoapods/repos/trunk")
 
       _key, pods = lock_file&.pods_by_spec_repo&.first
@@ -22,7 +22,7 @@ module SOUP
         puts("Checking #{pod} #{version}...")
 
         begin
-          package_details = source.specification(pod.gsub('/', '').gsub('Only', ''), version).attributes_hash
+          package_details = source.specification(pod.delete('/').gsub('Only', ''), version).attributes_hash
         rescue Pod::StandardError
           next
         end

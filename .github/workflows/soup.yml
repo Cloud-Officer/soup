@@ -1,0 +1,26 @@
+---
+name: Dependencies
+'on':
+  pull_request:
+    branches:
+    - dependabot/**
+  push:
+    branches:
+    - dependabot/**
+jobs:
+  update_dependencies:
+    name: Update Dependencies
+    permissions:
+      contents: write
+    runs-on: macos-latest
+    steps:
+    - name: Licenses
+      uses: cloud-officer/ci-actions/soup@master
+      with:
+        ssh-key: "${{secrets.SSH_KEY}}"
+        github-token: "${{secrets.GITHUB_TOKEN}}"
+        parameters: "--no_prompt --soup"
+    - name: Auto Commit Changes
+      uses: stefanzweifel/git-auto-commit-action@v5
+      with:
+        commit_message: Updated soup files

@@ -1,3 +1,6 @@
+require:
+  - rubocop-performance
+  - rubocop-rspec
 AllCops:
   EnabledByDefault: true
 Style/DisableCopsWithinSourceCodeDirective:
@@ -57,3 +60,5 @@ Style/TopLevelMethodDefinition:
   Enabled: false
 Style/YodaExpression:
   Enabled: false
+Style/HashSyntax:
+  EnforcedShorthandSyntax: never

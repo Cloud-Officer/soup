@@ -11,16 +11,17 @@ name: Build
     branches:
     - master
     - "[0-9]*"
+    - dependabot/**
     tags:
     - "**"
 env:
   RUBY-BUNDLER-CACHE: 'false'
-  RUBY-VERSION: 3.2.2
-  XCODE-VERSION: 14.2
+  RUBY-VERSION: 3.3.2
+  XCODE-VERSION: 15.4.0
 jobs:
   variables:
     name: Prepare Variables
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     outputs:
       BUILD_NAME: "${{steps.variables.outputs.BUILD_NAME}}"
       BUILD_VERSION: "${{steps.variables.outputs.BUILD_VERSION}}"
@@ -45,7 +46,7 @@ jobs:
         ssh-key: "${{secrets.SSH_KEY}}"
   actionlint:
     name: Github Actions Linter
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     needs:
     - variables
     if: "${{needs.variables.outputs.SKIP_LINTERS != '1' && (github.event_name == 'pull_request' || github.event_name == 'pull_request_target')}}"
@@ -63,7 +64,7 @@ jobs:
       actions: read
       contents: read
       security-events: write
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     needs:
     - variables
     if: "${{needs.variables.outputs.SKIP_LINTERS != '1' && (github.event_name == 'pull_request' || github.event_name == 'pull_request_target')}}"
@@ -81,7 +82,7 @@ jobs:
       actions: read
       contents: read
       security-events: write
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     needs:
     - variables
     if: "${{needs.variables.outputs.SKIP_LINTERS != '1' && (github.event_name == 'pull_request' || github.event_name == 'pull_request_target')}}"
@@ -95,7 +96,7 @@ jobs:
         languages: ruby
   markdownlint:
     name: Markdown Linter
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     needs:
     - variables
     if: "${{needs.variables.outputs.SKIP_LINTERS != '1' && (github.event_name == 'pull_request' || github.event_name == 'pull_request_target')}}"
@@ -109,7 +110,7 @@ jobs:
         github_token: "${{secrets.GITHUB_TOKEN}}"
   rubocop:
     name: Ruby Linter
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     needs:
     - variables
     if: "${{needs.variables.outputs.SKIP_LINTERS != '1' && (github.event_name == 'pull_request' || github.event_name == 'pull_request_target')}}"
@@ -123,7 +124,7 @@ jobs:
         github_token: "${{secrets.GITHUB_TOKEN}}"
   yamllint:
     name: YAML Linter
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     needs:
     - variables
     if: "${{needs.variables.outputs.SKIP_LINTERS != '1' && (github.event_name == 'pull_request' || github.event_name == 'pull_request_target')}}"
@@ -137,7 +138,7 @@ jobs:
         github_token: "${{secrets.GITHUB_TOKEN}}"
   licenses:
     name: Licenses Check
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     needs:
     - variables
     if: "${{needs.variables.outputs.SKIP_LICENSES != '1'}}"
@@ -157,8 +158,8 @@ jobs:
     strategy:
       matrix:
         os:
-        - macos-13
-        - ubuntu-22.04
+        - macos-latest
+        - ubuntu-latest
     steps:
     - name: Setup
       id: setup
