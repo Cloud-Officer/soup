@@ -18,7 +18,7 @@ jobs:
       uses: cloud-officer/ci-actions/soup@master
       with:
         ssh-key: "${{secrets.SSH_KEY}}"
-        github-token: "${{secrets.GITHUB_TOKEN}}"
+        github-token: "${{secrets.SOUP_DEPENDENCIES_UPDATE}}"
         parameters: "--no_prompt --soup"
     - name: Auto Commit Changes
       uses: stefanzweifel/git-auto-commit-action@v5
