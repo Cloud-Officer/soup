@@ -20,6 +20,12 @@ jobs:
         ssh-key: "${{secrets.SSH_KEY}}"
         github-token: "${{secrets.SOUP_DEPENDENCIES_UPDATE}}"
         parameters: "--no_prompt --soup"
+    - name: Set GitHub to use https with credentials
+      shell: bash
+      run: |
+        git config --global --add url."https://${{secrets.SOUP_DEPENDENCIES_UPDATE}}:x-oauth-basic@github.com/".insteadOf ssh://git@github.com:
+        git config --global --add url."https://${{secrets.SOUP_DEPENDENCIES_UPDATE}}:x-oauth-basic@github.com/".insteadOf https://github.com/
+        git config --global --add url."https://${{secrets.SOUP_DEPENDENCIES_UPDATE}}:x-oauth-basic@github.com/".insteadOf git@github.com:
     - name: Auto Commit Changes
       uses: stefanzweifel/git-auto-commit-action@v5
       with:
