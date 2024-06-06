@@ -6,6 +6,9 @@ require_relative '../package'
 
 module SOUP
   class YarnParser
+    MAX_RETRIES = 3
+    private_constant :MAX_RETRIES
+
     def parse(file, packages)
       lock_file = YarnLockParser::Parser.parse(file)
       main_file = File.read(file.gsub('yarn.lock', 'package.json'))
@@ -16,7 +19,22 @@ module SOUP
 
         next if main_file.include?("#{js_package[:name]}\": \"file:vendor")
 
-        response = HTTParty.get("https://registry.npmjs.org/#{js_package[:name]}")
+        response = nil
+        retries = 0
+
+        begin
+          response = HTTParty.get("https://registry.npmjs.org/#{js_package[:name]}")
+        rescue Net::OpenTimeout => e
+          retries += 1
+
+          if retries <= MAX_RETRIES
+            puts("Error: #{e.message}. Retrying (#{retries}/#{MAX_RETRIES})...")
+            retry
+          else
+            puts("Error: #{e.message}. Aborting after #{MAX_RETRIES} retries.")
+            next
+          end
+        end
 
         raise(response.message) unless response.code == 200
 
