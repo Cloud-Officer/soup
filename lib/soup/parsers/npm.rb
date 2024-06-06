@@ -4,6 +4,8 @@ require_relative '../package'
 
 module SOUP
   class NPMParser
+    MAX_RETRIES = 3
+    private_constant :MAX_RETRIES
     def parse(file, packages)
       lock_file = JSON.parse(File.read(file))
       main_file = File.read(file.gsub('package-lock.json', 'package.json'))
@@ -16,7 +18,22 @@ module SOUP
 
         name = key.split('node_modules/').last
         puts("Checking #{name} #{value['version']}...")
-        response = HTTParty.get("https://registry.npmjs.org/#{name}")
+        response = nil
+        retries = 0
+
+        begin
+          response = HTTParty.get("https://registry.npmjs.org/#{name}")
+        rescue Net::OpenTimeout => e
+          retries += 1
+
+          if retries <= MAX_RETRIES
+            puts("Error: #{e.message}. Retrying (#{retries}/#{MAX_RETRIES})...")
+            retry
+          else
+            puts("Error: #{e.message}. Aborting after #{MAX_RETRIES} retries.")
+            next
+          end
+        end
 
         if response.code != 200
           puts("Error: #{response.message}!")

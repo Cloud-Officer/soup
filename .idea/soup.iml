@@ -67,7 +67,7 @@
     <orderEntry type="library" scope="PROVIDED" name="rubocop-capybara (v2.20.0, ruby-3.3.1-p55) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="rubocop-factory_bot (v2.25.1, ruby-3.3.1-p55) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="rubocop-performance (v1.21.0, ruby-3.3.1-p55) [gem]" level="application" />
-    <orderEntry type="library" scope="PROVIDED" name="rubocop-rspec (v2.29.2, ruby-3.3.1-p55) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="rubocop-rspec (v2.30.0, ruby-3.3.1-p55) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="rubocop-rspec_rails (v2.28.3, ruby-3.3.1-p55) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="ruby-macho (v2.5.1, ruby-3.3.1-p55) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="ruby-progressbar (v1.13.0, ruby-3.3.1-p55) [gem]" level="application" />
