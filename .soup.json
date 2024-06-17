@@ -554,7 +554,7 @@
   "parser": {
     "language": "Ruby",
     "package": "parser",
-    "version": "3.3.2.0",
+    "version": "3.3.3.0",
     "license": "MIT",
     "description": "A Ruby parser written in pure Ruby.",
     "website": "https://github.com/whitequark/parser",
@@ -674,7 +674,7 @@
   "rubocop-performance": {
     "language": "Ruby",
     "package": "rubocop-performance",
-    "version": "1.21.0",
+    "version": "1.21.1",
     "license": "MIT",
     "description": "A collection of RuboCop cops to check for performance optimizations",
     "website": "https://docs.rubocop.org/rubocop-performance/",
