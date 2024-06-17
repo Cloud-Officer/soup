@@ -647,30 +647,6 @@
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
   },
-  "rubocop-capybara": {
-    "language": "Ruby",
-    "package": "rubocop-capybara",
-    "version": "2.21.0",
-    "license": "MIT",
-    "description": "Code style checking for Capybara test files (RSpec, Cucumber, Minitest).",
-    "website": "https://github.com/rubocop/rubocop-capybara",
-    "last_verified_at": "2024-06-02",
-    "risk_level": "Low",
-    "requirements": "Dependency",
-    "verification_reasoning": "Dependency"
-  },
-  "rubocop-factory_bot": {
-    "language": "Ruby",
-    "package": "rubocop-factory_bot",
-    "version": "2.26.0",
-    "license": "MIT",
-    "description": "Code style checking for factory_bot files.",
-    "website": "https://github.com/rubocop/rubocop-factory_bot",
-    "last_verified_at": "2024-06-02",
-    "risk_level": "Low",
-    "requirements": "Dependency",
-    "verification_reasoning": "Dependency"
-  },
   "rubocop-performance": {
     "language": "Ruby",
     "package": "rubocop-performance",
@@ -686,7 +662,7 @@
   "rubocop-rspec": {
     "language": "Ruby",
     "package": "rubocop-rspec",
-    "version": "2.31.0",
+    "version": "3.0.1",
     "license": "MIT",
     "description": "Code style checking for RSpec files.",
     "website": "https://github.com/rubocop/rubocop-rspec",
@@ -694,18 +670,6 @@
     "risk_level": "Low",
     "requirements": "Code style checking for RSpec files. A plugin for the RuboCop code style enforcing & linting tool",
     "verification_reasoning": "Most popular gem"
-  },
-  "rubocop-rspec_rails": {
-    "language": "Ruby",
-    "package": "rubocop-rspec_rails",
-    "version": "2.29.0",
-    "license": "MIT",
-    "description": "Code style checking for RSpec Rails files.",
-    "website": null,
-    "last_verified_at": "2024-06-02",
-    "risk_level": "Low",
-    "requirements": "Dependency",
-    "verification_reasoning": "Dependency"
   },
   "ruby-macho": {
     "language": "Ruby",
