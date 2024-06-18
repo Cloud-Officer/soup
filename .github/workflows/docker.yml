@@ -64,4 +64,4 @@ jobs:
         with:
           subject-name: docker.io/${{ secrets.DOCKER_USERNAME }}/${{ env.REPO_NAME }}
           subject-digest: ${{ steps.push.outputs.digest }}
-          push-to-registry: true
+          push-to-registry: false
