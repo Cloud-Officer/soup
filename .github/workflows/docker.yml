@@ -49,6 +49,6 @@ jobs:
       - name: Generate artifact attestation
         uses: actions/attest-build-provenance@v1
         with:
-          subject-name: ${{ secrets.DOCKER_USERNAME }}/${{ env.REPO_NAME }}
+          subject-name: docker.io/${{ secrets.DOCKER_USERNAME }}/${{ env.REPO_NAME }}
           subject-digest: ${{ steps.push.outputs.digest }}
           push-to-registry: true
