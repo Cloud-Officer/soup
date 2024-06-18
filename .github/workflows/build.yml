@@ -94,6 +94,19 @@ jobs:
         ssh-key: "${{secrets.SSH_KEY}}"
         github_token: "${{secrets.GITHUB_TOKEN}}"
         languages: ruby
+  hadolint:
+    name: Docker Linter
+    runs-on: ubuntu-latest
+    needs:
+    - variables
+    if: "${{needs.variables.outputs.SKIP_LINTERS != '1' && (github.event_name == 'pull_request' || github.event_name == 'pull_request_target')}}"
+    steps:
+    - name: Hadolint
+      uses: cloud-officer/ci-actions/linters/hadolint@master
+      with:
+        linters: "${{needs.variables.outputs.LINTERS}}"
+        ssh-key: "${{secrets.SSH_KEY}}"
+        github_token: "${{secrets.GITHUB_TOKEN}}"
   markdownlint:
     name: Markdown Linter
     runs-on: ubuntu-latest
