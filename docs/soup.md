@@ -20,7 +20,7 @@
 | Ruby | cocoapods-trunk | 1.6.0 | MIT | Interact with trunk.cocoapods.org | <https://github.com/CocoaPods/cocoapods-trunk> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | cocoapods-try | 1.2.0 | MIT | CocoaPods plugin which allows to quickly try the demo project of a Pod. | <https://github.com/cocoapods/cocoapods-try> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | colored2 | 3.1.2 | MIT | This is a heavily modified fork of HTML text removed. Please check the website. gem, with many | <http://github.com/kigster/colored2> | 2022-05-10 | Low | Dependency | Dependency |
-| Ruby | concurrent-ruby | 1.3.1 | MIT | Modern concurrency tools including agents, futures, promises, thread pools, actors, supervisors, and more. | <http://www.concurrent-ruby.com> | 2022-05-10 | Low | Dependency | Dependency |
+| Ruby | concurrent-ruby | 1.3.3 | MIT | Modern concurrency tools including agents, futures, promises, thread pools, actors, supervisors, and more. | <http://www.concurrent-ruby.com> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | connection_pool | 2.4.1 | MIT | Generic connection pool for Ruby | <https://github.com/mperham/connection_pool> | 2023-10-26 | Low | Dependency | Dependency |
 | Ruby | csv | 3.3.0 | Ruby | The CSV library provides a complete interface to CSV files and data | <https://github.com/ruby/csv> | 2024-04-29 | Low | Dependency | Dependency |
 | Ruby | drb | 2.2.1 | Ruby | Distributed object system for Ruby | <https://github.com/ruby/drb> | 2023-10-26 | Low | Dependency | Dependency |

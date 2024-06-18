@@ -6,6 +6,7 @@
 
 .github/                 @ydesgagn
 .gitignore               @ydesgagn
+.hadolint.yaml           @ydesgagn
 .markdownlint.yml        @ydesgagn
 .rubocop.yml             @ydesgagn
 .soup.json               @ydesgagn
@@ -15,3 +16,4 @@ readme.md                @ydesgagn
 bin/                     @ydesgagn
 docs/                    @ydesgagn
 lib/                     @ydesgagn
+Dockerfile               @ydesgagn
