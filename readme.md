@@ -43,8 +43,11 @@ choices.
 
 ## Installation
 
-You can run `bundle install` and then run the command `soup` or you can install the latest via homebrew
-with `brew install cloud-officer/ci/soup`.
+You can run `bundle install` and then run the command `soup`.
+
+You can install via Homebrew [here](https://github.com/Cloud-Officer/homebrew-ci).
+
+Docker images are available [here](https://hub.docker.com/r/ydesgagne/ci-tools).
 
 ## Usage
 
