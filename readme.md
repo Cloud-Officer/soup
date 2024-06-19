@@ -29,11 +29,13 @@ popular and highest rated GitHub library for networking written in Swift.
 
 The following package managers are supported:
 
-* Composer (composer.lock)
 * Bundler (Gemfile.lock)
-* SPM (Package.resolved)
 * CocoaPods (Podfile.lock)
+* Composer (composer.lock)
+* Gradle (buildscript-gradle.lockfile)
+* NPM (package-lock.json)
 * PIP (requirements.txt)
+* SPM (Package.resolved)
 * Yarn (yarn.lock)
 
 The soup file is generated in `./docs/soup.md` and a cache file `.soup.json` is used to preserved previously entered
