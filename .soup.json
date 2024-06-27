@@ -26,7 +26,7 @@
   "addressable": {
     "language": "Ruby",
     "package": "addressable",
-    "version": "2.8.6",
+    "version": "2.8.7",
     "license": "Apache-2.0",
     "description": "Addressable is an alternative implementation to the URI implementation that is",
     "website": "https://github.com/sporkmonger/addressable",
@@ -422,11 +422,23 @@
   "minitest": {
     "language": "Ruby",
     "package": "minitest",
-    "version": "5.23.1",
+    "version": "5.24.0",
     "license": "MIT",
     "description": "minitest provides a complete suite of testing facilities supporting",
     "website": "https://github.com/minitest/minitest",
     "last_verified_at": "2022-05-10",
+    "risk_level": "Low",
+    "requirements": "Dependency",
+    "verification_reasoning": "Dependency"
+  },
+  "mize": {
+    "language": "Ruby",
+    "package": "mize",
+    "version": "0.4.1",
+    "license": "MIT",
+    "description": "Library that provides memoziation for methods and functions for Ruby.",
+    "website": "http://flori.github.com/mize",
+    "last_verified_at": "2024-06-27",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -563,6 +575,18 @@
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
   },
+  "protocol": {
+    "language": "Ruby",
+    "package": "protocol",
+    "version": "2.0.0",
+    "license": "GPL-2",
+    "description": "This library offers an implementation of protocols against which you can check",
+    "website": "http://flori.github.com/protocol",
+    "last_verified_at": "2024-06-27",
+    "risk_level": "Low",
+    "requirements": "Dependency",
+    "verification_reasoning": "Dependency"
+  },
   "public_suffix": {
     "language": "Ruby",
     "package": "public_suffix",
@@ -695,6 +719,18 @@
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
   },
+  "ruby_parser": {
+    "language": "Ruby",
+    "package": "ruby_parser",
+    "version": "3.21.0",
+    "license": "MIT",
+    "description": "ruby_parser (RP) is a ruby parser written in pure ruby (utilizing",
+    "website": "https://github.com/seattlerb/ruby_parser",
+    "last_verified_at": "2024-06-27",
+    "risk_level": "Low",
+    "requirements": "Dependency",
+    "verification_reasoning": "Dependency"
+  },
   "semantic": {
     "language": "Ruby",
     "package": "semantic",
@@ -706,6 +742,18 @@
     "risk_level": "Low",
     "requirements": "Used to manipulate package versions.",
     "verification_reasoning": "Very popular on rubygems.org"
+  },
+  "sexp_processor": {
+    "language": "Ruby",
+    "package": "sexp_processor",
+    "version": "4.17.1",
+    "license": "MIT",
+    "description": "sexp_processor branches from ParseTree bringing all the generic sexp",
+    "website": "https://github.com/seattlerb/sexp_processor",
+    "last_verified_at": "2024-06-27",
+    "risk_level": "Low",
+    "requirements": "Dependency",
+    "verification_reasoning": "Dependency"
   },
   "strscan": {
     "language": "Ruby",
@@ -734,7 +782,7 @@
   "term-ansicolor": {
     "language": "Ruby",
     "package": "term-ansicolor",
-    "version": "1.8.0",
+    "version": "1.10.2",
     "license": "Apache-2.0",
     "description": "This library uses ANSI escape sequences to control the attributes of terminal output",
     "website": "http://flori.github.com/term-ansicolor",
