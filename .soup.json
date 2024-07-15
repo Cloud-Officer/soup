@@ -566,7 +566,7 @@
   "parser": {
     "language": "Ruby",
     "package": "parser",
-    "version": "3.3.3.0",
+    "version": "3.3.4.0",
     "license": "MIT",
     "description": "A Ruby parser written in pure Ruby.",
     "website": "https://github.com/whitequark/parser",
@@ -686,7 +686,7 @@
   "rubocop-rspec": {
     "language": "Ruby",
     "package": "rubocop-rspec",
-    "version": "3.0.2",
+    "version": "3.0.3",
     "license": "MIT",
     "description": "Code style checking for RSpec files.",
     "website": "https://github.com/rubocop/rubocop-rspec",
