@@ -434,7 +434,7 @@
   "mize": {
     "language": "Ruby",
     "package": "mize",
-    "version": "0.5.0",
+    "version": "0.6.0",
     "license": "MIT",
     "description": "Library that provides memoziation for methods and functions for Ruby.",
     "website": "http://flori.github.com/mize",
