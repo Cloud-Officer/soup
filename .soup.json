@@ -431,18 +431,6 @@
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
   },
-  "mize": {
-    "language": "Ruby",
-    "package": "mize",
-    "version": "0.6.0",
-    "license": "MIT",
-    "description": "Library that provides memoziation for methods and functions for Ruby.",
-    "website": "http://flori.github.com/mize",
-    "last_verified_at": "2024-06-27",
-    "risk_level": "Low",
-    "requirements": "Dependency",
-    "verification_reasoning": "Dependency"
-  },
   "molinillo": {
     "language": "Ruby",
     "package": "molinillo",
@@ -746,7 +734,7 @@
   "term-ansicolor": {
     "language": "Ruby",
     "package": "term-ansicolor",
-    "version": "1.10.4",
+    "version": "1.11.2",
     "license": "Apache-2.0",
     "description": "This library uses ANSI escape sequences to control the attributes of terminal output",
     "website": "http://flori.github.com/term-ansicolor",

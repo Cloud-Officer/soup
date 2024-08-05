@@ -38,7 +38,6 @@
 | Ruby | language_server-protocol | 3.17.0.3 | MIT | A Language Server Protocol SDK | <https://github.com/mtsmfm/language_server-protocol-ruby> | 2023-06-29 | Low | Dependency | Dependency |
 | Ruby | mini_mime | 1.1.5 | MIT | A minimal mime type library | <https://github.com/discourse/mini_mime> | 2023-03-30 | Low | Dependency | Dependency |
 | Ruby | minitest | 5.24.1 | MIT | minitest provides a complete suite of testing facilities supporting | <https://github.com/minitest/minitest> | 2022-05-10 | Low | Dependency | Dependency |
-| Ruby | mize | 0.6.0 | MIT | Library that provides memoziation for methods and functions for Ruby. | <http://flori.github.com/mize> | 2024-06-27 | Low | Dependency | Dependency |
 | Ruby | molinillo | 0.8.0 | MIT | Provides support for dependency resolution | <https://github.com/CocoaPods/Molinillo> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | multi_xml | 0.7.1 | MIT | Provides swappable XML backends utilizing LibXML, Nokogiri, Ox, or REXML. | <https://github.com/sferik/multi_xml> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | mutex_m | 0.2.0 | Ruby | Mixin to extend objects to be handled like a Mutex. | <https://github.com/ruby/mutex_m> | 2023-10-26 | Low | Dependency | Dependency |
@@ -64,7 +63,7 @@
 | Ruby | semantic | 1.6.1 | MIT | Semantic Version utility class for parsing, storing, and comparing versions | <https://github.com/jlindsey/semantic> | 2022-05-10 | Low | Used to manipulate package versions. | Very popular on rubygems.org |
 | Ruby | strscan | 3.1.0 | Ruby | Provides lexical scanning operations on a String. | <https://github.com/ruby/strscan> | 2024-05-21 | Low | Dependency | Dependency |
 | Ruby | sync | 0.5.0 | BSD-2-Clause | A module that provides a two-phase lock with a counter. | <https://github.com/ruby/sync> | 2022-05-10 | Low | Dependency | Dependency |
-| Ruby | term-ansicolor | 1.10.4 | Apache-2.0 | This library uses ANSI escape sequences to control the attributes of terminal output | <http://flori.github.com/term-ansicolor> | 2022-05-10 | Low | Dependency | Dependency |
+| Ruby | term-ansicolor | 1.11.2 | Apache-2.0 | This library uses ANSI escape sequences to control the attributes of terminal output | <http://flori.github.com/term-ansicolor> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | tins | 1.33.0 | MIT | All the stuff that isn't good/big enough for a real library. | <https://github.com/flori/tins> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | typhoeus | 1.4.1 | MIT | Like a modern code version of the mythical beast with 100 serpent heads, Typhoeus runs HTTP requests in parallel while cleanly encapsulating handling logic. | <https://github.com/typhoeus/typhoeus> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | tzinfo | 2.0.6 | MIT | TZInfo provides access to time zone data and allows times to be converted using time zone rules. | <https://tzinfo.github.io> | 2022-05-10 | Low | Dependency | Dependency |
