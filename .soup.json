@@ -590,9 +590,9 @@
   "racc": {
     "language": "Ruby",
     "package": "racc",
-    "version": "1.8.0",
+    "version": "1.8.1",
     "license": "Ruby",
-    "description": "Racc is a LALR(1) parser generator.",
+    "description": "Racc is an LALR(1) parser generator.",
     "website": "https://github.com/ruby/racc",
     "last_verified_at": "2023-06-09",
     "risk_level": "Low",
@@ -638,7 +638,7 @@
   "rubocop": {
     "language": "Ruby",
     "package": "rubocop",
-    "version": "1.65.0",
+    "version": "1.65.1",
     "license": "MIT",
     "description": "RuboCop is a Ruby code style checking and code formatting tool.",
     "website": "https://rubocop.org/",
