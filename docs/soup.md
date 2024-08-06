@@ -55,9 +55,9 @@
 | Ruby | regexp_parser | 2.9.2 | MIT | A library for tokenizing, lexing, and parsing Ruby regular expressions. | <https://github.com/ammar/regexp_parser> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | rexml | 3.2.9 | BSD-2-Clause | An XML toolkit for Ruby | <https://github.com/ruby/rexml> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | rubocop | 1.65.1 | MIT | RuboCop is a Ruby code style checking and code formatting tool. | <https://rubocop.org/> | 2023-06-11 | Low | Ruby linter | Most popular gem on rubygems |
-| Ruby | rubocop-ast | 1.31.3 | MIT |   RuboCop's Node and NodePattern classes. | <https://www.rubocop.org/> | 2022-05-10 | Low | Dependency | Dependency |
+| Ruby | rubocop-ast | 1.32.0 | MIT |   RuboCop's Node and NodePattern classes. | <https://www.rubocop.org/> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | rubocop-performance | 1.21.1 | MIT | A collection of RuboCop cops to check for performance optimizations | <https://docs.rubocop.org/rubocop-performance/> | 2024-05-30 | Low | A collection of RuboCop cops to check for performance optimizations in Ruby code | Most popular gem |
-| Ruby | rubocop-rspec | 3.0.3 | MIT | Code style checking for RSpec files. | <https://github.com/rubocop/rubocop-rspec> | 2024-05-30 | Low | Code style checking for RSpec files. A plugin for the RuboCop code style enforcing & linting tool | Most popular gem |
+| Ruby | rubocop-rspec | 3.0.4 | MIT | Code style checking for RSpec files. | <https://github.com/rubocop/rubocop-rspec> | 2024-05-30 | Low | Code style checking for RSpec files. A plugin for the RuboCop code style enforcing & linting tool | Most popular gem |
 | Ruby | ruby-macho | 2.5.1 | MIT | A library for viewing and manipulating Mach-O files in Ruby. | <https://github.com/Homebrew/ruby-macho> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | ruby-progressbar | 1.13.0 | MIT | Ruby/ProgressBar is an extremely flexible text progress bar library for Ruby | <https://github.com/jfelchner/ruby-progressbar> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | semantic | 1.6.1 | MIT | Semantic Version utility class for parsing, storing, and comparing versions | <https://github.com/jlindsey/semantic> | 2022-05-10 | Low | Used to manipulate package versions. | Very popular on rubygems.org |
