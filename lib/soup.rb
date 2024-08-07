@@ -2,7 +2,6 @@
 
 module SOUP
   PACKAGE_MANAGERS = %w[buildscript-gradle.lockfile composer.lock Gemfile.lock Package.resolved package-lock.json Podfile.lock requirements.txt yarn.lock].freeze
-  RISK_LEVELS = %w[Low Medium High].freeze
   RISK_LEVELS_SCREEN =
     [
       'Low (can’t lead to harm)',
@@ -11,6 +10,5 @@ module SOUP
     ].freeze
 
   private_constant :PACKAGE_MANAGERS
-  private_constant :RISK_LEVELS
   private_constant :RISK_LEVELS_SCREEN
 end

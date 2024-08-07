@@ -3,6 +3,7 @@
 require 'fileutils'
 require 'inquirer'
 require 'json'
+require 'tty-prompt'
 
 require_relative '../soup'
 require_relative 'options'
@@ -129,6 +130,7 @@ module SOUP
     def check_packages
       licenses = JSON.parse(File.read(@options.licenses_file)).map!(&:downcase)
       exceptions = JSON.parse(File.read(@options.exceptions_file))
+      prompt = TTY::Prompt.new
 
       @detected_packages.each do |name, package|
         if @options.licenses_check && !package.license.nil? && !package.license.empty?
@@ -159,18 +161,18 @@ module SOUP
         end
 
         if package.dependency
-          package.risk_level = RISK_LEVELS.first
+          package.risk_level = RISK_LEVELS_SCREEN.first.split.first
           package.requirements = DEPENDENCY_TEXT
           package.verification_reasoning = DEPENDENCY_TEXT
         end
 
         if package.risk_level.empty?
           if @options.auto_reply
-            package.risk_level = RISK_LEVELS.first
+            package.risk_level = RISK_LEVELS_SCREEN.first.split.first
           else
             raise("No risk level found for #{package.package}!") if @options.no_prompt
 
-            package.risk_level = RISK_LEVELS[Ask.list("Enter risk level for package #{package.package}", RISK_LEVELS_SCREEN)]
+            package.risk_level = prompt.select("Enter risk level for package #{package.package}", RISK_LEVELS_SCREEN).split.first
           end
         end
 
@@ -180,7 +182,7 @@ module SOUP
           else
             raise("No requirements found for #{package.package}!") if @options.no_prompt
 
-            package.requirements = Ask.input("Enter requirements for package #{package.package}")
+            package.requirements = prompt.ask("Enter requirements for package #{package.package}: ")
           end
         end
 
@@ -190,7 +192,7 @@ module SOUP
           else
             raise("No verification reasoning found for #{package.package}!") if @options.no_prompt
 
-            package.verification_reasoning = Ask.input("Enter verification reasoning for package #{package.package}")
+            package.verification_reasoning = prompt.ask("Enter verification reasoning for package #{package.package}: ")
           end
         end
 

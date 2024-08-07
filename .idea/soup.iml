@@ -13,12 +13,12 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" scope="PROVIDED" name="CFPropertyList (v3.0.7, ruby-3.3.3-p89) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="activesupport (v7.1.3.4, ruby-3.3.3-p89) [gem]" level="application" />
-    <orderEntry type="library" scope="PROVIDED" name="addressable (v2.8.6, ruby-3.3.3-p89) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="addressable (v2.8.7, ruby-3.3.3-p89) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="algoliasearch (v1.27.5, ruby-3.3.3-p89) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="ast (v2.4.2, ruby-3.3.3-p89) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="atomos (v0.1.3, ruby-3.3.3-p89) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="base64 (v0.2.0, ruby-3.3.3-p89) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="bigdecimal (v3.1.8, ruby-3.3.3-p89) [gem]" level="application" />
-    <orderEntry type="library" scope="PROVIDED" name="bundler (v2.5.9, ruby-3.3.3-p89) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="claide (v1.1.0, ruby-3.3.3-p89) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="cocoapods (v1.15.2, ruby-3.3.3-p89) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="cocoapods-core (v1.15.2, ruby-3.3.3-p89) [gem]" level="application" />
@@ -46,37 +46,45 @@
     <orderEntry type="library" scope="PROVIDED" name="json (v2.7.2, ruby-3.3.3-p89) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="language_server-protocol (v3.17.0.3, ruby-3.3.3-p89) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="mini_mime (v1.1.5, ruby-3.3.3-p89) [gem]" level="application" />
-    <orderEntry type="library" scope="PROVIDED" name="minitest (v5.23.1, ruby-3.3.3-p89) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="minitest (v5.24.1, ruby-3.3.3-p89) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="molinillo (v0.8.0, ruby-3.3.3-p89) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="multi_xml (v0.7.1, ruby-3.3.3-p89) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="mutex_m (v0.2.0, ruby-3.3.3-p89) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="nanaimo (v0.3.0, ruby-3.3.3-p89) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="nap (v1.1.0, ruby-3.3.3-p89) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="netrc (v0.11.0, ruby-3.3.3-p89) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="nkf (v0.2.0, ruby-3.3.3-p89) [gem]" level="application" />
-    <orderEntry type="library" scope="PROVIDED" name="nokogiri (v1.16.6, ruby-3.3.3-p89) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="nokogiri (v1.16.7, ruby-3.3.3-p89) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="optparse (v0.5.0, ruby-3.3.3-p89) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="parallel (v1.25.1, ruby-3.3.3-p89) [gem]" level="application" />
-    <orderEntry type="library" scope="PROVIDED" name="parser (v3.3.3.0, ruby-3.3.3-p89) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="parser (v3.3.4.1, ruby-3.3.3-p89) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="pastel (v0.8.0, ruby-3.3.3-p89) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="public_suffix (v4.0.7, ruby-3.3.3-p89) [gem]" level="application" />
-    <orderEntry type="library" scope="PROVIDED" name="racc (v1.8.0, ruby-3.3.3-p89) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="racc (v1.8.1, ruby-3.3.3-p89) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="rainbow (v3.1.1, ruby-3.3.3-p89) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="regexp_parser (v2.9.2, ruby-3.3.3-p89) [gem]" level="application" />
-    <orderEntry type="library" scope="PROVIDED" name="rexml (v3.2.9, ruby-3.3.3-p89) [gem]" level="application" />
-    <orderEntry type="library" scope="PROVIDED" name="rubocop (v1.64.1, ruby-3.3.3-p89) [gem]" level="application" />
-    <orderEntry type="library" scope="PROVIDED" name="rubocop-ast (v1.31.3, ruby-3.3.3-p89) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="rexml (v3.3.4, ruby-3.3.3-p89) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="rubocop (v1.65.1, ruby-3.3.3-p89) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="rubocop-ast (v1.32.0, ruby-3.3.3-p89) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="rubocop-performance (v1.21.1, ruby-3.3.3-p89) [gem]" level="application" />
-    <orderEntry type="library" scope="PROVIDED" name="rubocop-rspec (v3.0.1, ruby-3.3.3-p89) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="rubocop-rspec (v3.0.4, ruby-3.3.3-p89) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="ruby-macho (v2.5.1, ruby-3.3.3-p89) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="ruby-progressbar (v1.13.0, ruby-3.3.3-p89) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="semantic (v1.6.1, ruby-3.3.3-p89) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="strscan (v3.1.0, ruby-3.3.3-p89) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="sync (v0.5.0, ruby-3.3.3-p89) [gem]" level="application" />
-    <orderEntry type="library" scope="PROVIDED" name="term-ansicolor (v1.8.0, ruby-3.3.3-p89) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="term-ansicolor (v1.11.2, ruby-3.3.3-p89) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="tins (v1.33.0, ruby-3.3.3-p89) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="tty-color (v0.6.0, ruby-3.3.3-p89) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="tty-cursor (v0.7.1, ruby-3.3.3-p89) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="tty-prompt (v0.23.1, ruby-3.3.3-p89) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="tty-reader (v0.9.0, ruby-3.3.3-p89) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="tty-screen (v0.8.2, ruby-3.3.3-p89) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="typhoeus (v1.4.1, ruby-3.3.3-p89) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="tzinfo (v2.0.6, ruby-3.3.3-p89) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="unicode-display_width (v2.5.0, ruby-3.3.3-p89) [gem]" level="application" />
-    <orderEntry type="library" scope="PROVIDED" name="xcodeproj (v1.24.0, ruby-3.3.3-p89) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="wisper (v2.0.1, ruby-3.3.3-p89) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="xcodeproj (v1.25.0, ruby-3.3.3-p89) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="yarn_lock_parser (v0.1.0, ruby-3.3.3-p89) [gem]" level="application" />
   </component>
 </module>
