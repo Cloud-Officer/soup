@@ -554,11 +554,23 @@
   "parser": {
     "language": "Ruby",
     "package": "parser",
-    "version": "3.3.4.0",
+    "version": "3.3.4.1",
     "license": "MIT",
     "description": "A Ruby parser written in pure Ruby.",
     "website": "https://github.com/whitequark/parser",
     "last_verified_at": "2022-05-10",
+    "risk_level": "Low",
+    "requirements": "Dependency",
+    "verification_reasoning": "Dependency"
+  },
+  "pastel": {
+    "language": "Ruby",
+    "package": "pastel",
+    "version": "0.8.0",
+    "license": "MIT",
+    "description": "Terminal strings styling with intuitive and clean API.",
+    "website": "https://ttytoolkit.org",
+    "last_verified_at": "2024-08-07",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -614,7 +626,7 @@
   "rexml": {
     "language": "Ruby",
     "package": "rexml",
-    "version": "3.2.9",
+    "version": "3.3.4",
     "license": "BSD-2-Clause",
     "description": "An XML toolkit for Ruby",
     "website": "https://github.com/ruby/rexml",
@@ -755,6 +767,66 @@
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
   },
+  "tty-color": {
+    "language": "Ruby",
+    "package": "tty-color",
+    "version": "0.6.0",
+    "license": "MIT",
+    "description": "Terminal color capabilities detection",
+    "website": "https://ttytoolkit.org",
+    "last_verified_at": "2024-08-07",
+    "risk_level": "Low",
+    "requirements": "Dependency",
+    "verification_reasoning": "Dependency"
+  },
+  "tty-cursor": {
+    "language": "Ruby",
+    "package": "tty-cursor",
+    "version": "0.7.1",
+    "license": "MIT",
+    "description": "The purpose of this library is to help move the terminal cursor around and manipulate text by using intuitive method calls.",
+    "website": "https://ttytoolkit.org",
+    "last_verified_at": "2024-08-07",
+    "risk_level": "Low",
+    "requirements": "Dependency",
+    "verification_reasoning": "Dependency"
+  },
+  "tty-prompt": {
+    "language": "Ruby",
+    "package": "tty-prompt",
+    "version": "0.23.1",
+    "license": "MIT",
+    "description": "A beautiful and powerful interactive command line prompt with a robust API for getting and validating complex inputs.",
+    "website": "https://ttytoolkit.org",
+    "last_verified_at": "2024-08-07",
+    "risk_level": "Low",
+    "requirements": "Prompt for TTY",
+    "verification_reasoning": "Most popular on RubyGem"
+  },
+  "tty-reader": {
+    "language": "Ruby",
+    "package": "tty-reader",
+    "version": "0.9.0",
+    "license": "MIT",
+    "description": "A set of methods for processing keyboard input in character, line and multiline modes",
+    "website": "https://ttytoolkit.org",
+    "last_verified_at": "2024-08-07",
+    "risk_level": "Low",
+    "requirements": "Dependency",
+    "verification_reasoning": "Dependency"
+  },
+  "tty-screen": {
+    "language": "Ruby",
+    "package": "tty-screen",
+    "version": "0.8.2",
+    "license": "MIT",
+    "description": "Terminal screen size detection that works on Linux, macOS and Windows systems and supports Ruby MRI, JRuby, TruffleRuby and Rubinius interpreters.",
+    "website": "https://ttytoolkit.org",
+    "last_verified_at": "2024-08-07",
+    "risk_level": "Low",
+    "requirements": "Dependency",
+    "verification_reasoning": "Dependency"
+  },
   "typhoeus": {
     "language": "Ruby",
     "package": "typhoeus",
@@ -791,10 +863,22 @@
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
   },
+  "wisper": {
+    "language": "Ruby",
+    "package": "wisper",
+    "version": "2.0.1",
+    "license": "MIT",
+    "description": "  A micro library providing objects with Publish-Subscribe capabilities.",
+    "website": "https://github.com/krisleech/wisper",
+    "last_verified_at": "2024-08-07",
+    "risk_level": "Low",
+    "requirements": "Dependency",
+    "verification_reasoning": "Dependency"
+  },
   "xcodeproj": {
     "language": "Ruby",
     "package": "xcodeproj",
-    "version": "1.24.0",
+    "version": "1.25.0",
     "license": "MIT",
     "description": "Xcodeproj lets you create and modify Xcode projects from Ruby",
     "website": "https://github.com/cocoapods/xcodeproj",

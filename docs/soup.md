@@ -48,12 +48,13 @@
 | Ruby | nokogiri | 1.16.7 | MIT | Nokogiri (鋸) makes it easy and painless to work with XML and HTML from Ruby | <https://nokogiri.org> | 2024-05-15 | Low | XML parser | Most popular library |
 | Ruby | optparse | 0.5.0 | Ruby | OptionParser is a class for command-line option analysis. | <https://github.com/ruby/optparse> | 2022-05-10 | Low | Used to parse command line arguments. | Very popular on rubygems.org |
 | Ruby | parallel | 1.25.1 | MIT | Run any kind of code in parallel processes | <https://github.com/grosser/parallel> | 2022-05-10 | Low | Dependency | Dependency |
-| Ruby | parser | 3.3.4.0 | MIT | A Ruby parser written in pure Ruby. | <https://github.com/whitequark/parser> | 2022-05-10 | Low | Dependency | Dependency |
+| Ruby | parser | 3.3.4.1 | MIT | A Ruby parser written in pure Ruby. | <https://github.com/whitequark/parser> | 2022-05-10 | Low | Dependency | Dependency |
+| Ruby | pastel | 0.8.0 | MIT | Terminal strings styling with intuitive and clean API. | <https://ttytoolkit.org> | 2024-08-07 | Low | Dependency | Dependency |
 | Ruby | public_suffix | 4.0.7 | MIT | PublicSuffix can parse and decompose a domain name into top level domain, domain and subdomains. | <https://simonecarletti.com/code/publicsuffix-ruby> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | racc | 1.8.1 | Ruby | Racc is an LALR(1) parser generator. | <https://github.com/ruby/racc> | 2023-06-09 | Low | Dependency | Dependency |
 | Ruby | rainbow | 3.1.1 | MIT | Colorize printed text on ANSI terminals | <https://github.com/sickill/rainbow> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | regexp_parser | 2.9.2 | MIT | A library for tokenizing, lexing, and parsing Ruby regular expressions. | <https://github.com/ammar/regexp_parser> | 2022-05-10 | Low | Dependency | Dependency |
-| Ruby | rexml | 3.2.9 | BSD-2-Clause | An XML toolkit for Ruby | <https://github.com/ruby/rexml> | 2022-05-10 | Low | Dependency | Dependency |
+| Ruby | rexml | 3.3.4 | BSD-2-Clause | An XML toolkit for Ruby | <https://github.com/ruby/rexml> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | rubocop | 1.65.1 | MIT | RuboCop is a Ruby code style checking and code formatting tool. | <https://rubocop.org/> | 2023-06-11 | Low | Ruby linter | Most popular gem on rubygems |
 | Ruby | rubocop-ast | 1.32.0 | MIT |   RuboCop's Node and NodePattern classes. | <https://www.rubocop.org/> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | rubocop-performance | 1.21.1 | MIT | A collection of RuboCop cops to check for performance optimizations | <https://docs.rubocop.org/rubocop-performance/> | 2024-05-30 | Low | A collection of RuboCop cops to check for performance optimizations in Ruby code | Most popular gem |
@@ -65,8 +66,14 @@
 | Ruby | sync | 0.5.0 | BSD-2-Clause | A module that provides a two-phase lock with a counter. | <https://github.com/ruby/sync> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | term-ansicolor | 1.11.2 | Apache-2.0 | This library uses ANSI escape sequences to control the attributes of terminal output | <http://flori.github.com/term-ansicolor> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | tins | 1.33.0 | MIT | All the stuff that isn't good/big enough for a real library. | <https://github.com/flori/tins> | 2022-05-10 | Low | Dependency | Dependency |
+| Ruby | tty-color | 0.6.0 | MIT | Terminal color capabilities detection | <https://ttytoolkit.org> | 2024-08-07 | Low | Dependency | Dependency |
+| Ruby | tty-cursor | 0.7.1 | MIT | The purpose of this library is to help move the terminal cursor around and manipulate text by using intuitive method calls. | <https://ttytoolkit.org> | 2024-08-07 | Low | Dependency | Dependency |
+| Ruby | tty-prompt | 0.23.1 | MIT | A beautiful and powerful interactive command line prompt with a robust API for getting and validating complex inputs. | <https://ttytoolkit.org> | 2024-08-07 | Low | Prompt for TTY | Most popular on RubyGem |
+| Ruby | tty-reader | 0.9.0 | MIT | A set of methods for processing keyboard input in character, line and multiline modes | <https://ttytoolkit.org> | 2024-08-07 | Low | Dependency | Dependency |
+| Ruby | tty-screen | 0.8.2 | MIT | Terminal screen size detection that works on Linux, macOS and Windows systems and supports Ruby MRI, JRuby, TruffleRuby and Rubinius interpreters. | <https://ttytoolkit.org> | 2024-08-07 | Low | Dependency | Dependency |
 | Ruby | typhoeus | 1.4.1 | MIT | Like a modern code version of the mythical beast with 100 serpent heads, Typhoeus runs HTTP requests in parallel while cleanly encapsulating handling logic. | <https://github.com/typhoeus/typhoeus> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | tzinfo | 2.0.6 | MIT | TZInfo provides access to time zone data and allows times to be converted using time zone rules. | <https://tzinfo.github.io> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | unicode-display_width | 2.5.0 | MIT | [Unicode 15.1.0] Determines the monospace display width of a string using EastAsianWidth.txt, Unicode general category, and other data. | <https://github.com/janlelis/unicode-display_width> | 2022-05-10 | Low | Dependency | Dependency |
-| Ruby | xcodeproj | 1.24.0 | MIT | Xcodeproj lets you create and modify Xcode projects from Ruby | <https://github.com/cocoapods/xcodeproj> | 2022-05-10 | Low | Dependency | Dependency |
+| Ruby | wisper | 2.0.1 | MIT |   A micro library providing objects with Publish-Subscribe capabilities. | <https://github.com/krisleech/wisper> | 2024-08-07 | Low | Dependency | Dependency |
+| Ruby | xcodeproj | 1.25.0 | MIT | Xcodeproj lets you create and modify Xcode projects from Ruby | <https://github.com/cocoapods/xcodeproj> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | yarn_lock_parser | 0.1.0 | MIT | Parser for yarn.lock files. | <https://rubygems.org/yarn_lock_parser> | 2023-06-08 | Low | Read yarn lock file | Popular gem |
