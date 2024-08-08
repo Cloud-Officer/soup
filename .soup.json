@@ -542,7 +542,7 @@
   "parallel": {
     "language": "Ruby",
     "package": "parallel",
-    "version": "1.25.1",
+    "version": "1.26.0",
     "license": "MIT",
     "description": "Run any kind of code in parallel processes",
     "website": "https://github.com/grosser/parallel",
@@ -554,7 +554,7 @@
   "parser": {
     "language": "Ruby",
     "package": "parser",
-    "version": "3.3.4.1",
+    "version": "3.3.4.2",
     "license": "MIT",
     "description": "A Ruby parser written in pure Ruby.",
     "website": "https://github.com/whitequark/parser",
