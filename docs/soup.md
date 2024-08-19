@@ -38,7 +38,7 @@
 | Ruby | language_server-protocol | 3.17.0.3 | MIT | A Language Server Protocol SDK | <https://github.com/mtsmfm/language_server-protocol-ruby> | 2023-06-29 | Low | Dependency | Dependency |
 | Ruby | logger | 1.6.0 | Ruby | Provides a simple logging utility for outputting messages. | <https://github.com/ruby/logger> | 2024-08-12 | Low | Dependency | Dependency |
 | Ruby | mini_mime | 1.1.5 | MIT | A minimal mime type library | <https://github.com/discourse/mini_mime> | 2023-03-30 | Low | Dependency | Dependency |
-| Ruby | minitest | 5.25.0 | MIT | minitest provides a complete suite of testing facilities supporting | <https://github.com/minitest/minitest> | 2022-05-10 | Low | Dependency | Dependency |
+| Ruby | minitest | 5.25.1 | MIT | minitest provides a complete suite of testing facilities supporting | <https://github.com/minitest/minitest> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | molinillo | 0.8.0 | MIT | Provides support for dependency resolution | <https://github.com/CocoaPods/Molinillo> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | multi_xml | 0.7.1 | MIT | Provides swappable XML backends utilizing LibXML, Nokogiri, Ox, or REXML. | <https://github.com/sferik/multi_xml> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | nanaimo | 0.3.0 | MIT | A library for (de)serialization of ASCII Plists. | <https://github.com/CocoaPods/Nanaimo> | 2022-05-10 | Low | Dependency | Dependency |
@@ -47,7 +47,7 @@
 | Ruby | nkf | 0.2.0 | Ruby | Ruby extension for Network Kanji Filter | <https://github.com/ruby/nkf> | 2024-02-15 | Low | Dependency | Dependency |
 | Ruby | nokogiri | 1.16.7 | MIT | Nokogiri (鋸) makes it easy and painless to work with XML and HTML from Ruby | <https://nokogiri.org> | 2024-05-15 | Low | XML parser | Most popular library |
 | Ruby | optparse | 0.5.0 | Ruby | OptionParser is a class for command-line option analysis. | <https://github.com/ruby/optparse> | 2022-05-10 | Low | Used to parse command line arguments. | Very popular on rubygems.org |
-| Ruby | parallel | 1.26.2 | MIT | Run any kind of code in parallel processes | <https://github.com/grosser/parallel> | 2022-05-10 | Low | Dependency | Dependency |
+| Ruby | parallel | 1.26.3 | MIT | Run any kind of code in parallel processes | <https://github.com/grosser/parallel> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | parser | 3.3.4.2 | MIT | A Ruby parser written in pure Ruby. | <https://github.com/whitequark/parser> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | pastel | 0.8.0 | MIT | Terminal strings styling with intuitive and clean API. | <https://ttytoolkit.org> | 2024-08-07 | Low | Dependency | Dependency |
 | Ruby | public_suffix | 4.0.7 | MIT | PublicSuffix can parse and decompose a domain name into top level domain, domain and subdomains. | <https://simonecarletti.com/code/publicsuffix-ruby> | 2022-05-10 | Low | Dependency | Dependency |
@@ -56,7 +56,7 @@
 | Ruby | regexp_parser | 2.9.2 | MIT | A library for tokenizing, lexing, and parsing Ruby regular expressions. | <https://github.com/ammar/regexp_parser> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | rexml | 3.3.5 | BSD-2-Clause | An XML toolkit for Ruby | <https://github.com/ruby/rexml> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | rubocop | 1.65.1 | MIT | RuboCop is a Ruby code style checking and code formatting tool. | <https://rubocop.org/> | 2023-06-11 | Low | Ruby linter | Most popular gem on rubygems |
-| Ruby | rubocop-ast | 1.32.0 | MIT |   RuboCop's Node and NodePattern classes. | <https://www.rubocop.org/> | 2022-05-10 | Low | Dependency | Dependency |
+| Ruby | rubocop-ast | 1.32.1 | MIT |   RuboCop's Node and NodePattern classes. | <https://www.rubocop.org/> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | rubocop-performance | 1.21.1 | MIT | A collection of RuboCop cops to check for performance optimizations | <https://docs.rubocop.org/rubocop-performance/> | 2024-05-30 | Low | A collection of RuboCop cops to check for performance optimizations in Ruby code | Most popular gem |
 | Ruby | rubocop-rspec | 3.0.4 | MIT | Code style checking for RSpec files. | <https://github.com/rubocop/rubocop-rspec> | 2024-05-30 | Low | Code style checking for RSpec files. A plugin for the RuboCop code style enforcing & linting tool | Most popular gem |
 | Ruby | ruby-macho | 2.5.1 | MIT | A library for viewing and manipulating Mach-O files in Ruby. | <https://github.com/Homebrew/ruby-macho> | 2022-05-10 | Low | Dependency | Dependency |
