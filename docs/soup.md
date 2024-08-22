@@ -54,7 +54,7 @@
 | Ruby | racc | 1.8.1 | Ruby | Racc is an LALR(1) parser generator. | <https://github.com/ruby/racc> | 2023-06-09 | Low | Dependency | Dependency |
 | Ruby | rainbow | 3.1.1 | MIT | Colorize printed text on ANSI terminals | <https://github.com/sickill/rainbow> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | regexp_parser | 2.9.2 | MIT | A library for tokenizing, lexing, and parsing Ruby regular expressions. | <https://github.com/ammar/regexp_parser> | 2022-05-10 | Low | Dependency | Dependency |
-| Ruby | rexml | 3.3.5 | BSD-2-Clause | An XML toolkit for Ruby | <https://github.com/ruby/rexml> | 2022-05-10 | Low | Dependency | Dependency |
+| Ruby | rexml | 3.3.6 | BSD-2-Clause | An XML toolkit for Ruby | <https://github.com/ruby/rexml> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | rubocop | 1.65.1 | MIT | RuboCop is a Ruby code style checking and code formatting tool. | <https://rubocop.org/> | 2023-06-11 | Low | Ruby linter | Most popular gem on rubygems |
 | Ruby | rubocop-ast | 1.32.1 | MIT |   RuboCop's Node and NodePattern classes. | <https://www.rubocop.org/> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | rubocop-performance | 1.21.1 | MIT | A collection of RuboCop cops to check for performance optimizations | <https://docs.rubocop.org/rubocop-performance/> | 2024-05-30 | Low | A collection of RuboCop cops to check for performance optimizations in Ruby code | Most popular gem |
