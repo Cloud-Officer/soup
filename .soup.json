@@ -410,7 +410,7 @@
   "logger": {
     "language": "Ruby",
     "package": "logger",
-    "version": "1.6.0",
+    "version": "1.6.1",
     "license": "Ruby",
     "description": "Provides a simple logging utility for outputting messages.",
     "website": "https://github.com/ruby/logger",
@@ -650,7 +650,7 @@
   "rubocop-ast": {
     "language": "Ruby",
     "package": "rubocop-ast",
-    "version": "1.32.1",
+    "version": "1.32.2",
     "license": "MIT",
     "description": "  RuboCop's Node and NodePattern classes.",
     "website": "https://www.rubocop.org/",
