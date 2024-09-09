@@ -674,7 +674,7 @@
   "rubocop-rspec": {
     "language": "Ruby",
     "package": "rubocop-rspec",
-    "version": "3.0.4",
+    "version": "3.0.5",
     "license": "MIT",
     "description": "Code style checking for RSpec files.",
     "website": "https://github.com/rubocop/rubocop-rspec",
