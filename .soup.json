@@ -362,7 +362,7 @@
   "i18n": {
     "language": "Ruby",
     "package": "i18n",
-    "version": "1.14.5",
+    "version": "1.14.6",
     "license": "MIT",
     "description": "New wave Internationalization support for Ruby.",
     "website": "https://github.com/ruby-i18n/i18n",
@@ -599,6 +599,18 @@
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
   },
+  "rack": {
+    "language": "Ruby",
+    "package": "rack",
+    "version": "3.1.7",
+    "license": "MIT",
+    "description": "Rack provides a minimal, modular and adaptable interface for developing",
+    "website": "https://github.com/rack/rack",
+    "last_verified_at": "2024-09-16",
+    "risk_level": "Low",
+    "requirements": "Dependency",
+    "verification_reasoning": "Dependency"
+  },
   "rainbow": {
     "language": "Ruby",
     "package": "rainbow",
@@ -642,7 +654,7 @@
     "license": "MIT",
     "description": "RuboCop is a Ruby code style checking and code formatting tool.",
     "website": "https://rubocop.org/",
-    "last_verified_at": "2023-06-11",
+    "last_verified_at": "2023-06-12",
     "risk_level": "Low",
     "requirements": "Ruby linter",
     "verification_reasoning": "Most popular gem on rubygems"
@@ -654,21 +666,93 @@
     "license": "MIT",
     "description": "  RuboCop's Node and NodePattern classes.",
     "website": "https://www.rubocop.org/",
-    "last_verified_at": "2022-05-10",
+    "last_verified_at": "2023-06-12",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
   },
+  "rubocop-capybara": {
+    "language": "Ruby",
+    "package": "rubocop-capybara",
+    "version": "2.21.0",
+    "license": "MIT",
+    "description": "Code style checking for Capybara test files (RSpec, Cucumber, Minitest).",
+    "website": "https://github.com/rubocop/rubocop-capybara",
+    "last_verified_at": "2024-09-16",
+    "risk_level": "Low",
+    "requirements": "Ruby linter",
+    "verification_reasoning": "Most populat gem"
+  },
+  "rubocop-graphql": {
+    "language": "Ruby",
+    "package": "rubocop-graphql",
+    "version": "1.5.4",
+    "license": "MIT",
+    "description": "A collection of RuboCop cops to improve GraphQL-related code",
+    "website": "https://github.com/DmitryTsepelev/rubocop-graphql",
+    "last_verified_at": "2024-09-16",
+    "risk_level": "Low",
+    "requirements": "Ruby linter",
+    "verification_reasoning": "Most popular gem"
+  },
+  "rubocop-i18n": {
+    "language": "Ruby",
+    "package": "rubocop-i18n",
+    "version": "3.0.0",
+    "license": "Apache-2.0",
+    "description": "RuboCop rules for detecting and autocorrecting undecorated strings for i18n (gettext and rails-i18n)",
+    "website": "https://github.com/puppetlabs/rubocop-i18n",
+    "last_verified_at": "2024-09-16",
+    "risk_level": "Low",
+    "requirements": "Ruby linter",
+    "verification_reasoning": "Most popular gem"
+  },
+  "rubocop-minitest": {
+    "language": "Ruby",
+    "package": "rubocop-minitest",
+    "version": "0.36.0",
+    "license": "MIT",
+    "description": "Automatic Minitest code style checking tool.",
+    "website": "https://docs.rubocop.org/rubocop-minitest/",
+    "last_verified_at": "2024-09-16",
+    "risk_level": "Low",
+    "requirements": "Ruby linter",
+    "verification_reasoning": "Most popular gem"
+  },
   "rubocop-performance": {
     "language": "Ruby",
     "package": "rubocop-performance",
-    "version": "1.21.1",
+    "version": "1.22.0",
     "license": "MIT",
     "description": "A collection of RuboCop cops to check for performance optimizations",
     "website": "https://docs.rubocop.org/rubocop-performance/",
     "last_verified_at": "2024-05-30",
     "risk_level": "Low",
     "requirements": "A collection of RuboCop cops to check for performance optimizations in Ruby code",
+    "verification_reasoning": "Most popular gem"
+  },
+  "rubocop-rails": {
+    "language": "Ruby",
+    "package": "rubocop-rails",
+    "version": "2.26.1",
+    "license": "MIT",
+    "description": "Automatic Rails code style checking tool.",
+    "website": "https://docs.rubocop.org/rubocop-rails/",
+    "last_verified_at": "2024-09-16",
+    "risk_level": "Low",
+    "requirements": "Ruby linter",
+    "verification_reasoning": "Most popular gem"
+  },
+  "rubocop-rake": {
+    "language": "Ruby",
+    "package": "rubocop-rake",
+    "version": "0.6.0",
+    "license": "MIT",
+    "description": "A RuboCop plugin for Rake",
+    "website": "https://github.com/rubocop/rubocop-rake",
+    "last_verified_at": "2024-09-16",
+    "risk_level": "Low",
+    "requirements": "Ruby linter",
     "verification_reasoning": "Most popular gem"
   },
   "rubocop-rspec": {
@@ -681,6 +765,30 @@
     "last_verified_at": "2024-05-30",
     "risk_level": "Low",
     "requirements": "Code style checking for RSpec files. A plugin for the RuboCop code style enforcing & linting tool",
+    "verification_reasoning": "Most popular gem"
+  },
+  "rubocop-rspec_rails": {
+    "language": "Ruby",
+    "package": "rubocop-rspec_rails",
+    "version": "2.30.0",
+    "license": "MIT",
+    "description": "Code style checking for RSpec Rails files.",
+    "website": null,
+    "last_verified_at": "2024-09-16",
+    "risk_level": "Low",
+    "requirements": "Ruby linter",
+    "verification_reasoning": "Most popular gem"
+  },
+  "rubocop-thread_safety": {
+    "language": "Ruby",
+    "package": "rubocop-thread_safety",
+    "version": "0.5.1",
+    "license": "MIT",
+    "description": "  Thread-safety checks via static analysis.",
+    "website": "https://github.com/rubocop/rubocop-thread_safety",
+    "last_verified_at": "2024-09-16",
+    "risk_level": "Low",
+    "requirements": "Ruby linter",
     "verification_reasoning": "Most popular gem"
   },
   "ruby-macho": {
@@ -854,9 +962,9 @@
   "unicode-display_width": {
     "language": "Ruby",
     "package": "unicode-display_width",
-    "version": "2.5.0",
+    "version": "2.6.0",
     "license": "MIT",
-    "description": "[Unicode 15.1.0] Determines the monospace display width of a string using EastAsianWidth.txt, Unicode general category, and other data.",
+    "description": "[Unicode 16.0.0] Determines the monospace display width of a string using EastAsianWidth.txt, Unicode general category, and other data.",
     "website": "https://github.com/janlelis/unicode-display_width",
     "last_verified_at": "2022-05-10",
     "risk_level": "Low",
