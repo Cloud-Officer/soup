@@ -10,9 +10,20 @@ gem 'inquirer', '>= 0.2.0'
 gem 'json', '>= 2.6.0'
 gem 'nokogiri', '>= 1.16.0'
 gem 'optparse', '>= 0.2.0'
-gem 'rubocop', '>= 1.64.0'
-gem 'rubocop-performance', '>= 1.21.0'
-gem 'rubocop-rspec', '>= 2.29.2'
 gem 'semantic', '>= 1.6.1'
 gem 'tty-prompt', '>= 0.23.1'
 gem 'yarn_lock_parser', '>= 0.1.0'
+
+group :development do
+  gem 'rubocop', '>= 1.61.0', require: false
+  gem 'rubocop-capybara', '>= 2.16.0', require: false
+  gem 'rubocop-graphql', '>= 0.18.0', require: false
+  gem 'rubocop-i18n', '>= 3.0.0', require: false
+  gem 'rubocop-minitest', '>= 0.15.0', require: false
+  gem 'rubocop-performance', '>= 1.13.3', require: false
+  gem 'rubocop-rails', '>= 2.16.0', require: false
+  gem 'rubocop-rake', '>= 0.6.0', require: false
+  gem 'rubocop-rspec', '>= 2.16.0', require: false
+  gem 'rubocop-rspec_rails', '>= 2.30.0', require: false
+  gem 'rubocop-thread_safety', '>= 0.5.1', require: false
+end

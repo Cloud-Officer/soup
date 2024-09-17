@@ -1,6 +1,14 @@
 require:
+  - rubocop-capybara
+  - rubocop-graphql
+  # - rubocop-i18n
+  - rubocop-minitest
   - rubocop-performance
+  # - rubocop-rails
+  # - rubocop-rake
   - rubocop-rspec
+  # - rubocop-rspec_rails
+  - rubocop-thread_safety
 AllCops:
   EnabledByDefault: true
 Style/DisableCopsWithinSourceCodeDirective:
@@ -37,7 +45,7 @@ Style/ClassAndModuleChildren:
   Enabled: false
 Style/Copyright:
   Enabled: false
-  AutocorrectNotice: 'Copyright (c) 2021 by name all rights reserved.'
+  AutocorrectNotice: 'Copyright (c) 2024 by name all rights reserved.'
 Style/Documentation:
   Enabled: false
 Style/DocumentationMethod:
