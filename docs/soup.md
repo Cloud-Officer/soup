@@ -63,7 +63,7 @@
 | Ruby | rubocop-i18n | 3.0.0 | Apache-2.0 | RuboCop rules for detecting and autocorrecting undecorated strings for i18n (gettext and rails-i18n) | <https://github.com/puppetlabs/rubocop-i18n> | 2024-09-16 | Low | Ruby linter | Most popular gem |
 | Ruby | rubocop-minitest | 0.36.0 | MIT | Automatic Minitest code style checking tool. | <https://docs.rubocop.org/rubocop-minitest/> | 2024-09-16 | Low | Ruby linter | Most popular gem |
 | Ruby | rubocop-performance | 1.22.1 | MIT | A collection of RuboCop cops to check for performance optimizations | <https://docs.rubocop.org/rubocop-performance/> | 2024-05-30 | Low | A collection of RuboCop cops to check for performance optimizations in Ruby code | Most popular gem |
-| Ruby | rubocop-rails | 2.26.1 | MIT | Automatic Rails code style checking tool. | <https://docs.rubocop.org/rubocop-rails/> | 2024-09-16 | Low | Ruby linter | Most popular gem |
+| Ruby | rubocop-rails | 2.26.2 | MIT | Automatic Rails code style checking tool. | <https://docs.rubocop.org/rubocop-rails/> | 2024-09-16 | Low | Ruby linter | Most popular gem |
 | Ruby | rubocop-rake | 0.6.0 | MIT | A RuboCop plugin for Rake | <https://github.com/rubocop/rubocop-rake> | 2024-09-16 | Low | Ruby linter | Most popular gem |
 | Ruby | rubocop-rspec | 3.0.5 | MIT | Code style checking for RSpec files. | <https://github.com/rubocop/rubocop-rspec> | 2024-05-30 | Low | Code style checking for RSpec files. A plugin for the RuboCop code style enforcing & linting tool | Most popular gem |
 | Ruby | rubocop-rspec_rails | 2.30.0 | MIT | Code style checking for RSpec Rails files. | <> | 2024-09-16 | Low | Ruby linter | Most popular gem |

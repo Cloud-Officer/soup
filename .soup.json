@@ -734,7 +734,7 @@
   "rubocop-rails": {
     "language": "Ruby",
     "package": "rubocop-rails",
-    "version": "2.26.1",
+    "version": "2.26.2",
     "license": "MIT",
     "description": "Automatic Rails code style checking tool.",
     "website": "https://docs.rubocop.org/rubocop-rails/",
