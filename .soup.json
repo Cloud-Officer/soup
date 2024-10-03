@@ -758,7 +758,7 @@
   "rubocop-rspec": {
     "language": "Ruby",
     "package": "rubocop-rspec",
-    "version": "3.0.5",
+    "version": "3.1.0",
     "license": "MIT",
     "description": "Code style checking for RSpec files.",
     "website": "https://github.com/rubocop/rubocop-rspec",
@@ -866,7 +866,7 @@
   "tins": {
     "language": "Ruby",
     "package": "tins",
-    "version": "1.33.0",
+    "version": "1.34.0",
     "license": "MIT",
     "description": "All the stuff that isn't good/big enough for a real library.",
     "website": "https://github.com/flori/tins",
@@ -986,7 +986,7 @@
   "xcodeproj": {
     "language": "Ruby",
     "package": "xcodeproj",
-    "version": "1.25.0",
+    "version": "1.25.1",
     "license": "MIT",
     "description": "Xcodeproj lets you create and modify Xcode projects from Ruby",
     "website": "https://github.com/cocoapods/xcodeproj",
