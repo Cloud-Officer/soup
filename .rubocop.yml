@@ -70,3 +70,5 @@ Style/YodaExpression:
   Enabled: false
 Style/HashSyntax:
   EnforcedShorthandSyntax: never
+Minitest/NoTestCases:
+  Enabled: false
