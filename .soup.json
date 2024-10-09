@@ -599,18 +599,6 @@
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
   },
-  "rack": {
-    "language": "Ruby",
-    "package": "rack",
-    "version": "3.1.7",
-    "license": "MIT",
-    "description": "Rack provides a minimal, modular and adaptable interface for developing",
-    "website": "https://github.com/rack/rack",
-    "last_verified_at": "2024-09-16",
-    "risk_level": "Low",
-    "requirements": "Dependency",
-    "verification_reasoning": "Dependency"
-  },
   "rainbow": {
     "language": "Ruby",
     "package": "rainbow",
@@ -695,18 +683,6 @@
     "requirements": "Ruby linter",
     "verification_reasoning": "Most popular gem"
   },
-  "rubocop-i18n": {
-    "language": "Ruby",
-    "package": "rubocop-i18n",
-    "version": "3.0.0",
-    "license": "Apache-2.0",
-    "description": "RuboCop rules for detecting and autocorrecting undecorated strings for i18n (gettext and rails-i18n)",
-    "website": "https://github.com/puppetlabs/rubocop-i18n",
-    "last_verified_at": "2024-09-16",
-    "risk_level": "Low",
-    "requirements": "Ruby linter",
-    "verification_reasoning": "Most popular gem"
-  },
   "rubocop-minitest": {
     "language": "Ruby",
     "package": "rubocop-minitest",
@@ -731,30 +707,6 @@
     "requirements": "A collection of RuboCop cops to check for performance optimizations in Ruby code",
     "verification_reasoning": "Most popular gem"
   },
-  "rubocop-rails": {
-    "language": "Ruby",
-    "package": "rubocop-rails",
-    "version": "2.26.2",
-    "license": "MIT",
-    "description": "Automatic Rails code style checking tool.",
-    "website": "https://docs.rubocop.org/rubocop-rails/",
-    "last_verified_at": "2024-09-16",
-    "risk_level": "Low",
-    "requirements": "Ruby linter",
-    "verification_reasoning": "Most popular gem"
-  },
-  "rubocop-rake": {
-    "language": "Ruby",
-    "package": "rubocop-rake",
-    "version": "0.6.0",
-    "license": "MIT",
-    "description": "A RuboCop plugin for Rake",
-    "website": "https://github.com/rubocop/rubocop-rake",
-    "last_verified_at": "2024-09-16",
-    "risk_level": "Low",
-    "requirements": "Ruby linter",
-    "verification_reasoning": "Most popular gem"
-  },
   "rubocop-rspec": {
     "language": "Ruby",
     "package": "rubocop-rspec",
@@ -765,18 +717,6 @@
     "last_verified_at": "2024-05-30",
     "risk_level": "Low",
     "requirements": "Code style checking for RSpec files. A plugin for the RuboCop code style enforcing & linting tool",
-    "verification_reasoning": "Most popular gem"
-  },
-  "rubocop-rspec_rails": {
-    "language": "Ruby",
-    "package": "rubocop-rspec_rails",
-    "version": "2.30.0",
-    "license": "MIT",
-    "description": "Code style checking for RSpec Rails files.",
-    "website": null,
-    "last_verified_at": "2024-09-16",
-    "risk_level": "Low",
-    "requirements": "Ruby linter",
     "verification_reasoning": "Most popular gem"
   },
   "rubocop-thread_safety": {
