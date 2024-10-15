@@ -638,7 +638,7 @@
   "rubocop": {
     "language": "Ruby",
     "package": "rubocop",
-    "version": "1.66.1",
+    "version": "1.67.0",
     "license": "MIT",
     "description": "RuboCop is a Ruby code style checking and code formatting tool.",
     "website": "https://rubocop.org/",
@@ -806,7 +806,7 @@
   "tins": {
     "language": "Ruby",
     "package": "tins",
-    "version": "1.34.0",
+    "version": "1.36.1",
     "license": "MIT",
     "description": "All the stuff that isn't good/big enough for a real library.",
     "website": "https://github.com/flori/tins",
