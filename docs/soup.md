@@ -55,7 +55,7 @@
 | Ruby | rainbow | 3.1.1 | MIT | Colorize printed text on ANSI terminals | <https://github.com/sickill/rainbow> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | regexp_parser | 2.9.2 | MIT | A library for tokenizing, lexing, and parsing Ruby regular expressions. | <https://github.com/ammar/regexp_parser> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | rexml | 3.3.8 | BSD-2-Clause | An XML toolkit for Ruby | <https://github.com/ruby/rexml> | 2022-05-10 | Low | Dependency | Dependency |
-| Ruby | rubocop | 1.66.1 | MIT | RuboCop is a Ruby code style checking and code formatting tool. | <https://rubocop.org/> | 2023-06-12 | Low | Ruby linter | Most popular gem on rubygems |
+| Ruby | rubocop | 1.67.0 | MIT | RuboCop is a Ruby code style checking and code formatting tool. | <https://rubocop.org/> | 2023-06-12 | Low | Ruby linter | Most popular gem on rubygems |
 | Ruby | rubocop-ast | 1.32.3 | MIT |   RuboCop's Node and NodePattern classes. | <https://www.rubocop.org/> | 2023-06-12 | Low | Dependency | Dependency |
 | Ruby | rubocop-capybara | 2.21.0 | MIT | Code style checking for Capybara test files (RSpec, Cucumber, Minitest). | <https://github.com/rubocop/rubocop-capybara> | 2024-09-16 | Low | Ruby linter | Most populat gem |
 | Ruby | rubocop-graphql | 1.5.4 | MIT | A collection of RuboCop cops to improve GraphQL-related code | <https://github.com/DmitryTsepelev/rubocop-graphql> | 2024-09-16 | Low | Ruby linter | Most popular gem |
@@ -69,7 +69,7 @@
 | Ruby | semantic | 1.6.1 | MIT | Semantic Version utility class for parsing, storing, and comparing versions | <https://github.com/jlindsey/semantic> | 2022-05-10 | Low | Used to manipulate package versions. | Very popular on rubygems.org |
 | Ruby | sync | 0.5.0 | BSD-2-Clause | A module that provides a two-phase lock with a counter. | <https://github.com/ruby/sync> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | term-ansicolor | 1.11.2 | Apache-2.0 | This library uses ANSI escape sequences to control the attributes of terminal output | <http://flori.github.com/term-ansicolor> | 2022-05-10 | Low | Dependency | Dependency |
-| Ruby | tins | 1.34.0 | MIT | All the stuff that isn't good/big enough for a real library. | <https://github.com/flori/tins> | 2022-05-10 | Low | Dependency | Dependency |
+| Ruby | tins | 1.36.1 | MIT | All the stuff that isn't good/big enough for a real library. | <https://github.com/flori/tins> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | tty-color | 0.6.0 | MIT | Terminal color capabilities detection | <https://ttytoolkit.org> | 2024-08-07 | Low | Dependency | Dependency |
 | Ruby | tty-cursor | 0.7.1 | MIT | The purpose of this library is to help move the terminal cursor around and manipulate text by using intuitive method calls. | <https://ttytoolkit.org> | 2024-08-07 | Low | Dependency | Dependency |
 | Ruby | tty-prompt | 0.23.1 | MIT | A beautiful and powerful interactive command line prompt with a robust API for getting and validating complex inputs. | <https://ttytoolkit.org> | 2024-08-07 | Low | Prompt for TTY | Most popular on RubyGem |

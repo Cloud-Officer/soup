@@ -1,4 +1,4 @@
-# Software of Unknown Provenance (SOUP) [![Build](https://github.com/Cloud-Officer/soup/actions/workflows/build.yml/badge.svg)](https://github.com/Cloud-Officer/soup/actions/workflows/build.yml)
+# soup [![Build](https://github.com/Cloud-Officer/soup/actions/workflows/build.yml/badge.svg)](https://github.com/Cloud-Officer/soup/actions/workflows/build.yml)
 
 ## Table of Contents
 
