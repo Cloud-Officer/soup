@@ -806,7 +806,7 @@
   "tins": {
     "language": "Ruby",
     "package": "tins",
-    "version": "1.36.1",
+    "version": "1.37.0",
     "license": "MIT",
     "description": "All the stuff that isn't good/big enough for a real library.",
     "website": "https://github.com/flori/tins",
