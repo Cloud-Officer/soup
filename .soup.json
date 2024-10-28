@@ -386,10 +386,10 @@
   "json": {
     "language": "Ruby",
     "package": "json",
-    "version": "2.7.2",
+    "version": "2.7.4",
     "license": "Ruby",
     "description": "A JSON implementation as a JRuby extension.",
-    "website": "https://flori.github.io/json",
+    "website": "https://ruby.github.io/json",
     "last_verified_at": "2022-05-10",
     "risk_level": "Low",
     "requirements": "Used to read package manager and cache files.",
