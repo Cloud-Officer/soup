@@ -34,7 +34,7 @@
 | Ruby | httpclient | 2.8.3 | ruby | gives something like the functionality of libwww-perl (LWP) in Ruby | <https://github.com/nahi/httpclient> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | i18n | 1.14.6 | MIT | New wave Internationalization support for Ruby. | <https://github.com/ruby-i18n/i18n> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | inquirer | 0.2.1 | Apache v2 | Interactive user prompts on CLI for ruby. | <https://github.com/arlimus/inquirer.rb> | 2022-05-10 | Low | Interactive user prompts on CLI for ruby. | Very popular on rubygems.org |
-| Ruby | json | 2.7.2 | Ruby | A JSON implementation as a JRuby extension. | <https://flori.github.io/json> | 2022-05-10 | Low | Used to read package manager and cache files. | Very popular on rubygems.org |
+| Ruby | json | 2.7.4 | Ruby | A JSON implementation as a JRuby extension. | <https://ruby.github.io/json> | 2022-05-10 | Low | Used to read package manager and cache files. | Very popular on rubygems.org |
 | Ruby | language_server-protocol | 3.17.0.3 | MIT | A Language Server Protocol SDK | <https://github.com/mtsmfm/language_server-protocol-ruby> | 2023-06-29 | Low | Dependency | Dependency |
 | Ruby | logger | 1.6.1 | Ruby | Provides a simple logging utility for outputting messages. | <https://github.com/ruby/logger> | 2024-08-12 | Low | Dependency | Dependency |
 | Ruby | mini_mime | 1.1.5 | MIT | A minimal mime type library | <https://github.com/discourse/mini_mime> | 2023-03-30 | Low | Dependency | Dependency |
