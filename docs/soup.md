@@ -11,8 +11,8 @@
 | Ruby | base64 | 0.2.0 | Ruby | Support for encoding and decoding binary data using a Base64 representation. | <https://github.com/ruby/base64> | 2023-08-11 | Low | Dependency | Dependency |
 | Ruby | bigdecimal | 3.1.8 | Ruby | This library provides arbitrary-precision decimal floating-point number class. | <https://github.com/ruby/bigdecimal> | 2023-10-26 | Low | Dependency | Dependency |
 | Ruby | claide | 1.1.0 | MIT | A small command-line interface framework. | <https://github.com/CocoaPods/CLAide> | 2022-05-10 | Low | Dependency | Dependency |
-| Ruby | cocoapods | 1.15.2 | MIT | CocoaPods manages library dependencies for your Xcode project. | <https://github.com/CocoaPods/CocoaPods> | 2022-05-10 | Low | Used to read Podfile | Same package used by CocoaPods |
-| Ruby | cocoapods-core | 1.15.2 | MIT | The CocoaPods-Core gem provides support to work with the models of CocoaPods. | <https://github.com/CocoaPods/CocoaPods> | 2022-05-10 | Low | Dependency | Dependency |
+| Ruby | cocoapods | 1.16.1 | MIT | CocoaPods manages library dependencies for your Xcode project. | <https://github.com/CocoaPods/CocoaPods> | 2022-05-10 | Low | Used to read Podfile | Same package used by CocoaPods |
+| Ruby | cocoapods-core | 1.16.1 | MIT | The CocoaPods-Core gem provides support to work with the models of CocoaPods. | <https://github.com/CocoaPods/CocoaPods> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | cocoapods-deintegrate | 1.0.5 | MIT | A CocoaPods plugin to remove and de-integrate CocoaPods from your project. | <https://github.com/kylef/cocoapods-deintegrate> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | cocoapods-downloader | 2.1 | MIT | A small library for downloading files from remotes in a folder. | <https://github.com/CocoaPods/cocoapods-downloader> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | cocoapods-plugins | 1.0.0 | MIT |              This CocoaPods plugin shows information about all available CocoaPods plugins | <https://github.com/cocoapods/cocoapods-plugins> | 2022-05-10 | Low | Dependency | Dependency |
@@ -41,7 +41,7 @@
 | Ruby | minitest | 5.25.1 | MIT | minitest provides a complete suite of testing facilities supporting | <https://github.com/minitest/minitest> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | molinillo | 0.8.0 | MIT | Provides support for dependency resolution | <https://github.com/CocoaPods/Molinillo> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | multi_xml | 0.7.1 | MIT | Provides swappable XML backends utilizing LibXML, Nokogiri, Ox, or REXML. | <https://github.com/sferik/multi_xml> | 2022-05-10 | Low | Dependency | Dependency |
-| Ruby | nanaimo | 0.3.0 | MIT | A library for (de)serialization of ASCII Plists. | <https://github.com/CocoaPods/Nanaimo> | 2022-05-10 | Low | Dependency | Dependency |
+| Ruby | nanaimo | 0.4.0 | MIT | A library for (de)serialization of ASCII Plists. | <https://github.com/CocoaPods/Nanaimo> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | nap | 1.1.0 | MIT |   Nap is a really simple REST library | <https://github.com/Fingertips/nap> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | netrc | 0.11.0 | MIT | This library can read and update netrc files, preserving formatting including comments and whitespace. | <https://github.com/geemus/netrc> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | nkf | 0.2.0 | Ruby | Ruby extension for Network Kanji Filter | <https://github.com/ruby/nkf> | 2024-02-15 | Low | Dependency | Dependency |
@@ -56,7 +56,7 @@
 | Ruby | regexp_parser | 2.9.2 | MIT | A library for tokenizing, lexing, and parsing Ruby regular expressions. | <https://github.com/ammar/regexp_parser> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | rexml | 3.3.9 | BSD-2-Clause | An XML toolkit for Ruby | <https://github.com/ruby/rexml> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | rubocop | 1.67.0 | MIT | RuboCop is a Ruby code style checking and code formatting tool. | <https://rubocop.org/> | 2023-06-12 | Low | Ruby linter | Most popular gem on rubygems |
-| Ruby | rubocop-ast | 1.32.3 | MIT |   RuboCop's Node and NodePattern classes. | <https://www.rubocop.org/> | 2023-06-12 | Low | Dependency | Dependency |
+| Ruby | rubocop-ast | 1.33.0 | MIT |   RuboCop's Node and NodePattern classes. | <https://www.rubocop.org/> | 2023-06-12 | Low | Dependency | Dependency |
 | Ruby | rubocop-capybara | 2.21.0 | MIT | Code style checking for Capybara test files (RSpec, Cucumber, Minitest). | <https://github.com/rubocop/rubocop-capybara> | 2024-09-16 | Low | Ruby linter | Most populat gem |
 | Ruby | rubocop-graphql | 1.5.4 | MIT | A collection of RuboCop cops to improve GraphQL-related code | <https://github.com/DmitryTsepelev/rubocop-graphql> | 2024-09-16 | Low | Ruby linter | Most popular gem |
 | Ruby | rubocop-minitest | 0.36.0 | MIT | Automatic Minitest code style checking tool. | <https://docs.rubocop.org/rubocop-minitest/> | 2024-09-16 | Low | Ruby linter | Most popular gem |
@@ -79,5 +79,5 @@
 | Ruby | tzinfo | 2.0.6 | MIT | TZInfo provides access to time zone data and allows times to be converted using time zone rules. | <https://tzinfo.github.io> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | unicode-display_width | 2.6.0 | MIT | [Unicode 16.0.0] Determines the monospace display width of a string using EastAsianWidth.txt, Unicode general category, and other data. | <https://github.com/janlelis/unicode-display_width> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | wisper | 2.0.1 | MIT |   A micro library providing objects with Publish-Subscribe capabilities. | <https://github.com/krisleech/wisper> | 2024-08-07 | Low | Dependency | Dependency |
-| Ruby | xcodeproj | 1.25.1 | MIT | Xcodeproj lets you create and modify Xcode projects from Ruby | <https://github.com/cocoapods/xcodeproj> | 2022-05-10 | Low | Dependency | Dependency |
+| Ruby | xcodeproj | 1.26.0 | MIT | Xcodeproj lets you create and modify Xcode projects from Ruby | <https://github.com/cocoapods/xcodeproj> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | yarn_lock_parser | 0.1.0 | MIT | Parser for yarn.lock files. | <https://rubygems.org/yarn_lock_parser> | 2023-06-08 | Low | Read yarn lock file | Popular gem |
