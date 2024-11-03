@@ -17,9 +17,14 @@ module SOUP
         package.file = file
         package.language = 'PHP'
         package.version = php_package['version']&.strip
-        package.license = php_package['license']&.first&.tr('()', '  ')&.strip&.split&.first
+        license = php_package['license']&.first
+        license = license&.tr('()', '  ')
+        license = license&.strip
+        license = license&.split&.first
+        package.license = license
         package.license = 'NOASSERTION' if package.license&.start_with?('http')
-        package.description = php_package['description']&.split(/\n|\. /)&.first&.gsub(%r{((?:f|ht)tps?:/\S+)}, '<\1>')
+        description = php_package['description']&.split(/\n|\. /)&.first
+        package.description = description&.gsub(%r{((?:f|ht)tps?:/\S+)}, '<\1>')
         package.website = php_package['homepage']&.strip
         package.dependency = !main_file.include?(package.package)
         packages[package.package] = package

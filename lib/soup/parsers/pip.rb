@@ -35,7 +35,9 @@ module SOUP
         package.file = file
         package.language = 'Python'
         package.version = version
-        package.description = package_details['info']['summary']&.split(/\n|\. /)&.first&.gsub(%r{((?:f|ht)tps?:/\S+)}, '<\1>')
+        description = package_details['info']['summary']&.split(/\n|\. /)&.first
+        description = description&.gsub(%r{((?:f|ht)tps?:/\S+)}, '<\1>')
+        package.description = description
         package.website = package_details['info']['home_page']&.strip
         package.dependency = !main_file.include?(package.package)
 

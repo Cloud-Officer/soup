@@ -14,7 +14,7 @@
   "activesupport": {
     "language": "Ruby",
     "package": "activesupport",
-    "version": "7.2.1.2",
+    "version": "7.2.2",
     "license": "MIT",
     "description": "A toolkit of support libraries and Ruby core extensions extracted from the Rails framework",
     "website": "https://rubyonrails.org",
@@ -83,6 +83,18 @@
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
   },
+  "benchmark": {
+    "language": "Ruby",
+    "package": "benchmark",
+    "version": "0.3.0",
+    "license": "Ruby",
+    "description": "a performance benchmarking library",
+    "website": "https://github.com/ruby/benchmark",
+    "last_verified_at": "2024-11-03",
+    "risk_level": "Low",
+    "requirements": "Dependency",
+    "verification_reasoning": "Dependency"
+  },
   "bigdecimal": {
     "language": "Ruby",
     "package": "bigdecimal",
@@ -110,7 +122,7 @@
   "cocoapods": {
     "language": "Ruby",
     "package": "cocoapods",
-    "version": "1.16.1",
+    "version": "1.16.2",
     "license": "MIT",
     "description": "CocoaPods manages library dependencies for your Xcode project.",
     "website": "https://github.com/CocoaPods/CocoaPods",
@@ -122,7 +134,7 @@
   "cocoapods-core": {
     "language": "Ruby",
     "package": "cocoapods-core",
-    "version": "1.16.1",
+    "version": "1.16.2",
     "license": "MIT",
     "description": "The CocoaPods-Core gem provides support to work with the models of CocoaPods.",
     "website": "https://github.com/CocoaPods/CocoaPods",
@@ -386,9 +398,9 @@
   "json": {
     "language": "Ruby",
     "package": "json",
-    "version": "2.7.4",
+    "version": "2.7.5",
     "license": "Ruby",
-    "description": "A JSON implementation as a JRuby extension.",
+    "description": "This is a JSON implementation as a Ruby extension in C.",
     "website": "https://ruby.github.io/json",
     "last_verified_at": "2022-05-10",
     "risk_level": "Low",
@@ -554,7 +566,7 @@
   "parser": {
     "language": "Ruby",
     "package": "parser",
-    "version": "3.3.5.0",
+    "version": "3.3.5.1",
     "license": "MIT",
     "description": "A Ruby parser written in pure Ruby.",
     "website": "https://github.com/whitequark/parser",
@@ -638,7 +650,7 @@
   "rubocop": {
     "language": "Ruby",
     "package": "rubocop",
-    "version": "1.67.0",
+    "version": "1.68.0",
     "license": "MIT",
     "description": "RuboCop is a Ruby code style checking and code formatting tool.",
     "website": "https://rubocop.org/",
@@ -650,7 +662,7 @@
   "rubocop-ast": {
     "language": "Ruby",
     "package": "rubocop-ast",
-    "version": "1.33.0",
+    "version": "1.33.1",
     "license": "MIT",
     "description": "  RuboCop's Node and NodePattern classes.",
     "website": "https://www.rubocop.org/",
@@ -926,7 +938,7 @@
   "xcodeproj": {
     "language": "Ruby",
     "package": "xcodeproj",
-    "version": "1.26.0",
+    "version": "1.27.0",
     "license": "MIT",
     "description": "Xcodeproj lets you create and modify Xcode projects from Ruby",
     "website": "https://github.com/cocoapods/xcodeproj",
