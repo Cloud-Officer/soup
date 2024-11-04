@@ -3,12 +3,13 @@
 | **Language** | **Package** | **Version** | **License** | **Description** | **Website** | **Last Verified** | **Risk Level** | **Requirements** | **Verification Reasoning** |
 | :---: | :--- | :---: | :---: | :--- | :--- | :---: | :---: | :--- | :--- |
 | Ruby | CFPropertyList | 3.0.7 | MIT | This is a module to read, write and manipulate both binary and XML property lists as defined by apple. | <https://github.com/ckruse/CFPropertyList> | 2022-05-10 | Low | Dependency | Dependency |
-| Ruby | activesupport | 7.2.1.2 | MIT | A toolkit of support libraries and Ruby core extensions extracted from the Rails framework | <https://rubyonrails.org> | 2022-05-10 | Low | Dependency | Dependency |
+| Ruby | activesupport | 7.2.2 | MIT | A toolkit of support libraries and Ruby core extensions extracted from the Rails framework | <https://rubyonrails.org> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | addressable | 2.8.7 | Apache-2.0 | Addressable is an alternative implementation to the URI implementation that is | <https://github.com/sporkmonger/addressable> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | algoliasearch | 1.27.5 | MIT | A simple Ruby client for the algolia.com REST API | <https://www.algolia.com/doc/api-client/ruby/getting-started/> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | ast | 2.4.2 | MIT | A library for working with Abstract Syntax Trees. | <https://whitequark.github.io/ast/> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | atomos | 0.1.3 | MIT | A simple gem to atomically write files | <https://github.com/segiddins/atomos> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | base64 | 0.2.0 | Ruby | Support for encoding and decoding binary data using a Base64 representation. | <https://github.com/ruby/base64> | 2023-08-11 | Low | Dependency | Dependency |
+| Ruby | benchmark | 0.3.0 | Ruby | a performance benchmarking library | <https://github.com/ruby/benchmark> | 2024-11-04 | Low | Dependency | Dependency |
 | Ruby | bigdecimal | 3.1.8 | Ruby | This library provides arbitrary-precision decimal floating-point number class. | <https://github.com/ruby/bigdecimal> | 2023-10-26 | Low | Dependency | Dependency |
 | Ruby | claide | 1.1.0 | MIT | A small command-line interface framework. | <https://github.com/CocoaPods/CLAide> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | cocoapods | 1.16.1 | MIT | CocoaPods manages library dependencies for your Xcode project. | <https://github.com/CocoaPods/CocoaPods> | 2022-05-10 | Low | Used to read Podfile | Same package used by CocoaPods |
