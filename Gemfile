@@ -4,7 +4,7 @@ source 'https://rubygems.org'
 
 gem 'activesupport', '>= 7.1.0'
 gem 'bundler', '>= 2.3.0'
-gem 'cocoapods', '>=  1.14.0'
+gem 'cocoapods', '>= 1.14.0'
 gem 'httparty', '>= 0.20.0'
 gem 'inquirer', '>= 0.2.0'
 gem 'json', '>= 2.6.0'
