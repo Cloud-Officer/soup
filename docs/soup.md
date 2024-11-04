@@ -11,8 +11,8 @@
 | Ruby | base64 | 0.2.0 | Ruby | Support for encoding and decoding binary data using a Base64 representation. | <https://github.com/ruby/base64> | 2023-08-11 | Low | Dependency | Dependency |
 | Ruby | bigdecimal | 3.1.8 | Ruby | This library provides arbitrary-precision decimal floating-point number class. | <https://github.com/ruby/bigdecimal> | 2023-10-26 | Low | Dependency | Dependency |
 | Ruby | claide | 1.1.0 | MIT | A small command-line interface framework. | <https://github.com/CocoaPods/CLAide> | 2022-05-10 | Low | Dependency | Dependency |
-| Ruby | cocoapods | 1.16.1 | MIT | CocoaPods manages library dependencies for your Xcode project. | <https://github.com/CocoaPods/CocoaPods> | 2022-05-10 | Low | Used to read Podfile | Same package used by CocoaPods |
-| Ruby | cocoapods-core | 1.16.1 | MIT | The CocoaPods-Core gem provides support to work with the models of CocoaPods. | <https://github.com/CocoaPods/CocoaPods> | 2022-05-10 | Low | Dependency | Dependency |
+| Ruby | cocoapods | 1.16.2 | MIT | CocoaPods manages library dependencies for your Xcode project. | <https://github.com/CocoaPods/CocoaPods> | 2022-05-10 | Low | Used to read Podfile | Same package used by CocoaPods |
+| Ruby | cocoapods-core | 1.16.2 | MIT | The CocoaPods-Core gem provides support to work with the models of CocoaPods. | <https://github.com/CocoaPods/CocoaPods> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | cocoapods-deintegrate | 1.0.5 | MIT | A CocoaPods plugin to remove and de-integrate CocoaPods from your project. | <https://github.com/kylef/cocoapods-deintegrate> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | cocoapods-downloader | 2.1 | MIT | A small library for downloading files from remotes in a folder. | <https://github.com/CocoaPods/cocoapods-downloader> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | cocoapods-plugins | 1.0.0 | MIT |              This CocoaPods plugin shows information about all available CocoaPods plugins | <https://github.com/cocoapods/cocoapods-plugins> | 2022-05-10 | Low | Dependency | Dependency |
@@ -79,5 +79,5 @@
 | Ruby | tzinfo | 2.0.6 | MIT | TZInfo provides access to time zone data and allows times to be converted using time zone rules. | <https://tzinfo.github.io> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | unicode-display_width | 2.6.0 | MIT | [Unicode 16.0.0] Determines the monospace display width of a string using EastAsianWidth.txt, Unicode general category, and other data. | <https://github.com/janlelis/unicode-display_width> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | wisper | 2.0.1 | MIT |   A micro library providing objects with Publish-Subscribe capabilities. | <https://github.com/krisleech/wisper> | 2024-08-07 | Low | Dependency | Dependency |
-| Ruby | xcodeproj | 1.26.0 | MIT | Xcodeproj lets you create and modify Xcode projects from Ruby | <https://github.com/cocoapods/xcodeproj> | 2022-05-10 | Low | Dependency | Dependency |
+| Ruby | xcodeproj | 1.27.0 | MIT | Xcodeproj lets you create and modify Xcode projects from Ruby | <https://github.com/cocoapods/xcodeproj> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | yarn_lock_parser | 0.1.0 | MIT | Parser for yarn.lock files. | <https://rubygems.org/yarn_lock_parser> | 2023-06-08 | Low | Read yarn lock file | Popular gem |
