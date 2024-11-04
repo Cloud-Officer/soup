@@ -29,7 +29,8 @@ module SOUP
         package.language = 'Ruby'
         package.version = spec.version&.to_s&.strip
         package.license = package_details['licenses']&.first&.strip
-        package.description = package_details['info']&.split(/\n|\. /)&.first&.gsub(%r{((?:f|ht)tps?:/\S+)}, '<\1>')
+        package_info = package_details['info']&.split(/\n|\. /)&.first
+        package.description = package_info&.gsub(%r{((?:f|ht)tps?:/\S+)}, '<\1>')
         package.website = package_details['homepage_uri']&.strip
         package.dependency = !main_file.include?(package.package)
         packages[package.package] = package

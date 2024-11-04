@@ -23,9 +23,6 @@ module SOUP
         group_id, artifact_id, version = package_name.split(':')
         puts("Checking #{group_id}:#{artifact_id} #{version}...")
         response = HTTParty.get("https://search.maven.org/solrsearch/select?q=g:%22#{group_id}%22+AND+a:%22#{artifact_id}%22+AND+v:%22#{version}%22&rows=1&wt=json")
-        license = nil
-        description = nil
-        website = nil
 
         if response.code == 200 and JSON.parse(response.body)['response']['numFound'] == 1
           package_details = JSON.parse(response.body)['response']['docs'][0]

@@ -55,7 +55,9 @@ module SOUP
         package.language = 'Swift'
         package.version = pin['state']['version']&.strip
         package.license = package_details['license']['spdx_id']&.strip
-        package.description = package_details['description']&.split(/\n|\. /)&.first&.gsub(%r{((?:f|ht)tps?:/\S+)}, '<\1>')
+        description = package_details['description']&.split(/\n|\. /)&.first
+        description = description&.gsub(%r{((?:f|ht)tps?:/\S+)}, '<\1>')
+        package.description = description
         package.website = package_details['html_url']&.strip
         package.dependency = !main_file.include?(package.package)
         packages[package.package] = package
