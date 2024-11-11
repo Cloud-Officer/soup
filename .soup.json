@@ -86,7 +86,7 @@
   "benchmark": {
     "language": "Ruby",
     "package": "benchmark",
-    "version": "0.3.0",
+    "version": "0.4.0",
     "license": "Ruby",
     "description": "a performance benchmarking library",
     "website": "https://github.com/ruby/benchmark",
@@ -566,7 +566,7 @@
   "parser": {
     "language": "Ruby",
     "package": "parser",
-    "version": "3.3.5.1",
+    "version": "3.3.6.0",
     "license": "MIT",
     "description": "A Ruby parser written in pure Ruby.",
     "website": "https://github.com/whitequark/parser",
@@ -662,7 +662,7 @@
   "rubocop-ast": {
     "language": "Ruby",
     "package": "rubocop-ast",
-    "version": "1.33.1",
+    "version": "1.34.1",
     "license": "MIT",
     "description": "  RuboCop's Node and NodePattern classes.",
     "website": "https://www.rubocop.org/",
@@ -734,7 +734,7 @@
   "rubocop-thread_safety": {
     "language": "Ruby",
     "package": "rubocop-thread_safety",
-    "version": "0.5.1",
+    "version": "0.6.0",
     "license": "MIT",
     "description": "  Thread-safety checks via static analysis.",
     "website": "https://github.com/rubocop/rubocop-thread_safety",
@@ -770,7 +770,7 @@
   "securerandom": {
     "language": "Ruby",
     "package": "securerandom",
-    "version": "0.3.1",
+    "version": "0.3.2",
     "license": "Ruby",
     "description": "Interface for secure random number generator.",
     "website": "https://github.com/ruby/securerandom",

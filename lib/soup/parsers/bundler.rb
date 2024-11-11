@@ -9,13 +9,8 @@ require_relative '../package'
 module SOUP
   class BundlerParser
     def parse(file, packages)
-      lock_file = {}
-      main_file = ''
-
-      Dir.chdir(File.dirname(file)) do
-        lock_file = Bundler::LockfileParser.new(Bundler.read_file(file))
-        main_file = File.read(file.gsub('.lock', ''))
-      end
+      lock_file = Bundler::LockfileParser.new(Bundler.read_file(file))
+      main_file = File.read(file.sub(/\.lock$/, ''))
 
       lock_file.specs.each do |spec|
         puts("Checking #{spec.name} #{spec.version}...")
