@@ -47,7 +47,7 @@
 | Ruby | netrc | 0.11.0 | MIT | This library can read and update netrc files, preserving formatting including comments and whitespace. | <https://github.com/geemus/netrc> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | nkf | 0.2.0 | Ruby | Ruby extension for Network Kanji Filter | <https://github.com/ruby/nkf> | 2024-02-15 | Low | Dependency | Dependency |
 | Ruby | nokogiri | 1.16.7 | MIT | Nokogiri (鋸) makes it easy and painless to work with XML and HTML from Ruby | <https://nokogiri.org> | 2024-05-15 | Low | XML parser | Most popular library |
-| Ruby | optparse | 0.5.0 | Ruby | OptionParser is a class for command-line option analysis. | <https://github.com/ruby/optparse> | 2022-05-10 | Low | Used to parse command line arguments. | Very popular on rubygems.org |
+| Ruby | optparse | 0.6.0 | Ruby | OptionParser is a class for command-line option analysis. | <https://github.com/ruby/optparse> | 2022-05-10 | Low | Used to parse command line arguments. | Very popular on rubygems.org |
 | Ruby | parallel | 1.26.3 | MIT | Run any kind of code in parallel processes | <https://github.com/grosser/parallel> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | parser | 3.3.5.1 | MIT | A Ruby parser written in pure Ruby. | <https://github.com/whitequark/parser> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | pastel | 0.8.0 | MIT | Terminal strings styling with intuitive and clean API. | <https://ttytoolkit.org> | 2024-08-07 | Low | Dependency | Dependency |
