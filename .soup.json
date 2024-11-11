@@ -542,7 +542,7 @@
   "optparse": {
     "language": "Ruby",
     "package": "optparse",
-    "version": "0.5.0",
+    "version": "0.6.0",
     "license": "Ruby",
     "description": "OptionParser is a class for command-line option analysis.",
     "website": "https://github.com/ruby/optparse",
