@@ -57,11 +57,11 @@
 | Ruby | regexp_parser | 2.9.2 | MIT | A library for tokenizing, lexing, and parsing Ruby regular expressions. | <https://github.com/ammar/regexp_parser> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | rexml | 3.3.9 | BSD-2-Clause | An XML toolkit for Ruby | <https://github.com/ruby/rexml> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | rubocop | 1.68.0 | MIT | RuboCop is a Ruby code style checking and code formatting tool. | <https://rubocop.org/> | 2023-06-12 | Low | Ruby linter | Most popular gem on rubygems |
-| Ruby | rubocop-ast | 1.35.0 | MIT |   RuboCop's Node and NodePattern classes. | <https://www.rubocop.org/> | 2023-06-12 | Low | Dependency | Dependency |
+| Ruby | rubocop-ast | 1.36.1 | MIT |   RuboCop's Node and NodePattern classes. | <https://www.rubocop.org/> | 2023-06-12 | Low | Dependency | Dependency |
 | Ruby | rubocop-capybara | 2.21.0 | MIT | Code style checking for Capybara test files (RSpec, Cucumber, Minitest). | <https://github.com/rubocop/rubocop-capybara> | 2024-09-16 | Low | Ruby linter | Most populat gem |
 | Ruby | rubocop-graphql | 1.5.4 | MIT | A collection of RuboCop cops to improve GraphQL-related code | <https://github.com/DmitryTsepelev/rubocop-graphql> | 2024-09-16 | Low | Ruby linter | Most popular gem |
 | Ruby | rubocop-minitest | 0.36.0 | MIT | Automatic Minitest code style checking tool. | <https://docs.rubocop.org/rubocop-minitest/> | 2024-09-16 | Low | Ruby linter | Most popular gem |
-| Ruby | rubocop-performance | 1.22.1 | MIT | A collection of RuboCop cops to check for performance optimizations | <https://docs.rubocop.org/rubocop-performance/> | 2024-05-30 | Low | A collection of RuboCop cops to check for performance optimizations in Ruby code | Most popular gem |
+| Ruby | rubocop-performance | 1.23.0 | MIT | A collection of RuboCop cops to check for performance optimizations | <https://docs.rubocop.org/rubocop-performance/> | 2024-05-30 | Low | A collection of RuboCop cops to check for performance optimizations in Ruby code | Most popular gem |
 | Ruby | rubocop-rspec | 3.2.0 | MIT | Code style checking for RSpec files. | <https://github.com/rubocop/rubocop-rspec> | 2024-05-30 | Low | Code style checking for RSpec files. A plugin for the RuboCop code style enforcing & linting tool | Most popular gem |
 | Ruby | rubocop-thread_safety | 0.6.0 | MIT |   Thread-safety checks via static analysis. | <https://github.com/rubocop/rubocop-thread_safety> | 2024-09-16 | Low | Ruby linter | Most popular gem |
 | Ruby | ruby-macho | 2.5.1 | MIT | A library for viewing and manipulating Mach-O files in Ruby. | <https://github.com/Homebrew/ruby-macho> | 2022-05-10 | Low | Dependency | Dependency |
