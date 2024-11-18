@@ -662,7 +662,7 @@
   "rubocop-ast": {
     "language": "Ruby",
     "package": "rubocop-ast",
-    "version": "1.35.0",
+    "version": "1.36.1",
     "license": "MIT",
     "description": "  RuboCop's Node and NodePattern classes.",
     "website": "https://www.rubocop.org/",
@@ -710,7 +710,7 @@
   "rubocop-performance": {
     "language": "Ruby",
     "package": "rubocop-performance",
-    "version": "1.22.1",
+    "version": "1.23.0",
     "license": "MIT",
     "description": "A collection of RuboCop cops to check for performance optimizations",
     "website": "https://docs.rubocop.org/rubocop-performance/",
