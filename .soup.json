@@ -398,9 +398,9 @@
   "json": {
     "language": "Ruby",
     "package": "json",
-    "version": "2.8.1",
+    "version": "2.8.2",
     "license": "Ruby",
-    "description": "This is a JSON implementation as a Ruby extension in C.",
+    "description": "A JSON implementation as a JRuby extension.",
     "website": "https://ruby.github.io/json",
     "last_verified_at": "2022-05-10",
     "risk_level": "Low",
