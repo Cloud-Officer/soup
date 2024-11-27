@@ -650,7 +650,7 @@
   "rubocop": {
     "language": "Ruby",
     "package": "rubocop",
-    "version": "1.68.0",
+    "version": "1.69.0",
     "license": "MIT",
     "description": "RuboCop is a Ruby code style checking and code formatting tool.",
     "website": "https://rubocop.org/",
@@ -662,7 +662,7 @@
   "rubocop-ast": {
     "language": "Ruby",
     "package": "rubocop-ast",
-    "version": "1.36.1",
+    "version": "1.36.2",
     "license": "MIT",
     "description": "  RuboCop's Node and NodePattern classes.",
     "website": "https://www.rubocop.org/",
@@ -914,11 +914,23 @@
   "unicode-display_width": {
     "language": "Ruby",
     "package": "unicode-display_width",
-    "version": "2.6.0",
+    "version": "3.1.2",
     "license": "MIT",
-    "description": "[Unicode 16.0.0] Determines the monospace display width of a string using EastAsianWidth.txt, Unicode general category, and other data.",
+    "description": "[Unicode 16.0.0] Determines the monospace display width of a string using EastAsianWidth.txt, Unicode general category, Emoji specification, and other data.",
     "website": "https://github.com/janlelis/unicode-display_width",
     "last_verified_at": "2022-05-10",
+    "risk_level": "Low",
+    "requirements": "Dependency",
+    "verification_reasoning": "Dependency"
+  },
+  "unicode-emoji": {
+    "language": "Ruby",
+    "package": "unicode-emoji",
+    "version": "4.0.4",
+    "license": "MIT",
+    "description": "[Emoji 16.0] Provides Unicode Emoji data and regexes, incorporating the latest Unicode and Emoji standards",
+    "website": "https://github.com/janlelis/unicode-emoji",
+    "last_verified_at": "2024-11-27",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
