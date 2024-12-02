@@ -422,7 +422,7 @@
   "logger": {
     "language": "Ruby",
     "package": "logger",
-    "version": "1.6.1",
+    "version": "1.6.2",
     "license": "Ruby",
     "description": "Provides a simple logging utility for outputting messages.",
     "website": "https://github.com/ruby/logger",
@@ -626,7 +626,7 @@
   "regexp_parser": {
     "language": "Ruby",
     "package": "regexp_parser",
-    "version": "2.9.2",
+    "version": "2.9.3",
     "license": "MIT",
     "description": "A library for tokenizing, lexing, and parsing Ruby regular expressions.",
     "website": "https://github.com/ammar/regexp_parser",
@@ -770,7 +770,7 @@
   "securerandom": {
     "language": "Ruby",
     "package": "securerandom",
-    "version": "0.3.2",
+    "version": "0.4.0",
     "license": "Ruby",
     "description": "Interface for secure random number generator.",
     "website": "https://github.com/ruby/securerandom",
