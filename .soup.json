@@ -398,9 +398,9 @@
   "json": {
     "language": "Ruby",
     "package": "json",
-    "version": "2.8.2",
+    "version": "2.9.0",
     "license": "Ruby",
-    "description": "A JSON implementation as a JRuby extension.",
+    "description": "This is a JSON implementation as a Ruby extension in C.",
     "website": "https://ruby.github.io/json",
     "last_verified_at": "2022-05-10",
     "risk_level": "Low",
@@ -446,7 +446,7 @@
   "minitest": {
     "language": "Ruby",
     "package": "minitest",
-    "version": "5.25.2",
+    "version": "5.25.4",
     "license": "MIT",
     "description": "minitest provides a complete suite of testing facilities supporting",
     "website": "https://github.com/minitest/minitest",
@@ -530,7 +530,7 @@
   "nokogiri": {
     "language": "Ruby",
     "package": "nokogiri",
-    "version": "1.16.7",
+    "version": "1.17.0",
     "license": "MIT",
     "description": "Nokogiri (鋸) makes it easy and painless to work with XML and HTML from Ruby",
     "website": "https://nokogiri.org",
@@ -650,7 +650,7 @@
   "rubocop": {
     "language": "Ruby",
     "package": "rubocop",
-    "version": "1.69.0",
+    "version": "1.69.1",
     "license": "MIT",
     "description": "RuboCop is a Ruby code style checking and code formatting tool.",
     "website": "https://rubocop.org/",
