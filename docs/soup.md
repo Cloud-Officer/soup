@@ -3,7 +3,7 @@
 | **Language** | **Package** | **Version** | **License** | **Description** | **Website** | **Last Verified** | **Risk Level** | **Requirements** | **Verification Reasoning** |
 | :---: | :--- | :---: | :---: | :--- | :--- | :---: | :---: | :--- | :--- |
 | Ruby | CFPropertyList | 3.0.7 | MIT | This is a module to read, write and manipulate both binary and XML property lists as defined by apple. | <https://github.com/ckruse/CFPropertyList> | 2022-05-10 | Low | Dependency | Dependency |
-| Ruby | activesupport | 7.2.2 | MIT | A toolkit of support libraries and Ruby core extensions extracted from the Rails framework | <https://rubyonrails.org> | 2022-05-10 | Low | Dependency | Dependency |
+| Ruby | activesupport | 7.2.2.1 | MIT | A toolkit of support libraries and Ruby core extensions extracted from the Rails framework | <https://rubyonrails.org> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | addressable | 2.8.7 | Apache-2.0 | Addressable is an alternative implementation to the URI implementation that is | <https://github.com/sporkmonger/addressable> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | algoliasearch | 1.27.5 | MIT | A simple Ruby client for the algolia.com REST API | <https://www.algolia.com/doc/api-client/ruby/getting-started/> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | ast | 2.4.2 | MIT | A library for working with Abstract Syntax Trees. | <https://whitequark.github.io/ast/> | 2022-05-10 | Low | Dependency | Dependency |
@@ -46,7 +46,7 @@
 | Ruby | nap | 1.1.0 | MIT |   Nap is a really simple REST library | <https://github.com/Fingertips/nap> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | netrc | 0.11.0 | MIT | This library can read and update netrc files, preserving formatting including comments and whitespace. | <https://github.com/geemus/netrc> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | nkf | 0.2.0 | Ruby | Ruby extension for Network Kanji Filter | <https://github.com/ruby/nkf> | 2024-02-15 | Low | Dependency | Dependency |
-| Ruby | nokogiri | 1.17.0 | MIT | Nokogiri (鋸) makes it easy and painless to work with XML and HTML from Ruby | <https://nokogiri.org> | 2024-05-15 | Low | XML parser | Most popular library |
+| Ruby | nokogiri | 1.17.1 | MIT | Nokogiri (鋸) makes it easy and painless to work with XML and HTML from Ruby | <https://nokogiri.org> | 2024-05-15 | Low | XML parser | Most popular library |
 | Ruby | optparse | 0.6.0 | Ruby | OptionParser is a class for command-line option analysis. | <https://github.com/ruby/optparse> | 2022-05-10 | Low | Used to parse command line arguments. | Very popular on rubygems.org |
 | Ruby | parallel | 1.26.3 | MIT | Run any kind of code in parallel processes | <https://github.com/grosser/parallel> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | parser | 3.3.6.0 | MIT | A Ruby parser written in pure Ruby. | <https://github.com/whitequark/parser> | 2022-05-10 | Low | Dependency | Dependency |
