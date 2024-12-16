@@ -254,7 +254,7 @@
   "csv": {
     "language": "Ruby",
     "package": "csv",
-    "version": "3.3.0",
+    "version": "3.3.1",
     "license": "Ruby",
     "description": "The CSV library provides a complete interface to CSV files and data",
     "website": "https://github.com/ruby/csv",
@@ -422,7 +422,7 @@
   "logger": {
     "language": "Ruby",
     "package": "logger",
-    "version": "1.6.2",
+    "version": "1.6.3",
     "license": "Ruby",
     "description": "Provides a simple logging utility for outputting messages.",
     "website": "https://github.com/ruby/logger",
@@ -638,7 +638,7 @@
   "rexml": {
     "language": "Ruby",
     "package": "rexml",
-    "version": "3.3.9",
+    "version": "3.4.0",
     "license": "BSD-2-Clause",
     "description": "An XML toolkit for Ruby",
     "website": "https://github.com/ruby/rexml",
@@ -770,7 +770,7 @@
   "securerandom": {
     "language": "Ruby",
     "package": "securerandom",
-    "version": "0.4.0",
+    "version": "0.4.1",
     "license": "Ruby",
     "description": "Interface for secure random number generator.",
     "website": "https://github.com/ruby/securerandom",
@@ -818,7 +818,7 @@
   "tins": {
     "language": "Ruby",
     "package": "tins",
-    "version": "1.37.0",
+    "version": "1.37.1",
     "license": "MIT",
     "description": "All the stuff that isn't good/big enough for a real library.",
     "website": "https://github.com/flori/tins",
