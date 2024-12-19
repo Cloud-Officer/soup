@@ -398,7 +398,7 @@
   "json": {
     "language": "Ruby",
     "package": "json",
-    "version": "2.9.0",
+    "version": "2.9.1",
     "license": "Ruby",
     "description": "This is a JSON implementation as a Ruby extension in C.",
     "website": "https://ruby.github.io/json",
@@ -422,7 +422,7 @@
   "logger": {
     "language": "Ruby",
     "package": "logger",
-    "version": "1.6.3",
+    "version": "1.6.4",
     "license": "Ruby",
     "description": "Provides a simple logging utility for outputting messages.",
     "website": "https://github.com/ruby/logger",
