@@ -10,7 +10,7 @@
 | Ruby | atomos | 0.1.3 | MIT | A simple gem to atomically write files | <https://github.com/segiddins/atomos> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | base64 | 0.2.0 | Ruby | Support for encoding and decoding binary data using a Base64 representation. | <https://github.com/ruby/base64> | 2023-08-11 | Low | Dependency | Dependency |
 | Ruby | benchmark | 0.4.0 | Ruby | a performance benchmarking library | <https://github.com/ruby/benchmark> | 2024-11-03 | Low | Dependency | Dependency |
-| Ruby | bigdecimal | 3.1.8 | Ruby | This library provides arbitrary-precision decimal floating-point number class. | <https://github.com/ruby/bigdecimal> | 2023-10-26 | Low | Dependency | Dependency |
+| Ruby | bigdecimal | 3.1.9 | Ruby | This library provides arbitrary-precision decimal floating-point number class. | <https://github.com/ruby/bigdecimal> | 2023-10-26 | Low | Dependency | Dependency |
 | Ruby | claide | 1.1.0 | MIT | A small command-line interface framework. | <https://github.com/CocoaPods/CLAide> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | cocoapods | 1.16.2 | MIT | CocoaPods manages library dependencies for your Xcode project. | <https://github.com/CocoaPods/CocoaPods> | 2022-05-10 | Low | Used to read Podfile | Same package used by CocoaPods |
 | Ruby | cocoapods-core | 1.16.2 | MIT | The CocoaPods-Core gem provides support to work with the models of CocoaPods. | <https://github.com/CocoaPods/CocoaPods> | 2022-05-10 | Low | Dependency | Dependency |
@@ -23,7 +23,7 @@
 | Ruby | colored2 | 3.1.2 | MIT | This is a heavily modified fork of HTML text removed. Please check the website. gem, with many | <http://github.com/kigster/colored2> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | concurrent-ruby | 1.3.4 | MIT | Modern concurrency tools including agents, futures, promises, thread pools, actors, supervisors, and more. | <http://www.concurrent-ruby.com> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | connection_pool | 2.4.1 | MIT | Generic connection pool for Ruby | <https://github.com/mperham/connection_pool> | 2023-10-26 | Low | Dependency | Dependency |
-| Ruby | csv | 3.3.1 | Ruby | The CSV library provides a complete interface to CSV files and data | <https://github.com/ruby/csv> | 2024-04-29 | Low | Dependency | Dependency |
+| Ruby | csv | 3.3.2 | Ruby | The CSV library provides a complete interface to CSV files and data | <https://github.com/ruby/csv> | 2024-04-29 | Low | Dependency | Dependency |
 | Ruby | drb | 2.2.1 | Ruby | Distributed object system for Ruby | <https://github.com/ruby/drb> | 2023-10-26 | Low | Dependency | Dependency |
 | Ruby | escape | 0.0.4 |  | ... | <http://www.a-k-r.org/escape/> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | ethon | 0.16.0 | MIT | Very lightweight libcurl wrapper. | <https://github.com/typhoeus/ethon> | 2022-05-10 | Low | Dependency | Dependency |
@@ -46,7 +46,7 @@
 | Ruby | nap | 1.1.0 | MIT |   Nap is a really simple REST library | <https://github.com/Fingertips/nap> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | netrc | 0.11.0 | MIT | This library can read and update netrc files, preserving formatting including comments and whitespace. | <https://github.com/geemus/netrc> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | nkf | 0.2.0 | Ruby | Ruby extension for Network Kanji Filter | <https://github.com/ruby/nkf> | 2024-02-15 | Low | Dependency | Dependency |
-| Ruby | nokogiri | 1.17.2 | MIT | Nokogiri (鋸) makes it easy and painless to work with XML and HTML from Ruby | <https://nokogiri.org> | 2024-05-15 | Low | XML parser | Most popular library |
+| Ruby | nokogiri | 1.18.0 | MIT | Nokogiri (鋸) makes it easy and painless to work with XML and HTML from Ruby | <https://nokogiri.org> | 2024-05-15 | Low | XML parser | Most popular library |
 | Ruby | optparse | 0.6.0 | Ruby | OptionParser is a class for command-line option analysis. | <https://github.com/ruby/optparse> | 2022-05-10 | Low | Used to parse command line arguments. | Very popular on rubygems.org |
 | Ruby | parallel | 1.26.3 | MIT | Run any kind of code in parallel processes | <https://github.com/grosser/parallel> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | parser | 3.3.6.0 | MIT | A Ruby parser written in pure Ruby. | <https://github.com/whitequark/parser> | 2022-05-10 | Low | Dependency | Dependency |
@@ -54,7 +54,7 @@
 | Ruby | public_suffix | 4.0.7 | MIT | PublicSuffix can parse and decompose a domain name into top level domain, domain and subdomains. | <https://simonecarletti.com/code/publicsuffix-ruby> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | racc | 1.8.1 | Ruby | Racc is an LALR(1) parser generator. | <https://github.com/ruby/racc> | 2023-06-09 | Low | Dependency | Dependency |
 | Ruby | rainbow | 3.1.1 | MIT | Colorize printed text on ANSI terminals | <https://github.com/sickill/rainbow> | 2022-05-10 | Low | Dependency | Dependency |
-| Ruby | regexp_parser | 2.9.3 | MIT | A library for tokenizing, lexing, and parsing Ruby regular expressions. | <https://github.com/ammar/regexp_parser> | 2022-05-10 | Low | Dependency | Dependency |
+| Ruby | regexp_parser | 2.10.0 | MIT | A library for tokenizing, lexing, and parsing Ruby regular expressions. | <https://github.com/ammar/regexp_parser> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | rexml | 3.4.0 | BSD-2-Clause | An XML toolkit for Ruby | <https://github.com/ruby/rexml> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | rubocop | 1.69.2 | MIT | RuboCop is a Ruby code style checking and code formatting tool. | <https://rubocop.org/> | 2023-06-12 | Low | Ruby linter | Most popular gem on rubygems |
 | Ruby | rubocop-ast | 1.37.0 | MIT |   RuboCop's Node and NodePattern classes. | <https://www.rubocop.org/> | 2023-06-12 | Low | Dependency | Dependency |
@@ -78,7 +78,7 @@
 | Ruby | tty-screen | 0.8.2 | MIT | Terminal screen size detection that works on Linux, macOS and Windows systems and supports Ruby MRI, JRuby, TruffleRuby and Rubinius interpreters. | <https://ttytoolkit.org> | 2024-08-07 | Low | Dependency | Dependency |
 | Ruby | typhoeus | 1.4.1 | MIT | Like a modern code version of the mythical beast with 100 serpent heads, Typhoeus runs HTTP requests in parallel while cleanly encapsulating handling logic. | <https://github.com/typhoeus/typhoeus> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | tzinfo | 2.0.6 | MIT | TZInfo provides access to time zone data and allows times to be converted using time zone rules. | <https://tzinfo.github.io> | 2022-05-10 | Low | Dependency | Dependency |
-| Ruby | unicode-display_width | 3.1.2 | MIT | [Unicode 16.0.0] Determines the monospace display width of a string using EastAsianWidth.txt, Unicode general category, Emoji specification, and other data. | <https://github.com/janlelis/unicode-display_width> | 2022-05-10 | Low | Dependency | Dependency |
+| Ruby | unicode-display_width | 3.1.3 | MIT | [Unicode 16.0.0] Determines the monospace display width of a string using EastAsianWidth.txt, Unicode general category, Emoji specification, and other data. | <https://github.com/janlelis/unicode-display_width> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | unicode-emoji | 4.0.4 | MIT | [Emoji 16.0] Provides Unicode Emoji data and regexes, incorporating the latest Unicode and Emoji standards | <https://github.com/janlelis/unicode-emoji> | 2024-11-27 | Low | Dependency | Dependency |
 | Ruby | wisper | 2.0.1 | MIT |   A micro library providing objects with Publish-Subscribe capabilities. | <https://github.com/krisleech/wisper> | 2024-08-07 | Low | Dependency | Dependency |
 | Ruby | xcodeproj | 1.27.0 | MIT | Xcodeproj lets you create and modify Xcode projects from Ruby | <https://github.com/cocoapods/xcodeproj> | 2022-05-10 | Low | Dependency | Dependency |
