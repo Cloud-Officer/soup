@@ -98,7 +98,7 @@
   "bigdecimal": {
     "language": "Ruby",
     "package": "bigdecimal",
-    "version": "3.1.8",
+    "version": "3.1.9",
     "license": "Ruby",
     "description": "This library provides arbitrary-precision decimal floating-point number class.",
     "website": "https://github.com/ruby/bigdecimal",
@@ -254,7 +254,7 @@
   "csv": {
     "language": "Ruby",
     "package": "csv",
-    "version": "3.3.1",
+    "version": "3.3.2",
     "license": "Ruby",
     "description": "The CSV library provides a complete interface to CSV files and data",
     "website": "https://github.com/ruby/csv",
@@ -530,7 +530,7 @@
   "nokogiri": {
     "language": "Ruby",
     "package": "nokogiri",
-    "version": "1.17.2",
+    "version": "1.18.0",
     "license": "MIT",
     "description": "Nokogiri (鋸) makes it easy and painless to work with XML and HTML from Ruby",
     "website": "https://nokogiri.org",
@@ -626,7 +626,7 @@
   "regexp_parser": {
     "language": "Ruby",
     "package": "regexp_parser",
-    "version": "2.9.3",
+    "version": "2.10.0",
     "license": "MIT",
     "description": "A library for tokenizing, lexing, and parsing Ruby regular expressions.",
     "website": "https://github.com/ammar/regexp_parser",
@@ -914,7 +914,7 @@
   "unicode-display_width": {
     "language": "Ruby",
     "package": "unicode-display_width",
-    "version": "3.1.2",
+    "version": "3.1.3",
     "license": "MIT",
     "description": "[Unicode 16.0.0] Determines the monospace display width of a string using EastAsianWidth.txt, Unicode general category, Emoji specification, and other data.",
     "website": "https://github.com/janlelis/unicode-display_width",
