@@ -8,7 +8,7 @@ require 'tty-prompt'
 require_relative '../soup'
 require_relative 'options'
 require_relative 'parsers/bundler'
-require_relative 'parsers/cocoapods'
+# require_relative 'parsers/cocoapods'
 require_relative 'parsers/composer'
 require_relative 'parsers/generic'
 require_relative 'parsers/gradle'
@@ -95,7 +95,7 @@ module SOUP
 
             next unless RUBY_PLATFORM.match?(/darwin/i)
 
-            parser.parse(CocoaPodsParser.new, file, @detected_packages)
+            # parser.parse(CocoaPodsParser.new, file, @detected_packages)
 
           when 'requirements.txt'
             next if @options.skip_pip
