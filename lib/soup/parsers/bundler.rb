@@ -16,7 +16,16 @@ module SOUP
         puts("Checking #{spec.name} #{spec.version}...")
         response = HTTParty.get("https://api.rubygems.org/api/v2/rubygems/#{spec.name}/versions/#{spec.version}.json")
 
-        raise(response.message) unless response.code == 200
+        if response.code != 200
+          response = HTTParty.get("https://api.rubygems.org/api/v1/versions/#{spec.name}/latest.json")
+
+          raise(response.message) unless response.code == 200
+
+          latest_version = JSON.parse(response.body)['version']
+          response = HTTParty.get("https://api.rubygems.org/api/v2/rubygems/#{spec.name}/versions/#{latest_version}.json")
+
+          raise(response.message) unless response.code == 200
+        end
 
         package_details = JSON.parse(response.body)
         package = Package.new(spec.name)
