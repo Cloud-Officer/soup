@@ -12,7 +12,7 @@ jobs:
     name: Update Dependencies
     permissions:
       contents: write
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     steps:
     - name: Licenses
       uses: cloud-officer/ci-actions/soup@master
