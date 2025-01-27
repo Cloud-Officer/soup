@@ -158,7 +158,7 @@
   "language_server-protocol": {
     "language": "Ruby",
     "package": "language_server-protocol",
-    "version": "3.17.0.3",
+    "version": "3.17.0.4",
     "license": "MIT",
     "description": "A Language Server Protocol SDK",
     "website": "https://github.com/mtsmfm/language_server-protocol-ruby",
@@ -326,7 +326,7 @@
   "rubocop-ast": {
     "language": "Ruby",
     "package": "rubocop-ast",
-    "version": "1.37.0",
+    "version": "1.38.0",
     "license": "MIT",
     "description": "  RuboCop's Node and NodePattern classes.",
     "website": "https://www.rubocop.org/",
