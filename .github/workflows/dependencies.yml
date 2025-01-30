@@ -6,6 +6,7 @@ name: Cron Dependencies
 env:
   RUBY-BUNDLER-CACHE: 'false'
   RUBY-VERSION: 3.4.1
+  XCODE-VERSION: 15.4.0
 jobs:
   update_dependencies:
     name: Update Dependencies
@@ -30,19 +31,7 @@ jobs:
         git config --global --add url."https://${{secrets.SOUP_DEPENDENCIES_UPDATE}}:x-oauth-basic@github.com/".insteadOf https://github.com/
         git config --global --add url."https://${{secrets.SOUP_DEPENDENCIES_UPDATE}}:x-oauth-basic@github.com/".insteadOf git@github.com:
 
-        if [ -f "composer.json" ]; then
-          composer update
-        fi
-
-        if [ -f "Gemfile" ]; then
-          bundle config set frozen false
-          bundle update
-        fi
-
-        if [ -f "requirements.in" ]; then
-          pip install pip-tools
-          pip-compile --resolver=backtracking --upgrade
-        fi
+        bundle config set frozen false ; bundle update
     - name: Licenses
       uses: cloud-officer/ci-actions/soup@master
       with:
