@@ -5,11 +5,11 @@ updates:
   directory: "/"
   schedule:
     interval: monthly
-- package-ecosystem: composer
+- package-ecosystem: npm
   directory: "/"
   schedule:
     interval: monthly
-- package-ecosystem: npm
+- package-ecosystem: composer
   directory: "/"
   schedule:
     interval: monthly
