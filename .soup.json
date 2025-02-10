@@ -146,10 +146,10 @@
   "json": {
     "language": "Ruby",
     "package": "json",
-    "version": "2.9.1",
+    "version": "2.10.0",
     "license": "Ruby",
-    "description": "This is a JSON implementation as a Ruby extension in C.",
-    "website": "https://ruby.github.io/json",
+    "description": "A JSON implementation as a JRuby extension.",
+    "website": "https://github.com/ruby/json",
     "last_verified_at": "2022-05-10",
     "risk_level": "Low",
     "requirements": "Used to read package manager and cache files.",
