@@ -254,7 +254,7 @@
   "parser": {
     "language": "Ruby",
     "package": "parser",
-    "version": "3.3.7.0",
+    "version": "3.3.7.1",
     "license": "MIT",
     "description": "A Ruby parser written in pure Ruby.",
     "website": "https://github.com/whitequark/parser",
