@@ -146,7 +146,7 @@
   "json": {
     "language": "Ruby",
     "package": "json",
-    "version": "2.10.0",
+    "version": "2.10.1",
     "license": "Ruby",
     "description": "A JSON implementation as a JRuby extension.",
     "website": "https://github.com/ruby/json",
@@ -167,10 +167,22 @@
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
   },
+  "lint_roller": {
+    "language": "Ruby",
+    "package": "lint_roller",
+    "version": "1.1.0",
+    "license": "MIT",
+    "description": "A plugin specification for linter and formatter rulesets",
+    "website": "https://github.com/standardrb/lint_roller",
+    "last_verified_at": "2025-02-15",
+    "risk_level": "Low",
+    "requirements": "Dependency",
+    "verification_reasoning": "Dependency"
+  },
   "logger": {
     "language": "Ruby",
     "package": "logger",
-    "version": "1.6.5",
+    "version": "1.6.6",
     "license": "Ruby",
     "description": "Provides a simple logging utility for outputting messages.",
     "website": "https://github.com/ruby/logger",
@@ -314,7 +326,7 @@
   "rubocop": {
     "language": "Ruby",
     "package": "rubocop",
-    "version": "1.71.2",
+    "version": "1.72.1",
     "license": "MIT",
     "description": "RuboCop is a Ruby code style checking and code formatting tool.",
     "website": "https://rubocop.org/",
@@ -362,7 +374,7 @@
   "rubocop-minitest": {
     "language": "Ruby",
     "package": "rubocop-minitest",
-    "version": "0.36.0",
+    "version": "0.37.1",
     "license": "MIT",
     "description": "Automatic Minitest code style checking tool.",
     "website": "https://docs.rubocop.org/rubocop-minitest/",
@@ -374,7 +386,7 @@
   "rubocop-performance": {
     "language": "Ruby",
     "package": "rubocop-performance",
-    "version": "1.23.1",
+    "version": "1.24.0",
     "license": "MIT",
     "description": "A collection of RuboCop cops to check for performance optimizations",
     "website": "https://docs.rubocop.org/rubocop-performance/",
