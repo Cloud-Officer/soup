@@ -230,7 +230,7 @@
   "nokogiri": {
     "language": "Ruby",
     "package": "nokogiri",
-    "version": "1.18.2",
+    "version": "1.18.3",
     "license": "MIT",
     "description": "Nokogiri (鋸) makes it easy and painless to work with XML and HTML from Ruby",
     "website": "https://nokogiri.org",
@@ -326,7 +326,7 @@
   "rubocop": {
     "language": "Ruby",
     "package": "rubocop",
-    "version": "1.72.1",
+    "version": "1.72.2",
     "license": "MIT",
     "description": "RuboCop is a Ruby code style checking and code formatting tool.",
     "website": "https://rubocop.org/",

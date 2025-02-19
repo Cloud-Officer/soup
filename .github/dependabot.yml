@@ -3,17 +3,25 @@ version: 2
 updates:
 - package-ecosystem: github-actions
   directory: "/"
+  open-pull-requests-limit: 0
+  security-updates-only: true
   schedule:
     interval: monthly
 - package-ecosystem: npm
   directory: "/"
+  open-pull-requests-limit: 0
+  security-updates-only: true
   schedule:
     interval: monthly
 - package-ecosystem: composer
   directory: "/"
+  open-pull-requests-limit: 0
+  security-updates-only: true
   schedule:
     interval: monthly
 - package-ecosystem: bundler
   directory: "/"
+  open-pull-requests-limit: 0
+  security-updates-only: true
   schedule:
     interval: monthly
