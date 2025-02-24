@@ -410,7 +410,7 @@
   "rubocop-thread_safety": {
     "language": "Ruby",
     "package": "rubocop-thread_safety",
-    "version": "0.6.0",
+    "version": "0.7.0",
     "license": "MIT",
     "description": "  Thread-safety checks via static analysis.",
     "website": "https://github.com/rubocop/rubocop-thread_safety",
