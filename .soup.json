@@ -350,7 +350,7 @@
   "rubocop-capybara": {
     "language": "Ruby",
     "package": "rubocop-capybara",
-    "version": "2.21.0",
+    "version": "2.22.0",
     "license": "MIT",
     "description": "Code style checking for Capybara test files (RSpec, Cucumber, Minitest).",
     "website": "https://github.com/rubocop/rubocop-capybara",
