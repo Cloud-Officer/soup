@@ -73,3 +73,5 @@ Style/HashSyntax:
   EnforcedShorthandSyntax: never
 Minitest/NoTestCases:
   Enabled: false
+Capybara/AmbiguousClick:
+  Enabled: false
