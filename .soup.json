@@ -2,7 +2,7 @@
   "activesupport": {
     "language": "Ruby",
     "package": "activesupport",
-    "version": "8.0.1",
+    "version": "8.0.2",
     "license": "MIT",
     "description": "A toolkit of support libraries and Ruby core extensions extracted from the Rails framework",
     "website": "https://rubyonrails.org",
@@ -146,7 +146,7 @@
   "json": {
     "language": "Ruby",
     "package": "json",
-    "version": "2.10.1",
+    "version": "2.10.2",
     "license": "Ruby",
     "description": "A JSON implementation as a JRuby extension.",
     "website": "https://github.com/ruby/json",
@@ -206,7 +206,7 @@
   "minitest": {
     "language": "Ruby",
     "package": "minitest",
-    "version": "5.25.4",
+    "version": "5.25.5",
     "license": "MIT",
     "description": "minitest provides a complete suite of testing facilities supporting",
     "website": "https://github.com/minitest/minitest",
@@ -230,7 +230,7 @@
   "nokogiri": {
     "language": "Ruby",
     "package": "nokogiri",
-    "version": "1.18.3",
+    "version": "1.18.4",
     "license": "MIT",
     "description": "Nokogiri (鋸) makes it easy and painless to work with XML and HTML from Ruby",
     "website": "https://nokogiri.org",
@@ -326,7 +326,7 @@
   "rubocop": {
     "language": "Ruby",
     "package": "rubocop",
-    "version": "1.73.2",
+    "version": "1.74.0",
     "license": "MIT",
     "description": "RuboCop is a Ruby code style checking and code formatting tool.",
     "website": "https://rubocop.org/",
@@ -338,7 +338,7 @@
   "rubocop-ast": {
     "language": "Ruby",
     "package": "rubocop-ast",
-    "version": "1.38.1",
+    "version": "1.39.0",
     "license": "MIT",
     "description": "  RuboCop's Node and NodePattern classes.",
     "website": "https://www.rubocop.org/",
@@ -350,7 +350,7 @@
   "rubocop-capybara": {
     "language": "Ruby",
     "package": "rubocop-capybara",
-    "version": "2.22.0",
+    "version": "2.22.1",
     "license": "MIT",
     "description": "Code style checking for Capybara test files (RSpec, Cucumber, Minitest).",
     "website": "https://github.com/rubocop/rubocop-capybara",
@@ -410,7 +410,7 @@
   "rubocop-thread_safety": {
     "language": "Ruby",
     "package": "rubocop-thread_safety",
-    "version": "0.7.0",
+    "version": "0.7.2",
     "license": "MIT",
     "description": "  Thread-safety checks via static analysis.",
     "website": "https://github.com/rubocop/rubocop-thread_safety",
