@@ -14,7 +14,7 @@
   "ast": {
     "language": "Ruby",
     "package": "ast",
-    "version": "2.4.2",
+    "version": "2.4.3",
     "license": "MIT",
     "description": "A library for working with Abstract Syntax Trees.",
     "website": "https://whitequark.github.io/ast/",
@@ -86,7 +86,7 @@
   "csv": {
     "language": "Ruby",
     "package": "csv",
-    "version": "3.3.2",
+    "version": "3.3.3",
     "license": "Ruby",
     "description": "The CSV library provides a complete interface to CSV files and data",
     "website": "https://github.com/ruby/csv",
@@ -230,7 +230,7 @@
   "nokogiri": {
     "language": "Ruby",
     "package": "nokogiri",
-    "version": "1.18.4",
+    "version": "1.18.5",
     "license": "MIT",
     "description": "Nokogiri (鋸) makes it easy and painless to work with XML and HTML from Ruby",
     "website": "https://nokogiri.org",
@@ -266,7 +266,7 @@
   "parser": {
     "language": "Ruby",
     "package": "parser",
-    "version": "3.3.7.1",
+    "version": "3.3.7.2",
     "license": "MIT",
     "description": "A Ruby parser written in pure Ruby.",
     "website": "https://github.com/whitequark/parser",
@@ -338,7 +338,7 @@
   "rubocop-ast": {
     "language": "Ruby",
     "package": "rubocop-ast",
-    "version": "1.39.0",
+    "version": "1.41.0",
     "license": "MIT",
     "description": "  RuboCop's Node and NodePattern classes.",
     "website": "https://www.rubocop.org/",
@@ -362,7 +362,7 @@
   "rubocop-graphql": {
     "language": "Ruby",
     "package": "rubocop-graphql",
-    "version": "1.5.4",
+    "version": "1.5.5",
     "license": "MIT",
     "description": "A collection of RuboCop cops to improve GraphQL-related code",
     "website": "https://github.com/DmitryTsepelev/rubocop-graphql",

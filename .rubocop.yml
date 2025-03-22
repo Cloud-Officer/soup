@@ -1,7 +1,6 @@
-require:
-  - rubocop-graphql
 plugins:
   - rubocop-capybara
+  - rubocop-graphql
   # - rubocop-i18n
   - rubocop-minitest
   - rubocop-performance
