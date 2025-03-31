@@ -181,6 +181,7 @@ jobs:
       with:
         ruby-version: "${{env.RUBY-VERSION}}"
         ruby-bundler-cache: "${{env.RUBY-BUNDLER-CACHE}}"
+        ruby-cache-version: "${{runner.os}}-${{runner.arch}}-v2"
         xcode-version: "${{env.XCODE-VERSION}}"
     - name: Bundler
       shell: bash
