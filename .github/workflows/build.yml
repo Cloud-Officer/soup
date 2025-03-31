@@ -15,7 +15,7 @@ name: Build
     tags:
     - "**"
 env:
-  RUBY-BUNDLER-CACHE: 'false'
+  RUBY-BUNDLER-CACHE: 'true'
   RUBY-VERSION: 3.4.2
   XCODE-VERSION: 15.4.0
 jobs:
