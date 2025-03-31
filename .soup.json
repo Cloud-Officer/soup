@@ -110,7 +110,7 @@
   "httparty": {
     "language": "Ruby",
     "package": "httparty",
-    "version": "0.22.0",
+    "version": "0.23.1",
     "license": "MIT",
     "description": "Makes http fun! Also, makes consuming restful web services dead easy.",
     "website": "https://github.com/jnunemaker/httparty",
@@ -182,7 +182,7 @@
   "logger": {
     "language": "Ruby",
     "package": "logger",
-    "version": "1.6.6",
+    "version": "1.7.0",
     "license": "Ruby",
     "description": "Provides a simple logging utility for outputting messages.",
     "website": "https://github.com/ruby/logger",
@@ -266,7 +266,7 @@
   "parser": {
     "language": "Ruby",
     "package": "parser",
-    "version": "3.3.7.2",
+    "version": "3.3.7.4",
     "license": "MIT",
     "description": "A Ruby parser written in pure Ruby.",
     "website": "https://github.com/whitequark/parser",
@@ -283,6 +283,18 @@
     "description": "Terminal strings styling with intuitive and clean API.",
     "website": "https://ttytoolkit.org",
     "last_verified_at": "2024-08-07",
+    "risk_level": "Low",
+    "requirements": "Dependency",
+    "verification_reasoning": "Dependency"
+  },
+  "prism": {
+    "language": "Ruby",
+    "package": "prism",
+    "version": "1.4.0",
+    "license": "MIT",
+    "description": "Prism Ruby parser",
+    "website": "https://github.com/ruby/prism",
+    "last_verified_at": "2025-03-31",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -326,7 +338,7 @@
   "rubocop": {
     "language": "Ruby",
     "package": "rubocop",
-    "version": "1.74.0",
+    "version": "1.75.1",
     "license": "MIT",
     "description": "RuboCop is a Ruby code style checking and code formatting tool.",
     "website": "https://rubocop.org/",
@@ -338,7 +350,7 @@
   "rubocop-ast": {
     "language": "Ruby",
     "package": "rubocop-ast",
-    "version": "1.42.0",
+    "version": "1.43.0",
     "license": "MIT",
     "description": "  RuboCop's Node and NodePattern classes.",
     "website": "https://www.rubocop.org/",
