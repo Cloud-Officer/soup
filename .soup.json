@@ -86,7 +86,7 @@
   "csv": {
     "language": "Ruby",
     "package": "csv",
-    "version": "3.3.3",
+    "version": "3.3.4",
     "license": "Ruby",
     "description": "The CSV library provides a complete interface to CSV files and data",
     "website": "https://github.com/ruby/csv",
@@ -266,7 +266,7 @@
   "parser": {
     "language": "Ruby",
     "package": "parser",
-    "version": "3.3.7.4",
+    "version": "3.3.8.0",
     "license": "MIT",
     "description": "A Ruby parser written in pure Ruby.",
     "website": "https://github.com/whitequark/parser",
@@ -350,7 +350,7 @@
   "rubocop-ast": {
     "language": "Ruby",
     "package": "rubocop-ast",
-    "version": "1.44.0",
+    "version": "1.44.1",
     "license": "MIT",
     "description": "  RuboCop's Node and NodePattern classes.",
     "website": "https://www.rubocop.org/",
