@@ -8,13 +8,13 @@
 | Ruby | benchmark | 0.4.0 | Ruby | a performance benchmarking library | <https://github.com/ruby/benchmark> | 2024-11-03 | Low | Dependency | Dependency |
 | Ruby | bigdecimal | 3.1.9 | Ruby | This library provides arbitrary-precision decimal floating-point number class. | <https://github.com/ruby/bigdecimal> | 2023-10-26 | Low | Dependency | Dependency |
 | Ruby | concurrent-ruby | 1.3.5 | MIT | Modern concurrency tools including agents, futures, promises, thread pools, actors, supervisors, and more. | <http://www.concurrent-ruby.com> | 2022-05-10 | Low | Dependency | Dependency |
-| Ruby | connection_pool | 2.5.1 | MIT | Generic connection pool for Ruby | <https://github.com/mperham/connection_pool> | 2023-10-26 | Low | Dependency | Dependency |
+| Ruby | connection_pool | 2.5.2 | MIT | Generic connection pool for Ruby | <https://github.com/mperham/connection_pool> | 2023-10-26 | Low | Dependency | Dependency |
 | Ruby | csv | 3.3.4 | Ruby | The CSV library provides a complete interface to CSV files and data | <https://github.com/ruby/csv> | 2024-04-29 | Low | Dependency | Dependency |
 | Ruby | drb | 2.2.1 | Ruby | Distributed object system for Ruby | <https://github.com/ruby/drb> | 2023-10-26 | Low | Dependency | Dependency |
 | Ruby | httparty | 0.23.1 | MIT | Makes http fun! Also, makes consuming restful web services dead easy. | <https://github.com/jnunemaker/httparty> | 2022-05-10 | Low | Makes http fun! Also, makes consuming restful web services dead easy. | Very popular on rubygems.org |
 | Ruby | i18n | 1.14.7 | MIT | New wave Internationalization support for Ruby. | <https://github.com/ruby-i18n/i18n> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | inquirer | 0.2.1 | Apache v2 | Interactive user prompts on CLI for ruby. | <https://github.com/arlimus/inquirer.rb> | 2022-05-10 | Low | Interactive user prompts on CLI for ruby. | Very popular on rubygems.org |
-| Ruby | json | 2.10.2 | Ruby | A JSON implementation as a JRuby extension. | <https://github.com/ruby/json> | 2022-05-10 | Low | Used to read package manager and cache files. | Very popular on rubygems.org |
+| Ruby | json | 2.11.3 | Ruby | A JSON implementation as a JRuby extension. | <https://github.com/ruby/json> | 2022-05-10 | Low | Used to read package manager and cache files. | Very popular on rubygems.org |
 | Ruby | language_server-protocol | 3.17.0.4 | MIT | A Language Server Protocol SDK | <https://github.com/mtsmfm/language_server-protocol-ruby> | 2023-06-29 | Low | Dependency | Dependency |
 | Ruby | lint_roller | 1.1.0 | MIT | A plugin specification for linter and formatter rulesets | <https://github.com/standardrb/lint_roller> | 2025-02-15 | Low | Dependency | Dependency |
 | Ruby | logger | 1.7.0 | Ruby | Provides a simple logging utility for outputting messages. | <https://github.com/ruby/logger> | 2024-08-12 | Low | Dependency | Dependency |

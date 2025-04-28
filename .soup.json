@@ -74,7 +74,7 @@
   "connection_pool": {
     "language": "Ruby",
     "package": "connection_pool",
-    "version": "2.5.1",
+    "version": "2.5.2",
     "license": "MIT",
     "description": "Generic connection pool for Ruby",
     "website": "https://github.com/mperham/connection_pool",
@@ -146,7 +146,7 @@
   "json": {
     "language": "Ruby",
     "package": "json",
-    "version": "2.10.2",
+    "version": "2.11.3",
     "license": "Ruby",
     "description": "A JSON implementation as a JRuby extension.",
     "website": "https://github.com/ruby/json",
