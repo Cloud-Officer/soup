@@ -74,7 +74,7 @@
   "connection_pool": {
     "language": "Ruby",
     "package": "connection_pool",
-    "version": "2.5.2",
+    "version": "2.5.3",
     "license": "MIT",
     "description": "Generic connection pool for Ruby",
     "website": "https://github.com/mperham/connection_pool",
@@ -218,7 +218,7 @@
   "multi_xml": {
     "language": "Ruby",
     "package": "multi_xml",
-    "version": "0.7.1",
+    "version": "0.7.2",
     "license": "MIT",
     "description": "Provides swappable XML backends utilizing LibXML, Nokogiri, Ox, or REXML.",
     "website": "https://github.com/sferik/multi_xml",
@@ -338,7 +338,7 @@
   "rubocop": {
     "language": "Ruby",
     "package": "rubocop",
-    "version": "1.75.3",
+    "version": "1.75.4",
     "license": "MIT",
     "description": "RuboCop is a Ruby code style checking and code formatting tool.",
     "website": "https://rubocop.org/",
