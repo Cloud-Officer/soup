@@ -42,7 +42,7 @@ module SOUP
             HTTParty.get(url)
           end
 
-        raise("Error: #{response.message}! Please set GITHUB_TOKEN.") if response.message.include?('rate limit')
+        raise("Error: #{response.message}! Please set GITHUB_TOKEN.") if response.message.include?('rate limit') || response.message.include?('Bad credentials')
 
         next unless response.code == 200
 
