@@ -26,7 +26,7 @@ module SOUP
         next if pip_package&.strip&.empty?
 
         puts("Checking #{pip_package} #{version}...")
-        response = RequestWithTimeoutAndRetries.get_with_retries("https://pypi.python.org/pypi/#{pip_package}/json")
+        response = RequestWithTimeoutAndRetries.get_with_retries("https://pypi.python.org/pypi/#{pip_package.sub(/\[[^\]]+\]/, '')}/json")
 
         raise(response.message) unless response.code == 200
 
