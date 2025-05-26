@@ -98,7 +98,7 @@
   "drb": {
     "language": "Ruby",
     "package": "drb",
-    "version": "2.2.1",
+    "version": "2.2.3",
     "license": "Ruby",
     "description": "Distributed object system for Ruby",
     "website": "https://github.com/ruby/drb",
@@ -146,7 +146,7 @@
   "json": {
     "language": "Ruby",
     "package": "json",
-    "version": "2.12.0",
+    "version": "2.12.2",
     "license": "Ruby",
     "description": "A JSON implementation as a JRuby extension.",
     "website": "https://github.com/ruby/json",
@@ -338,7 +338,7 @@
   "rubocop": {
     "language": "Ruby",
     "package": "rubocop",
-    "version": "1.75.6",
+    "version": "1.75.7",
     "license": "MIT",
     "description": "RuboCop is a Ruby code style checking and code formatting tool.",
     "website": "https://rubocop.org/",
