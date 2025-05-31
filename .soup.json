@@ -26,7 +26,7 @@
   "base64": {
     "language": "Ruby",
     "package": "base64",
-    "version": "0.2.0",
+    "version": "0.3.0",
     "license": "Ruby",
     "description": "Support for encoding and decoding binary data using a Base64 representation.",
     "website": "https://github.com/ruby/base64",
@@ -38,7 +38,7 @@
   "benchmark": {
     "language": "Ruby",
     "package": "benchmark",
-    "version": "0.4.0",
+    "version": "0.4.1",
     "license": "Ruby",
     "description": "a performance benchmarking library",
     "website": "https://github.com/ruby/benchmark",
@@ -50,7 +50,7 @@
   "bigdecimal": {
     "language": "Ruby",
     "package": "bigdecimal",
-    "version": "3.1.9",
+    "version": "3.2.1",
     "license": "Ruby",
     "description": "This library provides arbitrary-precision decimal floating-point number class.",
     "website": "https://github.com/ruby/bigdecimal",
@@ -338,7 +338,7 @@
   "rubocop": {
     "language": "Ruby",
     "package": "rubocop",
-    "version": "1.75.7",
+    "version": "1.75.8",
     "license": "MIT",
     "description": "RuboCop is a Ruby code style checking and code formatting tool.",
     "website": "https://rubocop.org/",
