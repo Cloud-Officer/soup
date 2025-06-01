@@ -86,7 +86,7 @@
   "csv": {
     "language": "Ruby",
     "package": "csv",
-    "version": "3.3.4",
+    "version": "3.3.5",
     "license": "Ruby",
     "description": "The CSV library provides a complete interface to CSV files and data",
     "website": "https://github.com/ruby/csv",
@@ -386,7 +386,7 @@
   "rubocop-minitest": {
     "language": "Ruby",
     "package": "rubocop-minitest",
-    "version": "0.38.0",
+    "version": "0.38.1",
     "license": "MIT",
     "description": "Automatic Minitest code style checking tool.",
     "website": "https://docs.rubocop.org/rubocop-minitest/",
