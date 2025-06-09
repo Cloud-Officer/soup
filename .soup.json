@@ -50,7 +50,7 @@
   "bigdecimal": {
     "language": "Ruby",
     "package": "bigdecimal",
-    "version": "3.2.1",
+    "version": "3.2.2",
     "license": "Ruby",
     "description": "This library provides arbitrary-precision decimal floating-point number class.",
     "website": "https://github.com/ruby/bigdecimal",
@@ -338,7 +338,7 @@
   "rubocop": {
     "language": "Ruby",
     "package": "rubocop",
-    "version": "1.75.8",
+    "version": "1.76.1",
     "license": "MIT",
     "description": "RuboCop is a Ruby code style checking and code formatting tool.",
     "website": "https://rubocop.org/",
@@ -350,7 +350,7 @@
   "rubocop-ast": {
     "language": "Ruby",
     "package": "rubocop-ast",
-    "version": "1.44.1",
+    "version": "1.45.1",
     "license": "MIT",
     "description": "  RuboCop's Node and NodePattern classes.",
     "website": "https://www.rubocop.org/",
@@ -374,7 +374,7 @@
   "rubocop-graphql": {
     "language": "Ruby",
     "package": "rubocop-graphql",
-    "version": "1.5.5",
+    "version": "1.5.6",
     "license": "MIT",
     "description": "A collection of RuboCop cops to improve GraphQL-related code",
     "website": "https://github.com/DmitryTsepelev/rubocop-graphql",
