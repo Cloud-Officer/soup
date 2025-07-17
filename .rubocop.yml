@@ -45,7 +45,7 @@ Style/ClassAndModuleChildren:
   Enabled: false
 Style/Copyright:
   Enabled: false
-  AutocorrectNotice: 'Copyright (c) 2024 by name all rights reserved.'
+  AutocorrectNotice: 'Copyright (c) 2025 by name all rights reserved.'
 Style/Documentation:
   Enabled: false
 Style/DocumentationMethod:
