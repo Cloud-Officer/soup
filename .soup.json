@@ -146,9 +146,9 @@
   "json": {
     "language": "Ruby",
     "package": "json",
-    "version": "2.13.0",
+    "version": "2.13.2",
     "license": "Ruby",
-    "description": "This is a JSON implementation as a Ruby extension in C.",
+    "description": "A JSON implementation as a JRuby extension.",
     "website": "https://github.com/ruby/json",
     "last_verified_at": "2022-05-10",
     "risk_level": "Low",
@@ -266,7 +266,7 @@
   "parser": {
     "language": "Ruby",
     "package": "parser",
-    "version": "3.3.8.0",
+    "version": "3.3.9.0",
     "license": "MIT",
     "description": "A Ruby parser written in pure Ruby.",
     "website": "https://github.com/whitequark/parser",
@@ -338,7 +338,7 @@
   "rubocop": {
     "language": "Ruby",
     "package": "rubocop",
-    "version": "1.78.0",
+    "version": "1.79.0",
     "license": "MIT",
     "description": "RuboCop is a Ruby code style checking and code formatting tool.",
     "website": "https://rubocop.org/",
@@ -499,6 +499,18 @@
     "description": "All the stuff that isn't good/big enough for a real library.",
     "website": "https://github.com/flori/tins",
     "last_verified_at": "2022-05-10",
+    "risk_level": "Low",
+    "requirements": "Dependency",
+    "verification_reasoning": "Dependency"
+  },
+  "tsort": {
+    "language": "Ruby",
+    "package": "tsort",
+    "version": "0.2.0",
+    "license": "Ruby",
+    "description": "Topological sorting using Tarjan's algorithm",
+    "website": "https://github.com/ruby/tsort",
+    "last_verified_at": "2025-07-28",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
