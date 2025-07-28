@@ -53,6 +53,7 @@ module SOUP
 
   class RequestWithTimeoutAndRetries
     include HTTParty
+
     default_options.update(timeout: 5)
 
     def self.get_with_retries(url, options = {}, max_retries = 3)
