@@ -25,7 +25,7 @@ Step-by-step instructions on how to reproduce the bug
 
 **Troubleshooting:**
 
-Any steps to fix it 
+Any steps to fix it
 
 **Workaround:**
 
