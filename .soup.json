@@ -2,7 +2,7 @@
   "activesupport": {
     "language": "Ruby",
     "package": "activesupport",
-    "version": "8.0.2",
+    "version": "8.0.2.1",
     "license": "MIT",
     "description": "A toolkit of support libraries and Ruby core extensions extracted from the Rails framework",
     "website": "https://rubyonrails.org",
@@ -326,7 +326,7 @@
   "regexp_parser": {
     "language": "Ruby",
     "package": "regexp_parser",
-    "version": "2.11.1",
+    "version": "2.11.2",
     "license": "MIT",
     "description": "A library for tokenizing, lexing, and parsing Ruby regular expressions.",
     "website": "https://github.com/ammar/regexp_parser",
