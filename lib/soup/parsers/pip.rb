@@ -50,7 +50,7 @@ module SOUP
 
         if package.license.nil? or package.license.empty?
           license = package_details['info']['license']&.strip&.split("\n")
-          package.license = license&.first || 'null'
+          package.license = license&.first
         end
 
         packages[package.package] = package
