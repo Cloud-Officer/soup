@@ -42,10 +42,17 @@ module SOUP
         package.dependency = !main_file.include?(package.package)
 
         package_details['info']['classifiers'].each do |classifier|
-          package.license = "#{package.license} #{classifier.split('::').last}".strip if classifier.include?('License') and classifier.split('::').length > 2
+          if classifier.include?('License') and classifier.split('::').length > 2
+            classifier_license = classifier.split('::').last.strip.split("\n").first
+            package.license = "#{package.license} #{classifier_license}".strip
+          end
         end
 
-        package.license = package_details['info']['license']&.strip if package.license.nil? or package.license.empty?
+        if package.license.nil? or package.license.empty?
+          license = package_details['info']['license']&.strip&.split("\n")
+          package.license = license&.first
+        end
+
         packages[package.package] = package
       end
     end
