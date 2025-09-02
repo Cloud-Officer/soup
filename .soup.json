@@ -74,7 +74,7 @@
   "connection_pool": {
     "language": "Ruby",
     "package": "connection_pool",
-    "version": "2.5.3",
+    "version": "2.5.4",
     "license": "MIT",
     "description": "Generic connection pool for Ruby",
     "website": "https://github.com/mperham/connection_pool",
@@ -410,7 +410,7 @@
   "rubocop-rspec": {
     "language": "Ruby",
     "package": "rubocop-rspec",
-    "version": "3.6.0",
+    "version": "3.7.0",
     "license": "MIT",
     "description": "Code style checking for RSpec files.",
     "website": "https://github.com/rubocop/rubocop-rspec",
