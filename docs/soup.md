@@ -42,7 +42,7 @@
 | Ruby | securerandom | 0.4.1 | Ruby | Interface for secure random number generator. | <https://github.com/ruby/securerandom> | 2024-08-12 | Low | Dependency | Dependency |
 | Ruby | semantic | 1.6.1 | MIT | Semantic Version utility class for parsing, storing, and comparing versions | <https://github.com/jlindsey/semantic> | 2022-05-10 | Low | Used to manipulate package versions. | Very popular on rubygems.org |
 | Ruby | sync | 0.5.0 | BSD-2-Clause | A module that provides a two-phase lock with a counter. | <https://github.com/ruby/sync> | 2022-05-10 | Low | Dependency | Dependency |
-| Ruby | term-ansicolor | 1.11.2 | Apache-2.0 | This library uses ANSI escape sequences to control the attributes of terminal output | <http://flori.github.com/term-ansicolor> | 2022-05-10 | Low | Dependency | Dependency |
+| Ruby | term-ansicolor | 1.11.3 | Apache-2.0 | This library uses ANSI escape sequences to control the attributes of terminal output | <https://github.com/flori/term-ansicolor> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | tins | 1.43.0 | MIT | All the stuff that isn't good/big enough for a real library. | <https://github.com/flori/tins> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | tty-color | 0.6.0 | MIT | Terminal color capabilities detection | <https://ttytoolkit.org> | 2024-08-07 | Low | Dependency | Dependency |
 | Ruby | tty-cursor | 0.7.1 | MIT | The purpose of this library is to help move the terminal cursor around and manipulate text by using intuitive method calls. | <https://ttytoolkit.org> | 2024-08-07 | Low | Dependency | Dependency |
@@ -50,8 +50,8 @@
 | Ruby | tty-reader | 0.9.0 | MIT | A set of methods for processing keyboard input in character, line and multiline modes | <https://ttytoolkit.org> | 2024-08-07 | Low | Dependency | Dependency |
 | Ruby | tty-screen | 0.8.2 | MIT | Terminal screen size detection that works on Linux, macOS and Windows systems and supports Ruby MRI, JRuby, TruffleRuby and Rubinius interpreters. | <https://ttytoolkit.org> | 2024-08-07 | Low | Dependency | Dependency |
 | Ruby | tzinfo | 2.0.6 | MIT | TZInfo provides access to time zone data and allows times to be converted using time zone rules. | <https://tzinfo.github.io> | 2022-05-10 | Low | Dependency | Dependency |
-| Ruby | unicode-display_width | 3.1.5 | MIT | [Unicode 16.0.0] Determines the monospace display width of a string using EastAsianWidth.txt, Unicode general category, Emoji specification, and other data. | <https://github.com/janlelis/unicode-display_width> | 2022-05-10 | Low | Dependency | Dependency |
-| Ruby | unicode-emoji | 4.0.4 | MIT | [Emoji 16.0] Provides Unicode Emoji data and regexes, incorporating the latest Unicode and Emoji standards | <https://github.com/janlelis/unicode-emoji> | 2024-11-27 | Low | Dependency | Dependency |
+| Ruby | unicode-display_width | 3.2.0 | MIT | [Unicode 17.0.0] Determines the monospace display width of a string using EastAsianWidth.txt, Unicode general category, Emoji specification, and other data. | <https://github.com/janlelis/unicode-display_width> | 2022-05-10 | Low | Dependency | Dependency |
+| Ruby | unicode-emoji | 4.1.0 | MIT | [Emoji 17.0] Provides Unicode Emoji data and regexes, incorporating the latest Unicode and Emoji standards | <https://github.com/janlelis/unicode-emoji> | 2024-11-27 | Low | Dependency | Dependency |
 | Ruby | uri | 1.0.3 | Ruby | URI is a module providing classes to handle Uniform Resource Identifiers | <https://github.com/ruby/uri> | 2024-12-29 | Low | Dependency | Dependency |
 | Ruby | wisper | 2.0.1 | MIT |   A micro library providing objects with Publish-Subscribe capabilities. | <https://github.com/krisleech/wisper> | 2024-08-07 | Low | Dependency | Dependency |
 | Ruby | yarn_lock_parser | 0.1.0 | MIT | Parser for yarn.lock files. | <https://rubygems.org/yarn_lock_parser> | 2023-06-08 | Low | Read yarn lock file | Popular gem |

@@ -96,8 +96,8 @@ GEM
     securerandom (0.4.1)
     semantic (1.6.1)
     sync (0.5.0)
-    term-ansicolor (1.11.2)
-      tins (~> 1.0)
+    term-ansicolor (1.11.3)
+      tins (~> 1)
     tins (1.43.0)
       bigdecimal
       sync
@@ -113,9 +113,9 @@ GEM
     tty-screen (0.8.2)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
-    unicode-display_width (3.1.5)
-      unicode-emoji (~> 4.0, >= 4.0.4)
-    unicode-emoji (4.0.4)
+    unicode-display_width (3.2.0)
+      unicode-emoji (~> 4.1)
+    unicode-emoji (4.1.0)
     uri (1.0.3)
     wisper (2.0.1)
     yarn_lock_parser (0.1.0)
