@@ -215,6 +215,18 @@
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
   },
+  "mize": {
+    "language": "Ruby",
+    "package": "mize",
+    "version": "0.6.1",
+    "license": "MIT",
+    "description": "Library that provides memoziation for methods and functions for Ruby.",
+    "website": "http://flori.github.com/mize",
+    "last_verified_at": "2025-09-15",
+    "risk_level": "Low",
+    "requirements": "Dependency",
+    "verification_reasoning": "Dependency"
+  },
   "multi_xml": {
     "language": "Ruby",
     "package": "multi_xml",
@@ -230,7 +242,7 @@
   "nokogiri": {
     "language": "Ruby",
     "package": "nokogiri",
-    "version": "1.18.9",
+    "version": "1.18.10",
     "license": "MIT",
     "description": "Nokogiri (鋸) makes it easy and painless to work with XML and HTML from Ruby",
     "website": "https://nokogiri.org",
@@ -290,7 +302,7 @@
   "prism": {
     "language": "Ruby",
     "package": "prism",
-    "version": "1.4.0",
+    "version": "1.5.1",
     "license": "MIT",
     "description": "Prism Ruby parser",
     "website": "https://github.com/ruby/prism",
@@ -326,7 +338,7 @@
   "regexp_parser": {
     "language": "Ruby",
     "package": "regexp_parser",
-    "version": "2.11.2",
+    "version": "2.11.3",
     "license": "MIT",
     "description": "A library for tokenizing, lexing, and parsing Ruby regular expressions.",
     "website": "https://github.com/ammar/regexp_parser",
@@ -494,7 +506,7 @@
   "tins": {
     "language": "Ruby",
     "package": "tins",
-    "version": "1.43.0",
+    "version": "1.44.1",
     "license": "MIT",
     "description": "All the stuff that isn't good/big enough for a real library.",
     "website": "https://github.com/flori/tins",
