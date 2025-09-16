@@ -16,7 +16,7 @@ name: Build
     - "**"
 env:
   RUBY-BUNDLER-CACHE: 'false'
-  RUBY-VERSION: 3.4.5
+  RUBY-VERSION: 3.4.6
   XCODE-VERSION: 16.4.0
 jobs:
   variables:
