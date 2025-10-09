@@ -50,7 +50,7 @@
   "bigdecimal": {
     "language": "Ruby",
     "package": "bigdecimal",
-    "version": "3.2.3",
+    "version": "3.3.1",
     "license": "Ruby",
     "description": "This library provides arbitrary-precision decimal floating-point number class.",
     "website": "https://github.com/ruby/bigdecimal",
@@ -110,7 +110,7 @@
   "httparty": {
     "language": "Ruby",
     "package": "httparty",
-    "version": "0.23.1",
+    "version": "0.23.2",
     "license": "MIT",
     "description": "Makes http fun! Also, makes consuming restful web services dead easy.",
     "website": "https://github.com/jnunemaker/httparty",
@@ -146,7 +146,7 @@
   "json": {
     "language": "Ruby",
     "package": "json",
-    "version": "2.15.0",
+    "version": "2.15.1",
     "license": "Ruby",
     "description": "A JSON implementation as a JRuby extension.",
     "website": "https://github.com/ruby/json",
@@ -206,7 +206,7 @@
   "minitest": {
     "language": "Ruby",
     "package": "minitest",
-    "version": "5.25.5",
+    "version": "5.26.0",
     "license": "MIT",
     "description": "minitest provides a complete suite of testing facilities supporting",
     "website": "https://github.com/minitest/minitest",
@@ -302,7 +302,7 @@
   "prism": {
     "language": "Ruby",
     "package": "prism",
-    "version": "1.5.1",
+    "version": "1.5.2",
     "license": "MIT",
     "description": "Prism Ruby parser",
     "website": "https://github.com/ruby/prism",
@@ -614,7 +614,7 @@
   "uri": {
     "language": "Ruby",
     "package": "uri",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "license": "Ruby",
     "description": "URI is a module providing classes to handle Uniform Resource Identifiers",
     "website": "https://github.com/ruby/uri",
