@@ -302,7 +302,7 @@
   "prism": {
     "language": "Ruby",
     "package": "prism",
-    "version": "1.5.2",
+    "version": "1.6.0",
     "license": "MIT",
     "description": "Prism Ruby parser",
     "website": "https://github.com/ruby/prism",
@@ -410,7 +410,7 @@
   "rubocop-performance": {
     "language": "Ruby",
     "package": "rubocop-performance",
-    "version": "1.26.0",
+    "version": "1.26.1",
     "license": "MIT",
     "description": "A collection of RuboCop cops to check for performance optimizations",
     "website": "https://docs.rubocop.org/rubocop-performance/",
@@ -506,7 +506,7 @@
   "tins": {
     "language": "Ruby",
     "package": "tins",
-    "version": "1.44.1",
+    "version": "1.45.0",
     "license": "MIT",
     "description": "All the stuff that isn't good/big enough for a real library.",
     "website": "https://github.com/flori/tins",
