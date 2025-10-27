@@ -2,7 +2,7 @@
   "activesupport": {
     "language": "Ruby",
     "package": "activesupport",
-    "version": "8.0.3",
+    "version": "8.1.0",
     "license": "MIT",
     "description": "A toolkit of support libraries and Ruby core extensions extracted from the Rails framework",
     "website": "https://rubyonrails.org",
@@ -31,18 +31,6 @@
     "description": "Support for encoding and decoding binary data using a Base64 representation.",
     "website": "https://github.com/ruby/base64",
     "last_verified_at": "2023-08-11",
-    "risk_level": "Low",
-    "requirements": "Dependency",
-    "verification_reasoning": "Dependency"
-  },
-  "benchmark": {
-    "language": "Ruby",
-    "package": "benchmark",
-    "version": "0.4.1",
-    "license": "Ruby",
-    "description": "a performance benchmarking library",
-    "website": "https://github.com/ruby/benchmark",
-    "last_verified_at": "2024-11-03",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -146,7 +134,7 @@
   "json": {
     "language": "Ruby",
     "package": "json",
-    "version": "2.15.1",
+    "version": "2.15.2",
     "license": "Ruby",
     "description": "A JSON implementation as a JRuby extension.",
     "website": "https://github.com/ruby/json",
@@ -278,7 +266,7 @@
   "parser": {
     "language": "Ruby",
     "package": "parser",
-    "version": "3.3.9.0",
+    "version": "3.3.10.0",
     "license": "MIT",
     "description": "A Ruby parser written in pure Ruby.",
     "website": "https://github.com/whitequark/parser",
@@ -350,7 +338,7 @@
   "rubocop": {
     "language": "Ruby",
     "package": "rubocop",
-    "version": "1.81.1",
+    "version": "1.81.6",
     "license": "MIT",
     "description": "RuboCop is a Ruby code style checking and code formatting tool.",
     "website": "https://rubocop.org/",
