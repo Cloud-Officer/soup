@@ -52,6 +52,6 @@
 | Ruby | tzinfo | 2.0.6 | MIT | TZInfo provides access to time zone data and allows times to be converted using time zone rules. | <https://tzinfo.github.io> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | unicode-display_width | 3.2.0 | MIT | [Unicode 17.0.0] Determines the monospace display width of a string using EastAsianWidth.txt, Unicode general category, Emoji specification, and other data. | <https://github.com/janlelis/unicode-display_width> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | unicode-emoji | 4.1.0 | MIT | [Emoji 17.0] Provides Unicode Emoji data and regexes, incorporating the latest Unicode and Emoji standards | <https://github.com/janlelis/unicode-emoji> | 2024-11-27 | Low | Dependency | Dependency |
-| Ruby | uri | 1.1.0 | Ruby | URI is a module providing classes to handle Uniform Resource Identifiers | <https://github.com/ruby/uri> | 2024-12-29 | Low | Dependency | Dependency |
+| Ruby | uri | 1.1.1 | Ruby | URI is a module providing classes to handle Uniform Resource Identifiers | <https://github.com/ruby/uri> | 2024-12-29 | Low | Dependency | Dependency |
 | Ruby | wisper | 2.0.1 | MIT |   A micro library providing objects with Publish-Subscribe capabilities. | <https://github.com/krisleech/wisper> | 2024-08-07 | Low | Dependency | Dependency |
 | Ruby | yarn_lock_parser | 0.1.0 | MIT | Parser for yarn.lock files. | <https://rubygems.org/yarn_lock_parser> | 2023-06-08 | Low | Read yarn lock file | Popular gem |
