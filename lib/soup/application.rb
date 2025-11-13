@@ -41,6 +41,12 @@ module SOUP
 
     private
 
+    def markdown_cell(value)
+      return '' if value.nil? || value.to_s.strip.empty?
+
+      " #{value.strip} "
+    end
+
     def configure_options(argv)
       Options.new(argv).parse
     rescue OptionParser::InvalidOption => e
@@ -206,7 +212,8 @@ module SOUP
           package.description = package.description.gsub(/<.*>/, 'HTML text removed. Please check the website.')
         end
 
-        @markdown += "| #{package.language} | #{package.package} | #{package.version} | #{package.license} | #{package.description} | <#{package.website}> | #{package.last_verified_at} | #{package.risk_level} | #{package.requirements} | #{package.verification_reasoning} |\n"
+        website = package.website.to_s.strip.empty? ? '' : "<#{package.website}>"
+        @markdown += "|#{markdown_cell(package.language)}|#{markdown_cell(package.package)}|#{markdown_cell(package.version)}|#{markdown_cell(package.license)}|#{markdown_cell(package.description)}|#{markdown_cell(website)}|#{markdown_cell(package.last_verified_at)}|#{markdown_cell(package.risk_level)}|#{markdown_cell(package.requirements)}|#{markdown_cell(package.verification_reasoning)}|\n"
       end
     end
 
