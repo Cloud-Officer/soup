@@ -42,7 +42,7 @@ module SOUP
     private
 
     def markdown_cell(value)
-      return '' if value.nil? || value.to_s.strip.empty?
+      return ' ' if value.nil? || value.to_s.strip.empty?
 
       " #{value.strip} "
     end
