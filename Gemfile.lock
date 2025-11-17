@@ -98,7 +98,7 @@ GEM
     sync (0.5.0)
     term-ansicolor (1.11.3)
       tins (~> 1)
-    tins (1.46.0)
+    tins (1.47.0)
       bigdecimal
       mize (~> 0.6)
       sync

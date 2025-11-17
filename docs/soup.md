@@ -43,7 +43,7 @@
 | Ruby | semantic | 1.6.1 | MIT | Semantic Version utility class for parsing, storing, and comparing versions | <https://github.com/jlindsey/semantic> | 2022-05-10 | Low | Used to manipulate package versions. | Very popular on rubygems.org |
 | Ruby | sync | 0.5.0 | BSD-2-Clause | A module that provides a two-phase lock with a counter. | <https://github.com/ruby/sync> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | term-ansicolor | 1.11.3 | Apache-2.0 | This library uses ANSI escape sequences to control the attributes of terminal output | <https://github.com/flori/term-ansicolor> | 2022-05-10 | Low | Dependency | Dependency |
-| Ruby | tins | 1.46.0 | MIT | All the stuff that isn't good/big enough for a real library. | <https://github.com/flori/tins> | 2022-05-10 | Low | Dependency | Dependency |
+| Ruby | tins | 1.47.0 | MIT | All the stuff that isn't good/big enough for a real library. | <https://github.com/flori/tins> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | tty-color | 0.6.0 | MIT | Terminal color capabilities detection | <https://ttytoolkit.org> | 2024-08-07 | Low | Dependency | Dependency |
 | Ruby | tty-cursor | 0.7.1 | MIT | The purpose of this library is to help move the terminal cursor around and manipulate text by using intuitive method calls. | <https://ttytoolkit.org> | 2024-08-07 | Low | Dependency | Dependency |
 | Ruby | tty-prompt | 0.23.1 | MIT | A beautiful and powerful interactive command line prompt with a robust API for getting and validating complex inputs. | <https://ttytoolkit.org> | 2024-08-07 | Low | Prompt for TTY | Most popular on RubyGem |
