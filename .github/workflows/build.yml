@@ -58,24 +58,6 @@ jobs:
         linters: "${{needs.variables.outputs.LINTERS}}"
         ssh-key: "${{secrets.SSH_KEY}}"
         github_token: "${{secrets.GITHUB_TOKEN}}"
-  codeql-javascript-typescript:
-    name: CodeQL Javascript-Typescript Linter
-    permissions:
-      actions: read
-      contents: read
-      security-events: write
-    runs-on: ubuntu-latest
-    needs:
-    - variables
-    if: "${{needs.variables.outputs.SKIP_LINTERS != '1' && (github.event_name == 'pull_request' || github.event_name == 'pull_request_target')}}"
-    steps:
-    - name: CodeQL Javascript-Typescript
-      uses: cloud-officer/ci-actions/linters/codeql@master
-      with:
-        linters: "${{needs.variables.outputs.LINTERS}}"
-        ssh-key: "${{secrets.SSH_KEY}}"
-        github_token: "${{secrets.GITHUB_TOKEN}}"
-        languages: javascript-typescript
   codeql-ruby:
     name: CodeQL Ruby Linter
     permissions:
