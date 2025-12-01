@@ -74,3 +74,14 @@ Minitest/NoTestCases:
   Enabled: false
 Capybara/AmbiguousClick:
   Enabled: false
+# I18n/GetText/DecorateString:
+#   Enabled: false
+# I18n/RailsI18n/DecorateString:
+#   Enabled: false
+# I18n/GetText/DecorateFunctionMessage:
+#   Enabled: false
+# Rails/I18nLocaleTexts:
+#   Enabled: false
+# Rails/EnvironmentVariableAccess:
+#   Exclude:
+#     - "app/jobs/**/*"
