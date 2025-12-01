@@ -2,4 +2,5 @@ default: true
 first-line-heading: false
 line-length: false
 no-duplicate-heading: false
+single-h1: false
 tables: false

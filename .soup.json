@@ -62,7 +62,7 @@
   "connection_pool": {
     "language": "Ruby",
     "package": "connection_pool",
-    "version": "2.5.4",
+    "version": "2.5.5",
     "license": "MIT",
     "description": "Generic connection pool for Ruby",
     "website": "https://github.com/mperham/connection_pool",
