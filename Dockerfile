@@ -15,7 +15,7 @@ ENV LANGUAGE=en_US:en
 ENV LC_ALL=en_US.UTF-8
 
 # Update and install dependencies
-RUN apt-get update && apt-get install --no-install-recommends --yes autoconf autogen automake build-essential ca-certificates clang curl file gcc git git-lfs intltool libtool libtool-bin make pkg-config ruby ruby-all-dev ruby-build ruby-bundler ruby-dev sudo unzip wget zip && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install --no-install-recommends --yes autoconf autogen automake build-essential ca-certificates clang curl file gcc git git-lfs intltool libtool libtool-bin locales make pkg-config ruby ruby-all-dev ruby-build ruby-bundler ruby-dev sudo unzip wget zip && locale-gen en_US.UTF-8 && rm -rf /var/lib/apt/lists/*
 
 # Add user soup
 RUN useradd -m -s /bin/bash soup && echo 'soup ALL=(ALL) NOPASSWD:ALL' >>/etc/sudoers
