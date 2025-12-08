@@ -62,7 +62,7 @@
   "connection_pool": {
     "language": "Ruby",
     "package": "connection_pool",
-    "version": "3.0.1",
+    "version": "3.0.2",
     "license": "MIT",
     "description": "Generic connection pool for Ruby",
     "website": "https://github.com/mperham/connection_pool",
@@ -494,7 +494,7 @@
   "tins": {
     "language": "Ruby",
     "package": "tins",
-    "version": "1.47.0",
+    "version": "1.48.0",
     "license": "MIT",
     "description": "All the stuff that isn't good/big enough for a real library.",
     "website": "https://github.com/flori/tins",
