@@ -3,7 +3,6 @@
 require 'bundler'
 require 'httparty'
 require 'json'
-require 'uri'
 
 require_relative '../package'
 
@@ -35,7 +34,7 @@ module SOUP
         package.version = spec.version&.to_s&.strip
         package.license = package_details['licenses']&.first&.strip
         package_info = package_details['info']&.split(/\n|\. /)&.first
-        package.description = package_info&.then { |info| URI.extract(info, %w[http https ftp]).reduce(info) { |s, url| s.gsub(url, "<#{url}>") } }
+        package.description = package_info&.gsub(%r{((?:f|ht)tps?:/\S+)}, '<\1>')
         package.website = package_details['homepage_uri']&.strip
         package.dependency = !main_file.include?(package.package)
         packages[package.package] = package
