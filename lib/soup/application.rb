@@ -209,7 +209,7 @@ module SOUP
         if package.description
           package.description = package.description.delete('|')
           package.description = package.description.gsub('  ', ' ')
-          package.description = package.description.gsub(/<.*>/, 'HTML text removed. Please check the website.')
+          package.description = package.description.gsub(/<[^>]*>/, 'HTML text removed. Please check the website.')
         end
 
         website = package.website.to_s.strip.empty? ? '' : "<#{package.website}>"
