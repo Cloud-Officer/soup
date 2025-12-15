@@ -3,6 +3,7 @@
 require 'fileutils'
 require 'inquirer'
 require 'json'
+require 'nokogiri'
 require 'tty-prompt'
 
 require_relative '../soup'
@@ -209,7 +210,7 @@ module SOUP
         if package.description
           package.description = package.description.delete('|')
           package.description = package.description.gsub('  ', ' ')
-          package.description = package.description.gsub(/<.*>/, 'HTML text removed. Please check the website.')
+          package.description = Nokogiri::HTML.fragment(package.description).text
         end
 
         website = package.website.to_s.strip.empty? ? '' : "<#{package.website}>"
