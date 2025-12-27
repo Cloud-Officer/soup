@@ -110,7 +110,7 @@
   "i18n": {
     "language": "Ruby",
     "package": "i18n",
-    "version": "1.14.7",
+    "version": "1.14.8",
     "license": "MIT",
     "description": "New wave Internationalization support for Ruby.",
     "website": "https://github.com/ruby-i18n/i18n",
@@ -130,6 +130,18 @@
     "risk_level": "Low",
     "requirements": "Interactive user prompts on CLI for ruby.",
     "verification_reasoning": "Very popular on rubygems.org"
+  },
+  "io-console": {
+    "language": "Ruby",
+    "package": "io-console",
+    "version": "0.8.2",
+    "license": "Ruby",
+    "description": "add console capabilities to IO instances.",
+    "website": "https://github.com/ruby/io-console",
+    "last_verified_at": "2025-12-22",
+    "risk_level": "Low",
+    "requirements": "Dependency",
+    "verification_reasoning": "Dependency"
   },
   "json": {
     "language": "Ruby",
@@ -194,7 +206,7 @@
   "minitest": {
     "language": "Ruby",
     "package": "minitest",
-    "version": "5.27.0",
+    "version": "6.0.0",
     "license": "MIT",
     "description": "minitest provides a complete suite of testing facilities supporting",
     "website": "https://minite.st/",
@@ -290,7 +302,7 @@
   "prism": {
     "language": "Ruby",
     "package": "prism",
-    "version": "1.6.0",
+    "version": "1.7.0",
     "license": "MIT",
     "description": "Prism Ruby parser",
     "website": "https://github.com/ruby/prism",
@@ -323,6 +335,18 @@
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
   },
+  "readline": {
+    "language": "Ruby",
+    "package": "readline",
+    "version": "0.0.4",
+    "license": "Ruby",
+    "description": "This is just a loader for \"readline\"",
+    "website": "https://github.com/ruby/readline",
+    "last_verified_at": "2025-12-22",
+    "risk_level": "Low",
+    "requirements": "Dependency",
+    "verification_reasoning": "Dependency"
+  },
   "regexp_parser": {
     "language": "Ruby",
     "package": "regexp_parser",
@@ -335,10 +359,22 @@
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
   },
+  "reline": {
+    "language": "Ruby",
+    "package": "reline",
+    "version": "0.6.3",
+    "license": "Ruby",
+    "description": "Alternative GNU Readline or Editline implementation by pure Ruby.",
+    "website": "https://github.com/ruby/reline",
+    "last_verified_at": "2025-12-22",
+    "risk_level": "Low",
+    "requirements": "Dependency",
+    "verification_reasoning": "Dependency"
+  },
   "rubocop": {
     "language": "Ruby",
     "package": "rubocop",
-    "version": "1.81.7",
+    "version": "1.82.0",
     "license": "MIT",
     "description": "RuboCop is a Ruby code style checking and code formatting tool.",
     "website": "https://rubocop.org/",
@@ -494,7 +530,7 @@
   "tins": {
     "language": "Ruby",
     "package": "tins",
-    "version": "1.48.0",
+    "version": "1.51.0",
     "license": "MIT",
     "description": "All the stuff that isn't good/big enough for a real library.",
     "website": "https://github.com/flori/tins",
@@ -590,7 +626,7 @@
   "unicode-emoji": {
     "language": "Ruby",
     "package": "unicode-emoji",
-    "version": "4.1.0",
+    "version": "4.2.0",
     "license": "MIT",
     "description": "[Emoji 17.0] Provides Unicode Emoji data and regexes, incorporating the latest Unicode and Emoji standards",
     "website": "https://github.com/janlelis/unicode-emoji",
