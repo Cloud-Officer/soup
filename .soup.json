@@ -203,18 +203,6 @@
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
   },
-  "mini_portile2": {
-    "language": "Ruby",
-    "package": "mini_portile2",
-    "version": "2.8.9",
-    "license": "MIT",
-    "description": "Simple autoconf and cmake builder for developers",
-    "website": "https://github.com/flavorjones/mini_portile",
-    "last_verified_at": "2025-12-27",
-    "risk_level": "Low",
-    "requirements": "Dependency",
-    "verification_reasoning": "Dependency"
-  },
   "minitest": {
     "language": "Ruby",
     "package": "minitest",
@@ -254,7 +242,7 @@
   "nokogiri": {
     "language": "Ruby",
     "package": "nokogiri",
-    "version": "1.18.10",
+    "version": "1.19.0",
     "license": "MIT",
     "description": "Nokogiri (鋸) makes it easy and painless to work with XML and HTML from Ruby",
     "website": "https://nokogiri.org",
