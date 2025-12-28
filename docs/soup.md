@@ -35,7 +35,7 @@
 | Ruby | regexp_parser | 2.11.3 | MIT | A library for tokenizing, lexing, and parsing Ruby regular expressions. | <https://github.com/ammar/regexp_parser> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | reline | 0.6.3 | Ruby | Alternative GNU Readline or Editline implementation by pure Ruby. | <https://github.com/ruby/reline> | 2025-12-22 | Low | Dependency | Dependency |
 | Ruby | rubocop | 1.82.1 | MIT | RuboCop is a Ruby code style checking and code formatting tool. | <https://rubocop.org/> | 2023-06-12 | Low | Ruby linter | Most popular gem on rubygems |
-| Ruby | rubocop-ast | 1.48.0 | MIT | RuboCop's Node and NodePattern classes. | <https://www.rubocop.org/> | 2023-06-12 | Low | Dependency | Dependency |
+| Ruby | rubocop-ast | 1.49.0 | MIT | RuboCop's Node and NodePattern classes. | <https://www.rubocop.org/> | 2023-06-12 | Low | Dependency | Dependency |
 | Ruby | rubocop-capybara | 2.22.1 | MIT | Code style checking for Capybara test files (RSpec, Cucumber, Minitest). | <https://github.com/rubocop/rubocop-capybara> | 2024-09-16 | Low | Ruby linter | Most populat gem |
 | Ruby | rubocop-graphql | 1.5.6 | MIT | A collection of RuboCop cops to improve GraphQL-related code | <https://github.com/DmitryTsepelev/rubocop-graphql> | 2024-09-16 | Low | Ruby linter | Most popular gem |
 | Ruby | rubocop-minitest | 0.38.2 | MIT | Automatic Minitest code style checking tool. | <https://docs.rubocop.org/rubocop-minitest/> | 2024-09-16 | Low | Ruby linter | Most popular gem |
