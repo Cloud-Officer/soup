@@ -68,6 +68,8 @@ Style/TopLevelMethodDefinition:
   Enabled: false
 Style/YodaExpression:
   Enabled: false
+Style/MultilineMethodSignature:
+  Enabled: false # Disabled due to RuboCop 1.82.0 bug: https://github.com/rubocop/rubocop/issues
 Style/HashSyntax:
   EnforcedShorthandSyntax: never
 Minitest/NoTestCases:
