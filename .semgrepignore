@@ -1,0 +1,23 @@
+# Dependency directories
+vendor/
+node_modules/
+
+# Test files - Go
+*_test.go
+
+# Test files - Ruby
+*_spec.rb
+
+# Test files - JavaScript/TypeScript
+**/__tests__/
+**/*.test.js
+**/*.test.ts
+**/*.spec.js
+**/*.spec.ts
+
+# Test directories
+**/test/
+**/tests/
+**/testdata/
+**/fixtures/
+**/mocks/
