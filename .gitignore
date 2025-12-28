@@ -115,6 +115,7 @@ flycheck_*.el
 
 # network security
 /network-security.data
+
 ### JetBrains ###
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio, WebStorm and Rider
 # Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
@@ -515,3 +516,18 @@ $RECYCLE.BIN/
 
 # End of https://www.toptal.com/developers/gitignore/api/eclipse,emacs,jetbrains,linux,macos,netbeans,nova,ruby,rubymine,sublimetext,vim,visualstudiocode,windows
 
+# BEGIN AI Assistants
+
+# Claude Code
+.claude/
+
+# Cursor
+.cursor/
+
+# GitHub Copilot
+.copilot/
+
+# OpenAI Codex
+.codex/
+
+# END AI Assistants
