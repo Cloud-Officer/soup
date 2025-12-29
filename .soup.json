@@ -98,7 +98,7 @@
   "httparty": {
     "language": "Ruby",
     "package": "httparty",
-    "version": "0.23.2",
+    "version": "0.24.0",
     "license": "MIT",
     "description": "Makes http fun! Also, makes consuming restful web services dead easy.",
     "website": "https://github.com/jnunemaker/httparty",
