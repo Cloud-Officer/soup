@@ -45,7 +45,10 @@ module SOUP
     def markdown_cell(value)
       return ' ' if value.nil? || value.to_s.strip.empty?
 
-      " #{value.strip} "
+      # Strip leading/trailing spaces inside backtick code spans (MD038 lint rule)
+      # Using [^`]* instead of \s*(.*?)\s* to avoid ReDoS vulnerability
+      value = value.strip.gsub(/`([^`]*)`/) { "`#{Regexp.last_match(1).strip}`" }
+      " #{value} "
     end
 
     def configure_options(argv)
