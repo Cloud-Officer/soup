@@ -46,9 +46,10 @@ jobs:
     steps:
     - name: Prepare variables
       id: variables
-      uses: cloud-officer/ci-actions/variables@master
+      uses: cloud-officer/ci-actions/variables@v2
       with:
         ssh-key: "${{secrets.SSH_KEY}}"
+        github-token: "${{secrets.GH_PAT}}"
   actionlint:
     name: Github Actions Linter
     runs-on: ubuntu-latest
@@ -59,11 +60,11 @@ jobs:
     steps:
     - name: Actionlint
       id: actionlint
-      uses: cloud-officer/ci-actions/linters/actionlint@v1
+      uses: cloud-officer/ci-actions/linters/actionlint@v2
       with:
         linters: "${{needs.variables.outputs.LINTERS}}"
         ssh-key: "${{secrets.SSH_KEY}}"
-        github_token: "${{secrets.GITHUB_TOKEN}}"
+        github-token: "${{secrets.GH_PAT}}"
   hadolint:
     name: Docker Linter
     runs-on: ubuntu-latest
@@ -73,11 +74,11 @@ jobs:
     timeout-minutes: 30
     steps:
     - name: Hadolint
-      uses: cloud-officer/ci-actions/linters/hadolint@v1
+      uses: cloud-officer/ci-actions/linters/hadolint@v2
       with:
         linters: "${{needs.variables.outputs.LINTERS}}"
         ssh-key: "${{secrets.SSH_KEY}}"
-        github_token: "${{secrets.GITHUB_TOKEN}}"
+        github-token: "${{secrets.GH_PAT}}"
   markdownlint:
     name: Markdown Linter
     runs-on: ubuntu-latest
@@ -88,11 +89,11 @@ jobs:
     steps:
     - name: Markdownlint
       id: markdownlint
-      uses: cloud-officer/ci-actions/linters/markdownlint@v1
+      uses: cloud-officer/ci-actions/linters/markdownlint@v2
       with:
         linters: "${{needs.variables.outputs.LINTERS}}"
         ssh-key: "${{secrets.SSH_KEY}}"
-        github_token: "${{secrets.GITHUB_TOKEN}}"
+        github-token: "${{secrets.GH_PAT}}"
   semgrep:
     name: Semgrep Security Scanner
     permissions:
@@ -106,11 +107,11 @@ jobs:
     timeout-minutes: 30
     steps:
     - name: Semgrep
-      uses: cloud-officer/ci-actions/linters/semgrep@v1
+      uses: cloud-officer/ci-actions/linters/semgrep@v2
       with:
         linters: "${{needs.variables.outputs.LINTERS}}"
         ssh-key: "${{secrets.SSH_KEY}}"
-        github_token: "${{secrets.GITHUB_TOKEN}}"
+        github-token: "${{secrets.GH_PAT}}"
   rubocop:
     name: Ruby Linter
     runs-on: ubuntu-latest
@@ -121,11 +122,11 @@ jobs:
     steps:
     - name: Rubocop
       id: rubocop
-      uses: cloud-officer/ci-actions/linters/rubocop@v1
+      uses: cloud-officer/ci-actions/linters/rubocop@v2
       with:
         linters: "${{needs.variables.outputs.LINTERS}}"
         ssh-key: "${{secrets.SSH_KEY}}"
-        github_token: "${{secrets.GITHUB_TOKEN}}"
+        github-token: "${{secrets.GH_PAT}}"
   yamllint:
     name: YAML Linter
     runs-on: ubuntu-latest
@@ -136,11 +137,11 @@ jobs:
     steps:
     - name: Yamllint
       id: yamllint
-      uses: cloud-officer/ci-actions/linters/yamllint@v1
+      uses: cloud-officer/ci-actions/linters/yamllint@v2
       with:
         linters: "${{needs.variables.outputs.LINTERS}}"
         ssh-key: "${{secrets.SSH_KEY}}"
-        github_token: "${{secrets.GITHUB_TOKEN}}"
+        github-token: "${{secrets.GH_PAT}}"
   licenses:
     name: Licenses Check
     runs-on: ubuntu-latest
@@ -150,10 +151,10 @@ jobs:
     timeout-minutes: 30
     steps:
     - name: Licenses
-      uses: cloud-officer/ci-actions/soup@master
+      uses: cloud-officer/ci-actions/soup@v2
       with:
         ssh-key: "${{secrets.SSH_KEY}}"
-        github-token: "${{secrets.GITHUB_TOKEN}}"
+        github-token: "${{secrets.GH_PAT}}"
         parameters: "--no_prompt --soup"
   ruby_unit_tests:
     name: Ruby Unit Tests
@@ -170,18 +171,21 @@ jobs:
     steps:
     - name: Setup
       id: setup
-      uses: cloud-officer/ci-actions/setup@master
+      uses: cloud-officer/ci-actions/setup@v2
       if: "${{needs.variables.outputs.SKIP_LICENSES != '1' || needs.variables.outputs.SKIP_TESTS != '1'}}"
       with:
         ruby-version: "${{env.RUBY-VERSION}}"
         ruby-bundler-cache: "${{env.RUBY-BUNDLER-CACHE}}"
         xcode-version: "${{env.XCODE-VERSION}}"
+        github-token: "${{secrets.GH_PAT}}"
     - name: Bundler
       shell: bash
       if: "${{needs.variables.outputs.SKIP_LICENSES != '1' || needs.variables.outputs.SKIP_TESTS != '1'}}"
       run: |
         bundle config unset deployment
         bundle install
+      env:
+        GITHUB_TOKEN: "${{secrets.GH_PAT}}"
     - name: RSpec
       shell: bash
       if: "${{needs.variables.outputs.SKIP_TESTS != '1'}}"
@@ -195,3 +199,5 @@ jobs:
         mv _yarn.lock yarn.lock
         ../bin/soup.rb
         popd
+      env:
+        GITHUB_TOKEN: "${{secrets.GH_PAT}}"

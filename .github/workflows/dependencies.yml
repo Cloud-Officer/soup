@@ -20,24 +20,25 @@ jobs:
     steps:
     - name: Setup
       id: setup
-      uses: cloud-officer/ci-actions/setup@master
+      uses: cloud-officer/ci-actions/setup@v2
       with:
         ruby-version: "${{env.RUBY-VERSION}}"
         ruby-bundler-cache: "${{env.RUBY-BUNDLER-CACHE}}"
         xcode-version: "${{env.XCODE-VERSION}}"
+        github-token: "${{secrets.GH_PAT}}"
     - name: Update Dependencies
       shell: bash
       run: |
-        git config --global --add url."https://${{secrets.SOUP_DEPENDENCIES_UPDATE}}:x-oauth-basic@github.com/".insteadOf ssh://git@github.com:
-        git config --global --add url."https://${{secrets.SOUP_DEPENDENCIES_UPDATE}}:x-oauth-basic@github.com/".insteadOf https://github.com/
-        git config --global --add url."https://${{secrets.SOUP_DEPENDENCIES_UPDATE}}:x-oauth-basic@github.com/".insteadOf git@github.com:
+        git config --global --add url."https://${{secrets.GH_PAT}}:x-oauth-basic@github.com/".insteadOf ssh://git@github.com:
+        git config --global --add url."https://${{secrets.GH_PAT}}:x-oauth-basic@github.com/".insteadOf https://github.com/
+        git config --global --add url."https://${{secrets.GH_PAT}}:x-oauth-basic@github.com/".insteadOf git@github.com:
 
         bundle config set frozen false ; bundle update
     - name: Licenses
-      uses: cloud-officer/ci-actions/soup@master
+      uses: cloud-officer/ci-actions/soup@v2
       with:
         ssh-key: "${{secrets.SSH_KEY}}"
-        github-token: "${{secrets.SOUP_DEPENDENCIES_UPDATE}}"
+        github-token: "${{secrets.GH_PAT}}"
         parameters: "--no_prompt --soup"
         skip-checkout: 'true'
     - name: Create Pull Request
@@ -47,4 +48,4 @@ jobs:
         branch: update-dependencies-${{github.run_id}}
         title: Update Dependencies
         body: This PR updates the dependencies.
-        token: "${{secrets.SOUP_DEPENDENCIES_UPDATE}}"
+        token: "${{secrets.GH_PAT}}"
