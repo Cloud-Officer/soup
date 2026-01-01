@@ -9,6 +9,7 @@
 .hadolint.yaml           @ydesgagn
 .markdownlint.yml        @ydesgagn
 .rubocop.yml             @ydesgagn
+.ruby-version            @ydesgagn
 .yamllint.yml            @ydesgagn
 codeowners               @ydesgagn
 bin/                     @ydesgagn
