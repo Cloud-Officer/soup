@@ -21,7 +21,6 @@ jobs:
       id: setup
       uses: cloud-officer/ci-actions/setup@v2
       with:
-        ruby-version: "${{env.RUBY-VERSION}}"
         ruby-bundler-cache: "${{env.RUBY-BUNDLER-CACHE}}"
         xcode-version: "${{env.XCODE-VERSION}}"
         github-token: "${{secrets.GH_PAT}}"
