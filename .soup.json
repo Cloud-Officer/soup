@@ -2,7 +2,7 @@
   "activesupport": {
     "language": "Ruby",
     "package": "activesupport",
-    "version": "8.1.1",
+    "version": "8.1.2",
     "license": "MIT",
     "description": "A toolkit of support libraries and Ruby core extensions extracted from the Rails framework",
     "website": "https://rubyonrails.org",
@@ -230,7 +230,7 @@
   "multi_xml": {
     "language": "Ruby",
     "package": "multi_xml",
-    "version": "0.8.0",
+    "version": "0.8.1",
     "license": "MIT",
     "description": "Provides swappable XML backends utilizing LibXML, Nokogiri, Ox, or REXML.",
     "website": "https://github.com/sferik/multi_xml",
@@ -446,7 +446,7 @@
   "rubocop-rspec": {
     "language": "Ruby",
     "package": "rubocop-rspec",
-    "version": "3.8.0",
+    "version": "3.9.0",
     "license": "MIT",
     "description": "Code style checking for RSpec files.",
     "website": "https://github.com/rubocop/rubocop-rspec",
