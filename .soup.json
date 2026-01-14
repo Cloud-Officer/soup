@@ -302,7 +302,7 @@
   "prism": {
     "language": "Ruby",
     "package": "prism",
-    "version": "1.7.0",
+    "version": "1.8.0",
     "license": "MIT",
     "description": "Prism Ruby parser",
     "website": "https://github.com/ruby/prism",
