@@ -98,7 +98,7 @@
   "httparty": {
     "language": "Ruby",
     "package": "httparty",
-    "version": "0.24.0",
+    "version": "0.24.2",
     "license": "MIT",
     "description": "Makes http fun! Also, makes consuming restful web services dead easy.",
     "website": "https://github.com/jnunemaker/httparty",
@@ -278,7 +278,7 @@
   "parser": {
     "language": "Ruby",
     "package": "parser",
-    "version": "3.3.10.0",
+    "version": "3.3.10.1",
     "license": "MIT",
     "description": "A Ruby parser written in pure Ruby.",
     "website": "https://github.com/whitequark/parser",
@@ -530,7 +530,7 @@
   "tins": {
     "language": "Ruby",
     "package": "tins",
-    "version": "1.51.0",
+    "version": "1.51.1",
     "license": "MIT",
     "description": "All the stuff that isn't good/big enough for a real library.",
     "website": "https://github.com/flori/tins",
