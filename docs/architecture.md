@@ -134,7 +134,7 @@
 
 - `parse`: Parses command-line arguments and returns configured options object
 - Configuration attributes: `cache_file`, `markdown_file`, `licenses_file`, `exceptions_file`
-- Skip flags: `skip_bundler`, `skip_composer`, `skip_gradle`, `skip_npm`, `skip_pip`, `skip_spm`, `skip_yarn`, `skip_cocoapods`
+- Skip flags: `skip_bundler`, `skip_cocoapods`, `skip_composer`, `skip_gradle`, `skip_npm`, `skip_pip`, `skip_spm`, `skip_yarn`
 - Mode flags: `licenses_check`, `soup_check`, `no_prompt`, `auto_reply`
 
 **External Dependencies:**
@@ -149,7 +149,7 @@
 
 **Key Components:**
 
-- Attributes: `language`, `package`, `version`, `license`, `description`, `website`, `last_verified_at`, `risk_level`, `requirements`, `verification_reasoning`, `dependency`
+- Attributes: `file`, `language`, `package`, `version`, `license`, `description`, `website`, `last_verified_at`, `risk_level`, `requirements`, `verification_reasoning`, `dependency`
 - `as_json`: Serializes package to JSON format
 - `to_json`: JSON string representation
 
@@ -279,74 +279,22 @@
 
 ## Software of Unknown Provenance
 
-| Package | Version | License | Purpose |
-| :--- | :---: | :---: | :--- |
-| activesupport | 8.1.2 | MIT | Dependency of other gems |
-| ast | 2.4.3 | MIT | Dependency of rubocop |
-| base64 | 0.3.0 | Ruby | Dependency |
-| bigdecimal | 4.0.1 | Ruby | Dependency |
-| concurrent-ruby | 1.3.6 | MIT | Dependency of activesupport |
-| connection_pool | 3.0.2 | MIT | Dependency |
-| csv | 3.3.5 | Ruby | Dependency of httparty |
-| drb | 2.2.3 | Ruby | Dependency |
-| httparty | 0.24.2 | MIT | HTTP client for API requests to package registries |
-| i18n | 1.14.8 | MIT | Dependency of activesupport |
-| inquirer | 0.2.1 | Apache-2.0 | Interactive CLI prompts for user input |
-| io-console | 0.8.2 | Ruby | Dependency |
-| json | 2.18.0 | Ruby | JSON parsing for lock files and cache |
-| language_server-protocol | 3.17.0.5 | MIT | Dependency of rubocop |
-| lint_roller | 1.1.0 | MIT | Dependency of rubocop plugins |
-| logger | 1.7.0 | Ruby | Dependency |
-| mini_mime | 1.1.5 | MIT | Dependency of httparty |
-| minitest | 6.0.1 | MIT | Dependency |
-| mize | 0.6.1 | MIT | Dependency |
-| multi_xml | 0.8.1 | MIT | Dependency of httparty |
-| nokogiri | 1.19.0 | MIT | XML/HTML parsing for Gradle POM files and description sanitization |
-| optparse | 0.8.1 | Ruby | Command-line argument parsing |
-| parallel | 1.27.0 | MIT | Dependency of rubocop |
-| parser | 3.3.10.1 | MIT | Dependency of rubocop |
-| pastel | 0.8.0 | MIT | Dependency of tty-prompt |
-| prism | 1.8.0 | MIT | Dependency |
-| racc | 1.8.1 | Ruby | Dependency of nokogiri |
-| rainbow | 3.1.1 | MIT | Dependency of rubocop |
-| readline | 0.0.4 | Ruby | Dependency |
-| regexp_parser | 2.11.3 | MIT | Dependency of rubocop |
-| reline | 0.6.3 | Ruby | Dependency |
-| rubocop | 1.82.1 | MIT | Development dependency for code linting |
-| rubocop-ast | 1.49.0 | MIT | Dependency of rubocop |
-| rubocop-capybara | 2.22.1 | MIT | Development dependency for linting |
-| rubocop-graphql | 1.5.6 | MIT | Development dependency for linting |
-| rubocop-minitest | 0.38.2 | MIT | Development dependency for linting |
-| rubocop-performance | 1.26.1 | MIT | Development dependency for linting |
-| rubocop-rspec | 3.9.0 | MIT | Development dependency for linting |
-| rubocop-thread_safety | 0.7.3 | MIT | Development dependency for linting |
-| ruby-progressbar | 1.13.0 | MIT | Dependency of rubocop |
-| securerandom | 0.4.1 | Ruby | Dependency |
-| semantic | 1.6.1 | MIT | Semantic version parsing and comparison |
-| sync | 0.5.0 | BSD-2-Clause | Dependency |
-| term-ansicolor | 1.11.3 | Apache-2.0 | Dependency of inquirer |
-| tins | 1.51.1 | MIT | Dependency |
-| tty-color | 0.6.0 | MIT | Dependency of tty-prompt |
-| tty-cursor | 0.7.1 | MIT | Dependency of tty-prompt |
-| tty-prompt | 0.23.1 | MIT | Interactive CLI prompts for risk level and requirements input |
-| tty-reader | 0.9.0 | MIT | Dependency of tty-prompt |
-| tty-screen | 0.8.2 | MIT | Dependency of tty-prompt |
-| tzinfo | 2.0.6 | MIT | Dependency of activesupport |
-| unicode-display_width | 3.2.0 | MIT | Dependency of rubocop |
-| unicode-emoji | 4.2.0 | MIT | Dependency |
-| uri | 1.1.1 | Ruby | Dependency |
-| wisper | 2.0.1 | MIT | Dependency of tty-reader |
-| yarn_lock_parser | 0.1.0 | MIT | Parsing yarn.lock files |
+See [soup.md](soup.md) for the complete list of third-party dependencies.
 
-### Critical Dependencies
+### Risk Level Classification
 
-| Package | Purpose | Risk Assessment |
-| :--- | :--- | :--- |
-| httparty | HTTP client for all external API calls | Low - widely used, MIT licensed |
-| nokogiri | XML parsing for Maven POM files | Low - industry standard, MIT licensed |
-| bundler | Ruby Gemfile.lock parsing | Low - Ruby standard tool |
-| json | JSON parsing for lock files and cache | Low - Ruby standard library |
-| tty-prompt | User interaction for IEC 62304 metadata | Low - no security implications |
+| Level | Definition |
+| :--- | :--- |
+| Low | Cannot lead to harm |
+| Medium | Can lead to reversible harm |
+| High | Can lead to irreversible harm |
+
+### Validation
+
+The soup.md file is auto-generated by the `soup` tool itself. All packages are validated against:
+
+- Authorized license list (config/licenses.json)
+- Package-specific exceptions (config/exceptions.json)
 
 ## Critical algorithms
 
@@ -354,7 +302,7 @@
 
 **Purpose:** Recursively scans the project directory for supported lock files.
 
-**Location:** `lib/soup/application.rb:61-125`
+**Location:** `lib/soup/application.rb` in `detect_packages` method
 
 **Implementation:**
 
@@ -370,7 +318,7 @@
 
 **Purpose:** Validates that all dependencies use approved open-source licenses.
 
-**Location:** `lib/soup/application.rb:140-162`
+**Location:** `lib/soup/application.rb` in `check_packages` method
 
 **Implementation:**
 
@@ -385,7 +333,7 @@
 
 **Purpose:** Sanitizes package descriptions for safe markdown table inclusion.
 
-**Location:** `lib/soup/application.rb:45-51`
+**Location:** `lib/soup/application.rb` in `markdown_cell` method
 
 **Implementation:**
 
@@ -397,7 +345,7 @@
 
 **Purpose:** Handles transient network failures when fetching package metadata.
 
-**Location:** `lib/soup/parsers/pip.rb:61-77`, `lib/soup/parsers/npm.rb:23-37`, `lib/soup/parsers/yarn.rb:23-37`
+**Location:** `lib/soup/parsers/pip.rb` in `RequestWithTimeoutAndRetries` class, `lib/soup/parsers/npm.rb` and `lib/soup/parsers/yarn.rb` in `parse` method
 
 **Implementation:**
 
@@ -413,8 +361,8 @@
 
 | Control | Implementation | Location |
 | :--- | :--- | :--- |
-| Parser argument validation | Type checking for parser, file path, and packages hash | `lib/soup/parsers/generic.rb:5-14` |
-| Package name validation | Raises error if package name is nil | `lib/soup/package.rb:6` |
+| Parser argument validation | Type checking for parser, file path, and packages hash | `lib/soup/parsers/generic.rb` in `parse` method |
+| Package name validation | Raises error if package name is nil | `lib/soup/package.rb` in `initialize` method |
 | File path validation | Checks file existence before reading | Throughout parsers |
 | Command-line option validation | Uses OptionParser with defined option types | `lib/soup/options.rb` |
 
@@ -422,21 +370,21 @@
 
 | Failure Mode | Handling | Location |
 | :--- | :--- | :--- |
-| Invalid command-line options | Catches `OptionParser::InvalidOption`, displays error, exits with error code | `lib/soup/application.rb:56-59` |
-| API rate limiting | Detects rate limit messages, suggests setting `GITHUB_TOKEN` | `lib/soup/parsers/spm.rb:45` |
+| Invalid command-line options | Catches `OptionParser::InvalidOption`, displays error, exits with error code | `lib/soup/application.rb` in `configure_options` method |
+| API rate limiting | Detects rate limit messages, suggests setting `GITHUB_TOKEN` | `lib/soup/parsers/spm.rb` in `parse` method |
 | Network timeouts | Retry with exponential backoff up to 3 times | Multiple parsers |
 | Missing package metadata | Logs warning and continues processing other packages | NPM, Gradle parsers |
-| Missing required IEC 62304 fields | Raises error in `--no_prompt` mode, prompts user otherwise | `lib/soup/application.rb:179-209` |
+| Missing required IEC 62304 fields | Raises error in `--no_prompt` mode, prompts user otherwise | `lib/soup/application.rb` in `check_packages` method |
 
 ### Security Controls
 
 | Control | Description | Implementation |
 | :--- | :--- | :--- |
-| ReDoS prevention | Uses non-backtracking regex pattern for markdown sanitization | `lib/soup/application.rb:49-50` |
-| HTML entity sanitization | Uses Nokogiri to decode HTML entities in descriptions | `lib/soup/application.rb:216` |
-| License compliance | Validates all dependencies against approved license list | `lib/soup/application.rb:146-161` |
-| Directory traversal prevention | Excludes `node_modules/` and `vendor/` from scanning | `lib/soup/application.rb:66-68` |
-| API token handling | Uses environment variable for GitHub token, never logged | `lib/soup/parsers/spm.rb:24-31` |
+| ReDoS prevention | Uses non-backtracking regex pattern for markdown sanitization | `lib/soup/application.rb` in `markdown_cell` method |
+| HTML entity sanitization | Uses Nokogiri to decode HTML entities in descriptions | `lib/soup/application.rb` in `check_packages` method |
+| License compliance | Validates all dependencies against approved license list | `lib/soup/application.rb` in `check_packages` method |
+| Directory traversal prevention | Excludes `node_modules/` and `vendor/` from scanning | `lib/soup/application.rb` in `detect_packages` method |
+| API token handling | Uses environment variable for GitHub token, never logged | `lib/soup/parsers/spm.rb` in `parse` method |
 
 ### Operational Controls
 

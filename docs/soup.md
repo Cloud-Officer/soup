@@ -10,7 +10,7 @@
 | Ruby | connection_pool | 3.0.2 | MIT | Generic connection pool for Ruby | <https://github.com/mperham/connection_pool> | 2023-10-26 | Low | Dependency | Dependency |
 | Ruby | csv | 3.3.5 | Ruby | The CSV library provides a complete interface to CSV files and data | <https://github.com/ruby/csv> | 2024-04-29 | Low | Dependency | Dependency |
 | Ruby | drb | 2.2.3 | Ruby | Distributed object system for Ruby | <https://github.com/ruby/drb> | 2023-10-26 | Low | Dependency | Dependency |
-| Ruby | httparty | 0.24.2 | MIT | Makes http fun! Also, makes consuming restful web services dead easy. | <https://github.com/jnunemaker/httparty> | 2022-05-10 | Low | Makes http fun! Also, makes consuming restful web services dead easy. | Very popular on rubygems.org |
+| Ruby | httparty | 0.24.2 | MIT | Makes http fun! Also, makes consuming restful web services dead easy. | <https://github.com/jnunemaker/httparty> | 2022-05-10 | Medium | Makes http fun! Also, makes consuming restful web services dead easy. | Very popular on rubygems.org |
 | Ruby | i18n | 1.14.8 | MIT | New wave Internationalization support for Ruby. | <https://github.com/ruby-i18n/i18n> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | inquirer | 0.2.1 | Apache v2 | Interactive user prompts on CLI for ruby. | <https://github.com/arlimus/inquirer.rb> | 2022-05-10 | Low | Interactive user prompts on CLI for ruby. | Very popular on rubygems.org |
 | Ruby | io-console | 0.8.2 | Ruby | add console capabilities to IO instances. | <https://github.com/ruby/io-console> | 2025-12-22 | Low | Dependency | Dependency |
@@ -27,13 +27,13 @@
 | Ruby | parallel | 1.27.0 | MIT | Run any kind of code in parallel processes | <https://github.com/grosser/parallel> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | parser | 3.3.10.1 | MIT | A Ruby parser written in pure Ruby. | <https://github.com/whitequark/parser> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | pastel | 0.8.0 | MIT | Terminal strings styling with intuitive and clean API. | <https://ttytoolkit.org> | 2024-08-07 | Low | Dependency | Dependency |
-| Ruby | prism | 1.8.0 | MIT | Prism Ruby parser | <https://github.com/ruby/prism> | 2025-03-31 | Low | Dependency | Dependency |
+| Ruby | prism | 1.9.0 | MIT | Prism Ruby parser | <https://github.com/ruby/prism> | 2025-03-31 | Low | Dependency | Dependency |
 | Ruby | racc | 1.8.1 | Ruby | Racc is an LALR(1) parser generator. | <https://github.com/ruby/racc> | 2023-06-09 | Low | Dependency | Dependency |
 | Ruby | rainbow | 3.1.1 | MIT | Colorize printed text on ANSI terminals | <https://github.com/sickill/rainbow> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | readline | 0.0.4 | Ruby | This is just a loader for "readline" | <https://github.com/ruby/readline> | 2025-12-22 | Low | Dependency | Dependency |
 | Ruby | regexp_parser | 2.11.3 | MIT | A library for tokenizing, lexing, and parsing Ruby regular expressions. | <https://github.com/ammar/regexp_parser> | 2022-05-10 | Low | Dependency | Dependency |
 | Ruby | reline | 0.6.3 | Ruby | Alternative GNU Readline or Editline implementation by pure Ruby. | <https://github.com/ruby/reline> | 2025-12-22 | Low | Dependency | Dependency |
-| Ruby | rubocop | 1.82.1 | MIT | RuboCop is a Ruby code style checking and code formatting tool. | <https://rubocop.org/> | 2023-06-12 | Low | Ruby linter | Most popular gem on rubygems |
+| Ruby | rubocop | 1.84.0 | MIT | RuboCop is a Ruby code style checking and code formatting tool. | <https://rubocop.org/> | 2023-06-12 | Low | Ruby linter | Most popular gem on rubygems |
 | Ruby | rubocop-ast | 1.49.0 | MIT | RuboCop's Node and NodePattern classes. | <https://www.rubocop.org/> | 2023-06-12 | Low | Dependency | Dependency |
 | Ruby | rubocop-capybara | 2.22.1 | MIT | Code style checking for Capybara test files (RSpec, Cucumber, Minitest). | <https://github.com/rubocop/rubocop-capybara> | 2024-09-16 | Low | Ruby linter | Most populat gem |
 | Ruby | rubocop-graphql | 1.5.6 | MIT | A collection of RuboCop cops to improve GraphQL-related code | <https://github.com/DmitryTsepelev/rubocop-graphql> | 2024-09-16 | Low | Ruby linter | Most popular gem |

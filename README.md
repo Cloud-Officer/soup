@@ -15,7 +15,7 @@ those are the third-party libraries you’re using in your code. This tool helps
 software licenses that may be dangerous in commercial products. It is intended to be used in interactive mode and in
 continuous integration (CI) pipelines.
 
-The `risk` is shall be interpreted like that:
+The `risk` shall be interpreted like that:
 
 * Low (can’t lead to harm)
 * Medium (can lead to reversible harm)
@@ -30,7 +30,6 @@ popular and highest rated GitHub library for networking written in Swift.
 The following package managers are supported:
 
 * Bundler (Gemfile.lock)
-* CocoaPods (Podfile.lock)
 * Composer (composer.lock)
 * Gradle (buildscript-gradle.lockfile)
 * NPM (package-lock.json)
@@ -38,10 +37,14 @@ The following package managers are supported:
 * SPM (Package.resolved)
 * Yarn (yarn.lock)
 
+Note: CocoaPods support is implemented but currently disabled due to a dependency conflict. The `cocoapods-core` gem requires `activesupport < 8`, which is incompatible with the current ActiveSupport version used by this project.
+
 The soup file is generated in `./docs/soup.md` and a cache file `.soup.json` is used to preserved previously entered
 choices.
 
 ## Installation
+
+Prerequisites are Ruby >= 4.0 and Bundler.
 
 You can run `bundle install` and then run the command `soup`.
 
@@ -66,8 +69,9 @@ options
         --markdown_file file         Path to generated markdown file
         --no_prompt                  Do not prompt for missing information and fail immediately
         --skip_bundler               Ignore Ruby/Bundler/Gemfile/Gemfile.lock even if detected
-        --skip_cocoapods             Ignore Swift/CocoaPods/Podfile/Podfile.lock even if detected
         --skip_composer              Ignore PHP/Composer/composer.json/composer.lock even if detected
+        --skip_gradle                Ignore Kotlin/Gradle/build.gradle/buildscript-gradle.lockfile even if detected
+        --skip_npm                   Ignore JS/NPM/package.json/package-lock.json even if detected
         --skip_pip                   Ignore Python/PIP/requirements.txt even if detected
         --skip_spm                   Ignore Swift/SPM/Package.swift/Package.resolved even if detected
         --skip_yarn                  Ignore JS/Yarn/package.json/yarn.lock even if detected
@@ -120,5 +124,5 @@ Pull requests are the best way to propose changes to the codebase. We actively w
 4. Make sure your code lints.
 5. Issue that pull request!
 
-When you submit code changes, your submissions are understood to be under the same [License](license) that covers the
+When you submit code changes, your submissions are understood to be under the same [License](LICENSE) that covers the
 project. Feel free to contact the maintainers if that's a concern.

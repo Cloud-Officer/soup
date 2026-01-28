@@ -103,7 +103,7 @@
     "description": "Makes http fun! Also, makes consuming restful web services dead easy.",
     "website": "https://github.com/jnunemaker/httparty",
     "last_verified_at": "2022-05-10",
-    "risk_level": "Low",
+    "risk_level": "Medium",
     "requirements": "Makes http fun! Also, makes consuming restful web services dead easy.",
     "verification_reasoning": "Very popular on rubygems.org"
   },
@@ -302,7 +302,7 @@
   "prism": {
     "language": "Ruby",
     "package": "prism",
-    "version": "1.8.0",
+    "version": "1.9.0",
     "license": "MIT",
     "description": "Prism Ruby parser",
     "website": "https://github.com/ruby/prism",
@@ -374,7 +374,7 @@
   "rubocop": {
     "language": "Ruby",
     "package": "rubocop",
-    "version": "1.82.1",
+    "version": "1.84.0",
     "license": "MIT",
     "description": "RuboCop is a Ruby code style checking and code formatting tool.",
     "website": "https://rubocop.org/",

@@ -82,9 +82,10 @@ module SOUP
         @skip_bundler = true
       end
 
-      @parser.on('', '--skip_cocoapods', 'Ignore Swift/CocoaPods/Podfile/Podfile.lock even if detected') do
-        @skip_cocoapods = true
-      end
+      # Disabled: cocoapods-core requires activesupport < 8
+      # @parser.on('', '--skip_cocoapods', 'Ignore Swift/CocoaPods/Podfile/Podfile.lock even if detected') do
+      #   @skip_cocoapods = true
+      # end
 
       @parser.on('', '--skip_composer', 'Ignore PHP/Composer/composer.json/composer.lock even if detected') do
         @skip_composer = true
@@ -95,7 +96,7 @@ module SOUP
       end
 
       @parser.on('', '--skip_npm', 'Ignore JS/NPM/package.json/package-lock.json even if detected') do
-        @skip_spm = true
+        @skip_npm = true
       end
 
       @parser.on('', '--skip_pip', 'Ignore Python/PIP/requirements.txt even if detected') do
@@ -107,7 +108,7 @@ module SOUP
       end
 
       @parser.on('', '--skip_yarn', 'Ignore JS/Yarn/package.json/yarn.lock even if detected') do
-        @skip_spm = true
+        @skip_yarn = true
       end
 
       @parser.on('', '--soup', 'Check for missing information and generate the soup.md file') do
