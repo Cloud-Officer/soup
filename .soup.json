@@ -119,30 +119,6 @@
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
   },
-  "inquirer": {
-    "language": "Ruby",
-    "package": "inquirer",
-    "version": "0.2.1",
-    "license": "Apache v2",
-    "description": "Interactive user prompts on CLI for ruby.",
-    "website": "https://github.com/arlimus/inquirer.rb",
-    "last_verified_at": "2022-05-10",
-    "risk_level": "Low",
-    "requirements": "Interactive user prompts on CLI for ruby.",
-    "verification_reasoning": "Very popular on rubygems.org"
-  },
-  "io-console": {
-    "language": "Ruby",
-    "package": "io-console",
-    "version": "0.8.2",
-    "license": "Ruby",
-    "description": "add console capabilities to IO instances.",
-    "website": "https://github.com/ruby/io-console",
-    "last_verified_at": "2025-12-22",
-    "risk_level": "Low",
-    "requirements": "Dependency",
-    "verification_reasoning": "Dependency"
-  },
   "json": {
     "language": "Ruby",
     "package": "json",
@@ -211,18 +187,6 @@
     "description": "minitest provides a complete suite of testing facilities supporting",
     "website": "https://minite.st/",
     "last_verified_at": "2022-05-10",
-    "risk_level": "Low",
-    "requirements": "Dependency",
-    "verification_reasoning": "Dependency"
-  },
-  "mize": {
-    "language": "Ruby",
-    "package": "mize",
-    "version": "0.6.1",
-    "license": "MIT",
-    "description": "Library that provides memoziation for methods and functions for Ruby.",
-    "website": "http://flori.github.com/mize",
-    "last_verified_at": "2025-09-15",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -335,18 +299,6 @@
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
   },
-  "readline": {
-    "language": "Ruby",
-    "package": "readline",
-    "version": "0.0.4",
-    "license": "Ruby",
-    "description": "This is just a loader for \"readline\"",
-    "website": "https://github.com/ruby/readline",
-    "last_verified_at": "2025-12-22",
-    "risk_level": "Low",
-    "requirements": "Dependency",
-    "verification_reasoning": "Dependency"
-  },
   "regexp_parser": {
     "language": "Ruby",
     "package": "regexp_parser",
@@ -355,18 +307,6 @@
     "description": "A library for tokenizing, lexing, and parsing Ruby regular expressions.",
     "website": "https://github.com/ammar/regexp_parser",
     "last_verified_at": "2022-05-10",
-    "risk_level": "Low",
-    "requirements": "Dependency",
-    "verification_reasoning": "Dependency"
-  },
-  "reline": {
-    "language": "Ruby",
-    "package": "reline",
-    "version": "0.6.3",
-    "license": "Ruby",
-    "description": "Alternative GNU Readline or Editline implementation by pure Ruby.",
-    "website": "https://github.com/ruby/reline",
-    "last_verified_at": "2025-12-22",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -502,42 +442,6 @@
     "risk_level": "Low",
     "requirements": "Used to manipulate package versions.",
     "verification_reasoning": "Very popular on rubygems.org"
-  },
-  "sync": {
-    "language": "Ruby",
-    "package": "sync",
-    "version": "0.5.0",
-    "license": "BSD-2-Clause",
-    "description": "A module that provides a two-phase lock with a counter.",
-    "website": "https://github.com/ruby/sync",
-    "last_verified_at": "2022-05-10",
-    "risk_level": "Low",
-    "requirements": "Dependency",
-    "verification_reasoning": "Dependency"
-  },
-  "term-ansicolor": {
-    "language": "Ruby",
-    "package": "term-ansicolor",
-    "version": "1.11.3",
-    "license": "Apache-2.0",
-    "description": "This library uses ANSI escape sequences to control the attributes of terminal output",
-    "website": "https://github.com/flori/term-ansicolor",
-    "last_verified_at": "2022-05-10",
-    "risk_level": "Low",
-    "requirements": "Dependency",
-    "verification_reasoning": "Dependency"
-  },
-  "tins": {
-    "language": "Ruby",
-    "package": "tins",
-    "version": "1.51.1",
-    "license": "MIT",
-    "description": "All the stuff that isn't good/big enough for a real library.",
-    "website": "https://github.com/flori/tins",
-    "last_verified_at": "2022-05-10",
-    "risk_level": "Low",
-    "requirements": "Dependency",
-    "verification_reasoning": "Dependency"
   },
   "tty-color": {
     "language": "Ruby",
