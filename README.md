@@ -94,7 +94,7 @@ Only check for licenses.
 soup --licenses
 ```
 
-Generate soup and check for licenses but with Bundler.
+Generate soup and check for licenses but skip Bundler.
 
 ```bash
 soup --skip_bundler

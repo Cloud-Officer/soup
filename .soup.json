@@ -146,7 +146,7 @@
   "json": {
     "language": "Ruby",
     "package": "json",
-    "version": "2.18.0",
+    "version": "2.18.1",
     "license": "Ruby",
     "description": "A JSON implementation as a JRuby extension.",
     "website": "https://github.com/ruby/json",
@@ -374,7 +374,7 @@
   "rubocop": {
     "language": "Ruby",
     "package": "rubocop",
-    "version": "1.84.0",
+    "version": "1.84.1",
     "license": "MIT",
     "description": "RuboCop is a Ruby code style checking and code formatting tool.",
     "website": "https://rubocop.org/",
