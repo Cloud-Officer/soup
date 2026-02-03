@@ -10,7 +10,7 @@ require_relative '../lib/soup/application'
 begin
   exit(SOUP::Application.new(ARGV).execute)
 rescue StandardError => e
-  puts(e)
-  puts(e.backtrace)
+  puts("Error: #{e.message}")
+  warn(e.backtrace.join("\n")) if ENV['DEBUG']
   exit(1)
 end
