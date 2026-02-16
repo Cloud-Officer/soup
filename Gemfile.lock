@@ -55,7 +55,7 @@ GEM
     racc (1.8.1)
     rainbow (3.1.1)
     regexp_parser (2.11.3)
-    rubocop (1.84.1)
+    rubocop (1.84.2)
       json (~> 2.3)
       language_server-protocol (~> 3.17.0.2)
       lint_roller (~> 1.1.0)
@@ -72,7 +72,7 @@ GEM
     rubocop-capybara (2.22.1)
       lint_roller (~> 1.1)
       rubocop (~> 1.72, >= 1.72.1)
-    rubocop-graphql (1.5.6)
+    rubocop-graphql (1.6.0)
       lint_roller (~> 1.1)
       rubocop (>= 1.72.1, < 2)
     rubocop-minitest (0.38.2)
@@ -137,4 +137,4 @@ DEPENDENCIES
   yarn_lock_parser (>= 0.1.0)
 
 BUNDLED WITH
-  4.0.6
+  4.0.3
