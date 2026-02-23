@@ -32,6 +32,7 @@ module SOUP
     end
 
     def execute
+      validate_config!
       detect_packages
       read_cached_packages
       check_packages
@@ -40,6 +41,18 @@ module SOUP
     end
 
     private
+
+    def validate_config!
+      [@options.licenses_file, @options.exceptions_file].each do |file|
+        raise("Configuration file not found: #{file}") unless File.exist?(file)
+
+        begin
+          JSON.parse(File.read(file))
+        rescue JSON::ParserError => e
+          raise("Invalid JSON in configuration file #{file}: #{e.message}")
+        end
+      end
+    end
 
     def markdown_cell(value)
       return ' ' if value.nil? || value.to_s.strip.empty?
