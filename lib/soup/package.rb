@@ -2,6 +2,15 @@
 
 module SOUP
   class Package
+    def self.sanitize_description(text, first_sentence: false, strip_markdown: false)
+      return if text.nil?
+
+      text = text.split(/\n|\. /).first if first_sentence
+      text = text.gsub(%r{((?:f|ht)tps?:/\S+)}, '<\1>')
+      text = text.delete('_[]!|') if strip_markdown
+      text
+    end
+
     def initialize(package)
       raise('No package specified!') if package.nil?
 

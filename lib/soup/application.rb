@@ -6,6 +6,7 @@ require 'nokogiri'
 require 'tty-prompt'
 
 require_relative '../soup'
+require_relative 'http_client'
 require_relative 'options'
 require_relative 'parsers/bundler'
 # require_relative 'parsers/cocoapods'
@@ -21,6 +22,18 @@ require_relative 'status'
 DEPENDENCY_TEXT = 'Dependency'
 
 module SOUP
+  PARSER_REGISTRY = {
+    'buildscript-gradle.lockfile': { parser: GradleParser, skip: :skip_gradle },
+    'composer.lock': { parser: ComposerParser, skip: :skip_composer },
+    'Gemfile.lock': { parser: BundlerParser, skip: :skip_bundler },
+    'Package.resolved': { parser: SPMParser, skip: :skip_spm },
+    'package-lock.json': { parser: NPMParser, skip: :skip_npm },
+    'Podfile.lock': { parser: nil, skip: :skip_cocoapods }, # Disabled: cocoapods-core requires activesupport < 8
+    'requirements.txt': { parser: PIPParser, skip: :skip_pip },
+    'yarn.lock': { parser: YarnParser, skip: :skip_yarn }
+  }.freeze
+
+  private_constant :PARSER_REGISTRY
   # Represents an instance of a soup application. This is the entry point for all invocations of soup from the command line.
   class Application
     def initialize(argv)
@@ -71,9 +84,9 @@ module SOUP
     end
 
     def detect_packages
-      parser = GenericParser.new
+      generic_parser = GenericParser.new
 
-      PACKAGE_MANAGERS.each do |package_file|
+      PARSER_REGISTRY.each do |package_file, config|
         Dir.glob("#{Dir.pwd}/**/#{package_file}").each do |file|
           next if file.include?('/node_modules/')
 
@@ -85,53 +98,10 @@ module SOUP
           end
 
           puts("Reading file #{file}...")
+          next if @options.public_send(config[:skip])
+          next if config[:parser].nil?
 
-          case File.basename(file)
-          when 'buildscript-gradle.lockfile'
-            next if @options.skip_gradle
-
-            parser.parse(GradleParser.new, file, @detected_packages)
-
-          when 'composer.lock'
-            next if @options.skip_composer
-
-            parser.parse(ComposerParser.new, file, @detected_packages)
-
-          when 'Gemfile.lock'
-            next if @options.skip_bundler
-
-            parser.parse(BundlerParser.new, file, @detected_packages)
-
-          when 'Package.resolved'
-            next if @options.skip_spm
-
-            parser.parse(SPMParser.new, file, @detected_packages)
-
-          when 'package-lock.json'
-            next if @options.skip_npm
-
-            parser.parse(NPMParser.new, file, @detected_packages)
-
-          when 'Podfile.lock'
-            next if @options.skip_cocoapods
-
-            next unless RUBY_PLATFORM.match?(/darwin/i)
-
-            # parser.parse(CocoaPodsParser.new, file, @detected_packages)
-
-          when 'requirements.txt'
-            next if @options.skip_pip
-
-            parser.parse(PIPParser.new, file, @detected_packages)
-
-          when 'yarn.lock'
-            next if @options.skip_yarn
-
-            parser.parse(YarnParser.new, file, @detected_packages)
-
-          else
-            raise("Unknown file #{File.basename(file)}!")
-          end
+          generic_parser.parse(config[:parser].new, file, @detected_packages)
         end
       end
     end
