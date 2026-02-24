@@ -22,7 +22,7 @@ module SOUP
 
         group_id, artifact_id, version = package_name.split(':')
         puts("Checking #{group_id}:#{artifact_id} #{version}...")
-        response = HTTParty.get("https://search.maven.org/solrsearch/select?q=g:%22#{group_id}%22+AND+a:%22#{artifact_id}%22+AND+v:%22#{version}%22&rows=1&wt=json")
+        response = HttpClient.get("https://search.maven.org/solrsearch/select?q=g:%22#{group_id}%22+AND+a:%22#{artifact_id}%22+AND+v:%22#{version}%22&rows=1&wt=json")
 
         if response.code == 200 and JSON.parse(response.body)['response']['numFound'] == 1
           package_details = JSON.parse(response.body)['response']['docs'][0]
@@ -31,7 +31,7 @@ module SOUP
           website = package_details['home_page']
         else
           REPOSITORY_URLS.each do |url|
-            response = HTTParty.get("#{url}/#{group_id.tr('.', '/')}/#{artifact_id}/#{version}/#{artifact_id}-#{version}.pom")
+            response = HttpClient.get("#{url}/#{group_id.tr('.', '/')}/#{artifact_id}/#{version}/#{artifact_id}-#{version}.pom")
 
             next unless response.code == 200
 

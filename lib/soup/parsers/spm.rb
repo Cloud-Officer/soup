@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require 'httparty'
 require 'json'
 
 require_relative '../package'
@@ -21,14 +20,7 @@ module SOUP
 
       raise('No main file found!') if main_file.nil?
 
-      headers =
-        if ENV.fetch('GITHUB_TOKEN', '').empty?
-          nil
-        else
-          {
-            headers: { Authorization: "token #{ENV.fetch('GITHUB_TOKEN', '')}" }
-          }
-        end
+      token = ENV.fetch('GITHUB_TOKEN', '')
 
       lock_file['pins'].each do |pin|
         puts("Checking #{pin['identity'] || pin['package']} #{pin['state']['version']}...")
@@ -36,10 +28,10 @@ module SOUP
         url = "https://api.github.com/repos/#{location.gsub('git@github.com:', '').gsub('https://github.com/', '').gsub('.git', '')}"
 
         response =
-          if headers
-            HTTParty.get(url, headers)
+          if token.empty?
+            HttpClient.get(url)
           else
-            HTTParty.get(url)
+            HttpClient.get(url, headers: { Authorization: "token #{token}" })
           end
 
         raise("Error: #{response.message}! Please set GITHUB_TOKEN.") if response.message.include?('rate limit') || response.message.include?('Bad credentials')
@@ -55,9 +47,7 @@ module SOUP
         package.language = 'Swift'
         package.version = pin['state']['version']&.strip
         package.license = package_details['license']['spdx_id']&.strip
-        description = package_details['description']&.split(/\n|\. /)&.first
-        description = description&.gsub(%r{((?:f|ht)tps?:/\S+)}, '<\1>')
-        package.description = description
+        package.description = Package.sanitize_description(package_details['description'], first_sentence: true)
         package.website = package_details['html_url']&.strip
         package.dependency = !main_file.include?(package.package)
         packages[package.package] = package

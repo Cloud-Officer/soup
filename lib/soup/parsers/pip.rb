@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require 'httparty'
 require 'json'
 
 require_relative '../package'
@@ -26,7 +25,7 @@ module SOUP
         next if pip_package&.strip&.empty?
 
         puts("Checking #{pip_package} #{version}...")
-        response = RequestWithTimeoutAndRetries.get_with_retries("https://pypi.python.org/pypi/#{pip_package.sub(/\[[^\]]+\]/, '')}/json")
+        response = HttpClient.get("https://pypi.python.org/pypi/#{pip_package.sub(/\[[^\]]+\]/, '')}/json")
 
         raise(response.message) unless response.code == 200
 
@@ -35,9 +34,7 @@ module SOUP
         package.file = file
         package.language = 'Python'
         package.version = version
-        description = package_details['info']['summary']&.split(/\n|\. /)&.first
-        description = description&.gsub(%r{((?:f|ht)tps?:/\S+)}, '<\1>')
-        package.description = description
+        package.description = Package.sanitize_description(package_details['info']['summary'], first_sentence: true)
         package.website = package_details['info']['home_page']&.strip
         package.dependency = !main_file.include?(package.package)
 
@@ -54,24 +51,6 @@ module SOUP
         end
 
         packages[package.package] = package
-      end
-    end
-  end
-
-  class RequestWithTimeoutAndRetries
-    include HTTParty
-
-    default_options.update(timeout: 5)
-
-    def self.get_with_retries(url, options = {}, max_retries = 3)
-      retries = 0
-      begin
-        get(url, options)
-      rescue Net::OpenTimeout, Net::ReadTimeout => e
-        raise(e) if retries >= max_retries
-
-        retries += 1
-        retry
       end
     end
   end

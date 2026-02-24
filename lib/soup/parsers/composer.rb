@@ -23,8 +23,7 @@ module SOUP
         license = license&.split&.first
         package.license = license
         package.license = 'NOASSERTION' if package.license&.start_with?('http')
-        description = php_package['description']&.split(/\n|\. /)&.first
-        package.description = description&.gsub(%r{((?:f|ht)tps?:/\S+)}, '<\1>')
+        package.description = Package.sanitize_description(php_package['description'], first_sentence: true)
         package.website = php_package['homepage']&.strip
         package.dependency = !main_file.include?(package.package)
         packages[package.package] = package
