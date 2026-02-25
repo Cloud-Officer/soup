@@ -11,6 +11,18 @@
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
   },
+  "addressable": {
+    "language": "Ruby",
+    "package": "addressable",
+    "version": "2.8.8",
+    "license": "Apache-2.0",
+    "description": "Addressable is an alternative implementation to the URI implementation that is",
+    "website": "https://github.com/sporkmonger/addressable",
+    "last_verified_at": "2026-02-25",
+    "risk_level": "Low",
+    "requirements": "Dependency",
+    "verification_reasoning": "Dependency"
+  },
   "ast": {
     "language": "Ruby",
     "package": "ast",
@@ -71,6 +83,18 @@
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
   },
+  "crack": {
+    "language": "Ruby",
+    "package": "crack",
+    "version": "1.0.1",
+    "license": "MIT",
+    "description": "Really simple JSON and XML parsing, ripped from Merb and Rails.",
+    "website": "https://github.com/jnunemaker/crack",
+    "last_verified_at": "2026-02-25",
+    "risk_level": "Low",
+    "requirements": "Dependency",
+    "verification_reasoning": "Dependency"
+  },
   "csv": {
     "language": "Ruby",
     "package": "csv",
@@ -83,6 +107,30 @@
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
   },
+  "diff-lcs": {
+    "language": "Ruby",
+    "package": "diff-lcs",
+    "version": "1.6.2",
+    "license": "MIT",
+    "description": "Diff::LCS computes the difference between two Enumerable sequences using the",
+    "website": "https://github.com/halostatue/diff-lcs",
+    "last_verified_at": "2026-02-25",
+    "risk_level": "Low",
+    "requirements": "Dependency",
+    "verification_reasoning": "Dependency"
+  },
+  "docile": {
+    "language": "Ruby",
+    "package": "docile",
+    "version": "1.4.1",
+    "license": "MIT",
+    "description": "Docile treats the methods of a given ruby object as a DSL (domain specific language) within a given block",
+    "website": "https://ms-ati.github.io/docile/",
+    "last_verified_at": "2026-02-25",
+    "risk_level": "Low",
+    "requirements": "Dependency",
+    "verification_reasoning": "Dependency"
+  },
   "drb": {
     "language": "Ruby",
     "package": "drb",
@@ -91,6 +139,18 @@
     "description": "Distributed object system for Ruby",
     "website": "https://github.com/ruby/drb",
     "last_verified_at": "2023-10-26",
+    "risk_level": "Low",
+    "requirements": "Dependency",
+    "verification_reasoning": "Dependency"
+  },
+  "hashdiff": {
+    "language": "Ruby",
+    "package": "hashdiff",
+    "version": "1.2.1",
+    "license": "MIT",
+    "description": " Hashdiff is a diff lib to compute the smallest difference between two hashes",
+    "website": "https://github.com/liufengyun/hashdiff",
+    "last_verified_at": "2026-02-25",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -275,6 +335,18 @@
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
   },
+  "public_suffix": {
+    "language": "Ruby",
+    "package": "public_suffix",
+    "version": "7.0.2",
+    "license": "MIT",
+    "description": "PublicSuffix can parse and decompose a domain name into top level domain, domain and subdomains.",
+    "website": "https://simonecarletti.com/code/publicsuffix-ruby",
+    "last_verified_at": "2026-02-25",
+    "risk_level": "Low",
+    "requirements": "Dependency",
+    "verification_reasoning": "Dependency"
+  },
   "racc": {
     "language": "Ruby",
     "package": "racc",
@@ -307,6 +379,78 @@
     "description": "A library for tokenizing, lexing, and parsing Ruby regular expressions.",
     "website": "https://github.com/ammar/regexp_parser",
     "last_verified_at": "2022-05-10",
+    "risk_level": "Low",
+    "requirements": "Dependency",
+    "verification_reasoning": "Dependency"
+  },
+  "rexml": {
+    "language": "Ruby",
+    "package": "rexml",
+    "version": "3.4.4",
+    "license": "BSD-2-Clause",
+    "description": "An XML toolkit for Ruby",
+    "website": "https://github.com/ruby/rexml",
+    "last_verified_at": "2026-02-25",
+    "risk_level": "Low",
+    "requirements": "Dependency",
+    "verification_reasoning": "Dependency"
+  },
+  "rspec": {
+    "language": "Ruby",
+    "package": "rspec",
+    "version": "3.13.2",
+    "license": "MIT",
+    "description": "BDD for Ruby",
+    "website": "https://rspec.info",
+    "last_verified_at": "2026-02-25",
+    "risk_level": "Low",
+    "requirements": "Dependency",
+    "verification_reasoning": "Dependency"
+  },
+  "rspec-core": {
+    "language": "Ruby",
+    "package": "rspec-core",
+    "version": "3.13.6",
+    "license": "MIT",
+    "description": "BDD for Ruby",
+    "website": "https://rspec.info",
+    "last_verified_at": "2026-02-25",
+    "risk_level": "Low",
+    "requirements": "Dependency",
+    "verification_reasoning": "Dependency"
+  },
+  "rspec-expectations": {
+    "language": "Ruby",
+    "package": "rspec-expectations",
+    "version": "3.13.5",
+    "license": "MIT",
+    "description": "rspec-expectations provides a simple, readable API to express expected outcomes of a code example.",
+    "website": "https://rspec.info",
+    "last_verified_at": "2026-02-25",
+    "risk_level": "Low",
+    "requirements": "Dependency",
+    "verification_reasoning": "Dependency"
+  },
+  "rspec-mocks": {
+    "language": "Ruby",
+    "package": "rspec-mocks",
+    "version": "3.13.7",
+    "license": "MIT",
+    "description": "RSpec's 'test double' framework, with support for stubbing and mocking",
+    "website": "https://rspec.info",
+    "last_verified_at": "2026-02-25",
+    "risk_level": "Low",
+    "requirements": "Dependency",
+    "verification_reasoning": "Dependency"
+  },
+  "rspec-support": {
+    "language": "Ruby",
+    "package": "rspec-support",
+    "version": "3.13.7",
+    "license": "MIT",
+    "description": "Support utilities for RSpec gems",
+    "website": "https://rspec.info",
+    "last_verified_at": "2026-02-25",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -443,6 +587,42 @@
     "requirements": "Used to manipulate package versions.",
     "verification_reasoning": "Very popular on rubygems.org"
   },
+  "simplecov": {
+    "language": "Ruby",
+    "package": "simplecov",
+    "version": "0.22.0",
+    "license": "MIT",
+    "description": "Code coverage for Ruby with a powerful configuration library and automatic merging of coverage across test suites",
+    "website": "https://github.com/simplecov-ruby/simplecov",
+    "last_verified_at": "2026-02-25",
+    "risk_level": "Low",
+    "requirements": "Dependency",
+    "verification_reasoning": "Dependency"
+  },
+  "simplecov-html": {
+    "language": "Ruby",
+    "package": "simplecov-html",
+    "version": "0.13.2",
+    "license": "MIT",
+    "description": "Default HTML formatter for SimpleCov code coverage tool for ruby 2.4+",
+    "website": "https://github.com/simplecov-ruby/simplecov-html",
+    "last_verified_at": "2026-02-25",
+    "risk_level": "Low",
+    "requirements": "Dependency",
+    "verification_reasoning": "Dependency"
+  },
+  "simplecov_json_formatter": {
+    "language": "Ruby",
+    "package": "simplecov_json_formatter",
+    "version": "0.1.4",
+    "license": "MIT",
+    "description": "JSON formatter for SimpleCov",
+    "website": "https://github.com/fede-moya/simplecov_json_formatter",
+    "last_verified_at": "2026-02-25",
+    "risk_level": "Low",
+    "requirements": "Dependency",
+    "verification_reasoning": "Dependency"
+  },
   "tty-color": {
     "language": "Ruby",
     "package": "tty-color",
@@ -547,6 +727,18 @@
     "description": "URI is a module providing classes to handle Uniform Resource Identifiers",
     "website": "https://github.com/ruby/uri",
     "last_verified_at": "2024-12-29",
+    "risk_level": "Low",
+    "requirements": "Dependency",
+    "verification_reasoning": "Dependency"
+  },
+  "webmock": {
+    "language": "Ruby",
+    "package": "webmock",
+    "version": "3.26.1",
+    "license": "MIT",
+    "description": "WebMock allows stubbing HTTP requests and setting expectations on HTTP requests.",
+    "website": "https://github.com/bblimke/webmock",
+    "last_verified_at": "2026-02-25",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
