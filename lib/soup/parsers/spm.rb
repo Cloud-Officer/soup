@@ -46,7 +46,7 @@ module SOUP
         package.file = file
         package.language = 'Swift'
         package.version = pin['state']['version']&.strip
-        package.license = package_details['license']['spdx_id']&.strip
+        package.license = package_details.dig('license', 'spdx_id')&.strip
         package.description = Package.sanitize_description(package_details['description'], first_sentence: true)
         package.website = package_details['html_url']&.strip
         package.dependency = !main_file.include?(package.package)

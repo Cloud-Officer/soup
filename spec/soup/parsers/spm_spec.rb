@@ -63,6 +63,27 @@ RSpec.describe(SOUP::SPMParser) do
     expect(packages).to(have_key('Alamofire'))
   end
 
+  it 'handles repositories with no license' do
+    no_license_response = {
+      name: 'Alamofire',
+      private: false,
+      license: nil,
+      description: 'Elegant HTTP Networking. More details here.',
+      html_url: 'https://github.com/Alamofire/Alamofire'
+    }.to_json
+
+    stub_request(:get, 'https://api.github.com/repos/Alamofire/Alamofire')
+      .to_return(status: 200, body: no_license_response)
+
+    allow(ENV).to(receive(:fetch).and_call_original)
+    allow(ENV).to(receive(:fetch).with('GITHUB_TOKEN', '').and_return(''))
+
+    packages = {}
+    parser.parse('Package.resolved', packages)
+    expect(packages).to(have_key('Alamofire'))
+    expect(packages['Alamofire'].license).to(be_nil)
+  end
+
   it 'skips private repositories' do
     private_response = {
       name: 'Alamofire',
