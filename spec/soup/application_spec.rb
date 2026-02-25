@@ -95,6 +95,7 @@ RSpec.describe(SOUP::Application) do
     end
 
     it 'raises when config file has invalid JSON' do
+      bad_file = nil
       bad_file = Tempfile.new(['bad', '.json'])
       bad_file.write('not json')
       bad_file.close
@@ -118,7 +119,7 @@ RSpec.describe(SOUP::Application) do
       expect { app.execute }
         .to(raise_error(/Invalid JSON/))
     ensure
-      bad_file.unlink
+      bad_file.unlink if bad_file && File.exist?(bad_file.path)
     end
 
     context 'with detected packages' do
