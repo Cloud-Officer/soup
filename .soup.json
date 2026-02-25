@@ -489,7 +489,7 @@
     "last_verified_at": "2024-09-16",
     "risk_level": "Low",
     "requirements": "Ruby linter",
-    "verification_reasoning": "Most populat gem"
+    "verification_reasoning": "Most popular gem"
   },
   "rubocop-graphql": {
     "language": "Ruby",
