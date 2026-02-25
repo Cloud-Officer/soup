@@ -271,6 +271,45 @@ RSpec.describe(SOUP::Application) do
           .to(raise_error(/No risk level found/))
       end
 
+      it 'saves partial state when check_packages raises an exception' do
+        two_pkg_lock = {
+          packages: [
+            { name: 'first/pkg', version: '1.0.0', license: ['MIT'], description: 'First', homepage: 'https://example.com' },
+            { name: 'second/pkg', version: '2.0.0', license: ['MIT'], description: 'Second', homepage: 'https://example.com' }
+          ],
+          'packages-dev': []
+        }.to_json
+        allow(File).to(receive(:read).with('composer.lock').and_return(two_pkg_lock))
+        allow(File).to(receive(:read).with('composer.json').and_return('{"require":{"first/pkg":"^1.0","second/pkg":"^2.0"}}'))
+
+        app = described_class.new(
+          [
+            '--soup',
+            '--no_prompt',
+            '--licenses_file',
+            licenses_file.path,
+            '--exceptions_file',
+            exceptions_file.path,
+            '--cache_file',
+            cache_file.path,
+            '--markdown_file',
+            markdown_file,
+            '--skip_bundler',
+            '--skip_gradle',
+            '--skip_npm',
+            '--skip_pip',
+            '--skip_spm',
+            '--skip_yarn'
+          ]
+        )
+
+        expect { app.execute }
+          .to(raise_error(/No risk level found/))
+
+        cache_content = JSON.parse(File.read(cache_file.path))
+        expect(cache_content).not_to(be_empty)
+      end
+
       it 'uses cached package data' do
         cached = {
           'valid/pkg': {

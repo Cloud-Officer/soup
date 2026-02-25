@@ -51,6 +51,8 @@ module SOUP
       check_packages
       save_files
       @exit_code
+    ensure
+      save_files if @options&.soup_check
     end
 
     private
