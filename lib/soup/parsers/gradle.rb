@@ -24,11 +24,13 @@ module SOUP
         puts("Checking #{group_id}:#{artifact_id} #{version}...")
         response = HttpClient.get("https://search.maven.org/solrsearch/select?q=g:%22#{group_id}%22+AND+a:%22#{artifact_id}%22+AND+v:%22#{version}%22&rows=1&wt=json")
 
-        if response.code == 200 and JSON.parse(response.body)['response']['numFound'] == 1
-          package_details = JSON.parse(response.body)['response']['docs'][0]
-          license = package_details['l']
-          description = package_details['p']
-          website = package_details['home_page']
+        parsed = JSON.parse(response.body) if response.code == 200
+        docs = parsed&.dig('response', 'docs')
+
+        if response.code == 200 && docs&.length == 1
+          license = docs[0]['l']
+          description = docs[0]['p']
+          website = docs[0]['home_page']
         else
           REPOSITORY_URLS.each do |url|
             response = HttpClient.get("#{url}/#{group_id.tr('.', '/')}/#{artifact_id}/#{version}/#{artifact_id}-#{version}.pom")

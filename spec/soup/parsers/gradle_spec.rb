@@ -66,6 +66,40 @@ RSpec.describe(SOUP::GradleParser) do
     expect(pkg.description).to(eq('A library for example'))
   end
 
+  context 'when Maven Central returns numFound 1 but empty docs' do
+    let(:inconsistent_maven_response) do
+      { response: { numFound: 1, docs: [] } }.to_json
+    end
+
+    let(:pom_xml) do
+      <<~XML
+        <?xml version="1.0" encoding="UTF-8"?>
+        <project>
+          <licenses>
+            <license>
+              <name>MIT License</name>
+            </license>
+          </licenses>
+          <description>Fallback description</description>
+          <url>https://fallback.example.com</url>
+        </project>
+      XML
+    end
+
+    it 'falls back to POM XML instead of crashing' do
+      stub_request(:get, %r{search\.maven\.org/solrsearch/select})
+        .to_return(status: 200, body: inconsistent_maven_response)
+
+      stub_request(:get, 'https://maven.google.com/com/example/library/1.0.0/library-1.0.0.pom')
+        .to_return(status: 200, body: pom_xml)
+
+      packages = {}
+      parser.parse('buildscript-gradle.lockfile', packages)
+      pkg = packages['com.example:library']
+      expect(pkg.license).to(eq('MIT License'))
+    end
+  end
+
   context 'when Maven Central returns 0 results' do
     let(:empty_maven_response) do
       { response: { numFound: 0, docs: [] } }.to_json
