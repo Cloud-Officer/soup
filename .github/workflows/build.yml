@@ -184,7 +184,11 @@ jobs:
         bundle install
       env:
         GITHUB_TOKEN: "${{secrets.GH_PAT}}"
-    - name: RSpec
+    - name: RSpec Unit Tests
+      shell: bash
+      if: "${{needs.variables.outputs.SKIP_TESTS != '1'}}"
+      run: bundle exec rspec
+    - name: Integration Tests
       shell: bash
       if: "${{needs.variables.outputs.SKIP_TESTS != '1'}}"
       run: |

@@ -22,3 +22,9 @@ group :development do
   gem 'rubocop-rspec', '>= 2.16.0', require: false
   gem 'rubocop-thread_safety', '>= 0.5.1', require: false
 end
+
+group :test do
+  gem 'rspec', '>= 3.13.0'
+  gem 'simplecov', '>= 0.22.0'
+  gem 'webmock', '>= 3.23.0'
+end
