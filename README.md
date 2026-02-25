@@ -5,6 +5,7 @@
 * [Introduction](#introduction)
 * [Installation](#installation)
 * [Usage](#usage)
+  * [Environment Variables](#environment-variables)
   * [Examples](#examples)
 * [Contributing](#contributing)
 
@@ -81,10 +82,14 @@ options
 
 ```
 
-Depending on the package manager files detected, you may see an error `rate limit exceeded` if you have a lot of
-packages and you run this tool many times. In this case
-simply create a [Github personal access token](https://github.com/settings/tokens) and set it in the `GITHUB_TOKEN`
-environment variable.
+### Environment Variables
+
+| Variable       | Required | Description                                                                                                                                                                                     |
+|----------------|----------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `GITHUB_TOKEN` | Optional | GitHub personal access token for SPM dependency lookups. Required when processing many Swift packages to avoid GitHub API rate limiting. [Create one here](https://github.com/settings/tokens). |
+
+The tool works without `GITHUB_TOKEN` for non-SPM projects. When processing SPM dependencies, unauthenticated GitHub
+API requests are limited to 60 per hour. Setting `GITHUB_TOKEN` increases this to 5,000 per hour.
 
 ### Examples
 
