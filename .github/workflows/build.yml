@@ -184,7 +184,11 @@ jobs:
         bundle install
       env:
         GITHUB_TOKEN: "${{secrets.GH_PAT}}"
-    - name: RSpec
+    - name: RSpec Unit Tests
+      shell: bash
+      if: "${{needs.variables.outputs.SKIP_TESTS != '1'}}"
+      run: bundle exec rspec
+    - name: Integration Tests
       shell: bash
       if: "${{needs.variables.outputs.SKIP_TESTS != '1'}}"
       run: |
@@ -192,9 +196,7 @@ jobs:
         pushd tests
         mv _composer.json composer.json
         mv _composer.lock composer.lock
-        mv _package.json package.json
         mv _requirements._txt requirements.txt
-        mv _yarn.lock yarn.lock
         ../bin/soup.rb
         popd
       env:

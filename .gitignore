@@ -249,7 +249,7 @@ modules.xml
 .LSOverride
 
 # Icon must end with two \r
-Icon
+Icon
 
 # Thumbnails
 ._*
@@ -531,4 +531,7 @@ $RECYCLE.BIN/
 .codex/
 
 # END AI Assistants
+
+# RSpec
+.rspec_status
 
