@@ -2,37 +2,46 @@
 
 RSpec.describe(SOUP::Options) do
   describe '#parse' do
-    it 'sets default values' do
-      options = described_class.new([]).parse
-      expect(options.auto_reply).to(be(false))
-      expect(options.cache_file).to(eq('.soup.json'))
-      expect(options.ignored_folders).to(eq([]))
-      expect(options.licenses_check).to(be(true))
-      expect(options.no_prompt).to(be(false))
-      expect(options.skip_bundler).to(be(false))
-      expect(options.skip_cocoapods).to(be(false))
-      expect(options.skip_composer).to(be(false))
-      expect(options.skip_gradle).to(be(false))
-      expect(options.skip_npm).to(be(false))
-      expect(options.skip_pip).to(be(false))
-      expect(options.skip_spm).to(be(false))
-      expect(options.skip_yarn).to(be(false))
-      expect(options.soup_check).to(be(true))
+    context 'with default values' do
+      let(:options) { described_class.new([]).parse }
+
+      it 'sets default general options', :aggregate_failures do
+        expect(options.auto_reply).to(be(false))
+        expect(options.cache_file).to(eq('.soup.json'))
+        expect(options.ignored_folders).to(eq([]))
+        expect(options.licenses_check).to(be(true))
+        expect(options.no_prompt).to(be(false))
+      end
+
+      it 'sets default skip options', :aggregate_failures do
+        expect(options.skip_bundler).to(be(false))
+        expect(options.skip_cocoapods).to(be(false))
+        expect(options.skip_composer).to(be(false))
+        expect(options.skip_gradle).to(be(false))
+        expect(options.skip_npm).to(be(false))
+      end
+
+      it 'sets remaining default skip options', :aggregate_failures do
+        expect(options.skip_pip).to(be(false))
+        expect(options.skip_spm).to(be(false))
+        expect(options.skip_yarn).to(be(false))
+        expect(options.soup_check).to(be(true))
+      end
     end
 
-    it 'enables only licenses_check with --licenses' do
+    it 'enables only licenses_check with --licenses', :aggregate_failures do
       options = described_class.new(['--licenses']).parse
       expect(options.licenses_check).to(be(true))
       expect(options.soup_check).to(be(false))
     end
 
-    it 'enables only soup_check with --soup' do
+    it 'enables only soup_check with --soup', :aggregate_failures do
       options = described_class.new(['--soup']).parse
       expect(options.licenses_check).to(be(false))
       expect(options.soup_check).to(be(true))
     end
 
-    it 'enables both when neither --licenses nor --soup is given' do
+    it 'enables both when neither --licenses nor --soup is given', :aggregate_failures do
       options = described_class.new([]).parse
       expect(options.licenses_check).to(be(true))
       expect(options.soup_check).to(be(true))
@@ -108,13 +117,16 @@ RSpec.describe(SOUP::Options) do
       expect(options.auto_reply).to(be(true))
     end
 
-    it 'parses multiple flags combined' do
-      options = described_class.new(['--licenses', '--skip_npm', '--no_prompt', '--cache_file', 'test.json']).parse
-      expect(options.licenses_check).to(be(true))
-      expect(options.soup_check).to(be(false))
-      expect(options.skip_npm).to(be(true))
-      expect(options.no_prompt).to(be(true))
-      expect(options.cache_file).to(eq('test.json'))
+    context 'with multiple flags combined' do
+      let(:options) { described_class.new(['--licenses', '--skip_npm', '--no_prompt', '--cache_file', 'test.json']).parse }
+
+      it 'parses multiple flags combined', :aggregate_failures do
+        expect(options.licenses_check).to(be(true))
+        expect(options.soup_check).to(be(false))
+        expect(options.skip_npm).to(be(true))
+        expect(options.no_prompt).to(be(true))
+        expect(options.cache_file).to(eq('test.json'))
+      end
     end
 
     it 'raises OptionParser::InvalidOption for unknown flags' do

@@ -28,48 +28,39 @@ RSpec.describe(SOUP::ComposerParser) do
 
   let(:main_file) { '{"require":{"vendor/main-pkg":"^1.0"}}' }
 
+  let(:packages) { {} }
+
   before do
     allow(File).to(receive(:read).and_call_original)
     allow(File).to(receive(:read).with('composer.lock').and_return(lock_file))
     allow(File).to(receive(:read).with('composer.json').and_return(main_file))
+    parser.parse('composer.lock', packages)
   end
 
-  it 'parses packages and packages-dev' do
-    packages = {}
-    parser.parse('composer.lock', packages)
+  it 'parses packages and packages-dev', :aggregate_failures do
     expect(packages).to(have_key('vendor/main-pkg'))
     expect(packages).to(have_key('vendor/dev-pkg'))
   end
 
   it 'sets language to PHP' do
-    packages = {}
-    parser.parse('composer.lock', packages)
     expect(packages['vendor/main-pkg'].language).to(eq('PHP'))
   end
 
-  it 'extracts version' do
-    packages = {}
-    parser.parse('composer.lock', packages)
+  it 'extracts version', :aggregate_failures do
     expect(packages['vendor/main-pkg'].version).to(eq('v1.2.3'))
     expect(packages['vendor/dev-pkg'].version).to(eq('2.0.0'))
   end
 
-  it 'extracts license' do
-    packages = {}
-    parser.parse('composer.lock', packages)
+  it 'extracts license', :aggregate_failures do
     expect(packages['vendor/main-pkg'].license).to(eq('MIT'))
     expect(packages['vendor/dev-pkg'].license).to(eq('Apache-2.0'))
   end
 
   it 'extracts first sentence of description' do
-    packages = {}
-    parser.parse('composer.lock', packages)
     expect(packages['vendor/main-pkg'].description).to(eq('A main package'))
   end
 
-  it 'marks non-main-file packages as dependencies' do
-    packages = {}
-    parser.parse('composer.lock', packages)
+  it 'marks non-main-file packages as dependencies', :aggregate_failures do
     expect(packages['vendor/main-pkg'].dependency).to(be(false))
     expect(packages['vendor/dev-pkg'].dependency).to(be(true))
   end
@@ -91,8 +82,6 @@ RSpec.describe(SOUP::ComposerParser) do
     end
 
     it 'strips parentheses and takes first license' do
-      packages = {}
-      parser.parse('composer.lock', packages)
       expect(packages['vendor/paren-pkg'].license).to(eq('MIT'))
     end
   end
@@ -113,10 +102,9 @@ RSpec.describe(SOUP::ComposerParser) do
       }.to_json
     end
 
-    it 'handles nil version, license, description, and homepage' do
-      packages = {}
-      parser.parse('composer.lock', packages)
-      pkg = packages['vendor/nil-pkg']
+    let(:pkg) { packages['vendor/nil-pkg'] }
+
+    it 'handles nil version, license, description, and homepage', :aggregate_failures do
       expect(pkg.version).to(be_nil)
       expect(pkg.license).to(be_nil)
       expect(pkg.description).to(be_nil)
@@ -141,8 +129,6 @@ RSpec.describe(SOUP::ComposerParser) do
     end
 
     it 'converts URL license to NOASSERTION' do
-      packages = {}
-      parser.parse('composer.lock', packages)
       expect(packages['vendor/url-pkg'].license).to(eq('NOASSERTION'))
     end
   end
