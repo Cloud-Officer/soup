@@ -6,7 +6,7 @@
     "license": "MIT",
     "description": "A toolkit of support libraries and Ruby core extensions extracted from the Rails framework",
     "website": "https://rubyonrails.org",
-    "last_verified_at": "2022-05-10",
+    "last_verified_at": "2026-02-25",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -30,7 +30,7 @@
     "license": "MIT",
     "description": "A library for working with Abstract Syntax Trees.",
     "website": "https://whitequark.github.io/ast/",
-    "last_verified_at": "2022-05-10",
+    "last_verified_at": "2026-02-25",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -66,7 +66,7 @@
     "license": "MIT",
     "description": "Modern concurrency tools including agents, futures, promises, thread pools, actors, supervisors, and more.",
     "website": "http://www.concurrent-ruby.com",
-    "last_verified_at": "2022-05-10",
+    "last_verified_at": "2026-02-25",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -162,7 +162,7 @@
     "license": "MIT",
     "description": "Makes http fun! Also, makes consuming restful web services dead easy.",
     "website": "https://github.com/jnunemaker/httparty",
-    "last_verified_at": "2022-05-10",
+    "last_verified_at": "2026-02-25",
     "risk_level": "Medium",
     "requirements": "Makes http fun! Also, makes consuming restful web services dead easy.",
     "verification_reasoning": "Very popular on rubygems.org"
@@ -174,7 +174,7 @@
     "license": "MIT",
     "description": "New wave Internationalization support for Ruby.",
     "website": "https://github.com/ruby-i18n/i18n",
-    "last_verified_at": "2022-05-10",
+    "last_verified_at": "2026-02-25",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -186,7 +186,7 @@
     "license": "Ruby",
     "description": "A JSON implementation as a JRuby extension.",
     "website": "https://github.com/ruby/json",
-    "last_verified_at": "2022-05-10",
+    "last_verified_at": "2026-02-25",
     "risk_level": "Low",
     "requirements": "Used to read package manager and cache files.",
     "verification_reasoning": "Very popular on rubygems.org"
@@ -246,7 +246,7 @@
     "license": "MIT",
     "description": "minitest provides a complete suite of testing facilities supporting",
     "website": "https://minite.st/",
-    "last_verified_at": "2022-05-10",
+    "last_verified_at": "2026-02-25",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -258,7 +258,7 @@
     "license": "MIT",
     "description": "Provides swappable XML backends utilizing LibXML, Nokogiri, Ox, or REXML.",
     "website": "https://github.com/sferik/multi_xml",
-    "last_verified_at": "2022-05-10",
+    "last_verified_at": "2026-02-25",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -282,7 +282,7 @@
     "license": "Ruby",
     "description": "OptionParser is a class for command-line option analysis",
     "website": "https://github.com/ruby/optparse",
-    "last_verified_at": "2022-05-10",
+    "last_verified_at": "2026-02-25",
     "risk_level": "Low",
     "requirements": "Used to parse command line arguments.",
     "verification_reasoning": "Very popular on rubygems.org"
@@ -294,7 +294,7 @@
     "license": "MIT",
     "description": "Run any kind of code in parallel processes",
     "website": "https://github.com/grosser/parallel",
-    "last_verified_at": "2022-05-10",
+    "last_verified_at": "2026-02-25",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -306,7 +306,7 @@
     "license": "MIT",
     "description": "A Ruby parser written in pure Ruby.",
     "website": "https://github.com/whitequark/parser",
-    "last_verified_at": "2022-05-10",
+    "last_verified_at": "2026-02-25",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -366,7 +366,7 @@
     "license": "MIT",
     "description": "Colorize printed text on ANSI terminals",
     "website": "https://github.com/sickill/rainbow",
-    "last_verified_at": "2022-05-10",
+    "last_verified_at": "2026-02-25",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -378,7 +378,7 @@
     "license": "MIT",
     "description": "A library for tokenizing, lexing, and parsing Ruby regular expressions.",
     "website": "https://github.com/ammar/regexp_parser",
-    "last_verified_at": "2022-05-10",
+    "last_verified_at": "2026-02-25",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -558,7 +558,7 @@
     "license": "MIT",
     "description": "Ruby/ProgressBar is an extremely flexible text progress bar library for Ruby",
     "website": "https://github.com/jfelchner/ruby-progressbar",
-    "last_verified_at": "2022-05-10",
+    "last_verified_at": "2026-02-25",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -582,7 +582,7 @@
     "license": "MIT",
     "description": "Semantic Version utility class for parsing, storing, and comparing versions",
     "website": "https://github.com/jlindsey/semantic",
-    "last_verified_at": "2022-05-10",
+    "last_verified_at": "2026-02-25",
     "risk_level": "Low",
     "requirements": "Used to manipulate package versions.",
     "verification_reasoning": "Very popular on rubygems.org"
@@ -690,7 +690,7 @@
     "license": "MIT",
     "description": "TZInfo provides access to time zone data and allows times to be converted using time zone rules.",
     "website": "https://tzinfo.github.io",
-    "last_verified_at": "2022-05-10",
+    "last_verified_at": "2026-02-25",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -702,7 +702,7 @@
     "license": "MIT",
     "description": "[Unicode 17.0.0] Determines the monospace display width of a string using EastAsianWidth.txt, Unicode general category, Emoji specification, and other data.",
     "website": "https://github.com/janlelis/unicode-display_width",
-    "last_verified_at": "2022-05-10",
+    "last_verified_at": "2026-02-25",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
