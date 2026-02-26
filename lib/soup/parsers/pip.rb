@@ -14,7 +14,7 @@ module SOUP
           ''
         end
 
-      File.open(file, 'r').each_line do |line|
+      File.foreach(file) do |line|
         next if line.strip.empty?
 
         next if line.include?('#')

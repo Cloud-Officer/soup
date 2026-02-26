@@ -49,10 +49,10 @@ RSpec.describe(SOUP::PIPParser) do
   before do
     allow(File).to(receive(:exist?).and_call_original)
     allow(File).to(receive(:exist?).with('requirements.in').and_return(false))
-    allow(File).to(receive(:open).and_call_original)
-
-    file_io = StringIO.new(requirements_content)
-    allow(File).to(receive(:open).with('requirements.txt', 'r').and_return(file_io))
+    allow(File).to(receive(:foreach).and_call_original)
+    foreach_stub = receive(:foreach).with('requirements.txt')
+    requirements_content.lines.each { |line| foreach_stub.and_yield(line) }
+    allow(File).to(foreach_stub)
   end
 
   it 'parses requirements line by line, skips comments and empty lines' do
@@ -128,8 +128,9 @@ RSpec.describe(SOUP::PIPParser) do
     allow(File).to(receive(:read).and_call_original)
     allow(File).to(receive(:read).with('requirements.in').and_return("requests\n"))
 
-    file_io = StringIO.new("requests==2.31.0\nflask==3.0.0\n")
-    allow(File).to(receive(:open).with('requirements.txt', 'r').and_return(file_io))
+    foreach_stub = receive(:foreach).with('requirements.txt')
+    "requests==2.31.0\nflask==3.0.0\n".lines.each { |line| foreach_stub.and_yield(line) }
+    allow(File).to(foreach_stub)
 
     stub_request(:get, 'https://pypi.python.org/pypi/requests/json')
       .to_return(status: 200, body: requests_response)
@@ -152,8 +153,7 @@ RSpec.describe(SOUP::PIPParser) do
       }
     }.to_json
 
-    file_io = StringIO.new("simple==1.0.0\n")
-    allow(File).to(receive(:open).with('requirements.txt', 'r').and_return(file_io))
+    allow(File).to(receive(:foreach).with('requirements.txt').and_yield("simple==1.0.0\n"))
     stub_request(:get, 'https://pypi.python.org/pypi/simple/json')
       .to_return(status: 200, body: nil_homepage_response)
 
@@ -172,8 +172,7 @@ RSpec.describe(SOUP::PIPParser) do
       }
     }.to_json
 
-    file_io = StringIO.new("pkg==1.0.0\n")
-    allow(File).to(receive(:open).with('requirements.txt', 'r').and_return(file_io))
+    allow(File).to(receive(:foreach).with('requirements.txt').and_yield("pkg==1.0.0\n"))
     stub_request(:get, 'https://pypi.python.org/pypi/pkg/json')
       .to_return(status: 200, body: empty_license_response)
 
