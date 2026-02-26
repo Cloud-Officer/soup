@@ -27,11 +27,13 @@ jobs:
     - name: Update Dependencies
       shell: bash
       run: |
-        git config --global --add url."https://${{secrets.GH_PAT}}:x-oauth-basic@github.com/".insteadOf ssh://git@github.com:
-        git config --global --add url."https://${{secrets.GH_PAT}}:x-oauth-basic@github.com/".insteadOf https://github.com/
-        git config --global --add url."https://${{secrets.GH_PAT}}:x-oauth-basic@github.com/".insteadOf git@github.com:
+        git config --global --add url."https://${GH_PAT}:x-oauth-basic@github.com/".insteadOf ssh://git@github.com:
+        git config --global --add url."https://${GH_PAT}:x-oauth-basic@github.com/".insteadOf https://github.com/
+        git config --global --add url."https://${GH_PAT}:x-oauth-basic@github.com/".insteadOf git@github.com:
 
         bundle config set frozen false ; bundle update
+      env:
+        GH_PAT: "${{secrets.GH_PAT}}"
     - name: Licenses
       uses: cloud-officer/ci-actions/soup@v2
       with:

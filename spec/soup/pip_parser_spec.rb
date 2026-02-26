@@ -1,0 +1,176 @@
+# frozen_string_literal: true
+
+RSpec.describe(SOUP::PIPParser) do
+  subject(:parser) { described_class.new }
+
+  let(:requirements_content) do
+    <<~TXT
+      requests==2.31.0
+      # this is a comment
+      flask==3.0.0;python_version>="3.8"
+
+      boto3[crt]==1.34.0
+    TXT
+  end
+
+  let(:requests_response) do
+    {
+      info: {
+        summary: 'HTTP library. For humans.',
+        home_page: 'https://requests.readthedocs.io ',
+        classifiers: ['License :: OSI Approved :: Apache Software License'],
+        license: ''
+      }
+    }.to_json
+  end
+
+  let(:flask_response) do
+    {
+      info: {
+        summary: 'Flask web framework',
+        home_page: 'https://flask.palletsprojects.com',
+        classifiers: [],
+        license: "BSD-3-Clause\nSome additional text"
+      }
+    }.to_json
+  end
+
+  let(:boto3_response) do
+    {
+      info: {
+        summary: 'AWS SDK for Python',
+        home_page: 'https://aws.amazon.com/sdk-for-python/',
+        classifiers: ['License :: OSI Approved :: Apache Software License'],
+        license: 'Apache-2.0'
+      }
+    }.to_json
+  end
+
+  before do
+    allow(File).to(receive(:exist?).and_call_original)
+    allow(File).to(receive(:exist?).with('requirements.in').and_return(false))
+    allow(File).to(receive(:foreach).and_call_original)
+    foreach_stub = receive(:foreach).with('requirements.txt')
+    requirements_content.lines.each { |line| foreach_stub.and_yield(line) }
+    allow(File).to(foreach_stub)
+  end
+
+  context 'when parsing all three packages' do
+    before do
+      stub_request(:get, 'https://pypi.python.org/pypi/requests/json')
+        .to_return(status: 200, body: requests_response)
+      stub_request(:get, 'https://pypi.python.org/pypi/flask/json')
+        .to_return(status: 200, body: flask_response)
+      stub_request(:get, 'https://pypi.python.org/pypi/boto3/json')
+        .to_return(status: 200, body: boto3_response)
+    end
+
+    let(:packages) do
+      result = {}
+      parser.parse('requirements.txt', result)
+      result
+    end
+
+    it 'parses requirements line by line, skips comments and empty lines', :aggregate_failures do
+      expect(packages).to(have_key('requests'))
+      expect(packages).to(have_key('flask'))
+      expect(packages).to(have_key('boto3[crt]'))
+      expect(packages.size).to(eq(3))
+    end
+
+    it 'strips environment markers from line' do
+      expect(packages['flask'].version).to(eq('3.0.0'))
+    end
+
+    it 'strips extras brackets from package name in URL' do
+      packages
+      expect(a_request(:get, 'https://pypi.python.org/pypi/boto3/json')).to(have_been_made)
+    end
+
+    it 'extracts license from classifiers first' do
+      expect(packages['requests'].license).to(eq('Apache Software License'))
+    end
+
+    it 'falls back to license field when classifiers are empty' do
+      expect(packages['flask'].license).to(eq('BSD-3-Clause'))
+    end
+
+    it 'sets language to Python' do
+      expect(packages['requests'].language).to(eq('Python'))
+    end
+  end
+
+  context 'when .in file exists for dependency detection' do
+    before do
+      allow(File).to(receive(:exist?).with('requirements.in').and_return(true))
+      allow(File).to(receive(:read).and_call_original)
+      allow(File).to(receive(:read).with('requirements.in').and_return("requests\n"))
+
+      foreach_stub = receive(:foreach).with('requirements.txt')
+      "requests==2.31.0\nflask==3.0.0\n".lines.each { |line| foreach_stub.and_yield(line) }
+      allow(File).to(foreach_stub)
+
+      stub_request(:get, 'https://pypi.python.org/pypi/requests/json')
+        .to_return(status: 200, body: requests_response)
+      stub_request(:get, 'https://pypi.python.org/pypi/flask/json')
+        .to_return(status: 200, body: flask_response)
+    end
+
+    it 'uses .in file for dependency detection if it exists', :aggregate_failures do
+      packages = {}
+      parser.parse('requirements.txt', packages)
+      expect(packages['requests'].dependency).to(be(false))
+      expect(packages['flask'].dependency).to(be(true))
+    end
+  end
+
+  context 'when home_page is nil' do
+    let(:nil_homepage_response) do
+      {
+        info: {
+          summary: 'A package',
+          home_page: nil,
+          classifiers: ['License :: OSI Approved :: MIT License'],
+          license: ''
+        }
+      }.to_json
+    end
+
+    before do
+      allow(File).to(receive(:foreach).with('requirements.txt').and_yield("simple==1.0.0\n"))
+      stub_request(:get, 'https://pypi.python.org/pypi/simple/json')
+        .to_return(status: 200, body: nil_homepage_response)
+    end
+
+    it 'handles nil home_page' do
+      packages = {}
+      parser.parse('requirements.txt', packages)
+      expect(packages['simple'].website).to(be_nil)
+    end
+  end
+
+  context 'when license is empty and no classifiers exist' do
+    let(:empty_license_response) do
+      {
+        info: {
+          summary: 'A package',
+          home_page: '',
+          classifiers: [],
+          license: nil
+        }
+      }.to_json
+    end
+
+    before do
+      allow(File).to(receive(:foreach).with('requirements.txt').and_yield("pkg==1.0.0\n"))
+      stub_request(:get, 'https://pypi.python.org/pypi/pkg/json')
+        .to_return(status: 200, body: empty_license_response)
+    end
+
+    it 'handles empty license and no classifiers' do
+      packages = {}
+      parser.parse('requirements.txt', packages)
+      expect(packages['pkg'].license).to(be_nil)
+    end
+  end
+end

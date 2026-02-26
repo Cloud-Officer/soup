@@ -4,25 +4,29 @@ RSpec.describe(SOUP::HttpClient) do
   let(:url) { 'https://api.example.com/test' }
 
   describe '.get' do
-    it 'returns a successful response' do
+    it 'returns a successful response', :aggregate_failures do
       stub_request(:get, url).to_return(status: 200, body: '{"ok":true}')
       response = described_class.get(url)
       expect(response.code).to(eq(200))
       expect(response.body).to(eq('{"ok":true}'))
     end
 
-    it 'retries on timeout and succeeds on third attempt' do
-      stub_request(:get, url)
-        .to_timeout
-        .to_timeout
-        .to_return(status: 200, body: 'ok')
+    context 'when the server times out twice then succeeds' do
+      before do
+        stub_request(:get, url)
+          .to_timeout
+          .to_timeout
+          .to_return(status: 200, body: 'ok')
+      end
 
-      expect { described_class.get(url) }
-        .to(output(/Retrying/).to_stdout)
-      expect(WebMock).to(have_requested(:get, url).times(3))
+      it 'retries on timeout and succeeds on third attempt', :aggregate_failures do
+        expect { described_class.get(url) }
+          .to(output(/Retrying/).to_stdout)
+        expect(WebMock).to(have_requested(:get, url).times(3))
+      end
     end
 
-    it 'raises after exhausting retries' do
+    it 'raises after exhausting retries', :aggregate_failures do
       stub_request(:get, url).to_timeout
 
       expect do
@@ -41,7 +45,7 @@ RSpec.describe(SOUP::HttpClient) do
       expect(response.code).to(eq(200))
     end
 
-    it 'respects custom max_retries' do
+    it 'respects custom max_retries', :aggregate_failures do
       stub_request(:get, url).to_timeout
 
       expect do

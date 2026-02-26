@@ -191,6 +191,18 @@
     "requirements": "Used to read package manager and cache files.",
     "verification_reasoning": "Very popular on rubygems.org"
   },
+  "json-schema": {
+    "language": "Ruby",
+    "package": "json-schema",
+    "version": "6.1.0",
+    "license": "MIT",
+    "description": "Ruby JSON Schema Validator",
+    "website": "https://github.com/voxpupuli/json-schema/",
+    "last_verified_at": "2026-02-26",
+    "risk_level": "Low",
+    "requirements": "Dependency",
+    "verification_reasoning": "Dependency"
+  },
   "language_server-protocol": {
     "language": "Ruby",
     "package": "language_server-protocol",
@@ -227,6 +239,18 @@
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
   },
+  "mcp": {
+    "language": "Ruby",
+    "package": "mcp",
+    "version": "0.7.1",
+    "license": "Apache-2.0",
+    "description": "The official Ruby SDK for Model Context Protocol servers and clients",
+    "website": "https://github.com/modelcontextprotocol/ruby-sdk",
+    "last_verified_at": "2026-02-26",
+    "risk_level": "Low",
+    "requirements": "Dependency",
+    "verification_reasoning": "Dependency"
+  },
   "mini_mime": {
     "language": "Ruby",
     "package": "mini_mime",
@@ -242,7 +266,7 @@
   "minitest": {
     "language": "Ruby",
     "package": "minitest",
-    "version": "6.0.1",
+    "version": "6.0.2",
     "license": "MIT",
     "description": "minitest provides a complete suite of testing facilities supporting",
     "website": "https://minite.st/",
@@ -458,7 +482,7 @@
   "rubocop": {
     "language": "Ruby",
     "package": "rubocop",
-    "version": "1.84.2",
+    "version": "1.85.0",
     "license": "MIT",
     "description": "RuboCop is a Ruby code style checking and code formatting tool.",
     "website": "https://rubocop.org/",
@@ -506,7 +530,7 @@
   "rubocop-minitest": {
     "language": "Ruby",
     "package": "rubocop-minitest",
-    "version": "0.38.2",
+    "version": "0.39.1",
     "license": "MIT",
     "description": "Automatic Minitest code style checking tool.",
     "website": "https://docs.rubocop.org/rubocop-minitest/",

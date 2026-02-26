@@ -44,59 +44,81 @@ RSpec.describe(SOUP::Package) do
         .to(raise_error('No package specified!'))
     end
 
-    it 'sets default values' do
-      package = described_class.new('test-package')
-      expect(package.package).to(eq('test-package'))
-      expect(package.file).to(eq(''))
-      expect(package.language).to(eq(''))
-      expect(package.version).to(eq(''))
-      expect(package.license).to(eq(''))
-      expect(package.description).to(eq(''))
-      expect(package.website).to(eq(''))
-      expect(package.last_verified_at).to(eq(''))
-      expect(package.risk_level).to(eq(''))
-      expect(package.requirements).to(eq(''))
-      expect(package.verification_reasoning).to(eq(''))
-      expect(package.dependency).to(be(false))
+    context 'with default values' do
+      let(:package) { described_class.new('test-package') }
+
+      it 'sets package name and empty string defaults', :aggregate_failures do
+        expect(package.package).to(eq('test-package'))
+        expect(package.file).to(eq(''))
+        expect(package.language).to(eq(''))
+        expect(package.version).to(eq(''))
+        expect(package.license).to(eq(''))
+      end
+
+      it 'sets remaining empty string defaults', :aggregate_failures do
+        expect(package.description).to(eq(''))
+        expect(package.website).to(eq(''))
+        expect(package.last_verified_at).to(eq(''))
+        expect(package.risk_level).to(eq(''))
+        expect(package.requirements).to(eq(''))
+      end
+
+      it 'sets verification_reasoning and dependency defaults', :aggregate_failures do
+        expect(package.verification_reasoning).to(eq(''))
+        expect(package.dependency).to(be(false))
+      end
     end
   end
 
   describe '#as_json' do
-    it 'excludes file and dependency fields' do
-      package = described_class.new('test-package')
-      package.file = 'Gemfile.lock'
-      package.dependency = true
-      json = package.as_json
+    let(:package) { described_class.new('test-package') }
 
-      expect(json).not_to(have_key(:file))
-      expect(json).not_to(have_key(:dependency))
+    context 'when file and dependency are set' do
+      before do
+        package.file = 'Gemfile.lock'
+        package.dependency = true
+      end
+
+      it 'excludes file and dependency fields', :aggregate_failures do
+        json = package.as_json
+        expect(json).not_to(have_key(:file))
+        expect(json).not_to(have_key(:dependency))
+      end
     end
 
-    it 'includes all other fields' do
-      package = described_class.new('test-package')
-      package.language = 'Ruby'
-      package.version = '1.0.0'
-      package.license = 'MIT'
-      package.description = 'A test package'
-      package.website = 'https://example.com'
-      json = package.as_json
+    context 'when all fields are populated' do
+      before do
+        package.language = 'Ruby'
+        package.version = '1.0.0'
+        package.license = 'MIT'
+        package.description = 'A test package'
+        package.website = 'https://example.com'
+      end
 
-      expect(json[:language]).to(eq('Ruby'))
-      expect(json[:package]).to(eq('test-package'))
-      expect(json[:version]).to(eq('1.0.0'))
-      expect(json[:license]).to(eq('MIT'))
-      expect(json[:description]).to(eq('A test package'))
-      expect(json[:website]).to(eq('https://example.com'))
+      it 'includes all other fields', :aggregate_failures do
+        expect(package.as_json[:language]).to(eq('Ruby'))
+        expect(package.as_json[:package]).to(eq('test-package'))
+        expect(package.as_json[:version]).to(eq('1.0.0'))
+        expect(package.as_json[:license]).to(eq('MIT'))
+        expect(package.as_json[:description]).to(eq('A test package'))
+      end
+
+      it 'includes the website field' do
+        json = package.as_json
+        expect(json[:website]).to(eq('https://example.com'))
+      end
     end
   end
 
   describe '#to_json' do
-    it 'returns valid JSON string' do
-      package = described_class.new('test-package')
-      package.language = 'Ruby'
-      json_string = package.to_json
+    let(:package) do
+      p = described_class.new('test-package')
+      p.language = 'Ruby'
+      p
+    end
 
-      parsed = JSON.parse(json_string)
+    it 'returns valid JSON string', :aggregate_failures do
+      parsed = JSON.parse(package.to_json)
       expect(parsed['package']).to(eq('test-package'))
       expect(parsed['language']).to(eq('Ruby'))
     end

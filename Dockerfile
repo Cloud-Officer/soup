@@ -30,6 +30,9 @@ USER root
 WORKDIR /home/soup/soup
 RUN bundle install && ln -s "/home/soup/soup/bin/soup.rb" "/usr/local/bin/soup"
 
+# Health check
+HEALTHCHECK --interval=30s --timeout=5s --retries=3 CMD pgrep sleep > /dev/null || exit 1
+
 # Entrypoint
 USER soup
 CMD ["bash", "-c", "sleep 86400"]
