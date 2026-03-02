@@ -206,6 +206,22 @@
 
 - `bundler`
 
+### SOUP::CocoaPodsParser
+
+**Purpose:** Parses Swift Podfile.lock files and fetches metadata from the local CocoaPods trunk repository. Currently disabled because cocoapods-core requires activesupport < 8.
+
+**Location:** `lib/soup/parsers/cocoapods.rb`
+
+**Key Components:**
+
+- `parse(file, packages)`: Parses lock file, resolves specifications from local trunk source, and extracts package metadata
+
+**External Dependencies:**
+
+- `active_support`
+- `cocoapods-core` (conditionally loaded on macOS only)
+- `semantic`
+
 ### SOUP::ComposerParser
 
 **Purpose:** Parses PHP composer.lock files.
