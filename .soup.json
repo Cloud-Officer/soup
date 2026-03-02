@@ -458,7 +458,7 @@
   "rspec-mocks": {
     "language": "Ruby",
     "package": "rspec-mocks",
-    "version": "3.13.7",
+    "version": "3.13.8",
     "license": "MIT",
     "description": "RSpec's 'test double' framework, with support for stubbing and mocking",
     "website": "https://rspec.info",
