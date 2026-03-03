@@ -22,7 +22,7 @@
 | Ruby | language_server-protocol | 3.17.0.5 | MIT | A Language Server Protocol SDK | <https://github.com/mtsmfm/language_server-protocol-ruby> | 2023-06-29 | Low | Dependency | Dependency |
 | Ruby | lint_roller | 1.1.0 | MIT | A plugin specification for linter and formatter rulesets | <https://github.com/standardrb/lint_roller> | 2025-02-15 | Low | Dependency | Dependency |
 | Ruby | logger | 1.7.0 | Ruby | Provides a simple logging utility for outputting messages. | <https://github.com/ruby/logger> | 2024-08-12 | Low | Dependency | Dependency |
-| Ruby | mcp | 0.7.1 | Apache-2.0 | The official Ruby SDK for Model Context Protocol servers and clients | <https://github.com/modelcontextprotocol/ruby-sdk> | 2026-02-26 | Low | Dependency | Dependency |
+| Ruby | mcp | 0.8.0 | Apache-2.0 | The official Ruby SDK for Model Context Protocol servers and clients | <https://github.com/modelcontextprotocol/ruby-sdk> | 2026-02-26 | Low | Dependency | Dependency |
 | Ruby | mini_mime | 1.1.5 | MIT | A minimal mime type library | <https://github.com/discourse/mini_mime> | 2023-03-30 | Low | Dependency | Dependency |
 | Ruby | minitest | 6.0.2 | MIT | minitest provides a complete suite of testing facilities supporting | <https://minite.st/> | 2026-02-25 | Low | Dependency | Dependency |
 | Ruby | multi_xml | 0.8.1 | MIT | Provides swappable XML backends utilizing LibXML, Nokogiri, Ox, or REXML. | <https://github.com/sferik/multi_xml> | 2026-02-25 | Low | Dependency | Dependency |
