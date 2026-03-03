@@ -362,7 +362,7 @@
   "public_suffix": {
     "language": "Ruby",
     "package": "public_suffix",
-    "version": "7.0.2",
+    "version": "7.0.5",
     "license": "MIT",
     "description": "PublicSuffix can parse and decompose a domain name into top level domain, domain and subdomains.",
     "website": "https://simonecarletti.com/code/publicsuffix-ruby",
