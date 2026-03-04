@@ -3,9 +3,11 @@
 module SOUP
   class Package
     def self.sanitize_description(text, first_sentence: false, strip_markdown: false)
-      return if text.nil?
+      return if text.nil? || text.empty?
 
       text = text.split(/\n|\. /).first if first_sentence
+      return if text.nil?
+
       text = text.gsub(%r{((?:f|ht)tps?:/\S+)}, '<\1>')
       text = text.delete('_[]!|') if strip_markdown
       text

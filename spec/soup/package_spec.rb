@@ -6,6 +6,18 @@ RSpec.describe(SOUP::Package) do
       expect(described_class.sanitize_description(nil)).to(be_nil)
     end
 
+    it 'returns nil for empty string input' do
+      expect(described_class.sanitize_description('')).to(be_nil)
+    end
+
+    it 'returns nil for empty string with first_sentence' do
+      expect(described_class.sanitize_description('', first_sentence: true)).to(be_nil)
+    end
+
+    it 'returns nil when first_sentence splits to empty result' do
+      expect(described_class.sanitize_description("\n", first_sentence: true)).to(be_nil)
+    end
+
     it 'extracts first sentence when first_sentence is true' do
       text = 'First sentence. Second sentence'
       expect(described_class.sanitize_description(text, first_sentence: true)).to(eq('First sentence'))
