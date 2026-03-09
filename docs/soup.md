@@ -17,8 +17,8 @@
 | Ruby | hashdiff | 1.2.1 | MIT | Hashdiff is a diff lib to compute the smallest difference between two hashes | <https://github.com/liufengyun/hashdiff> | 2026-02-25 | Low | Dependency | Dependency |
 | Ruby | httparty | 0.24.2 | MIT | Makes http fun! Also, makes consuming restful web services dead easy. | <https://github.com/jnunemaker/httparty> | 2026-02-25 | Medium | Makes http fun! Also, makes consuming restful web services dead easy. | Very popular on rubygems.org |
 | Ruby | i18n | 1.14.8 | MIT | New wave Internationalization support for Ruby. | <https://github.com/ruby-i18n/i18n> | 2026-02-25 | Low | Dependency | Dependency |
-| Ruby | json | 2.18.1 | Ruby | A JSON implementation as a JRuby extension. | <https://github.com/ruby/json> | 2026-02-25 | Low | Used to read package manager and cache files. | Very popular on rubygems.org |
-| Ruby | json-schema | 6.1.0 | MIT | Ruby JSON Schema Validator | <https://github.com/voxpupuli/json-schema/> | 2026-02-26 | Low | Dependency | Dependency |
+| Ruby | json | 2.19.1 | Ruby | A JSON implementation as a JRuby extension. | <https://github.com/ruby/json> | 2026-02-25 | Low | Used to read package manager and cache files. | Very popular on rubygems.org |
+| Ruby | json-schema | 6.2.0 | MIT | Ruby JSON Schema Validator | <https://github.com/voxpupuli/json-schema/> | 2026-02-26 | Low | Dependency | Dependency |
 | Ruby | language_server-protocol | 3.17.0.5 | MIT | A Language Server Protocol SDK | <https://github.com/mtsmfm/language_server-protocol-ruby> | 2023-06-29 | Low | Dependency | Dependency |
 | Ruby | lint_roller | 1.1.0 | MIT | A plugin specification for linter and formatter rulesets | <https://github.com/standardrb/lint_roller> | 2025-02-15 | Low | Dependency | Dependency |
 | Ruby | logger | 1.7.0 | Ruby | Provides a simple logging utility for outputting messages. | <https://github.com/ruby/logger> | 2024-08-12 | Low | Dependency | Dependency |
