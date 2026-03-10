@@ -7,6 +7,7 @@
 .github/                 @ydesgagn
 .gitignore               @ydesgagn
 .hadolint.yaml           @ydesgagn
+.markdownlint-cli2.yaml  @ydesgagn
 .rubocop.yml             @ydesgagn
 .ruby-version            @ydesgagn
 .yamllint.yml            @ydesgagn
