@@ -5,5 +5,20 @@ rules:
 ignore: |
   node_modules/
   vendor/
+  .build/
+  Pods/
+  Carthage/
+  DerivedData/
+  venv/
+  .venv/
+  .bundle/
+  .gradle/
+  .m2/
+  dist/
+  build/
+  target/
+  .npm/
+  .yarn/
+  .pnpm/
   tmp/
   var/
