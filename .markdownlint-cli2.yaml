@@ -1,0 +1,25 @@
+globs:
+  - "**/*.md"
+  - "!.*"
+  - "!**/vendor/**"
+  - "!**/node_modules/**"
+  - "!**/Libraries/**"
+  - "!**/Pods/**"
+  - "!**/.build/**"
+  - "!**/Carthage/**"
+  - "!**/DerivedData/**"
+  - "!**/venv/**"
+  - "!**/.venv/**"
+  - "!**/dist/**"
+  - "!**/build/**"
+  - "!**/target/**"
+config:
+  default: true
+  first-line-heading: false
+  line-length: false
+  no-duplicate-heading: false
+  single-h1: false
+  tables: false
+  no-inline-html:
+    allowed_elements:
+      - br
