@@ -182,7 +182,7 @@
   "json": {
     "language": "Ruby",
     "package": "json",
-    "version": "2.19.1",
+    "version": "2.19.2",
     "license": "Ruby",
     "description": "A JSON implementation as a JRuby extension.",
     "website": "https://github.com/ruby/json",
@@ -242,7 +242,7 @@
   "mcp": {
     "language": "Ruby",
     "package": "mcp",
-    "version": "0.8.0",
+    "version": "0.9.0",
     "license": "Apache-2.0",
     "description": "The official Ruby SDK for Model Context Protocol servers and clients",
     "website": "https://github.com/modelcontextprotocol/ruby-sdk",
@@ -290,7 +290,7 @@
   "nokogiri": {
     "language": "Ruby",
     "package": "nokogiri",
-    "version": "1.19.1",
+    "version": "1.19.2",
     "license": "MIT",
     "description": "Nokogiri (鋸) makes it easy and painless to work with XML and HTML from Ruby",
     "website": "https://nokogiri.org",
@@ -758,7 +758,7 @@
   "webmock": {
     "language": "Ruby",
     "package": "webmock",
-    "version": "3.26.1",
+    "version": "3.26.2",
     "license": "MIT",
     "description": "WebMock allows stubbing HTTP requests and setting expectations on HTTP requests.",
     "website": "https://github.com/bblimke/webmock",
