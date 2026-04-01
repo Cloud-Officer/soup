@@ -242,7 +242,7 @@
   "minitest": {
     "language": "Ruby",
     "package": "minitest",
-    "version": "6.0.2",
+    "version": "6.0.3",
     "license": "MIT",
     "description": "minitest provides a complete suite of testing facilities supporting",
     "website": "https://minite.st/",
