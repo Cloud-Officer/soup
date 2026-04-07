@@ -3,10 +3,10 @@
 | **Language** | **Package** | **Version** | **License** | **Description** | **Website** | **Last Verified** | **Risk Level** | **Requirements** | **Verification Reasoning** |
 | :---: | :--- | :---: | :---: | :--- | :--- | :---: | :---: | :--- | :--- |
 | Ruby | activesupport | 8.1.3 | MIT | A toolkit of support libraries and Ruby core extensions extracted from the Rails framework | <https://rubyonrails.org> | 2026-02-25 | Low | Dependency | Dependency |
-| Ruby | addressable | 2.8.9 | Apache-2.0 | Addressable is an alternative implementation to the URI implementation that is | <https://github.com/sporkmonger/addressable> | 2026-02-25 | Low | Dependency | Dependency |
+| Ruby | addressable | 2.9.0 | Apache-2.0 | Addressable is an alternative implementation to the URI implementation that is | <https://github.com/sporkmonger/addressable> | 2026-02-25 | Low | Dependency | Dependency |
 | Ruby | ast | 2.4.3 | MIT | A library for working with Abstract Syntax Trees. | <https://whitequark.github.io/ast/> | 2026-02-25 | Low | Dependency | Dependency |
 | Ruby | base64 | 0.3.0 | Ruby | Support for encoding and decoding binary data using a Base64 representation. | <https://github.com/ruby/base64> | 2023-08-11 | Low | Dependency | Dependency |
-| Ruby | bigdecimal | 4.1.0 | Ruby | This library provides arbitrary-precision decimal floating-point number class. | <https://github.com/ruby/bigdecimal> | 2023-10-26 | Low | Dependency | Dependency |
+| Ruby | bigdecimal | 4.1.1 | Ruby | This library provides arbitrary-precision decimal floating-point number class. | <https://github.com/ruby/bigdecimal> | 2023-10-26 | Low | Dependency | Dependency |
 | Ruby | concurrent-ruby | 1.3.6 | MIT | Modern concurrency tools including agents, futures, promises, thread pools, actors, supervisors, and more. | <http://www.concurrent-ruby.com> | 2026-02-25 | Low | Dependency | Dependency |
 | Ruby | connection_pool | 3.0.2 | MIT | Generic connection pool for Ruby | <https://github.com/mperham/connection_pool> | 2023-10-26 | Low | Dependency | Dependency |
 | Ruby | crack | 1.0.1 | MIT | Really simple JSON and XML parsing, ripped from Merb and Rails. | <https://github.com/jnunemaker/crack> | 2026-02-25 | Low | Dependency | Dependency |
@@ -33,7 +33,7 @@
 | Ruby | public_suffix | 7.0.5 | MIT | PublicSuffix can parse and decompose a domain name into top level domain, domain and subdomains. | <https://simonecarletti.com/code/publicsuffix-ruby> | 2026-02-25 | Low | Dependency | Dependency |
 | Ruby | racc | 1.8.1 | Ruby | Racc is an LALR(1) parser generator. | <https://github.com/ruby/racc> | 2023-06-09 | Low | Dependency | Dependency |
 | Ruby | rainbow | 3.1.1 | MIT | Colorize printed text on ANSI terminals | <https://github.com/sickill/rainbow> | 2026-02-25 | Low | Dependency | Dependency |
-| Ruby | regexp_parser | 2.11.3 | MIT | A library for tokenizing, lexing, and parsing Ruby regular expressions. | <https://github.com/ammar/regexp_parser> | 2026-02-25 | Low | Dependency | Dependency |
+| Ruby | regexp_parser | 2.12.0 | MIT | A library for tokenizing, lexing, and parsing Ruby regular expressions. | <https://github.com/ammar/regexp_parser> | 2026-02-25 | Low | Dependency | Dependency |
 | Ruby | rexml | 3.4.4 | BSD-2-Clause | An XML toolkit for Ruby | <https://github.com/ruby/rexml> | 2026-02-25 | Low | Dependency | Dependency |
 | Ruby | rspec | 3.13.2 | MIT | BDD for Ruby | <https://rspec.info> | 2026-02-25 | Low | Dependency | Dependency |
 | Ruby | rspec-core | 3.13.6 | MIT | BDD for Ruby | <https://rspec.info> | 2026-02-25 | Low | Dependency | Dependency |
