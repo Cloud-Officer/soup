@@ -1,0 +1,85 @@
+---
+name: Auto-merge for code owners
+'on':
+  pull_request_target:
+    types:
+    - opened
+    - reopened
+    - ready_for_review
+    - synchronize
+permissions:
+  contents: write
+  pull-requests: write
+jobs:
+  enable_automerge:
+    name: Enable Auto-merge
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.draft == false
+    timeout-minutes: 30
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        ref: "${{github.event.pull_request.base.sha}}"
+    - name: Check if PR author is a code owner
+      id: check
+      shell: bash
+      run: |
+        set -euo pipefail
+
+        # Find the CODEOWNERS file (GitHub checks these three locations)
+        for path in .github/CODEOWNERS CODEOWNERS docs/CODEOWNERS; do
+          if [ -f "$path" ]; then CODEOWNERS="$path"; break; fi
+        done
+        if [ -z "${CODEOWNERS:-}" ]; then
+          echo "No CODEOWNERS file found"
+          echo "is_owner=false" >> "$GITHUB_OUTPUT"
+          exit 0
+        fi
+
+        # Collect @handles only from the catch-all (*) line — the repo-wide code owners
+        handles=$(grep -E '^\*\s' "$CODEOWNERS" \
+          | grep -oE '@[A-Za-z0-9_.\-]+(/[A-Za-z0-9_.\-]+)?' \
+          | sort -u)
+
+        is_owner=false
+        for h in $handles; do
+          entry="${h#@}"
+          if [[ "$entry" == */* ]]; then
+            # Team handle: org/team-slug
+            team_org="${entry%/*}"
+            team_slug="${entry#*/}"
+            if gh api "orgs/${team_org}/teams/${team_slug}/memberships/${AUTHOR}" \
+                 --jq '.state' 2>/dev/null | grep -q active; then
+              is_owner=true
+              break
+            fi
+          else
+            # Individual user handle
+            if [ "$entry" = "$AUTHOR" ]; then
+              is_owner=true
+              break
+            fi
+          fi
+        done
+
+        echo "is_owner=${is_owner}" >> "$GITHUB_OUTPUT"
+        echo "PR author ${AUTHOR} is_owner=${is_owner}"
+      env:
+        GH_TOKEN: "${{secrets.GH_PAT}}"
+        AUTHOR: "${{github.event.pull_request.user.login}}"
+        ORG: "${{github.repository_owner}}"
+    - name: Approve PR
+      shell: bash
+      if: steps.check.outputs.is_owner == 'true'
+      run: gh pr review --approve "$PR"
+      env:
+        GH_TOKEN: "${{secrets.GITHUB_TOKEN}}"
+        PR: "${{github.event.pull_request.number}}"
+    - name: Enable auto-merge
+      shell: bash
+      if: steps.check.outputs.is_owner == 'true'
+      run: gh pr merge --auto --squash "$PR"
+      env:
+        GH_TOKEN: "${{secrets.GITHUB_TOKEN}}"
+        PR: "${{github.event.pull_request.number}}"
