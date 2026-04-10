@@ -149,7 +149,7 @@
 
 **Key Components:**
 
-- `self.sanitize_description(text, first_sentence:, strip_markdown:)`: Class method that sanitizes package descriptions by extracting the first sentence, wrapping URLs, and stripping markdown characters
+- `self.sanitize_description(text, first_sentence:, strip_markdown:)`: Class method that sanitizes package descriptions by returning nil for nil/empty input, extracting the first sentence, wrapping URLs, and stripping markdown characters
 - Attributes: `file`, `language`, `package`, `version`, `license`, `description`, `website`, `last_verified_at`, `risk_level`, `requirements`, `verification_reasoning`, `dependency`
 - `as_json`: Serializes package to JSON format
 - `to_json`: JSON string representation
