@@ -174,4 +174,4 @@ DEPENDENCIES
   yarn_lock_parser (>= 0.1.0)
 
 BUNDLED WITH
-  4.0.10
+  4.0.6
