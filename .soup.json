@@ -290,7 +290,7 @@
   "parallel": {
     "language": "Ruby",
     "package": "parallel",
-    "version": "2.0.1",
+    "version": "2.1.0",
     "license": "MIT",
     "description": "Run any kind of code in parallel processes",
     "website": "https://github.com/grosser/parallel",
