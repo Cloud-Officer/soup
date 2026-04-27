@@ -85,7 +85,7 @@
 
 ### SOUP Module
 
-**Purpose:** Root module defining constants and configuration for supported package managers and risk levels.
+**Purpose:** Root module defining the IEC 62304 risk level constants used throughout the application.
 
 **Location:** `lib/soup.rb`
 
