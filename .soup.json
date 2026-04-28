@@ -266,7 +266,7 @@
   "nokogiri": {
     "language": "Ruby",
     "package": "nokogiri",
-    "version": "1.19.2",
+    "version": "1.19.3",
     "license": "MIT",
     "description": "Nokogiri (鋸) makes it easy and painless to work with XML and HTML from Ruby",
     "website": "https://nokogiri.org",

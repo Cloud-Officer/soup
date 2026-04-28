@@ -24,7 +24,7 @@
 | Ruby | mini_mime | 1.1.5 | MIT | A minimal mime type library | <https://github.com/discourse/mini_mime> | 2023-03-30 | Low | Dependency | Dependency |
 | Ruby | minitest | 6.0.5 | MIT | minitest provides a complete suite of testing facilities supporting | <https://minite.st/> | 2026-02-25 | Low | Dependency | Dependency |
 | Ruby | multi_xml | 0.8.1 | MIT | Provides swappable XML backends utilizing LibXML, Nokogiri, Ox, or REXML. | <https://github.com/sferik/multi_xml> | 2026-02-25 | Low | Dependency | Dependency |
-| Ruby | nokogiri | 1.19.2 | MIT | Nokogiri (鋸) makes it easy and painless to work with XML and HTML from Ruby | <https://nokogiri.org> | 2024-05-15 | Low | XML parser | Most popular library |
+| Ruby | nokogiri | 1.19.3 | MIT | Nokogiri (鋸) makes it easy and painless to work with XML and HTML from Ruby | <https://nokogiri.org> | 2024-05-15 | Low | XML parser | Most popular library |
 | Ruby | optparse | 0.8.1 | Ruby | OptionParser is a class for command-line option analysis | <https://github.com/ruby/optparse> | 2026-02-25 | Low | Used to parse command line arguments. | Very popular on rubygems.org |
 | Ruby | parallel | 2.1.0 | MIT | Run any kind of code in parallel processes | <https://github.com/grosser/parallel> | 2026-02-25 | Low | Dependency | Dependency |
 | Ruby | parser | 3.3.11.1 | MIT | A Ruby parser written in pure Ruby. | <https://github.com/whitequark/parser> | 2026-02-25 | Low | Dependency | Dependency |
