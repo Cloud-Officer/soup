@@ -77,10 +77,3 @@ jobs:
       env:
         GH_TOKEN: "${{secrets.GITHUB_TOKEN}}"
         PR: "${{github.event.pull_request.number}}"
-    - name: Enable auto-merge
-      shell: bash
-      if: steps.check.outputs.is_owner == 'true'
-      run: gh pr merge --auto --squash "$PR"
-      env:
-        GH_TOKEN: "${{secrets.GITHUB_TOKEN}}"
-        PR: "${{github.event.pull_request.number}}"
