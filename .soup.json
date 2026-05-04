@@ -182,7 +182,7 @@
   "json": {
     "language": "Ruby",
     "package": "json",
-    "version": "2.19.4",
+    "version": "2.19.5",
     "license": "Ruby",
     "description": "A JSON implementation as a JRuby extension.",
     "website": "https://github.com/ruby/json",
@@ -242,7 +242,7 @@
   "minitest": {
     "language": "Ruby",
     "package": "minitest",
-    "version": "6.0.5",
+    "version": "6.0.6",
     "license": "MIT",
     "description": "minitest provides a complete suite of testing facilities supporting",
     "website": "https://minite.st/",
@@ -254,7 +254,7 @@
   "multi_xml": {
     "language": "Ruby",
     "package": "multi_xml",
-    "version": "0.8.1",
+    "version": "0.9.0",
     "license": "MIT",
     "description": "Provides swappable XML backends utilizing LibXML, Nokogiri, Ox, or REXML.",
     "website": "https://github.com/sferik/multi_xml",

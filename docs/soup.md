@@ -17,13 +17,13 @@
 | Ruby | hashdiff | 1.2.1 | MIT | Hashdiff is a diff lib to compute the smallest difference between two hashes | <https://github.com/liufengyun/hashdiff> | 2026-02-25 | Low | Dependency | Dependency |
 | Ruby | httparty | 0.24.2 | MIT | Makes http fun! Also, makes consuming restful web services dead easy. | <https://github.com/jnunemaker/httparty> | 2026-02-25 | Medium | Makes http fun! Also, makes consuming restful web services dead easy. | Very popular on rubygems.org |
 | Ruby | i18n | 1.14.8 | MIT | New wave Internationalization support for Ruby. | <https://github.com/ruby-i18n/i18n> | 2026-02-25 | Low | Dependency | Dependency |
-| Ruby | json | 2.19.4 | Ruby | A JSON implementation as a JRuby extension. | <https://github.com/ruby/json> | 2026-02-25 | Low | Used to read package manager and cache files. | Very popular on rubygems.org |
+| Ruby | json | 2.19.5 | Ruby | A JSON implementation as a JRuby extension. | <https://github.com/ruby/json> | 2026-02-25 | Low | Used to read package manager and cache files. | Very popular on rubygems.org |
 | Ruby | language_server-protocol | 3.17.0.5 | MIT | A Language Server Protocol SDK | <https://github.com/mtsmfm/language_server-protocol-ruby> | 2023-06-29 | Low | Dependency | Dependency |
 | Ruby | lint_roller | 1.1.0 | MIT | A plugin specification for linter and formatter rulesets | <https://github.com/standardrb/lint_roller> | 2025-02-15 | Low | Dependency | Dependency |
 | Ruby | logger | 1.7.0 | Ruby | Provides a simple logging utility for outputting messages. | <https://github.com/ruby/logger> | 2024-08-12 | Low | Dependency | Dependency |
 | Ruby | mini_mime | 1.1.5 | MIT | A minimal mime type library | <https://github.com/discourse/mini_mime> | 2023-03-30 | Low | Dependency | Dependency |
-| Ruby | minitest | 6.0.5 | MIT | minitest provides a complete suite of testing facilities supporting | <https://minite.st/> | 2026-02-25 | Low | Dependency | Dependency |
-| Ruby | multi_xml | 0.8.1 | MIT | Provides swappable XML backends utilizing LibXML, Nokogiri, Ox, or REXML. | <https://github.com/sferik/multi_xml> | 2026-02-25 | Low | Dependency | Dependency |
+| Ruby | minitest | 6.0.6 | MIT | minitest provides a complete suite of testing facilities supporting | <https://minite.st/> | 2026-02-25 | Low | Dependency | Dependency |
+| Ruby | multi_xml | 0.9.0 | MIT | Provides swappable XML backends utilizing LibXML, Nokogiri, Ox, or REXML. | <https://github.com/sferik/multi_xml> | 2026-02-25 | Low | Dependency | Dependency |
 | Ruby | nokogiri | 1.19.3 | MIT | Nokogiri (鋸) makes it easy and painless to work with XML and HTML from Ruby | <https://nokogiri.org> | 2024-05-15 | Low | XML parser | Most popular library |
 | Ruby | optparse | 0.8.1 | Ruby | OptionParser is a class for command-line option analysis | <https://github.com/ruby/optparse> | 2026-02-25 | Low | Used to parse command line arguments. | Very popular on rubygems.org |
 | Ruby | parallel | 2.1.0 | MIT | Run any kind of code in parallel processes | <https://github.com/grosser/parallel> | 2026-02-25 | Low | Dependency | Dependency |
