@@ -11,14 +11,21 @@ module SOUP
 
     def parse(file, packages)
       lock_file = File.readlines(file)
-      main_file = File.read(file.gsub('buildscript-gradle.lockfile', 'build.gradle'))
+      main_file = File.read(file.sub(/(?:buildscript-)?gradle\.lockfile\z/, 'build.gradle'))
+      is_buildscript = File.basename(file) == 'buildscript-gradle.lockfile'
 
       lock_file.each do |line|
         next if line.strip.start_with?('#')
 
         package_name, type = line.strip.split('=')
 
-        next unless type == 'classpath'
+        if is_buildscript
+          next unless type == 'classpath'
+        else
+          next unless type&.split(',')&.any? do |config|
+            config.end_with?('RuntimeClasspath') && !config.include?('Test') && !config.include?('Debug')
+          end
+        end
 
         group_id, artifact_id, version = package_name.split(':')
         puts("Checking #{group_id}:#{artifact_id} #{version}...")

@@ -91,7 +91,7 @@ module SOUP
         @skip_composer = true
       end
 
-      @parser.on('', '--skip_gradle', 'Ignore Kotlin/Gradle/build.gradle/buildscript-gradle.lockfile even if detected') do
+      @parser.on('', '--skip_gradle', 'Ignore Kotlin/Gradle/build.gradle/buildscript-gradle.lockfile/gradle.lockfile even if detected') do
         @skip_gradle = true
       end
 
