@@ -13,6 +13,7 @@ globs:
   - "!**/dist/**"
   - "!**/build/**"
   - "!**/target/**"
+  - "!docs/code-review.md"
 config:
   default: true
   first-line-heading: false

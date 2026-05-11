@@ -75,5 +75,5 @@ jobs:
       if: steps.check.outputs.is_owner == 'true'
       run: gh pr review --approve "$PR"
       env:
-        GH_TOKEN: "${{secrets.GITHUB_TOKEN}}"
+        GH_TOKEN: "${{secrets.GH_BOT_PAT}}"
         PR: "${{github.event.pull_request.number}}"
