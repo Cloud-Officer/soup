@@ -174,4 +174,53 @@ RSpec.describe(SOUP::GradleParser) do
       expect(packages['com.example:library'].dependency).to(be(true))
     end
   end
+
+  context 'when parsing an application gradle.lockfile (runtime classpath)' do
+    let(:runtime_lock_content) do
+      [
+        "# Gradle dependency lock file\n",
+        "androidx.activity:activity-compose:1.10.1=googleProdDebugRuntimeClasspath,googleProdReleaseRuntimeClasspath\n",
+        "androidx.test:runner:1.5.2=googleProdReleaseUnitTestRuntimeClasspath\n",
+        "com.example:debug-only:1.0.0=googleProdDebugRuntimeClasspath\n",
+        "com.example:compile-only:1.0.0=googleProdReleaseCompileClasspath\n",
+        "com.example:runtime-lib:2.0.0=runtimeClasspath\n",
+        "empty:no-config:0=\n"
+      ]
+    end
+
+    before do
+      allow(File).to(receive(:readlines).with('app/gradle.lockfile').and_return(runtime_lock_content))
+      allow(File).to(receive(:read).with('app/build.gradle').and_return('implementation "androidx.activity:activity-compose:1.10.1"'))
+
+      stub_request(:get, %r{search\.maven\.org/solrsearch/select})
+        .to_return(status: 200, body: maven_response)
+    end
+
+    it 'derives the build.gradle path from the lockfile location' do
+      packages = {}
+      expect { parser.parse('app/gradle.lockfile', packages) }.not_to(raise_error)
+    end
+
+    it 'includes production runtime classpath entries', :aggregate_failures do
+      packages = {}
+      parser.parse('app/gradle.lockfile', packages)
+      expect(packages).to(have_key('androidx.activity:activity-compose'))
+      expect(packages).to(have_key('com.example:runtime-lib'))
+    end
+
+    it 'excludes test, debug-only, and compile-only configurations', :aggregate_failures do
+      packages = {}
+      parser.parse('app/gradle.lockfile', packages)
+      expect(packages).not_to(have_key('androidx.test:runner'))
+      expect(packages).not_to(have_key('com.example:debug-only'))
+      expect(packages).not_to(have_key('com.example:compile-only'))
+    end
+
+    it 'flags transitive dependencies not declared in build.gradle' do
+      packages = {}
+      parser.parse('app/gradle.lockfile', packages)
+      expect(packages['com.example:runtime-lib'].dependency).to(be(true))
+      expect(packages['androidx.activity:activity-compose'].dependency).to(be(false))
+    end
+  end
 end
