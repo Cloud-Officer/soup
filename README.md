@@ -32,7 +32,7 @@ The following package managers are supported:
 
 * Bundler (Gemfile.lock)
 * Composer (composer.lock)
-* Gradle (buildscript-gradle.lockfile)
+* Gradle (buildscript-gradle.lockfile, gradle.lockfile)
 * NPM (package-lock.json)
 * PIP (requirements.txt)
 * SPM (Package.resolved)
@@ -71,7 +71,7 @@ options
         --no_prompt                  Do not prompt for missing information and fail immediately
         --skip_bundler               Ignore Ruby/Bundler/Gemfile/Gemfile.lock even if detected
         --skip_composer              Ignore PHP/Composer/composer.json/composer.lock even if detected
-        --skip_gradle                Ignore Kotlin/Gradle/build.gradle/buildscript-gradle.lockfile even if detected
+        --skip_gradle                Ignore Kotlin/Gradle/build.gradle/buildscript-gradle.lockfile/gradle.lockfile even if detected
         --skip_npm                   Ignore JS/NPM/package.json/package-lock.json even if detected
         --skip_pip                   Ignore Python/PIP/requirements.txt even if detected
         --skip_spm                   Ignore Swift/SPM/Package.swift/Package.resolved even if detected
