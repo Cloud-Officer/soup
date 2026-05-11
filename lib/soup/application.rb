@@ -26,6 +26,7 @@ module SOUP
     'buildscript-gradle.lockfile': { parser: GradleParser, skip: :skip_gradle },
     'composer.lock': { parser: ComposerParser, skip: :skip_composer },
     'Gemfile.lock': { parser: BundlerParser, skip: :skip_bundler },
+    'gradle.lockfile': { parser: GradleParser, skip: :skip_gradle },
     'Package.resolved': { parser: SPMParser, skip: :skip_spm },
     'package-lock.json': { parser: NPMParser, skip: :skip_npm },
     'Podfile.lock': { parser: nil, skip: :skip_cocoapods }, # Disabled: cocoapods-core requires activesupport < 8
