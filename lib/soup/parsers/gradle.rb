@@ -23,7 +23,8 @@ module SOUP
           next unless type == 'classpath'
         else
           next unless type&.split(',')&.any? do |config|
-            config.end_with?('RuntimeClasspath') && !config.include?('Test') && !config.include?('Debug')
+            lower = config.downcase
+            lower.end_with?('runtimeclasspath') && !lower.include?('test') && !lower.include?('debug')
           end
         end
 
