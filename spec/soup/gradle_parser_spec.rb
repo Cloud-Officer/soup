@@ -198,7 +198,9 @@ RSpec.describe(SOUP::GradleParser) do
 
     it 'derives the build.gradle path from the lockfile location' do
       packages = {}
-      expect { parser.parse('app/gradle.lockfile', packages) }.not_to(raise_error)
+      expect do
+        parser.parse('app/gradle.lockfile', packages)
+      end.not_to(raise_error)
     end
 
     it 'includes production runtime classpath entries', :aggregate_failures do
@@ -216,7 +218,7 @@ RSpec.describe(SOUP::GradleParser) do
       expect(packages).not_to(have_key('com.example:compile-only'))
     end
 
-    it 'flags transitive dependencies not declared in build.gradle' do
+    it 'flags transitive dependencies not declared in build.gradle', :aggregate_failures do
       packages = {}
       parser.parse('app/gradle.lockfile', packages)
       expect(packages['com.example:runtime-lib'].dependency).to(be(true))

@@ -230,13 +230,13 @@
 
 ### SOUP::GradleParser
 
-**Purpose:** Parses Kotlin/Gradle buildscript-gradle.lockfile and fetches metadata from Maven repositories.
+**Purpose:** Parses Kotlin/Gradle `buildscript-gradle.lockfile` (buildscript classpath) and `gradle.lockfile` (runtime classpath) files, and fetches metadata from Maven repositories.
 
 **Location:** `lib/soup/parsers/gradle.rb`
 
 **Key Components:**
 
-- `parse(file, packages)`: Parses lock file and fetches package details from Maven Central or fallback repositories
+- `parse(file, packages)`: Parses lock file and fetches package details from Maven Central or fallback repositories. Selects `classpath` entries for `buildscript-gradle.lockfile` and non-test, non-debug `RuntimeClasspath` entries for `gradle.lockfile`
 - `REPOSITORY_URLS`: List of Maven repository URLs for fallback lookups
 
 **External Dependencies:**
