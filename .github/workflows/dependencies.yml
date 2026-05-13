@@ -5,7 +5,6 @@ name: Cron Dependencies
   - cron: 0 9 * * 1
 env:
   RUBY-BUNDLER-CACHE: 'false'
-  XCODE-VERSION: 16.4.0
 jobs:
   update_dependencies:
     name: Update Dependencies
@@ -22,7 +21,6 @@ jobs:
       uses: cloud-officer/ci-actions/setup@v2
       with:
         ruby-bundler-cache: "${{env.RUBY-BUNDLER-CACHE}}"
-        xcode-version: "${{env.XCODE-VERSION}}"
         github-token: "${{secrets.GH_PAT}}"
     - name: Close Stale Dependency PRs
       shell: bash
