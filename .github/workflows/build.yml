@@ -20,7 +20,6 @@ permissions:
   pull-requests: read
 env:
   RUBY-BUNDLER-CACHE: 'false'
-  XCODE-VERSION: 26.5
 jobs:
   variables:
     name: Prepare Variables
@@ -188,7 +187,6 @@ jobs:
       if: "${{needs.variables.outputs.SKIP_LICENSES != '1' || needs.variables.outputs.SKIP_TESTS != '1'}}"
       with:
         ruby-bundler-cache: "${{env.RUBY-BUNDLER-CACHE}}"
-        xcode-version: "${{env.XCODE-VERSION}}"
         github-token: "${{secrets.GH_PAT}}"
     - name: Bundler
       shell: bash
