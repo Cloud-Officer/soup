@@ -5,7 +5,7 @@ name: Cron Dependencies
   - cron: 0 9 * * 1
 env:
   RUBY-BUNDLER-CACHE: 'false'
-  XCODE-VERSION: 16.4.0
+  XCODE-VERSION: 26.5
 jobs:
   update_dependencies:
     name: Update Dependencies

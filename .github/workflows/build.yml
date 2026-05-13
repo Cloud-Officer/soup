@@ -20,7 +20,7 @@ permissions:
   pull-requests: read
 env:
   RUBY-BUNDLER-CACHE: 'false'
-  XCODE-VERSION: 16.4.0
+  XCODE-VERSION: 26.5
 jobs:
   variables:
     name: Prepare Variables
