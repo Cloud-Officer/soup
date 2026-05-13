@@ -1,5 +1,5 @@
-# Use Ubuntu 24.04 as the base image
-FROM ubuntu:24.04
+# Use Ubuntu 26.04 as the base image
+FROM ubuntu:26.04
 
 # Labels
 LABEL org.opencontainers.image.source=https://github.com/Cloud-Officer/soup
