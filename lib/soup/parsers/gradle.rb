@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
 require 'nokogiri'
+require 'parallel'
 
+require_relative '../http_client'
 require_relative '../package'
 
 module SOUP
@@ -14,61 +16,74 @@ module SOUP
       main_file = File.read(file.sub(/(?:buildscript-)?gradle\.lockfile\z/, 'build.gradle'))
       is_buildscript = File.basename(file) == 'buildscript-gradle.lockfile'
 
-      lock_file.each do |line|
-        next if line.strip.start_with?('#')
+      work_items =
+        lock_file.filter_map do |line|
+          next if line.strip.start_with?('#')
 
-        package_name, type = line.strip.split('=')
+          package_name, type = line.strip.split('=')
 
-        if is_buildscript
-          next unless type == 'classpath'
-        else
-          next unless type&.split(',')&.any? do |config|
-            lower = config.downcase
-            lower.end_with?('runtimeclasspath') && !lower.include?('test') && !lower.include?('debug')
+          if is_buildscript
+            next unless type == 'classpath'
+          else
+            next unless type&.split(',')&.any? do |config|
+              lower = config.downcase
+              lower.end_with?('runtimeclasspath') && !lower.include?('test') && !lower.include?('debug')
+            end
           end
+
+          package_name.split(':')
         end
 
-        group_id, artifact_id, version = package_name.split(':')
-        puts("Checking #{group_id}:#{artifact_id} #{version}...")
-        response = HttpClient.get("https://search.maven.org/solrsearch/select?q=g:%22#{group_id}%22+AND+a:%22#{artifact_id}%22+AND+v:%22#{version}%22&rows=1&wt=json")
-
-        parsed = JSON.parse(response.body) if response.code == 200
-        docs = parsed&.dig('response', 'docs')
-
-        if response.code == 200 && docs&.length == 1
-          license = docs[0]['l']
-          description = docs[0]['p']
-          website = docs[0]['home_page']
-        else
-          REPOSITORY_URLS.each do |url|
-            response = HttpClient.get("#{url}/#{group_id.tr('.', '/')}/#{artifact_id}/#{version}/#{artifact_id}-#{version}.pom")
-
-            next unless response.code == 200
-
-            xml_doc = Nokogiri::XML(response.body)
-            xml_doc.remove_namespaces!
-            license = xml_doc.xpath('//licenses/license/name').text
-            description = xml_doc.xpath('//description').text
-            website = xml_doc.xpath('/project/url').text
-            break
-          end
+      results =
+        Parallel.map(work_items, in_threads: HttpClient::THREAD_COUNT) do |group_id, artifact_id, version|
+          fetch_package(file, main_file, group_id, artifact_id, version)
         end
 
-        if response.code != 200
-          puts("Could not find #{group_id}:#{artifact_id} #{version}...")
-          next
-        end
+      results.compact.each { |package| packages[package.package] = package }
+    end
 
-        package = Package.new("#{group_id}:#{artifact_id}")
-        package.file = file
-        package.language = 'Kotlin'
-        package.version = version
-        package.license = license
-        package.description = description
-        package.website = website
-        package.dependency = !main_file.include?("#{group_id}:#{artifact_id}")
-        packages[package.package] = package
+    private
+
+    def fetch_package(file, main_file, group_id, artifact_id, version)
+      puts("Checking #{group_id}:#{artifact_id} #{version}...")
+      response = HttpClient.get("https://search.maven.org/solrsearch/select?q=g:%22#{group_id}%22+AND+a:%22#{artifact_id}%22+AND+v:%22#{version}%22&rows=1&wt=json")
+
+      parsed = JSON.parse(response.body) if response.code == 200
+      docs = parsed&.dig('response', 'docs')
+
+      if response.code == 200 && docs&.length == 1
+        license = docs[0]['l']
+        description = docs[0]['p']
+        website = docs[0]['home_page']
+      else
+        REPOSITORY_URLS.each do |url|
+          response = HttpClient.get("#{url}/#{group_id.tr('.', '/')}/#{artifact_id}/#{version}/#{artifact_id}-#{version}.pom")
+
+          next unless response.code == 200
+
+          xml_doc = Nokogiri::XML(response.body)
+          xml_doc.remove_namespaces!
+          license = xml_doc.xpath('//licenses/license/name').text
+          description = xml_doc.xpath('//description').text
+          website = xml_doc.xpath('/project/url').text
+          break
+        end
       end
+
+      if response.code != 200
+        puts("Could not find #{group_id}:#{artifact_id} #{version}...")
+        return
+      end
+
+      package = Package.new("#{group_id}:#{artifact_id}")
+      package.file = file
+      package.language = 'Kotlin'
+      package.version = version
+      package.license = license
+      package.description = description
+      package.website = website
+      package.dependency = !main_file.include?("#{group_id}:#{artifact_id}")
+      package
     end
   end
 end

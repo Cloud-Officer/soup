@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+require 'parallel'
+
+require_relative '../http_client'
 require_relative '../package'
 
 module SOUP
@@ -9,43 +12,57 @@ module SOUP
       main_file = File.read(file.gsub('package-lock.json', 'package.json'))
       all_packages = lock_file['packages']
 
-      all_packages.each do |key, value|
-        next if key.empty?
+      work_items = all_packages.reject { |key, value| key.empty? || value['dev'] }
 
-        next if value['dev']
-
-        name = key.split('node_modules/').last
-        puts("Checking #{name} #{value['version']}...")
-
-        begin
-          response = HttpClient.get("https://registry.npmjs.org/#{name}")
-        rescue Net::OpenTimeout, Net::ReadTimeout
-          next
+      results =
+        Parallel.map(work_items, in_threads: HttpClient::THREAD_COUNT) do |key, value|
+          fetch_package(file, main_file, key, value)
         end
 
-        if response.code != 200
-          puts("Error: #{response.message}!")
-          next
-        end
+      results.compact.each { |package| packages[package.package] = package }
+    end
 
-        package_details = JSON.parse(response.body)['versions'][value['version']]
+    private
 
-        if package_details.nil?
-          puts("Error: Package #{name} version #{value['version']} not found!")
-          next
-        end
+    def fetch_package(file, main_file, key, value)
+      name = key.split('node_modules/').last
+      puts("Checking #{name} #{value['version']}...")
 
-        package = Package.new(name)
-        package.file = file
-        package.language = 'JS'
-        package.version = value['version']
-        package.license = package_details['license']
-        package.license = 'NOASSERTION' if package.license&.include?('Unlicense')
-        package.description = Package.sanitize_description(package_details['description'], strip_markdown: true)
-        package.website = package_details['homepage']
-        package.dependency = !main_file.include?(name)
-        packages[package.package] = package
+      begin
+        response = HttpClient.get("https://registry.npmjs.org/#{name}")
+      rescue Net::OpenTimeout, Net::ReadTimeout
+        return
       end
+
+      if response.code != 200
+        puts("Error: #{response.message}!")
+        return
+      end
+
+      versions = JSON.parse(response.body)['versions']
+
+      if versions.nil?
+        puts("Error: Package #{name} has no versions on registry!")
+        return
+      end
+
+      package_details = versions[value['version']]
+
+      if package_details.nil?
+        puts("Error: Package #{name} version #{value['version']} not found!")
+        return
+      end
+
+      package = Package.new(name)
+      package.file = file
+      package.language = 'JS'
+      package.version = value['version']
+      package.license = package_details['license']
+      package.license = 'NOASSERTION' if package.license&.include?('Unlicense')
+      package.description = Package.sanitize_description(package_details['description'], strip_markdown: true)
+      package.website = package_details['homepage']
+      package.dependency = !main_file.include?(name)
+      package
     end
   end
 end
