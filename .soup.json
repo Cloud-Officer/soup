@@ -294,10 +294,10 @@
     "license": "MIT",
     "description": "Run any kind of code in parallel processes",
     "website": "https://github.com/grosser/parallel",
-    "last_verified_at": "2026-02-25",
+    "last_verified_at": "2026-05-14",
     "risk_level": "Low",
-    "requirements": "Dependency",
-    "verification_reasoning": "Dependency"
+    "requirements": "Used to parallelize HTTP fetches across CPU cores in each parser.",
+    "verification_reasoning": "Very popular on rubygems.org"
   },
   "parser": {
     "language": "Ruby",

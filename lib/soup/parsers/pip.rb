@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
 require 'json'
+require 'parallel'
 
+require_relative '../http_client'
 require_relative '../package'
 
 module SOUP
@@ -14,6 +16,7 @@ module SOUP
           ''
         end
 
+      work_items = []
       File.foreach(file) do |line|
         next if line.strip.empty?
 
@@ -24,34 +27,47 @@ module SOUP
 
         next if pip_package&.strip&.empty?
 
-        puts("Checking #{pip_package} #{version}...")
-        response = HttpClient.get("https://pypi.python.org/pypi/#{pip_package.sub(/\[[^\]]+\]/, '')}/json")
-
-        raise(response.message) unless response.code == 200
-
-        package_details = JSON.parse(response.body)
-        package = Package.new(pip_package)
-        package.file = file
-        package.language = 'Python'
-        package.version = version
-        package.description = Package.sanitize_description(package_details['info']['summary'], first_sentence: true)
-        package.website = package_details['info']['home_page']&.strip
-        package.dependency = !main_file.include?(package.package)
-
-        package_details['info']['classifiers'].each do |classifier|
-          if classifier.include?('License') and classifier.split('::').length > 2
-            classifier_license = classifier.split('::').last.strip.split("\n").first
-            package.license = "#{package.license} #{classifier_license}".strip
-          end
-        end
-
-        if package.license.nil? or package.license.empty?
-          license = package_details['info']['license']&.strip&.split("\n")
-          package.license = license&.first
-        end
-
-        packages[package.package] = package
+        work_items << [pip_package, version]
       end
+
+      results =
+        Parallel.map(work_items, in_threads: HttpClient::THREAD_COUNT) do |pip_package, version|
+          fetch_package(file, main_file, pip_package, version)
+        end
+
+      results.compact.each { |package| packages[package.package] = package }
+    end
+
+    private
+
+    def fetch_package(file, main_file, pip_package, version)
+      puts("Checking #{pip_package} #{version}...")
+      response = HttpClient.get("https://pypi.python.org/pypi/#{pip_package.sub(/\[[^\]]+\]/, '')}/json")
+
+      raise(response.message) unless response.code == 200
+
+      package_details = JSON.parse(response.body)
+      package = Package.new(pip_package)
+      package.file = file
+      package.language = 'Python'
+      package.version = version
+      package.description = Package.sanitize_description(package_details['info']['summary'], first_sentence: true)
+      package.website = package_details['info']['home_page']&.strip
+      package.dependency = !main_file.include?(package.package)
+
+      package_details['info']['classifiers'].each do |classifier|
+        if classifier.include?('License') and classifier.split('::').length > 2
+          classifier_license = classifier.split('::').last.strip.split("\n").first
+          package.license = "#{package.license} #{classifier_license}".strip
+        end
+      end
+
+      if package.license.nil? or package.license.empty?
+        license = package_details['info']['license']&.strip&.split("\n")
+        package.license = license&.first
+      end
+
+      package
     end
   end
 end

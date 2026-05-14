@@ -1,14 +1,17 @@
 # frozen_string_literal: true
 
+require 'etc'
 require 'httparty'
 
 module SOUP
   module HttpClient
     MAX_RETRIES = 3
     DEFAULT_TIMEOUT = 5
+    THREAD_COUNT = Etc.nprocessors
 
     private_constant :MAX_RETRIES
     private_constant :DEFAULT_TIMEOUT
+    public_constant :THREAD_COUNT
 
     def self.get(url, max_retries: MAX_RETRIES, **options)
       retries = 0

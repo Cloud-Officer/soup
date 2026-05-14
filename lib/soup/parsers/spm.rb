@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
 require 'json'
+require 'parallel'
 
+require_relative '../http_client'
 require_relative '../package'
 
 module SOUP
@@ -22,36 +24,45 @@ module SOUP
 
       token = ENV.fetch('GITHUB_TOKEN', '')
 
-      lock_file['pins'].each do |pin|
-        puts("Checking #{pin['identity'] || pin['package']} #{pin['state']['version']}...")
-        location = pin['location'] || pin['repositoryURL']
-        url = "https://api.github.com/repos/#{location.gsub('git@github.com:', '').gsub('https://github.com/', '').gsub('.git', '')}"
+      results =
+        Parallel.map(lock_file['pins'], in_threads: HttpClient::THREAD_COUNT) do |pin|
+          fetch_package(file, main_file, token, pin)
+        end
 
-        response =
-          if token.empty?
-            HttpClient.get(url)
-          else
-            HttpClient.get(url, headers: { Authorization: "token #{token}" })
-          end
+      results.compact.each { |package| packages[package.package] = package }
+    end
 
-        raise("Error: #{response.message}! Please set GITHUB_TOKEN.") if response.message.include?('rate limit') || response.message.include?('Bad credentials')
+    private
 
-        next unless response.code == 200
+    def fetch_package(file, main_file, token, pin)
+      puts("Checking #{pin['identity'] || pin['package']} #{pin['state']['version']}...")
+      location = pin['location'] || pin['repositoryURL']
+      url = "https://api.github.com/repos/#{location.gsub('git@github.com:', '').gsub('https://github.com/', '').gsub('.git', '')}"
 
-        package_details = JSON.parse(response.body)
+      response =
+        if token.empty?
+          HttpClient.get(url)
+        else
+          HttpClient.get(url, headers: { Authorization: "token #{token}" })
+        end
 
-        next if package_details['private']
+      raise("Error: #{response.message}! Please set GITHUB_TOKEN.") if response.message.include?('rate limit') || response.message.include?('Bad credentials')
 
-        package = Package.new(package_details['name'])
-        package.file = file
-        package.language = 'Swift'
-        package.version = pin['state']['version']&.strip
-        package.license = package_details.dig('license', 'spdx_id')&.strip
-        package.description = Package.sanitize_description(package_details['description'], first_sentence: true)
-        package.website = package_details['html_url']&.strip
-        package.dependency = !main_file.include?(package.package)
-        packages[package.package] = package
-      end
+      return unless response.code == 200
+
+      package_details = JSON.parse(response.body)
+
+      return if package_details['private']
+
+      package = Package.new(package_details['name'])
+      package.file = file
+      package.language = 'Swift'
+      package.version = pin['state']['version']&.strip
+      package.license = package_details.dig('license', 'spdx_id')&.strip
+      package.description = Package.sanitize_description(package_details['description'], first_sentence: true)
+      package.website = package_details['html_url']&.strip
+      package.dependency = !main_file.include?(package.package)
+      package
     end
   end
 end

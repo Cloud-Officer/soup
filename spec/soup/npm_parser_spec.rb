@@ -118,4 +118,18 @@ RSpec.describe(SOUP::NPMParser) do
       expect(packages).to(be_empty)
     end
   end
+
+  context 'when registry response has no versions key' do
+    before do
+      stub_request(:get, 'https://registry.npmjs.org/lodash')
+        .to_return(status: 200, body: { _id: 'lodash', name: 'lodash', time: {} }.to_json)
+    end
+
+    it 'handles unpublished or stub-only packages without raising', :aggregate_failures do
+      packages = {}
+      expect { parser.parse('package-lock.json', packages) }
+        .not_to(raise_error)
+      expect(packages).to(be_empty)
+    end
+  end
 end
