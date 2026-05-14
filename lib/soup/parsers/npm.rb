@@ -9,14 +9,16 @@ module SOUP
   class NPMParser
     def parse(file, packages)
       lock_file = JSON.parse(File.read(file))
-      main_file = File.read(file.gsub('package-lock.json', 'package.json'))
+      main_file_json = JSON.parse(File.read(file.gsub('package-lock.json', 'package.json')))
+      direct_deps = (main_file_json['dependencies'] || {}).keys |
+                    (main_file_json['devDependencies'] || {}).keys
       all_packages = lock_file['packages']
 
       work_items = all_packages.reject { |key, value| key.empty? || value['dev'] }
 
       results =
         Parallel.map(work_items, in_threads: HttpClient::THREAD_COUNT) do |key, value|
-          fetch_package(file, main_file, key, value)
+          fetch_package(file, direct_deps, key, value)
         end
 
       results.compact.each { |package| packages[package.package] = package }
@@ -24,7 +26,7 @@ module SOUP
 
     private
 
-    def fetch_package(file, main_file, key, value)
+    def fetch_package(file, direct_deps, key, value)
       name = key.split('node_modules/').last
       puts("Checking #{name} #{value['version']}...")
 
@@ -57,11 +59,12 @@ module SOUP
       package.file = file
       package.language = 'JS'
       package.version = value['version']
-      package.license = package_details['license']
-      package.license = 'NOASSERTION' if package.license&.include?('Unlicense')
+      raw_license = package_details['license']
+      package.license = raw_license.is_a?(Hash) ? raw_license['type'].to_s : raw_license.to_s
+      package.license = 'NOASSERTION' if package.license.include?('Unlicense')
       package.description = Package.sanitize_description(package_details['description'], strip_markdown: true)
       package.website = package_details['homepage']
-      package.dependency = !main_file.include?(name)
+      package.dependency = !direct_deps.include?(name)
       package
     end
   end

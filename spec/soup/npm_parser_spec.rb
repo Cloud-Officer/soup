@@ -132,4 +132,47 @@ RSpec.describe(SOUP::NPMParser) do
       expect(packages).to(be_empty)
     end
   end
+
+  context 'when package only appears in package.json overrides' do
+    let(:main_file) { '{"dependencies":{"lodash":"^4.17.0"},"overrides":{"lodash":"4.17.21"}}' }
+
+    before do
+      stub_request(:get, 'https://registry.npmjs.org/lodash')
+        .to_return(status: 200, body: registry_response)
+    end
+
+    it 'classifies overrides-only packages as transitive (not direct)' do
+      packages = {}
+      parser.parse('package-lock.json', packages)
+      expect(packages['lodash'].dependency).to(be(false))
+    end
+  end
+
+  context 'when package is in overrides but not declared as a direct dep' do
+    let(:lock_file) do
+      {
+        packages: {
+          '': { version: '1.0.0' }, # rubocop:disable Naming/VariableNumber
+          'node_modules/transitive-only': { version: '1.0.0' }
+        }
+      }.to_json
+    end
+
+    let(:main_file) { '{"dependencies":{},"overrides":{"transitive-only":"1.0.0"}}' }
+
+    let(:transitive_response) do
+      { versions: { '1.0.0': { license: 'MIT', description: 'x', homepage: 'https://example.com' } } }.to_json
+    end
+
+    before do
+      stub_request(:get, 'https://registry.npmjs.org/transitive-only')
+        .to_return(status: 200, body: transitive_response)
+    end
+
+    it 'is treated as transitive even though it appears in overrides' do
+      packages = {}
+      parser.parse('package-lock.json', packages)
+      expect(packages['transitive-only'].dependency).to(be(true))
+    end
+  end
 end
