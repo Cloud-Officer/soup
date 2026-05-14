@@ -80,7 +80,7 @@ module SOUP
       package.language = 'Kotlin'
       package.version = version
       package.license = license
-      package.description = description
+      package.description = Package.sanitize_description(description)
       package.website = website
       package.dependency = !main_file.include?("#{group_id}:#{artifact_id}")
       package
