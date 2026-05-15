@@ -172,10 +172,12 @@
 
 - `MAX_RETRIES`: Maximum retry attempts (3)
 - `DEFAULT_TIMEOUT`: HTTP request timeout in seconds (5)
+- `THREAD_COUNT`: Public constant set to `Etc.nprocessors`; used by all parsers as the thread-pool size for parallel metadata fetching
 - `self.get(url, max_retries:, **options)`: Performs HTTP GET with automatic retry on `Net::OpenTimeout` and `Net::ReadTimeout`
 
 **External Dependencies:**
 
+- `etc`
 - `httparty`
 
 ### SOUP::GenericParser
@@ -196,11 +198,12 @@
 
 **Key Components:**
 
-- `parse(file, packages)`: Parses lock file and fetches package details from RubyGems
+- `parse(file, packages)`: Parses lock file and fetches package details from RubyGems, fetching metadata for all specs in parallel via `Parallel.map(..., in_threads: HttpClient::THREAD_COUNT)`
 
 **External Dependencies:**
 
 - `bundler`
+- `parallel`
 
 ### SOUP::CocoaPodsParser
 
@@ -236,12 +239,13 @@
 
 **Key Components:**
 
-- `parse(file, packages)`: Parses lock file and fetches package details from Maven Central or fallback repositories. Selects `classpath` entries for `buildscript-gradle.lockfile` and non-test, non-debug `RuntimeClasspath` entries for `gradle.lockfile`
+- `parse(file, packages)`: Parses lock file and fetches package details from Maven Central or fallback repositories, in parallel via `Parallel.map(..., in_threads: HttpClient::THREAD_COUNT)`. Selects `classpath` entries for `buildscript-gradle.lockfile` and non-test, non-debug `RuntimeClasspath` entries for `gradle.lockfile`
 - `REPOSITORY_URLS`: List of Maven repository URLs for fallback lookups
 
 **External Dependencies:**
 
 - `nokogiri`
+- `parallel`
 
 ### SOUP::NPMParser
 
@@ -251,7 +255,11 @@
 
 **Key Components:**
 
-- `parse(file, packages)`: Parses lock file and fetches package details from NPM registry
+- `parse(file, packages)`: Parses lock file and fetches package details from NPM registry in parallel via `Parallel.map(..., in_threads: HttpClient::THREAD_COUNT)`
+
+**External Dependencies:**
+
+- `parallel`
 
 ### SOUP::PIPParser
 
@@ -261,7 +269,11 @@
 
 **Key Components:**
 
-- `parse(file, packages)`: Parses requirements file and fetches package details from PyPI
+- `parse(file, packages)`: Parses requirements file and fetches package details from PyPI in parallel via `Parallel.map(..., in_threads: HttpClient::THREAD_COUNT)`
+
+**External Dependencies:**
+
+- `parallel`
 
 ### SOUP::SPMParser
 
@@ -271,8 +283,12 @@
 
 **Key Components:**
 
-- `parse(file, packages)`: Parses resolved file and fetches package details from GitHub API
+- `parse(file, packages)`: Parses resolved file and fetches package details from GitHub API in parallel via `Parallel.map(..., in_threads: HttpClient::THREAD_COUNT)`
 - Supports `GITHUB_TOKEN` environment variable for rate limit handling
+
+**External Dependencies:**
+
+- `parallel`
 
 ### SOUP::YarnParser
 
@@ -282,10 +298,11 @@
 
 **Key Components:**
 
-- `parse(file, packages)`: Parses lock file and fetches package details from NPM registry
+- `parse(file, packages)`: Parses lock file and fetches package details from NPM registry in parallel via `Parallel.map(..., in_threads: HttpClient::THREAD_COUNT)`
 
 **External Dependencies:**
 
+- `parallel`
 - `yarn_lock_parser`
 
 ## Software of Unknown Provenance
@@ -386,6 +403,19 @@ Validation criteria for SOUP entries: Accuracy (Requirements match actual usage)
    - Logs retry attempt with counter
    - Retries up to `MAX_RETRIES` (3) times
    - Raises the exception after max retries are exhausted
+
+### Parallel Metadata Fetching Algorithm
+
+**Purpose:** Speeds up registry lookups by fetching package metadata concurrently instead of serially.
+
+**Location:** `parse` method of the Bundler, Gradle, NPM, PIP, SPM, and Yarn parsers in `lib/soup/parsers/`
+
+**Implementation:**
+
+1. Builds a work-item list of packages discovered in the lock file
+2. Processes the list with `Parallel.map(work_items, in_threads: HttpClient::THREAD_COUNT)`
+3. `THREAD_COUNT` is `Etc.nprocessors`, sizing the thread pool to the available CPU cores
+4. Each thread fetches metadata through `SOUP::HttpClient.get` (which applies its own timeout and retry logic)
 
 ## Risk controls
 
