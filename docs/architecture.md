@@ -385,9 +385,10 @@ Validation criteria for SOUP entries: Accuracy (Requirements match actual usage)
 
 **Implementation:**
 
-1. Strips leading/trailing whitespace
-2. Fixes MD038 lint rule violations (spaces inside backtick code spans)
-3. Uses regex pattern ``[^`]*`` instead of ``\s*(.*?)\s*`` to avoid ReDoS vulnerability
+1. Returns a single space for nil/empty values
+2. Collapses any whitespace run (including embedded newlines and tabs) to a single space so a multi-line package description does not break the markdown table
+3. Fixes MD038 lint rule violations (spaces inside backtick code spans)
+4. Uses regex pattern ``[^`]*`` instead of ``\s*(.*?)\s*`` to avoid ReDoS vulnerability
 
 ### HTTP Retry Algorithm
 
