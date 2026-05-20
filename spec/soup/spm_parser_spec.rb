@@ -328,4 +328,47 @@ RSpec.describe(SOUP::SPMParser) do
         .to(raise_error(/Bad credentials/))
     end
   end
+
+  # TEST-04: malformed-Package.resolved coverage. Locks in current behavior
+  # so future error-handling improvements are deliberate, not accidental.
+  describe '#parse with malformed input' do
+    let(:packages) { {} }
+
+    context 'with empty Package.resolved content' do
+      before { allow(File).to(receive(:read).with('Package.resolved').and_return('')) }
+
+      it 'raises JSON::ParserError' do
+        expect { parser.parse('Package.resolved', packages) }
+          .to(raise_error(JSON::ParserError))
+      end
+    end
+
+    context 'with truncated JSON in Package.resolved' do
+      before { allow(File).to(receive(:read).with('Package.resolved').and_return('{"pins":[{"identity":"alamofire"')) }
+
+      it 'raises JSON::ParserError' do
+        expect { parser.parse('Package.resolved', packages) }
+          .to(raise_error(JSON::ParserError))
+      end
+    end
+
+    context 'with non-JSON garbage in Package.resolved' do
+      before { allow(File).to(receive(:read).with('Package.resolved').and_return('not json')) }
+
+      it 'raises JSON::ParserError' do
+        expect { parser.parse('Package.resolved', packages) }
+          .to(raise_error(JSON::ParserError))
+      end
+    end
+
+    context 'with valid JSON but empty pins array' do
+      before { allow(File).to(receive(:read).with('Package.resolved').and_return('{"pins":[]}')) }
+
+      it 'parses without raising and adds no packages', :aggregate_failures do
+        expect { parser.parse('Package.resolved', packages) }
+          .not_to(raise_error)
+        expect(packages).to(be_empty)
+      end
+    end
+  end
 end
