@@ -112,6 +112,51 @@ RSpec.describe(SOUP::ComposerParser) do
     end
   end
 
+  context 'with composer.lock missing packages-dev key' do
+    # Regression test for BUG-021: production-only lockfiles (e.g. from
+    # composer install --no-dev) may omit packages-dev entirely. The parser
+    # used to raise TypeError on Array + nil.
+    let(:lock_file) do
+      {
+        packages: [
+          {
+            name: 'vendor/prod-only',
+            version: '1.0.0',
+            license: ['MIT'],
+            description: 'Prod',
+            homepage: 'https://example.com'
+          }
+        ]
+      }.to_json
+    end
+
+    it 'treats missing packages-dev as empty and parses the prod packages', :aggregate_failures do
+      expect { packages }
+        .not_to(raise_error)
+      expect(packages).to(have_key('vendor/prod-only'))
+    end
+  end
+
+  context 'with composer.lock missing packages key' do
+    let(:lock_file) do
+      {
+        'packages-dev': [
+          {
+            name: 'vendor/dev-only',
+            version: '1.0.0',
+            license: ['MIT'],
+            description: 'Dev',
+            homepage: 'https://example.com'
+          }
+        ]
+      }.to_json
+    end
+
+    it 'treats missing packages as empty and still parses dev packages' do
+      expect(packages).to(have_key('vendor/dev-only'))
+    end
+  end
+
   context 'with URL license' do
     let(:lock_file) do
       {

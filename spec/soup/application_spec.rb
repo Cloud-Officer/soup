@@ -143,6 +143,18 @@ RSpec.describe(SOUP::Application) do
       expect(exit_code).to(eq(SOUP::Status::SUCCESS_EXIT_CODE))
     end
 
+    context 'when CLI args trigger an OptionParser::ParseError subclass other than InvalidOption' do
+      # Regression test for BUG-017: the configure_options rescue used to be
+      # OptionParser::InvalidOption only, which let MissingArgument (and other
+      # ParseError subclasses) escape with a stack trace instead of the
+      # friendly "Error: ..." message + ERROR_EXIT_CODE.
+      it 'exits with ERROR_EXIT_CODE on --licenses_file missing its required argument', :aggregate_failures do
+        expect { described_class.new(['--licenses_file']) }
+          .to(raise_error(SystemExit) { |e| expect(e.status).to(eq(SOUP::Status::ERROR_EXIT_CODE)) }
+                .and(output(/missing argument/).to_stderr))
+      end
+    end
+
     context 'when config file is missing' do
       def missing_licenses_args
         ['--licenses', '--licenses_file', '/nonexistent/path.json', '--exceptions_file', exceptions_file.path] + skip_all_parsers

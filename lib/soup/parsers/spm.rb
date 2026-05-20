@@ -9,14 +9,7 @@ module SOUP
     def parse(file, packages)
       lock_file = JSON.parse(File.read(file))
       lock_file = lock_file['object'] if lock_file['object']
-      main_file =
-        if File.exist?(file.gsub('resolved', 'swift'))
-          File.read(file.gsub('resolved', 'swift'))
-        elsif File.exist?("#{file.split('Tuist').first}Tuist/Dependencies.swift")
-          File.read("#{file.split('Tuist').first}Tuist/Dependencies.swift")
-        elsif File.exist?("#{file.split('.').first}.xcodeproj/project.pbxproj")
-          File.read("#{file.split('.').first}.xcodeproj/project.pbxproj")
-        end
+      main_file = read_main_swift_file(file)
 
       raise('No main file found!') if main_file.nil?
 
@@ -28,6 +21,48 @@ module SOUP
     end
 
     private
+
+    # Locate the Swift manifest associated with a Package.resolved file.
+    # Tries, in order: the sibling Package.swift (or matching <Name>.swift),
+    # the enclosing Tuist/Dependencies.swift if the resolved file lives under a
+    # Tuist directory, and finally the sibling <Name>.xcodeproj/project.pbxproj.
+    # Path joining uses File.dirname + File.basename so directories containing
+    # dots in their name do not corrupt the candidate paths.
+    def read_main_swift_file(file)
+      dir = File.dirname(file)
+      base = File.basename(file, '.*')
+
+      package_swift = path_join(dir, "#{base}.swift")
+      return File.read(package_swift) if File.exist?(package_swift)
+
+      tuist_deps = tuist_dependencies_path(dir)
+      return File.read(tuist_deps) if tuist_deps && File.exist?(tuist_deps)
+
+      xcodeproj = path_join(dir, "#{base}.xcodeproj/project.pbxproj")
+      return File.read(xcodeproj) if File.exist?(xcodeproj)
+
+      nil
+    end
+
+    # Drop the leading "./" that File.join would introduce when dir == '.' so
+    # downstream File.exist?/File.read receive the same path callers use.
+    def path_join(dir, suffix)
+      return suffix if dir.nil? || dir.empty? || dir == '.'
+
+      "#{dir}/#{suffix}"
+    end
+
+    # If the resolved file lives anywhere inside a Tuist/ directory, return the
+    # path to Dependencies.swift inside that same Tuist directory. Returns nil
+    # otherwise so a non-Tuist project never invents a synthetic path.
+    def tuist_dependencies_path(dir)
+      parts = dir.split('/')
+      tuist_idx = parts.index('Tuist')
+      return if tuist_idx.nil?
+
+      tuist_root = parts[0..tuist_idx].join('/')
+      "#{tuist_root}/Dependencies.swift"
+    end
 
     def fetch_package(file, main_file, token, pin)
       pin_id = pin['identity'] || pin['package']
