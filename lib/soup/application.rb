@@ -35,6 +35,7 @@ module SOUP
   }.freeze
 
   private_constant :PARSER_REGISTRY
+
   # Represents an instance of a soup application. This is the entry point for all invocations of soup from the command line.
   class Application
     def initialize(argv)
@@ -132,82 +133,116 @@ module SOUP
       prompt = TTY::Prompt.new
 
       @detected_packages.each do |name, package|
-        if @options.licenses_check && !package.license.nil? && !package.license.empty?
-          found = false
-
-          licenses.each do |license|
-            if package.license.downcase.include?(license)
-              found = true
-              break
-            end
-          end
-
-          found = true if exceptions.include?(package.package)
-
-          unless found
-            puts("Invalid license #{package.license} found in #{package.file} in package #{package.package}!")
-            @exit_code = Status::ERROR_EXIT_CODE if package.license != 'NOASSERTION'
-          end
-        end
+        validate_license(package, licenses, exceptions)
 
         next unless @options.soup_check
 
-        if @cached_packages[name]
-          package.last_verified_at = @cached_packages[name]['last_verified_at']
-          package.risk_level = @cached_packages[name]['risk_level']
-          package.requirements = @cached_packages[name]['requirements']
-          package.verification_reasoning = @cached_packages[name]['verification_reasoning']
-        end
-
-        if package.dependency
-          package.risk_level = RISK_LEVELS_SCREEN.first.split.first
-          package.requirements = DEPENDENCY_TEXT
-          package.verification_reasoning = DEPENDENCY_TEXT
-        end
-
-        if package.risk_level.empty?
-          if @options.auto_reply
-            package.risk_level = RISK_LEVELS_SCREEN.first.split.first
-          else
-            raise("No risk level found for #{package.package}!") if @options.no_prompt
-
-            package.risk_level = prompt.select("Enter risk level for package #{package.package}", RISK_LEVELS_SCREEN).split.first
-          end
-        end
-
-        if package.requirements.empty?
-          if @options.auto_reply
-            package.requirements = DEPENDENCY_TEXT
-          else
-            raise("No requirements found for #{package.package}!") if @options.no_prompt
-
-            package.requirements = prompt.ask("Enter requirements for package #{package.package}: ")
-          end
-        end
-
-        if package.verification_reasoning.empty?
-          if @options.auto_reply
-            package.verification_reasoning = DEPENDENCY_TEXT
-          else
-            raise("No verification reasoning found for #{package.package}!") if @options.no_prompt
-
-            package.verification_reasoning = prompt.ask("Enter verification reasoning for package #{package.package}: ")
-          end
-        end
-
-        raise("Missing information for #{package.package}!") if package.risk_level.empty? or package.requirements.empty? or package.verification_reasoning.empty?
+        apply_cached_metadata(name, package)
+        apply_dependency_defaults(package)
+        prompt_for_metadata(package, prompt)
+        ensure_metadata_complete!(package)
 
         package.last_verified_at = Time.now.strftime('%Y-%m-%d').to_s if package.last_verified_at.empty?
 
-        if package.description
-          package.description = package.description.delete('|')
-          package.description = package.description.gsub('  ', ' ')
-          package.description = Nokogiri::HTML.fragment(package.description).text
-        end
-
-        website = package.website.to_s.strip.empty? ? '' : "<#{package.website}>"
-        @markdown += "|#{markdown_cell(package.language)}|#{markdown_cell(package.package)}|#{markdown_cell(package.version)}|#{markdown_cell(package.license)}|#{markdown_cell(package.description)}|#{markdown_cell(website)}|#{markdown_cell(package.last_verified_at)}|#{markdown_cell(package.risk_level)}|#{markdown_cell(package.requirements)}|#{markdown_cell(package.verification_reasoning)}|\n"
+        append_markdown_row(package)
       end
+    end
+
+    def validate_license(package, licenses, exceptions)
+      return unless @options.licenses_check
+      return if package.license.nil? || package.license.empty?
+      return if licenses.any? { |license| package.license.downcase.include?(license) }
+      return if exceptions.include?(package.package)
+
+      puts("Invalid license #{package.license} found in #{package.file} in package #{package.package}!")
+      @exit_code = Status::ERROR_EXIT_CODE if package.license != 'NOASSERTION'
+    end
+
+    def apply_cached_metadata(name, package)
+      cached = @cached_packages[name]
+      return unless cached
+
+      package.last_verified_at = cached['last_verified_at']
+      package.risk_level = cached['risk_level']
+      package.requirements = cached['requirements']
+      package.verification_reasoning = cached['verification_reasoning']
+    end
+
+    def apply_dependency_defaults(package)
+      return unless package.dependency
+
+      package.risk_level = RISK_LEVELS_SCREEN.first.split.first
+      package.requirements = DEPENDENCY_TEXT
+      package.verification_reasoning = DEPENDENCY_TEXT
+    end
+
+    def prompt_for_metadata(package, prompt)
+      prompt_missing_field(
+        package,
+        prompt,
+        field: :risk_level,
+        label: 'risk level',
+        default_value: RISK_LEVELS_SCREEN.first.split.first
+      ) { |p, pkg| p.select("Enter risk level for package #{pkg.package}", RISK_LEVELS_SCREEN).split.first }
+
+      prompt_missing_field(
+        package,
+        prompt,
+        field: :requirements,
+        label: 'requirements',
+        default_value: DEPENDENCY_TEXT
+      ) { |p, pkg| p.ask("Enter requirements for package #{pkg.package}: ") }
+
+      prompt_missing_field(
+        package,
+        prompt,
+        field: :verification_reasoning,
+        label: 'verification reasoning',
+        default_value: DEPENDENCY_TEXT
+      ) { |p, pkg| p.ask("Enter verification reasoning for package #{pkg.package}: ") }
+    end
+
+    def prompt_missing_field(package, prompt, field:, label:, default_value:)
+      return unless package.public_send(field).to_s.empty?
+
+      if @options.auto_reply
+        package.public_send(:"#{field}=", default_value)
+        return
+      end
+
+      raise("No #{label} found for #{package.package}!") if @options.no_prompt
+
+      package.public_send(:"#{field}=", yield(prompt, package))
+    end
+
+    def ensure_metadata_complete!(package)
+      return unless package.risk_level.empty? || package.requirements.empty? || package.verification_reasoning.empty?
+
+      raise("Missing information for #{package.package}!")
+    end
+
+    def append_markdown_row(package)
+      if package.description
+        package.description = package.description.delete('|')
+        package.description = package.description.gsub('  ', ' ')
+        package.description = Nokogiri::HTML.fragment(package.description).text
+      end
+
+      website = package.website.to_s.strip.empty? ? '' : "<#{package.website}>"
+      cells =
+        [
+          package.language,
+          package.package,
+          package.version,
+          package.license,
+          package.description,
+          website,
+          package.last_verified_at,
+          package.risk_level,
+          package.requirements,
+          package.verification_reasoning
+        ].map { |cell| markdown_cell(cell) }
+      @markdown += "|#{cells.join('|')}|\n"
     end
 
     def save_files

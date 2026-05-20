@@ -1,13 +1,11 @@
 # frozen_string_literal: true
 
 require 'json'
-require 'parallel'
 
-require_relative '../http_client'
-require_relative '../package'
+require_relative 'base'
 
 module SOUP
-  class PIPParser
+  class PIPParser < BaseParser
     def parse(file, packages)
       main_file =
         if File.exist?(file.gsub('.txt', '.in'))
@@ -30,12 +28,9 @@ module SOUP
         work_items << [pip_package, version]
       end
 
-      results =
-        Parallel.map(work_items, in_threads: HttpClient::THREAD_COUNT) do |pip_package, version|
-          fetch_package(file, main_file, pip_package, version)
-        end
-
-      results.compact.each { |package| packages[package.package] = package }
+      parallel_each(work_items, packages) do |pip_package, version|
+        fetch_package(file, main_file, pip_package, version)
+      end
     end
 
     private
@@ -47,27 +42,36 @@ module SOUP
       raise(response.message) unless response.code == 200
 
       package_details = JSON.parse(response.body)
-      package = Package.new(pip_package)
-      package.file = file
-      package.language = 'Python'
-      package.version = version
-      package.description = Package.sanitize_description(package_details['info']['summary'], first_sentence: true)
-      package.website = package_details['info']['home_page']&.strip
-      package.dependency = !main_file.include?(package.package)
+      info = package_details['info']
 
-      package_details['info']['classifiers'].each do |classifier|
-        if classifier.include?('License') and classifier.split('::').length > 2
-          classifier_license = classifier.split('::').last.strip.split("\n").first
-          package.license = "#{package.license} #{classifier_license}".strip
-        end
+      build_package(
+        name: pip_package,
+        file: file,
+        language: 'Python',
+        version: version,
+        license: extract_pip_license(info),
+        description: Package.sanitize_description(info['summary'], first_sentence: true),
+        website: info['home_page']&.strip,
+        dependency: !main_file.include?(pip_package)
+      )
+    end
+
+    def extract_pip_license(info)
+      license = ''
+
+      Array(info['classifiers']).each do |classifier|
+        next unless classifier.include?('License') && classifier.split('::').length > 2
+
+        classifier_license = classifier.split('::').last.strip.split("\n").first
+        license = "#{license} #{classifier_license}".strip
       end
 
-      if package.license.nil? or package.license.empty?
-        license = package_details['info']['license']&.strip&.split("\n")
-        package.license = license&.first
-      end
+      return license unless license.empty?
 
-      package
+      raw = info['license']
+      return raw if raw.nil?
+
+      raw.strip.split("\n").first
     end
   end
 end

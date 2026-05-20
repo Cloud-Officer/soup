@@ -2,23 +2,18 @@
 
 require 'bundler'
 require 'json'
-require 'parallel'
 
-require_relative '../http_client'
-require_relative '../package'
+require_relative 'base'
 
 module SOUP
-  class BundlerParser
+  class BundlerParser < BaseParser
     def parse(file, packages)
       lock_file = Bundler::LockfileParser.new(Bundler.read_file(file))
       main_file = File.read(file.sub(/\.lock$/, ''))
 
-      results =
-        Parallel.map(lock_file.specs, in_threads: HttpClient::THREAD_COUNT) do |spec|
-          fetch_package(file, main_file, spec)
-        end
-
-      results.compact.each { |package| packages[package.package] = package }
+      parallel_each(lock_file.specs, packages) do |spec|
+        fetch_package(file, main_file, spec)
+      end
     end
 
     private
@@ -39,15 +34,17 @@ module SOUP
       end
 
       package_details = JSON.parse(response.body)
-      package = Package.new(spec.name)
-      package.file = file
-      package.language = 'Ruby'
-      package.version = spec.version&.to_s&.strip
-      package.license = package_details['licenses']&.first&.strip
-      package.description = Package.sanitize_description(package_details['info'], first_sentence: true)
-      package.website = package_details['homepage_uri']&.strip
-      package.dependency = !main_file.include?(package.package)
-      package
+
+      build_package(
+        name: spec.name,
+        file: file,
+        language: 'Ruby',
+        version: spec.version&.to_s&.strip,
+        license: package_details['licenses']&.first&.strip,
+        description: Package.sanitize_description(package_details['info'], first_sentence: true),
+        website: package_details['homepage_uri']&.strip,
+        dependency: !main_file.include?(spec.name)
+      )
     end
   end
 end

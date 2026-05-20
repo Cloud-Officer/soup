@@ -1,13 +1,11 @@
 # frozen_string_literal: true
 
 require 'json'
-require 'parallel'
 
-require_relative '../http_client'
-require_relative '../package'
+require_relative 'base'
 
 module SOUP
-  class SPMParser
+  class SPMParser < BaseParser
     def parse(file, packages)
       lock_file = JSON.parse(File.read(file))
       lock_file = lock_file['object'] if lock_file['object']
@@ -24,12 +22,9 @@ module SOUP
 
       token = ENV.fetch('GITHUB_TOKEN', '')
 
-      results =
-        Parallel.map(lock_file['pins'], in_threads: HttpClient::THREAD_COUNT) do |pin|
-          fetch_package(file, main_file, token, pin)
-        end
-
-      results.compact.each { |package| packages[package.package] = package }
+      parallel_each(lock_file['pins'], packages) do |pin|
+        fetch_package(file, main_file, token, pin)
+      end
     end
 
     private
@@ -54,15 +49,16 @@ module SOUP
 
       return if package_details['private']
 
-      package = Package.new(package_details['name'])
-      package.file = file
-      package.language = 'Swift'
-      package.version = pin['state']['version']&.strip
-      package.license = package_details.dig('license', 'spdx_id')&.strip
-      package.description = Package.sanitize_description(package_details['description'], first_sentence: true)
-      package.website = package_details['html_url']&.strip
-      package.dependency = !main_file.include?(package.package)
-      package
+      build_package(
+        name: package_details['name'],
+        file: file,
+        language: 'Swift',
+        version: pin['state']['version']&.strip,
+        license: package_details.dig('license', 'spdx_id')&.strip,
+        description: Package.sanitize_description(package_details['description'], first_sentence: true),
+        website: package_details['html_url']&.strip,
+        dependency: !main_file.include?(package_details['name'])
+      )
     end
   end
 end

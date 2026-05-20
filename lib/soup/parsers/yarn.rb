@@ -1,25 +1,20 @@
 # frozen_string_literal: true
 
-require 'parallel'
 require 'yarn_lock_parser'
 
-require_relative '../http_client'
-require_relative '../package'
+require_relative 'base'
 
 module SOUP
-  class YarnParser
+  class YarnParser < BaseParser
     def parse(file, packages)
       lock_file = YarnLockParser::Parser.parse(file)
       main_file = File.read(file.gsub('yarn.lock', 'package.json'))
 
       work_items = lock_file.reject { |js_package| main_file.include?("#{js_package[:name]}\": \"file:vendor") }
 
-      results =
-        Parallel.map(work_items, in_threads: HttpClient::THREAD_COUNT) do |js_package|
-          fetch_package(file, main_file, js_package)
-        end
-
-      results.compact.each { |package| packages[package.package] = package }
+      parallel_each(work_items, packages) do |js_package|
+        fetch_package(file, main_file, js_package)
+      end
     end
 
     private
@@ -36,16 +31,17 @@ module SOUP
       raise(response.message) unless response.code == 200
 
       package_details = JSON.parse(response.body)['versions'][js_package[:version]]
-      package = Package.new(js_package[:name])
-      package.file = file
-      package.language = 'JS'
-      package.version = js_package[:version]
-      package.license = package_details['license']
-      package.license = 'NOASSERTION' if package.license&.include?('Unlicense')
-      package.description = Package.sanitize_description(package_details['description'], strip_markdown: true)
-      package.website = package_details['homepage']
-      package.dependency = !main_file.include?(js_package[:name])
-      package
+
+      build_package(
+        name: js_package[:name],
+        file: file,
+        language: 'JS',
+        version: js_package[:version],
+        license: package_details['license'],
+        description: Package.sanitize_description(package_details['description'], strip_markdown: true),
+        website: package_details['homepage'],
+        dependency: !main_file.include?(js_package[:name])
+      )
     end
   end
 end
