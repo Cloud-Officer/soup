@@ -180,7 +180,6 @@ RSpec.describe(SOUP::SPMParser) do
   context 'when only xcodeproj exists' do
     before do
       allow(File).to(receive(:exist?).with('Package.swift').and_return(false))
-      allow(File).to(receive(:exist?).with('Package.resolvedTuist/Dependencies.swift').and_return(false))
       allow(File).to(receive(:exist?).with('Package.xcodeproj/project.pbxproj').and_return(true))
       allow(File).to(receive(:read).with('Package.xcodeproj/project.pbxproj').and_return(main_file_content))
       stub_request(:get, 'https://api.github.com/repos/Alamofire/Alamofire')
@@ -194,10 +193,30 @@ RSpec.describe(SOUP::SPMParser) do
     end
   end
 
+  context 'when the project directory contains a dot in its name' do
+    # Regression test for BUG-011: a previous implementation used
+    # file.split('.').first to derive the xcodeproj path, which truncated
+    # any path whose parent directory contained a dot.
+    before do
+      allow(File).to(receive(:read).with('/Users/foo.bar/MyProject/Package.resolved').and_return(resolved_file))
+      allow(File).to(receive(:exist?).with('/Users/foo.bar/MyProject/Package.swift').and_return(false))
+      allow(File).to(receive(:exist?).with('/Users/foo.bar/MyProject/Package.xcodeproj/project.pbxproj').and_return(true))
+      allow(File).to(receive(:read).with('/Users/foo.bar/MyProject/Package.xcodeproj/project.pbxproj').and_return(main_file_content))
+      stub_request(:get, 'https://api.github.com/repos/Alamofire/Alamofire')
+        .to_return(status: 200, body: github_response)
+    end
+
+    it 'resolves the xcodeproj sibling path without truncating at the first dot', :aggregate_failures do
+      packages = {}
+      expect { parser.parse('/Users/foo.bar/MyProject/Package.resolved', packages) }
+        .not_to(raise_error)
+      expect(packages).to(have_key('Alamofire'))
+    end
+  end
+
   context 'when no main file exists' do
     before do
       allow(File).to(receive(:exist?).with('Package.swift').and_return(false))
-      allow(File).to(receive(:exist?).with('Package.resolvedTuist/Dependencies.swift').and_return(false))
       allow(File).to(receive(:exist?).with('Package.xcodeproj/project.pbxproj').and_return(false))
     end
 

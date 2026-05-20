@@ -9,7 +9,7 @@ module SOUP
     def parse(file, packages)
       lock_file = JSON.parse(File.read(file))
       main_file = File.read(file.gsub('lock', 'json'))
-      all_packages = lock_file['packages'] + lock_file['packages-dev']
+      all_packages = (lock_file['packages'] || []) + (lock_file['packages-dev'] || [])
 
       all_packages.each do |php_package|
         puts("Checking #{php_package['name']} #{php_package['version']}...")

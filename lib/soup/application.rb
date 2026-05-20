@@ -86,7 +86,7 @@ module SOUP
 
     def configure_options(argv)
       Options.new(argv).parse
-    rescue OptionParser::InvalidOption => e
+    rescue OptionParser::ParseError => e
       warn("Error: #{e}")
       exit(Status::ERROR_EXIT_CODE)
     end
