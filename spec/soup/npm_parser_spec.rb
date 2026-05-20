@@ -238,4 +238,31 @@ RSpec.describe(SOUP::NPMParser) do
         .to(raise_error(Errno::ENOENT))
     end
   end
+
+  # TEST-12 follow-up: parser exercised against real lockfile bytes via
+  # SoupFixtureHelpers, demonstrating the no-stub pattern for npm.
+  context 'with a real package-lock.json fixture on disk' do
+    let(:lockfile_bytes) do
+      {
+        lockfileVersion: 3,
+        packages: {
+          '': { version: '1.0.0' }, # rubocop:disable Naming/VariableNumber
+          'node_modules/lodash': { version: '4.17.21' }
+        }
+      }.to_json
+    end
+
+    before do
+      stub_request(:get, 'https://registry.npmjs.org/lodash')
+        .to_return(status: 200, body: registry_response)
+    end
+
+    it 'reads both files from disk without File stubs' do
+      write_fixture('package.json', main_file)
+      lockfile_path = write_fixture('package-lock.json', lockfile_bytes)
+      packages = {}
+      parser.parse(lockfile_path, packages)
+      expect(packages['lodash']).to(have_attributes(language: 'JS', version: '4.17.21', license: 'MIT'))
+    end
+  end
 end

@@ -292,4 +292,32 @@ RSpec.describe(SOUP::ComposerParser) do
       end
     end
   end
+
+  # TEST-12 follow-up: parser exercised against real lockfile bytes via
+  # SoupFixtureHelpers. Uses auto_parse: false so the outer before-hook does
+  # not invoke parser.parse with the stubbed 'composer.lock' literal before
+  # the example writes its real fixture path.
+  context 'with real fixture files on disk', auto_parse: false do
+    let(:tmpdir_lock_content) do
+      {
+        packages: [
+          {
+            name: 'vendor/main-pkg',
+            version: '1.0.0',
+            license: ['MIT'],
+            description: 'Main package',
+            homepage: 'https://example.com'
+          }
+        ],
+        'packages-dev': []
+      }.to_json
+    end
+
+    it 'reads the lockfile + composer.json from disk without File stubs' do
+      write_fixture('composer.json', '{"require":{"vendor/main-pkg":"^1.0"}}')
+      lockfile_path = write_fixture('composer.lock', tmpdir_lock_content)
+      parser.parse(lockfile_path, packages)
+      expect(packages['vendor/main-pkg']).to(have_attributes(language: 'PHP', version: '1.0.0', license: 'MIT'))
+    end
+  end
 end

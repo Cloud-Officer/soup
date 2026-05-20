@@ -341,5 +341,32 @@ RSpec.describe(SOUP::GradleParser) do
           .to(raise_error(Errno::ENOENT))
       end
     end
+
+    # TEST-12 follow-up: parser exercised against real Gradle fixtures via
+    # SoupFixtureHelpers. File.readlines / File.read stubs bypassed with
+    # and_call_original so real filesystem reads run.
+    context 'with real Gradle fixtures on disk' do
+      let(:tmpdir_lockfile_bytes) do
+        <<~LOCK
+          # This is a Gradle lockfile
+          com.example:library:1.0.0=classpath
+        LOCK
+      end
+
+      before do
+        allow(File).to(receive(:readlines).and_call_original)
+        allow(File).to(receive(:read).and_call_original)
+        stub_request(:get, %r{search\.maven\.org/solrsearch/select})
+          .to_return(status: 200, body: maven_response)
+      end
+
+      it 'reads the lockfile + sibling build.gradle from disk without File stubs' do
+        write_fixture('build.gradle', 'classpath "com.example:library:1.0.0"')
+        lockfile_path = write_fixture('buildscript-gradle.lockfile', tmpdir_lockfile_bytes)
+        packages = {}
+        parser.parse(lockfile_path, packages)
+        expect(packages['com.example:library']).to(have_attributes(language: 'Kotlin', version: '1.0.0', license: 'Apache-2.0'))
+      end
+    end
   end
 end
