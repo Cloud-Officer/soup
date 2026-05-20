@@ -1,13 +1,11 @@
 # frozen_string_literal: true
 
 require 'nokogiri'
-require 'parallel'
 
-require_relative '../http_client'
-require_relative '../package'
+require_relative 'base'
 
 module SOUP
-  class GradleParser
+  class GradleParser < BaseParser
     REPOSITORY_URLS = %w[https://maven.google.com https://jcenter.bintray.com https://plugins.gradle.org/m2/ https://jitpack.io https://oss.sonatype.org/content/repositories/snapshots/ https://maven.pkg.github.com/skgmn/].freeze
     private_constant :REPOSITORY_URLS
 
@@ -34,12 +32,9 @@ module SOUP
           package_name.split(':')
         end
 
-      results =
-        Parallel.map(work_items, in_threads: HttpClient::THREAD_COUNT) do |group_id, artifact_id, version|
-          fetch_package(file, main_file, group_id, artifact_id, version)
-        end
-
-      results.compact.each { |package| packages[package.package] = package }
+      parallel_each(work_items, packages) do |group_id, artifact_id, version|
+        fetch_package(file, main_file, group_id, artifact_id, version)
+      end
     end
 
     private
@@ -75,15 +70,16 @@ module SOUP
         return
       end
 
-      package = Package.new("#{group_id}:#{artifact_id}")
-      package.file = file
-      package.language = 'Kotlin'
-      package.version = version
-      package.license = license
-      package.description = Package.sanitize_description(description)
-      package.website = website
-      package.dependency = !main_file.include?("#{group_id}:#{artifact_id}")
-      package
+      build_package(
+        name: "#{group_id}:#{artifact_id}",
+        file: file,
+        language: 'Kotlin',
+        version: version,
+        license: license,
+        description: Package.sanitize_description(description),
+        website: website,
+        dependency: !main_file.include?("#{group_id}:#{artifact_id}")
+      )
     end
   end
 end
