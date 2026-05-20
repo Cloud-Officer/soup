@@ -197,6 +197,21 @@ RSpec.describe(SOUP::ComposerParser) do
     end
   end
 
+  # TEST-05: a transient race where Dir.glob found the lockfile but it was
+  # deleted/unreadable before File.read surfaces as a bare Errno::ENOENT
+  # backtrace. Locking in current behavior so a future improvement (clearer
+  # message) is deliberate.
+  context 'when the lockfile itself is missing at read time', auto_parse: false do
+    before do
+      allow(File).to(receive(:read).with('composer.lock').and_raise(Errno::ENOENT.new('composer.lock')))
+    end
+
+    it 'surfaces Errno::ENOENT' do
+      expect { parser.parse('composer.lock', packages) }
+        .to(raise_error(Errno::ENOENT))
+    end
+  end
+
   # TEST-04: malformed-JSON cases use auto_parse: false so the top-level
   # before-hook does not invoke parser.parse before the example body has
   # a chance to assert on the expected exception.

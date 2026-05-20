@@ -329,5 +329,21 @@ RSpec.describe(SOUP::GradleParser) do
         expect(packages).to(be_empty)
       end
     end
+
+    # TEST-05: race where Dir.glob found the lockfile but it was deleted /
+    # unreadable before File.readlines ran.
+    context 'when the lockfile cannot be read' do
+      before do
+        allow(File).to(
+          receive(:readlines)
+                    .with('buildscript-gradle.lockfile').and_raise(Errno::ENOENT.new('buildscript-gradle.lockfile'))
+        )
+      end
+
+      it 'surfaces Errno::ENOENT' do
+        expect { parser.parse('buildscript-gradle.lockfile', packages) }
+          .to(raise_error(Errno::ENOENT))
+      end
+    end
   end
 end

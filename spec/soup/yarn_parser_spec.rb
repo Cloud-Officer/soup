@@ -152,4 +152,18 @@ RSpec.describe(SOUP::YarnParser) do
       expect(packages['lodash'].license).to(eq('NOASSERTION'))
     end
   end
+
+  # TEST-05: race where Dir.glob found the lockfile but it was deleted /
+  # unreadable before YarnLockParser::Parser.parse ran.
+  context 'when yarn.lock cannot be read' do
+    before do
+      allow(YarnLockParser::Parser).to(receive(:parse).with('yarn.lock').and_raise(Errno::ENOENT.new('yarn.lock')))
+    end
+
+    it 'surfaces Errno::ENOENT' do
+      packages = {}
+      expect { parser.parse('yarn.lock', packages) }
+        .to(raise_error(Errno::ENOENT))
+    end
+  end
 end
