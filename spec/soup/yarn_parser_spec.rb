@@ -59,12 +59,12 @@ RSpec.describe(SOUP::YarnParser) do
     end
   end
 
-  it 'raises on non-200 response' do
+  it 'raises a SOUP::RegistryError on non-200 response' do
     stub_request(:get, 'https://registry.npmjs.org/lodash')
       .to_return(status: 500, body: 'Server Error')
     packages = {}
     expect { parser.parse('yarn.lock', packages) }
-      .to(raise_error(RuntimeError))
+      .to(raise_error(SOUP::RegistryError, /HTTP 500.*lodash.*registry\.npmjs\.org/m))
   end
 
   it 'handles timeout gracefully', :aggregate_failures do
@@ -123,7 +123,7 @@ RSpec.describe(SOUP::YarnParser) do
     it 'raises a clear unsupported-format error', :aggregate_failures do
       packages = {}
       expect { parser.parse('yarn.lock', packages) }
-        .to(raise_error(/Unsupported yarn\.lock format/))
+        .to(raise_error(SOUP::UnsupportedFormatError, /Unsupported yarn\.lock format/))
       expect(packages).to(be_empty)
     end
   end
@@ -150,6 +150,20 @@ RSpec.describe(SOUP::YarnParser) do
       packages = {}
       parser.parse('yarn.lock', packages)
       expect(packages['lodash'].license).to(eq('NOASSERTION'))
+    end
+  end
+
+  # TEST-05: race where Dir.glob found the lockfile but it was deleted /
+  # unreadable before YarnLockParser::Parser.parse ran.
+  context 'when yarn.lock cannot be read' do
+    before do
+      allow(YarnLockParser::Parser).to(receive(:parse).with('yarn.lock').and_raise(Errno::ENOENT.new('yarn.lock')))
+    end
+
+    it 'surfaces Errno::ENOENT' do
+      packages = {}
+      expect { parser.parse('yarn.lock', packages) }
+        .to(raise_error(Errno::ENOENT))
     end
   end
 

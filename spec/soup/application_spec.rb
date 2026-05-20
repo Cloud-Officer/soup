@@ -183,7 +183,7 @@ RSpec.describe(SOUP::Application) do
       it 'raises when config file is missing' do
         app = described_class.new(missing_licenses_args)
         expect { app.execute }
-          .to(raise_error(/Configuration file not found/))
+          .to(raise_error(SOUP::ConfigurationError, /Configuration file not found/))
       end
 
       # Regression test for BUG-08: when --soup is enabled (default) and
@@ -193,7 +193,7 @@ RSpec.describe(SOUP::Application) do
       it 'in --soup mode, preserves the existing cache and markdown when validate_config! raises', :aggregate_failures do
         write_existing_soup_files('{"existing/pkg":{"version":"1.0.0"}}', "# Existing SOUP\n")
         expect { described_class.new(missing_soup_args).execute }
-          .to(raise_error(/Configuration file not found/))
+          .to(raise_error(SOUP::ConfigurationError, /Configuration file not found/))
         expect(File.read(cache_file.path)).to(eq('{"existing/pkg":{"version":"1.0.0"}}'))
         expect(File.read(markdown_file)).to(eq("# Existing SOUP\n"))
       end
@@ -214,7 +214,7 @@ RSpec.describe(SOUP::Application) do
       it 'raises when config file has invalid JSON' do
         args = ['--licenses', '--licenses_file', bad_file.path, '--exceptions_file', exceptions_file.path] + skip_all_parsers
         expect { described_class.new(args).execute }
-          .to(raise_error(/Invalid JSON/))
+          .to(raise_error(SOUP::ConfigurationError, /Invalid JSON/))
       end
     end
 
@@ -250,7 +250,7 @@ RSpec.describe(SOUP::Application) do
       it 'raises with no_prompt when risk_level is missing' do
         app = described_class.new(soup_no_prompt_args(skip: skip_parsers_except_composer))
         expect { app.execute }
-          .to(raise_error(/No risk level found/))
+          .to(raise_error(SOUP::MissingMetadataError, /No risk level found/))
       end
 
       it 'reads cached packages from file when it exists' do
@@ -317,7 +317,7 @@ RSpec.describe(SOUP::Application) do
       it 'saves partial state when check_packages raises an exception', :aggregate_failures do
         app = described_class.new(soup_no_prompt_args(skip: skip_parsers_except_composer))
         expect { app.execute }
-          .to(raise_error(/No risk level found/))
+          .to(raise_error(SOUP::MissingMetadataError, /No risk level found/))
         cache_content = JSON.parse(File.read(cache_file.path))
         expect(cache_content).not_to(be_empty)
       end

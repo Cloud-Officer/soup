@@ -220,10 +220,10 @@ RSpec.describe(SOUP::SPMParser) do
       allow(File).to(receive(:exist?).with('Package.xcodeproj/project.pbxproj').and_return(false))
     end
 
-    it 'raises an error' do
+    it 'raises a SOUP::InvalidLockfileError naming the file' do
       packages = {}
       expect { parser.parse('Package.resolved', packages) }
-        .to(raise_error('No main file found!'))
+        .to(raise_error(SOUP::InvalidLockfileError, /No Swift main file found/))
     end
   end
 
@@ -261,7 +261,7 @@ RSpec.describe(SOUP::SPMParser) do
     it 'raises on rate limit' do
       packages = {}
       expect { parser.parse('Package.resolved', packages) }
-        .to(raise_error(/rate limit/))
+        .to(raise_error(SOUP::RateLimitError, /rate limit/))
     end
   end
 
@@ -281,7 +281,7 @@ RSpec.describe(SOUP::SPMParser) do
     it 'raises on rate limit even when the reason phrase does not contain the keyword' do
       packages = {}
       expect { parser.parse('Package.resolved', packages) }
-        .to(raise_error(/rate limit/))
+        .to(raise_error(SOUP::RateLimitError, /rate limit/))
     end
   end
 
@@ -363,7 +363,7 @@ RSpec.describe(SOUP::SPMParser) do
     it 'raises on bad credentials' do
       packages = {}
       expect { parser.parse('Package.resolved', packages) }
-        .to(raise_error(/Bad credentials/))
+        .to(raise_error(SOUP::AuthenticationError, /Bad credentials/))
     end
   end
 
@@ -406,6 +406,22 @@ RSpec.describe(SOUP::SPMParser) do
         expect { parser.parse('Package.resolved', packages) }
           .not_to(raise_error)
         expect(packages).to(be_empty)
+      end
+    end
+
+    # TEST-05: race where Dir.glob found the lockfile but it was deleted /
+    # unreadable before File.read ran.
+    context 'when Package.resolved cannot be read' do
+      before do
+        allow(File).to(
+          receive(:read)
+                    .with('Package.resolved').and_raise(Errno::ENOENT.new('Package.resolved'))
+        )
+      end
+
+      it 'surfaces Errno::ENOENT' do
+        expect { parser.parse('Package.resolved', packages) }
+          .to(raise_error(Errno::ENOENT))
       end
     end
   end

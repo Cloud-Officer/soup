@@ -186,8 +186,56 @@ RSpec.describe(SOUP::NPMParser) do
     it 'raises a clear unsupported-format error', :aggregate_failures do
       packages = {}
       expect { parser.parse('package-lock.json', packages) }
-        .to(raise_error(/Unsupported package-lock\.json/))
+        .to(raise_error(SOUP::UnsupportedFormatError, /Unsupported package-lock\.json/))
       expect(packages).to(be_empty)
+    end
+  end
+
+  # TEST-07: realistic-scale lockfile to exercise Parallel.map(in_threads: ...)
+  # at a meaningful work-item count. Pre-fix parser specs only used 1-2
+  # packages, so the parallel fan-out path was never realistically loaded and
+  # concurrency or ordering regressions would not have been caught.
+  context 'with 100 packages (Parallel.map fan-out)' do
+    let(:lock_file) do
+      packages_hash =
+        (1..100).each_with_object({ '': { version: '1.0.0' } }) do |i, acc| # rubocop:disable Naming/VariableNumber
+          acc["node_modules/pkg-#{i}"] = { version: '1.0.0' }
+        end
+      { packages: packages_hash }.to_json
+    end
+
+    let(:main_file) do
+      deps = (1..100).to_h { |i| ["pkg-#{i}", '^1.0.0'] }
+      { dependencies: deps }.to_json
+    end
+
+    before do
+      (1..100).each do |i|
+        body = { versions: { '1.0.0': { license: 'MIT', description: "pkg-#{i}", homepage: '' } } }.to_json
+        stub_request(:get, "https://registry.npmjs.org/pkg-#{i}").to_return(status: 200, body: body)
+      end
+    end
+
+    it 'parses all 100 packages without raising and adds them to the hash', :aggregate_failures do
+      packages = {}
+      parser.parse('package-lock.json', packages)
+      expect(packages.size).to(eq(100))
+      expect(packages['pkg-1']).to(have_attributes(license: 'MIT', version: '1.0.0'))
+      expect(packages['pkg-100']).to(have_attributes(license: 'MIT', version: '1.0.0'))
+    end
+  end
+
+  # TEST-05: race where Dir.glob found the lockfile but it was deleted /
+  # unreadable before File.read ran.
+  context 'when package-lock.json cannot be read' do
+    before do
+      allow(File).to(receive(:read).with('package-lock.json').and_raise(Errno::ENOENT.new('package-lock.json')))
+    end
+
+    it 'surfaces Errno::ENOENT' do
+      packages = {}
+      expect { parser.parse('package-lock.json', packages) }
+        .to(raise_error(Errno::ENOENT))
     end
   end
 end

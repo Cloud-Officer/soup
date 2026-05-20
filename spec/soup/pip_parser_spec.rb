@@ -229,5 +229,21 @@ RSpec.describe(SOUP::PIPParser) do
         expect(packages).to(be_empty)
       end
     end
+
+    # TEST-05: race where Dir.glob found the lockfile but it was deleted /
+    # unreadable before File.foreach ran.
+    context 'when requirements.txt cannot be read' do
+      before do
+        allow(File).to(
+          receive(:foreach)
+                    .with('requirements.txt').and_raise(Errno::ENOENT.new('requirements.txt'))
+        )
+      end
+
+      it 'surfaces Errno::ENOENT' do
+        expect { parser.parse('requirements.txt', packages) }
+          .to(raise_error(Errno::ENOENT))
+      end
+    end
   end
 end

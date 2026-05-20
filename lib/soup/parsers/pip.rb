@@ -50,7 +50,7 @@ module SOUP
       url = "https://pypi.python.org/pypi/#{pip_package.sub(/\[[^\]]+\]/, '')}/json"
       response = HttpClient.get(url)
 
-      raise(http_error_message(response, url: url, package: "#{pip_package}==#{version}")) unless response.code == 200
+      raise(RegistryError, http_error_message(response, url: url, package: "#{pip_package}==#{version}")) unless response.code == 200
 
       package_details = JSON.parse(response.body)
       info = package_details['info']

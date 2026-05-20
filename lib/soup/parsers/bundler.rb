@@ -27,13 +27,13 @@ module SOUP
         latest_url = "https://api.rubygems.org/api/v1/versions/#{spec.name}/latest.json"
         response = HttpClient.get(latest_url)
 
-        raise(http_error_message(response, url: latest_url, package: "#{spec.name} #{spec.version}")) unless response.code == 200
+        raise(RegistryError, http_error_message(response, url: latest_url, package: "#{spec.name} #{spec.version}")) unless response.code == 200
 
         latest_version = JSON.parse(response.body)['version']
         fallback_url = "https://api.rubygems.org/api/v2/rubygems/#{spec.name}/versions/#{latest_version}.json"
         response = HttpClient.get(fallback_url)
 
-        raise(http_error_message(response, url: fallback_url, package: "#{spec.name} #{latest_version}")) unless response.code == 200
+        raise(RegistryError, http_error_message(response, url: fallback_url, package: "#{spec.name} #{latest_version}")) unless response.code == 200
       end
 
       package_details = JSON.parse(response.body)

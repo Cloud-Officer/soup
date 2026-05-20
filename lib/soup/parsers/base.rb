@@ -2,6 +2,7 @@
 
 require 'parallel'
 
+require_relative '../errors'
 require_relative '../http_client'
 require_relative '../package'
 

@@ -53,7 +53,7 @@ module SOUP
         next
       end
 
-      raise("No build.gradle or build.gradle.kts found alongside #{file}")
+      raise(InvalidLockfileError, "No build.gradle or build.gradle.kts found alongside #{file}")
     end
 
     def fetch_package(file, main_file, group_id, artifact_id, version)

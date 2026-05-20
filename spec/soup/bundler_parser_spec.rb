@@ -72,10 +72,10 @@ RSpec.describe(SOUP::BundlerParser) do
           .to_return(status: 500, body: 'Internal Server Error', headers: { Status: 'Internal Server Error' })
       end
 
-      it 'raises an error' do
+      it 'raises a SOUP::RegistryError with status + url + package context' do
         packages = {}
         expect { parser.parse('Gemfile.lock', packages) }
-          .to(raise_error(RuntimeError))
+          .to(raise_error(SOUP::RegistryError, /HTTP 500.*test-gem.*api\.rubygems\.org/m))
       end
     end
   end
@@ -149,6 +149,19 @@ RSpec.describe(SOUP::BundlerParser) do
         expect { parser.parse('Gemfile.lock', packages) }
           .not_to(raise_error)
         expect(packages).to(be_empty)
+      end
+    end
+
+    # TEST-05: race where Dir.glob found the lockfile but it was deleted /
+    # unreadable before Bundler.read_file ran.
+    context 'when Gemfile.lock cannot be read' do
+      before do
+        allow(Bundler).to(receive(:read_file).with('Gemfile.lock').and_raise(Errno::ENOENT.new('Gemfile.lock')))
+      end
+
+      it 'surfaces Errno::ENOENT' do
+        expect { parser.parse('Gemfile.lock', packages) }
+          .to(raise_error(Errno::ENOENT))
       end
     end
   end

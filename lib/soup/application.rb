@@ -6,6 +6,7 @@ require 'nokogiri'
 require 'tty-prompt'
 
 require_relative '../soup'
+require_relative 'errors'
 require_relative 'http_client'
 require_relative 'options'
 require_relative 'parsers/bundler'
@@ -61,12 +62,12 @@ module SOUP
 
     def validate_config!
       [@options.licenses_file, @options.exceptions_file].each do |file|
-        raise("Configuration file not found: #{file}") unless File.exist?(file)
+        raise(ConfigurationError, "Configuration file not found: #{file}") unless File.exist?(file)
 
         begin
           JSON.parse(File.read(file))
         rescue JSON::ParserError => e
-          raise("Invalid JSON in configuration file #{file}: #{e.message}")
+          raise(ConfigurationError, "Invalid JSON in configuration file #{file}: #{e.message}")
         end
       end
     end
@@ -210,7 +211,7 @@ module SOUP
         return
       end
 
-      raise("No #{label} found for #{package.package}!") if @options.no_prompt
+      raise(MissingMetadataError, "No #{label} found for #{package.package}!") if @options.no_prompt
 
       package.public_send(:"#{field}=", yield(prompt, package))
     end
@@ -218,7 +219,7 @@ module SOUP
     def ensure_metadata_complete!(package)
       return unless package.risk_level.empty? || package.requirements.empty? || package.verification_reasoning.empty?
 
-      raise("Missing information for #{package.package}!")
+      raise(MissingMetadataError, "Missing information for #{package.package}!")
     end
 
     def append_markdown_row(package)

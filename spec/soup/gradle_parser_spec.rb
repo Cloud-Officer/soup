@@ -223,7 +223,7 @@ RSpec.describe(SOUP::GradleParser) do
     it 'raises a clear error rather than a bare ENOENT' do
       packages = {}
       expect { parser.parse('buildscript-gradle.lockfile', packages) }
-        .to(raise_error(/No build\.gradle or build\.gradle\.kts found/))
+        .to(raise_error(SOUP::InvalidLockfileError, /No build\.gradle or build\.gradle\.kts found/))
     end
   end
 
@@ -327,6 +327,22 @@ RSpec.describe(SOUP::GradleParser) do
         expect { parser.parse('buildscript-gradle.lockfile', packages) }
           .not_to(raise_error)
         expect(packages).to(be_empty)
+      end
+    end
+
+    # TEST-05: race where Dir.glob found the lockfile but it was deleted /
+    # unreadable before File.readlines ran.
+    context 'when the lockfile cannot be read' do
+      before do
+        allow(File).to(
+          receive(:readlines)
+                    .with('buildscript-gradle.lockfile').and_raise(Errno::ENOENT.new('buildscript-gradle.lockfile'))
+        )
+      end
+
+      it 'surfaces Errno::ENOENT' do
+        expect { parser.parse('buildscript-gradle.lockfile', packages) }
+          .to(raise_error(Errno::ENOENT))
       end
     end
   end
