@@ -408,5 +408,21 @@ RSpec.describe(SOUP::SPMParser) do
         expect(packages).to(be_empty)
       end
     end
+
+    # TEST-05: race where Dir.glob found the lockfile but it was deleted /
+    # unreadable before File.read ran.
+    context 'when Package.resolved cannot be read' do
+      before do
+        allow(File).to(
+          receive(:read)
+                    .with('Package.resolved').and_raise(Errno::ENOENT.new('Package.resolved'))
+        )
+      end
+
+      it 'surfaces Errno::ENOENT' do
+        expect { parser.parse('Package.resolved', packages) }
+          .to(raise_error(Errno::ENOENT))
+      end
+    end
   end
 end

@@ -151,5 +151,18 @@ RSpec.describe(SOUP::BundlerParser) do
         expect(packages).to(be_empty)
       end
     end
+
+    # TEST-05: race where Dir.glob found the lockfile but it was deleted /
+    # unreadable before Bundler.read_file ran.
+    context 'when Gemfile.lock cannot be read' do
+      before do
+        allow(Bundler).to(receive(:read_file).with('Gemfile.lock').and_raise(Errno::ENOENT.new('Gemfile.lock')))
+      end
+
+      it 'surfaces Errno::ENOENT' do
+        expect { parser.parse('Gemfile.lock', packages) }
+          .to(raise_error(Errno::ENOENT))
+      end
+    end
   end
 end
