@@ -8,7 +8,7 @@ module SOUP
   class ComposerParser < BaseParser
     def parse(file, packages)
       lock_file = JSON.parse(File.read(file))
-      main_file = File.read(file.gsub('lock', 'json'))
+      main_file = File.read(sibling_file(file, 'composer.json'))
       all_packages = (lock_file['packages'] || []) + (lock_file['packages-dev'] || [])
 
       all_packages.each do |php_package|
@@ -30,8 +30,13 @@ module SOUP
 
     private
 
+    # Composer schema permits `license` to be a single string (e.g. "MIT") or an
+    # Array of SPDX-style strings (for disjunctive 'OR' combinations). Wrap with
+    # Array() so a String input behaves the same as a single-element Array
+    # instead of crashing on .first (plain Ruby) or returning the first char
+    # (when ActiveSupport's String#first is loaded).
     def extract_composer_license(raw)
-      license = raw&.first
+      license = Array(raw).first
       license = license&.tr('()', '  ')
       license = license&.strip
       license&.split&.first

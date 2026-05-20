@@ -6,7 +6,7 @@ module SOUP
   class NPMParser < BaseParser
     def parse(file, packages)
       lock_file = JSON.parse(File.read(file))
-      main_file_json = JSON.parse(File.read(file.gsub('package-lock.json', 'package.json')))
+      main_file_json = JSON.parse(File.read(sibling_file(file, 'package.json')))
       direct_deps = (main_file_json['dependencies'] || {}).keys |
                     (main_file_json['devDependencies'] || {}).keys
       all_packages = lock_file['packages'] ||

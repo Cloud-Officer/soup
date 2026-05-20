@@ -157,6 +157,57 @@ RSpec.describe(SOUP::ComposerParser) do
     end
   end
 
+  context 'when the lockfile lives in a directory whose name contains "lock"' do
+    # Regression test for BUG-04: pre-fix the parser used file.gsub('lock',
+    # 'json'), an unanchored substring substitution that corrupted any path
+    # containing "lock" (e.g. /Users/sherlock/proj/composer.lock).
+    let(:lock_file_path) { '/Users/sherlock/proj/composer.lock' }
+    let(:main_file_path) { '/Users/sherlock/proj/composer.json' }
+    let(:lock_file) do
+      {
+        packages: [
+          { name: 'vendor/x', version: '1.0.0', license: ['MIT'], description: 'X', homepage: '' }
+        ],
+        'packages-dev': []
+      }.to_json
+    end
+
+    before do
+      allow(File).to(receive(:read).with(lock_file_path).and_return(lock_file))
+      allow(File).to(receive(:read).with(main_file_path).and_return('{"require":{"vendor/x":"^1.0"}}'))
+      parser.parse(lock_file_path, packages)
+    end
+
+    it 'reads composer.json from the same directory without corrupting the path' do
+      expect(packages).to(have_key('vendor/x'))
+    end
+  end
+
+  context 'when license is a single String (not an Array)' do
+    # Regression test for BUG-12: Composer's schema permits `license` as a
+    # single string. Pre-fix the parser called `.first` on a String, which
+    # either raised NoMethodError (plain Ruby) or returned the first
+    # character "M" (when ActiveSupport's String#first was loaded).
+    let(:lock_file) do
+      {
+        packages: [
+          {
+            name: 'vendor/str-license',
+            version: '1.0.0',
+            license: 'MIT',
+            description: 'Single-string license',
+            homepage: 'https://example.com'
+          }
+        ],
+        'packages-dev': []
+      }.to_json
+    end
+
+    it 'treats the string as a one-element array and keeps the full SPDX id' do
+      expect(packages['vendor/str-license'].license).to(eq('MIT'))
+    end
+  end
+
   # TEST-04: graceful malformed-lockfile cases. Structurally-empty and
   # unknown-shape JSON should fall through the existing `|| []` guards
   # without raising.

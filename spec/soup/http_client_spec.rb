@@ -55,4 +55,50 @@ RSpec.describe(SOUP::HttpClient) do
       expect(WebMock).to(have_requested(:get, url).times(2))
     end
   end
+
+  # Regression tests for CFG-01: SOUP_HTTP_TIMEOUT and SOUP_HTTP_MAX_RETRIES
+  # are read from ENV at call time so operators can tune behavior on slow
+  # corporate proxies / rate-limited mirrors without forking.
+  describe '.max_retries' do
+    it 'defaults to 3 when SOUP_HTTP_MAX_RETRIES is unset' do
+      allow(ENV).to(receive(:fetch).and_call_original)
+      allow(ENV).to(receive(:fetch).with('SOUP_HTTP_MAX_RETRIES', 3).and_return(3))
+      expect(described_class.max_retries).to(eq(3))
+    end
+
+    it 'honors SOUP_HTTP_MAX_RETRIES when set' do
+      allow(ENV).to(receive(:fetch).and_call_original)
+      allow(ENV).to(receive(:fetch).with('SOUP_HTTP_MAX_RETRIES', 3).and_return('7'))
+      expect(described_class.max_retries).to(eq(7))
+    end
+  end
+
+  describe '.default_timeout' do
+    it 'defaults to 5 when SOUP_HTTP_TIMEOUT is unset' do
+      allow(ENV).to(receive(:fetch).and_call_original)
+      allow(ENV).to(receive(:fetch).with('SOUP_HTTP_TIMEOUT', 5).and_return(5))
+      expect(described_class.default_timeout).to(eq(5))
+    end
+
+    it 'honors SOUP_HTTP_TIMEOUT when set' do
+      allow(ENV).to(receive(:fetch).and_call_original)
+      allow(ENV).to(receive(:fetch).with('SOUP_HTTP_TIMEOUT', 5).and_return('45'))
+      expect(described_class.default_timeout).to(eq(45))
+    end
+  end
+
+  describe '.get with SOUP_HTTP_MAX_RETRIES env override' do
+    before do
+      allow(ENV).to(receive(:fetch).and_call_original)
+      allow(ENV).to(receive(:fetch).with('SOUP_HTTP_MAX_RETRIES', 3).and_return('1'))
+      allow(ENV).to(receive(:fetch).with('SOUP_HTTP_TIMEOUT', 5).and_return(5))
+      stub_request(:get, url).to_timeout
+    end
+
+    it 'uses the env-resolved max_retries as the default when no kwarg is passed', :aggregate_failures do
+      expect { described_class.get(url) }
+        .to(raise_error(Net::OpenTimeout))
+      expect(WebMock).to(have_requested(:get, url).times(2))
+    end
+  end
 end

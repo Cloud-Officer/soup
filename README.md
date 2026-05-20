@@ -57,6 +57,10 @@ You can use the [Docker images](https://hub.docker.com/r/ydesgagne/ci-tools).
 
 Run `soup` in the root of the project.
 
+Running `soup` with no flags is equivalent to `soup --licenses --soup` — both
+license compliance checking and SOUP file generation are enabled by default.
+Pass `--licenses` alone (or `--soup` alone) to opt into a single mode.
+
 ```bash
 Usage: soup options
 
@@ -84,9 +88,11 @@ options
 
 ### Environment Variables
 
-| Variable       | Required | Description                                                                                                                                                                                     |
-|----------------|----------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `GITHUB_TOKEN` | Optional | GitHub personal access token for SPM dependency lookups. Required when processing many Swift packages to avoid GitHub API rate limiting. [Create one here](https://github.com/settings/tokens). |
+| Variable                | Required | Description                                                                                                                                                                                     |
+|-------------------------|----------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `GITHUB_TOKEN`          | Optional | GitHub personal access token for SPM dependency lookups. Required when processing many Swift packages to avoid GitHub API rate limiting. [Create one here](https://github.com/settings/tokens). |
+| `SOUP_HTTP_TIMEOUT`     | Optional | Per-request HTTP timeout in seconds (integer). Defaults to `5`. Raise this on slow corporate proxies or rate-limited mirrors.                                                                  |
+| `SOUP_HTTP_MAX_RETRIES` | Optional | Number of retries on transient timeouts (integer). Defaults to `3`. Each retry uses the same timeout.                                                                                          |
 
 The tool works without `GITHUB_TOKEN` for non-SPM projects. When processing SPM dependencies, unauthenticated GitHub
 API requests are limited to 60 per hour. Setting `GITHUB_TOKEN` increases this to 5,000 per hour.
