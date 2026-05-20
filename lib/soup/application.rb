@@ -87,7 +87,7 @@ module SOUP
     def configure_options(argv)
       Options.new(argv).parse
     rescue OptionParser::InvalidOption => e
-      puts("Error: #{e}")
+      warn("Error: #{e}")
       exit(Status::ERROR_EXIT_CODE)
     end
 
@@ -154,7 +154,7 @@ module SOUP
       return if licenses.any? { |license| package.license.downcase.include?(license) }
       return if exceptions.include?(package.package)
 
-      puts("Invalid license #{package.license} found in #{package.file} in package #{package.package}!")
+      warn("Invalid license #{package.license} found in #{package.file} in package #{package.package}!")
       @exit_code = Status::ERROR_EXIT_CODE if package.license != 'NOASSERTION'
     end
 

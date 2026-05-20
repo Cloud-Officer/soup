@@ -23,29 +23,31 @@ module SOUP
     def fetch_package(file, direct_deps, key, value)
       name = key.split('node_modules/').last
       puts("Checking #{name} #{value['version']}...")
+      url = "https://registry.npmjs.org/#{name}"
 
       begin
-        response = HttpClient.get("https://registry.npmjs.org/#{name}")
-      rescue Net::OpenTimeout, Net::ReadTimeout
+        response = HttpClient.get(url)
+      rescue Net::OpenTimeout, Net::ReadTimeout => e
+        warn("Skipping #{name}@#{value['version']}: network timeout after retries (#{e.message}); package omitted from SOUP")
         return
       end
 
       if response.code != 200
-        puts("Error: #{response.message}!")
+        warn(http_error_message(response, url: url, package: "#{name}@#{value['version']}"))
         return
       end
 
       versions = JSON.parse(response.body)['versions']
 
       if versions.nil?
-        puts("Error: Package #{name} has no versions on registry!")
+        warn("Skipping #{name}@#{value['version']}: registry response has no versions key; package omitted from SOUP")
         return
       end
 
       package_details = versions[value['version']]
 
       if package_details.nil?
-        puts("Error: Package #{name} version #{value['version']} not found!")
+        warn("Skipping #{name}@#{value['version']}: version not present in registry; package omitted from SOUP")
         return
       end
 

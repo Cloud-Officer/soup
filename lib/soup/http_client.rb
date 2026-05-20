@@ -22,11 +22,11 @@ module SOUP
         retries += 1
 
         if retries <= max_retries
-          puts("Error: #{e.message}. Retrying (#{retries}/#{max_retries})...")
+          warn("Error: #{e.message}. Retrying (#{retries}/#{max_retries})...")
           retry
         end
 
-        puts("Error: #{e.message}. Aborting after #{max_retries} retries.")
+        warn("Error: #{e.message}. Aborting after #{max_retries} retries.")
         raise
       end
     end

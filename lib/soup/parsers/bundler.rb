@@ -20,17 +20,20 @@ module SOUP
 
     def fetch_package(file, main_file, spec)
       puts("Checking #{spec.name} #{spec.version}...")
-      response = HttpClient.get("https://api.rubygems.org/api/v2/rubygems/#{spec.name}/versions/#{spec.version}.json")
+      version_url = "https://api.rubygems.org/api/v2/rubygems/#{spec.name}/versions/#{spec.version}.json"
+      response = HttpClient.get(version_url)
 
       if response.code != 200
-        response = HttpClient.get("https://api.rubygems.org/api/v1/versions/#{spec.name}/latest.json")
+        latest_url = "https://api.rubygems.org/api/v1/versions/#{spec.name}/latest.json"
+        response = HttpClient.get(latest_url)
 
-        raise(response.message) unless response.code == 200
+        raise(http_error_message(response, url: latest_url, package: "#{spec.name} #{spec.version}")) unless response.code == 200
 
         latest_version = JSON.parse(response.body)['version']
-        response = HttpClient.get("https://api.rubygems.org/api/v2/rubygems/#{spec.name}/versions/#{latest_version}.json")
+        fallback_url = "https://api.rubygems.org/api/v2/rubygems/#{spec.name}/versions/#{latest_version}.json"
+        response = HttpClient.get(fallback_url)
 
-        raise(response.message) unless response.code == 200
+        raise(http_error_message(response, url: fallback_url, package: "#{spec.name} #{latest_version}")) unless response.code == 200
       end
 
       package_details = JSON.parse(response.body)
