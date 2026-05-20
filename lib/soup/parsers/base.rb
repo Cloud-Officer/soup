@@ -49,6 +49,19 @@ module SOUP
       license
     end
 
+    # Return the path of a sibling file next to `file` (in the same directory).
+    # Uses dirname/basename so a path containing the substring of the lockfile
+    # name (e.g. /Users/blocker/composer.lock) is not corrupted, and preserves
+    # the caller's "relative or absolute" shape: a bare 'composer.lock' yields
+    # 'composer.json' (not './composer.json') so File.read stubs and callers
+    # that pass bare basenames keep working.
+    def sibling_file(file, suffix)
+      dir = File.dirname(file)
+      return suffix if dir.nil? || dir.empty? || dir == '.'
+
+      File.join(dir, suffix)
+    end
+
     # Build an actionable error message for a non-2xx response.
     #
     # Includes status code, reason phrase, URL, the package being processed (when

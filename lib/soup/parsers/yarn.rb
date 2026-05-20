@@ -9,7 +9,7 @@ module SOUP
     def parse(file, packages)
       lock_file = YarnLockParser::Parser.parse(file) ||
                   raise("Unsupported yarn.lock format at #{file}: only Yarn v1 lockfiles are supported by yarn_lock_parser")
-      main_file = File.read(file.gsub('yarn.lock', 'package.json'))
+      main_file = File.read(sibling_file(file, 'package.json'))
 
       work_items = lock_file.reject { |js_package| main_file.include?("#{js_package[:name]}\": \"file:vendor") }
 
