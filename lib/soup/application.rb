@@ -247,6 +247,10 @@ module SOUP
 
     def save_files
       return unless @options.soup_check
+      # Guard against ensure-block invocations that fire before any work has been
+      # done (e.g. validate_config! raised). Without this, an early failure would
+      # overwrite the existing .soup.json with {} and the markdown file with ''.
+      return if @detected_packages.empty? && @markdown.empty?
 
       File.write(@options.cache_file, JSON.pretty_generate(@detected_packages))
       FileUtils.mkdir_p(File.dirname(@options.markdown_file))
