@@ -158,6 +158,28 @@ RSpec.describe(SOUP::GradleParser) do
         expect(packages).to(have_key('com.example:library'))
       end
     end
+
+    context 'when every fallback repository returns a non-200' do
+      # Regression test for BUG-07: the warn used to be a one-liner that
+      # dropped the URL, HTTP status, and response body, making maven-side
+      # failures opaque. It now uses BaseParser#http_error_message so the
+      # operator sees status + url + truncated body.
+      before do
+        stub_request(:get, /maven\.google\.com/).to_return(status: 503, body: 'maven.google: gateway timeout')
+        stub_request(:get, /jcenter\.bintray\.com/).to_return(status: 503, body: 'jcenter offline')
+        stub_request(:get, /plugins\.gradle\.org/).to_return(status: 503, body: 'plugins offline')
+        stub_request(:get, /jitpack\.io/).to_return(status: 503, body: 'jitpack offline')
+        stub_request(:get, /oss\.sonatype\.org/).to_return(status: 503, body: 'sonatype offline')
+        stub_request(:get, /maven\.pkg\.github\.com/).to_return(status: 503, body: 'ghcr offline')
+      end
+
+      it 'warns with http_error_message (status, url, package, truncated body)', :aggregate_failures do
+        packages = {}
+        expect { parser.parse('buildscript-gradle.lockfile', packages) }
+          .to(output(/HTTP 503.*com\.example:library 1\.0\.0.*\.pom.*offline/m).to_stderr)
+        expect(packages).to(be_empty)
+      end
+    end
   end
 
   context 'when package is not in main file' do

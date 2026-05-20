@@ -9,7 +9,8 @@ module SOUP
       main_file_json = JSON.parse(File.read(file.gsub('package-lock.json', 'package.json')))
       direct_deps = (main_file_json['dependencies'] || {}).keys |
                     (main_file_json['devDependencies'] || {}).keys
-      all_packages = lock_file['packages']
+      all_packages = lock_file['packages'] ||
+                     raise("Unsupported package-lock.json at #{file}: lockfileVersion 2+ (with 'packages' key) is required")
 
       work_items = all_packages.reject { |key, value| key.empty? || value['dev'] }
 
