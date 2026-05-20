@@ -175,4 +175,19 @@ RSpec.describe(SOUP::NPMParser) do
       expect(packages['transitive-only'].dependency).to(be(true))
     end
   end
+
+  context 'with a lockfileVersion 1 package-lock.json (no `packages` key)' do
+    # Regression test for BUG-02: npm v6 / lockfileVersion 1 lockfiles only
+    # contain a top-level `dependencies` key; without the nil guard in
+    # npm.rb#parse the next line raises NoMethodError on NilClass and the
+    # whole run aborts.
+    let(:lock_file) { { dependencies: { lodash: { version: '4.17.21' } } }.to_json }
+
+    it 'raises a clear unsupported-format error', :aggregate_failures do
+      packages = {}
+      expect { parser.parse('package-lock.json', packages) }
+        .to(raise_error(/Unsupported package-lock\.json/))
+      expect(packages).to(be_empty)
+    end
+  end
 end

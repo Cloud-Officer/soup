@@ -265,6 +265,44 @@ RSpec.describe(SOUP::SPMParser) do
     end
   end
 
+  context 'when rate limited with the real GitHub response shape' do
+    # Regression test for BUG-05: GitHub returns the actionable string in the
+    # response BODY (the `message` field), not in the HTTP reason phrase.
+    # Pre-fix the parser only inspected `response.message` (reason phrase) so
+    # this realistic 403 fell through to a silent return.
+    before do
+      stub_request(:get, 'https://api.github.com/repos/Alamofire/Alamofire')
+        .to_return(
+          status: [403, 'Forbidden'],
+          body: { message: 'API rate limit exceeded for 1.2.3.4', documentation_url: '...' }.to_json
+        )
+    end
+
+    it 'raises on rate limit even when the reason phrase does not contain the keyword' do
+      packages = {}
+      expect { parser.parse('Package.resolved', packages) }
+        .to(raise_error(/rate limit/))
+    end
+  end
+
+  context 'when GitHub returns a 5xx error' do
+    # Regression test for BUG-06: the parser used to silently `return unless
+    # response.code == 200` on non-200 responses, omitting the package from
+    # the SOUP report with no diagnostic. It should warn via http_error_message
+    # to match the discipline of every other parser post-PR #327.
+    before do
+      stub_request(:get, 'https://api.github.com/repos/Alamofire/Alamofire')
+        .to_return(status: [502, 'Bad Gateway'], body: '<html>upstream timeout</html>')
+    end
+
+    it 'warns with status + url + package context and omits the package', :aggregate_failures do
+      packages = {}
+      expect { parser.parse('Package.resolved', packages) }
+        .to(output(%r{HTTP 502 .*package=alamofire.*url=https://api\.github\.com/repos/Alamofire/Alamofire.*body=<html>upstream timeout</html>}m).to_stderr)
+      expect(packages).to(be_empty)
+    end
+  end
+
   context 'when pin is branch-based (no version)' do
     let(:resolved_file) do
       {

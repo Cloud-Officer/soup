@@ -58,7 +58,8 @@ module SOUP
 
     def fetch_package(file, main_file, group_id, artifact_id, version)
       puts("Checking #{group_id}:#{artifact_id} #{version}...")
-      response = HttpClient.get("https://search.maven.org/solrsearch/select?q=g:%22#{group_id}%22+AND+a:%22#{artifact_id}%22+AND+v:%22#{version}%22&rows=1&wt=json")
+      last_url = "https://search.maven.org/solrsearch/select?q=g:%22#{group_id}%22+AND+a:%22#{artifact_id}%22+AND+v:%22#{version}%22&rows=1&wt=json"
+      response = HttpClient.get(last_url)
 
       parsed = JSON.parse(response.body) if response.code == 200
       docs = parsed&.dig('response', 'docs')
@@ -69,7 +70,8 @@ module SOUP
         website = docs[0]['home_page']
       else
         REPOSITORY_URLS.each do |url|
-          response = HttpClient.get("#{url}/#{group_id.tr('.', '/')}/#{artifact_id}/#{version}/#{artifact_id}-#{version}.pom")
+          last_url = "#{url}/#{group_id.tr('.', '/')}/#{artifact_id}/#{version}/#{artifact_id}-#{version}.pom"
+          response = HttpClient.get(last_url)
 
           next unless response.code == 200
 
@@ -83,7 +85,7 @@ module SOUP
       end
 
       if response.code != 200
-        warn("Could not find #{group_id}:#{artifact_id} #{version}...")
+        warn(http_error_message(response, url: last_url, package: "#{group_id}:#{artifact_id} #{version}"))
         return
       end
 

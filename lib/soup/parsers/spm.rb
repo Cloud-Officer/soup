@@ -78,9 +78,14 @@ module SOUP
           HttpClient.get(url, headers: { Authorization: "token #{token}" })
         end
 
-      raise("Error: #{response.message}! Please set GITHUB_TOKEN.") if response.message.include?('rate limit') || response.message.include?('Bad credentials')
+      unless response.code == 200
+        combined = github_error_message(response)
+        raise('GitHub API: rate limit exceeded. Please set GITHUB_TOKEN to raise the rate limit.') if combined.include?('rate limit')
+        raise('GitHub API: Bad credentials. Please verify GITHUB_TOKEN.') if combined.downcase.include?('bad credentials')
 
-      return unless response.code == 200
+        warn(http_error_message(response, url: url, package: pin_id))
+        return
+      end
 
       package_details = JSON.parse(response.body)
 
@@ -106,6 +111,22 @@ module SOUP
       state = pin['state'] || {}
       raw = state['version'] || state['branch'] || state['revision']
       raw&.to_s&.strip
+    end
+
+    # GitHub returns its actionable error string ("API rate limit exceeded...",
+    # "Bad credentials") in the JSON response body's `message` field, NOT in
+    # the HTTP reason phrase. We still concatenate the reason phrase so any
+    # consumer that already relies on it keeps working.
+    def github_error_message(response)
+      body_message =
+        begin
+          parsed = JSON.parse(response.body.to_s)
+          parsed.is_a?(Hash) ? parsed['message'].to_s : ''
+        rescue JSON::ParserError
+          ''
+        end
+
+      [body_message, response.message.to_s].reject(&:empty?).join(' ')
     end
   end
 end
