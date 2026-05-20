@@ -245,5 +245,32 @@ RSpec.describe(SOUP::PIPParser) do
           .to(raise_error(Errno::ENOENT))
       end
     end
+
+    # TEST-12 follow-up: parser exercised against a real requirements.txt
+    # via SoupFixtureHelpers. Stubs the .in / foreach defaults from the outer
+    # before are bypassed via and_call_original so real File.foreach reads
+    # the tmpdir fixture.
+    context 'with a real requirements.txt fixture on disk' do
+      before do
+        allow(File).to(receive(:exist?).and_call_original)
+        allow(File).to(receive(:foreach).and_call_original)
+        body = {
+          info: {
+            summary: 'HTTP library',
+            home_page: 'https://example.com',
+            classifiers: ['License :: OSI Approved :: Apache Software License'],
+            license: ''
+          }
+        }.to_json
+        stub_request(:get, 'https://pypi.python.org/pypi/requests/json')
+          .to_return(status: 200, body: body)
+      end
+
+      it 'reads pinned requirements from disk and skips comments/blanks' do
+        lockfile_path = write_fixture('requirements.txt', "# top-level comment\nrequests==2.31.0\n\n")
+        parser.parse(lockfile_path, packages)
+        expect(packages['requests']).to(have_attributes(language: 'Python', version: '2.31.0'))
+      end
+    end
   end
 end

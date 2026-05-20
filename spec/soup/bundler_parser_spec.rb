@@ -164,5 +164,43 @@ RSpec.describe(SOUP::BundlerParser) do
           .to(raise_error(Errno::ENOENT))
       end
     end
+
+    # TEST-12 follow-up: parser exercised against real Gemfile + Gemfile.lock
+    # bytes via SoupFixtureHelpers. Overrides the outer LockfileParser /
+    # Bundler.read_file stubs with and_call_original so the real Bundler
+    # parser runs against on-disk content.
+    context 'with real Gemfile.lock + Gemfile fixtures on disk' do
+      # `def` inside a context block defines an instance method on the
+      # example group; it is not a memoized helper and does not count against
+      # RSpec/MultipleMemoizedHelpers like a `let` would.
+      def gemfile_lock_bytes
+        <<~LOCK
+          GEM
+            remote: https://rubygems.org/
+            specs:
+              test-gem (1.0.0)
+          PLATFORMS
+            ruby
+          DEPENDENCIES
+            test-gem
+          BUNDLED WITH
+             2.5.0
+        LOCK
+      end
+
+      before do
+        allow(Bundler::LockfileParser).to(receive(:new).and_call_original)
+        allow(Bundler).to(receive(:read_file).and_call_original)
+        stub_request(:get, 'https://api.rubygems.org/api/v2/rubygems/test-gem/versions/1.0.0.json')
+          .to_return(status: 200, body: v2_response_body)
+      end
+
+      it 'reads Gemfile + Gemfile.lock from disk and lets the real LockfileParser run' do
+        write_fixture('Gemfile', "gem 'test-gem'")
+        lockfile_path = write_fixture('Gemfile.lock', gemfile_lock_bytes)
+        parser.parse(lockfile_path, packages)
+        expect(packages['test-gem']).to(have_attributes(language: 'Ruby', version: '1.0.0', license: 'MIT'))
+      end
+    end
   end
 end

@@ -424,5 +424,29 @@ RSpec.describe(SOUP::SPMParser) do
           .to(raise_error(Errno::ENOENT))
       end
     end
+
+    # TEST-12 follow-up: parser exercised against real Package.resolved bytes
+    # via SoupFixtureHelpers, demonstrating the no-stub pattern for spm.
+    context 'with real Package.resolved + Package.swift fixtures on disk' do
+      before do
+        allow(File).to(receive(:exist?).and_call_original)
+        body = {
+          name: 'Alamofire',
+          private: false,
+          license: { spdx_id: 'MIT' },
+          description: 'Elegant HTTP Networking.',
+          html_url: 'https://github.com/Alamofire/Alamofire'
+        }.to_json
+        stub_request(:get, 'https://api.github.com/repos/Alamofire/Alamofire')
+          .to_return(status: 200, body: body)
+      end
+
+      it 'reads Package.resolved + sibling Package.swift from disk without File stubs' do
+        write_fixture('Package.swift', '.package(url: "https://github.com/Alamofire/Alamofire.git", from: "5.0.0")')
+        lockfile_path = write_fixture('Package.resolved', resolved_file)
+        parser.parse(lockfile_path, packages)
+        expect(packages['Alamofire']).to(have_attributes(language: 'Swift', version: '5.9.0', license: 'MIT'))
+      end
+    end
   end
 end
