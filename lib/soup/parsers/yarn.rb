@@ -8,7 +8,10 @@ module SOUP
   class YarnParser < BaseParser
     def parse(file, packages)
       lock_file = YarnLockParser::Parser.parse(file) ||
-                  raise("Unsupported yarn.lock format at #{file}: only Yarn v1 lockfiles are supported by yarn_lock_parser")
+                  raise(
+                    UnsupportedFormatError,
+                    "Unsupported yarn.lock format at #{file}: only Yarn v1 lockfiles are supported by yarn_lock_parser"
+                  )
       main_file = File.read(sibling_file(file, 'package.json'))
 
       work_items = lock_file.reject { |js_package| main_file.include?("#{js_package[:name]}\": \"file:vendor") }
@@ -33,7 +36,7 @@ module SOUP
         return
       end
 
-      raise(http_error_message(response, url: url, package: "#{name}@#{version}")) unless response.code == 200
+      raise(RegistryError, http_error_message(response, url: url, package: "#{name}@#{version}")) unless response.code == 200
 
       versions = JSON.parse(response.body)['versions']
 

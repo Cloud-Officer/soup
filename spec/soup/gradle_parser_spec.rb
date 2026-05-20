@@ -223,7 +223,7 @@ RSpec.describe(SOUP::GradleParser) do
     it 'raises a clear error rather than a bare ENOENT' do
       packages = {}
       expect { parser.parse('buildscript-gradle.lockfile', packages) }
-        .to(raise_error(/No build\.gradle or build\.gradle\.kts found/))
+        .to(raise_error(SOUP::InvalidLockfileError, /No build\.gradle or build\.gradle\.kts found/))
     end
   end
 

@@ -72,10 +72,10 @@ RSpec.describe(SOUP::BundlerParser) do
           .to_return(status: 500, body: 'Internal Server Error', headers: { Status: 'Internal Server Error' })
       end
 
-      it 'raises an error' do
+      it 'raises a SOUP::RegistryError with status + url + package context' do
         packages = {}
         expect { parser.parse('Gemfile.lock', packages) }
-          .to(raise_error(RuntimeError))
+          .to(raise_error(SOUP::RegistryError, /HTTP 500.*test-gem.*api\.rubygems\.org/m))
       end
     end
   end

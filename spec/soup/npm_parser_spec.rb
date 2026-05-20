@@ -186,7 +186,7 @@ RSpec.describe(SOUP::NPMParser) do
     it 'raises a clear unsupported-format error', :aggregate_failures do
       packages = {}
       expect { parser.parse('package-lock.json', packages) }
-        .to(raise_error(/Unsupported package-lock\.json/))
+        .to(raise_error(SOUP::UnsupportedFormatError, /Unsupported package-lock\.json/))
       expect(packages).to(be_empty)
     end
   end

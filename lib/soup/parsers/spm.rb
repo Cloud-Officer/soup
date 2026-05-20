@@ -11,7 +11,7 @@ module SOUP
       lock_file = lock_file['object'] if lock_file['object']
       main_file = read_main_swift_file(file)
 
-      raise('No main file found!') if main_file.nil?
+      raise(InvalidLockfileError, "No Swift main file found alongside #{file}") if main_file.nil?
 
       token = ENV.fetch('GITHUB_TOKEN', '')
 
@@ -80,8 +80,8 @@ module SOUP
 
       unless response.code == 200
         combined = github_error_message(response)
-        raise('GitHub API: rate limit exceeded. Please set GITHUB_TOKEN to raise the rate limit.') if combined.include?('rate limit')
-        raise('GitHub API: Bad credentials. Please verify GITHUB_TOKEN.') if combined.downcase.include?('bad credentials')
+        raise(RateLimitError, 'GitHub API: rate limit exceeded. Please set GITHUB_TOKEN to raise the rate limit.') if combined.include?('rate limit')
+        raise(AuthenticationError, 'GitHub API: Bad credentials. Please verify GITHUB_TOKEN.') if combined.downcase.include?('bad credentials')
 
         warn(http_error_message(response, url: url, package: pin_id))
         return
