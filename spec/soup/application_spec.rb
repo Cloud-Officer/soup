@@ -237,6 +237,16 @@ RSpec.describe(SOUP::Application) do
         expect(content).to(include('valid/pkg'))
       end
 
+      it 'persists the parser-supplied description verbatim to the cache (no in-place mutation)' do
+        # Regression test for QUAL-02: append_markdown_row used to mutate
+        # package.description in place via Nokogiri.fragment.text + gsub, so
+        # the persisted .soup.json contained the sanitized markdown version
+        # instead of the parser-supplied description.
+        described_class.new(soup_args(skip: skip_parsers_except_composer)).execute
+        cached = JSON.parse(File.read(cache_file.path))
+        expect(cached['valid/pkg']['description']).to(eq('A valid package'))
+      end
+
       it 'raises with no_prompt when risk_level is missing' do
         app = described_class.new(soup_no_prompt_args(skip: skip_parsers_except_composer))
         expect { app.execute }

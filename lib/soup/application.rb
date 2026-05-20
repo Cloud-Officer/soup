@@ -222,11 +222,10 @@ module SOUP
     end
 
     def append_markdown_row(package)
-      if package.description
-        package.description = package.description.delete('|')
-        package.description = package.description.gsub('  ', ' ')
-        package.description = Nokogiri::HTML.fragment(package.description).text
-      end
+      # Sanitize into a local instead of mutating package.description in place.
+      # Pre-fix this method re-rendered every Package twice across re-runs and
+      # leaked sanitized state into the persisted .soup.json cache.
+      description = sanitize_markdown_description(package.description)
 
       website = package.website.to_s.strip.empty? ? '' : "<#{package.website}>"
       cells =
@@ -235,7 +234,7 @@ module SOUP
           package.package,
           package.version,
           package.license,
-          package.description,
+          description,
           website,
           package.last_verified_at,
           package.risk_level,
@@ -243,6 +242,13 @@ module SOUP
           package.verification_reasoning
         ].map { |cell| markdown_cell(cell) }
       @markdown += "|#{cells.join('|')}|\n"
+    end
+
+    def sanitize_markdown_description(raw)
+      return raw if raw.nil? || raw.empty?
+
+      stripped = raw.delete('|').gsub('  ', ' ')
+      Nokogiri::HTML.fragment(stripped).text
     end
 
     def save_files

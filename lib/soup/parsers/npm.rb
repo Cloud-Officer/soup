@@ -38,19 +38,8 @@ module SOUP
         return
       end
 
-      versions = JSON.parse(response.body)['versions']
-
-      if versions.nil?
-        warn("Skipping #{name}@#{value['version']}: registry response has no versions key; package omitted from SOUP")
-        return
-      end
-
-      package_details = versions[value['version']]
-
-      if package_details.nil?
-        warn("Skipping #{name}@#{value['version']}: version not present in registry; package omitted from SOUP")
-        return
-      end
+      package_details = lookup_npm_registry_version(JSON.parse(response.body), name: name, version: value['version'])
+      return if package_details.nil?
 
       raw_license = package_details['license']
       license = raw_license.is_a?(Hash) ? raw_license['type'].to_s : raw_license.to_s

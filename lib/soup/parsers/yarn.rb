@@ -35,19 +35,8 @@ module SOUP
 
       raise(http_error_message(response, url: url, package: "#{name}@#{version}")) unless response.code == 200
 
-      versions = JSON.parse(response.body)['versions']
-
-      if versions.nil?
-        warn("Skipping #{name}@#{version}: registry response has no versions key; package omitted from SOUP")
-        return
-      end
-
-      package_details = versions[version]
-
-      if package_details.nil?
-        warn("Skipping #{name}@#{version}: version not present in registry; package omitted from SOUP")
-        return
-      end
+      package_details = lookup_npm_registry_version(JSON.parse(response.body), name: name, version: version)
+      return if package_details.nil?
 
       build_package(
         name: name,
