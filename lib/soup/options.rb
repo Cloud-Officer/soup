@@ -18,7 +18,6 @@ module SOUP
       @no_prompt = false
       @parser = OptionParser.new
       @skip_bundler = false
-      @skip_cocoapods = false
       @skip_composer = false
       @skip_gradle = false
       @skip_npm = false
@@ -30,7 +29,14 @@ module SOUP
       setup_parser
     end
 
-    attr_reader :auto_reply, :exceptions_file, :ignored_folders, :licenses_check, :licenses_file, :markdown_file, :no_prompt, :skip_bundler, :skip_cocoapods, :skip_composer, :skip_gradle, :skip_npm, :skip_pip, :skip_spm, :skip_yarn, :soup_check, :cache_file
+    # Mode / interaction flags
+    attr_reader :auto_reply, :licenses_check, :no_prompt, :soup_check
+
+    # File-path flags
+    attr_reader :cache_file, :exceptions_file, :licenses_file, :markdown_file, :ignored_folders
+
+    # Per-package-manager skip flags
+    attr_reader :skip_bundler, :skip_composer, :skip_gradle, :skip_npm, :skip_pip, :skip_spm, :skip_yarn
 
     def parse
       @parser.parse!(@argv)
@@ -81,11 +87,6 @@ module SOUP
       @parser.on('', '--skip_bundler', 'Ignore Ruby/Bundler/Gemfile/Gemfile.lock even if detected') do
         @skip_bundler = true
       end
-
-      # Disabled: cocoapods-core requires activesupport < 8
-      # @parser.on('', '--skip_cocoapods', 'Ignore Swift/CocoaPods/Podfile/Podfile.lock even if detected') do
-      #   @skip_cocoapods = true
-      # end
 
       @parser.on('', '--skip_composer', 'Ignore PHP/Composer/composer.json/composer.lock even if detected') do
         @skip_composer = true

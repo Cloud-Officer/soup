@@ -54,6 +54,39 @@ RSpec.describe(SOUP::HttpClient) do
 
       expect(WebMock).to(have_requested(:get, url).times(2))
     end
+
+    # TEST-06: HttpClient.get is a thin retry wrapper that only catches
+    # Net::OpenTimeout / Net::ReadTimeout. These specs lock in the contract
+    # that non-timeout transient errors pass through unchanged (no retry),
+    # and that 4xx/5xx responses are returned to the caller for inspection
+    # rather than raised internally.
+    it 'returns a 404 response unchanged so callers can decide how to handle it', :aggregate_failures do
+      stub_request(:get, url).to_return(status: 404, body: 'Not Found')
+      response = described_class.get(url)
+      expect(response.code).to(eq(404))
+      expect(WebMock).to(have_requested(:get, url).times(1))
+    end
+
+    it 'returns a 5xx response without retrying', :aggregate_failures do
+      stub_request(:get, url).to_return(status: 503, body: 'gateway timeout')
+      response = described_class.get(url)
+      expect(response.code).to(eq(503))
+      expect(WebMock).to(have_requested(:get, url).times(1))
+    end
+
+    it 'lets Errno::ECONNREFUSED bypass the retry loop and propagate', :aggregate_failures do
+      stub_request(:get, url).to_raise(Errno::ECONNREFUSED.new("connect to #{url} refused"))
+      expect { described_class.get(url) }
+        .to(raise_error(Errno::ECONNREFUSED))
+      expect(WebMock).to(have_requested(:get, url).times(1))
+    end
+
+    it 'lets SocketError bypass the retry loop and propagate', :aggregate_failures do
+      stub_request(:get, url).to_raise(SocketError.new('getaddrinfo: nodename nor servname provided'))
+      expect { described_class.get(url) }
+        .to(raise_error(SocketError, /getaddrinfo/))
+      expect(WebMock).to(have_requested(:get, url).times(1))
+    end
   end
 
   # Regression tests for CFG-01: SOUP_HTTP_TIMEOUT and SOUP_HTTP_MAX_RETRIES

@@ -68,8 +68,7 @@ module SOUP
       pin_id = pin['identity'] || pin['package']
       version = pin_version(pin)
       puts("Checking #{pin_id} #{version}...")
-      location = pin['location'] || pin['repositoryURL']
-      url = "https://api.github.com/repos/#{location.gsub('git@github.com:', '').gsub('https://github.com/', '').gsub('.git', '')}"
+      url = "https://api.github.com/repos/#{github_repo_path(pin['location'] || pin['repositoryURL'])}"
 
       response =
         if token.empty?
@@ -101,6 +100,19 @@ module SOUP
         website: package_details['html_url']&.strip,
         dependency: !main_file.include?(package_details['name'])
       )
+    end
+
+    # Extract the GitHub owner/repo path from a Package.resolved location URL,
+    # which can appear in three forms:
+    #   - https://github.com/<owner>/<repo>.git
+    #   - https://github.com/<owner>/<repo>
+    #   - git@github.com:<owner>/<repo>.git
+    # Single regex replaces the previous triple-chained gsub.
+    GITHUB_URL_NOISE = %r{\A(?:git@github\.com:|https?://github\.com/)|\.git\z}
+    private_constant :GITHUB_URL_NOISE
+
+    def github_repo_path(location)
+      location.to_s.gsub(GITHUB_URL_NOISE, '')
     end
 
     # Resolve the pinned identifier for a Swift Package.resolved entry.

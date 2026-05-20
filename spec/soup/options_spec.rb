@@ -15,10 +15,15 @@ RSpec.describe(SOUP::Options) do
 
       it 'sets default skip options', :aggregate_failures do
         expect(options.skip_bundler).to(be(false))
-        expect(options.skip_cocoapods).to(be(false))
         expect(options.skip_composer).to(be(false))
         expect(options.skip_gradle).to(be(false))
         expect(options.skip_npm).to(be(false))
+      end
+
+      it 'does not respond to the historical skip_cocoapods accessor' do
+        # Regression guard for QUAL-08: the CocoaPods parser + skip_cocoapods
+        # flag were dropped because cocoapods-core is pinned to activesupport < 8.
+        expect(options).not_to(respond_to(:skip_cocoapods))
       end
 
       it 'sets remaining default skip options', :aggregate_failures do
