@@ -30,7 +30,9 @@ module SOUP
     private
 
     def fetch_package(file, main_file, token, pin)
-      puts("Checking #{pin['identity'] || pin['package']} #{pin['state']['version']}...")
+      pin_id = pin['identity'] || pin['package']
+      version = pin_version(pin)
+      puts("Checking #{pin_id} #{version}...")
       location = pin['location'] || pin['repositoryURL']
       url = "https://api.github.com/repos/#{location.gsub('git@github.com:', '').gsub('https://github.com/', '').gsub('.git', '')}"
 
@@ -53,12 +55,22 @@ module SOUP
         name: package_details['name'],
         file: file,
         language: 'Swift',
-        version: pin['state']['version']&.strip,
+        version: version,
         license: package_details.dig('license', 'spdx_id')&.strip,
         description: Package.sanitize_description(package_details['description'], first_sentence: true),
         website: package_details['html_url']&.strip,
         dependency: !main_file.include?(package_details['name'])
       )
+    end
+
+    # Resolve the pinned identifier for a Swift Package.resolved entry.
+    # Pins can be version-, branch-, or revision-based; the SOUP record needs
+    # to capture whichever identifier is present rather than silently falling
+    # back to empty string for non-version pins.
+    def pin_version(pin)
+      state = pin['state'] || {}
+      raw = state['version'] || state['branch'] || state['revision']
+      raw&.to_s&.strip
     end
   end
 end

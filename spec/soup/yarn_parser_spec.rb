@@ -75,6 +75,42 @@ RSpec.describe(SOUP::YarnParser) do
     expect(packages).to(be_empty)
   end
 
+  context 'when the resolved version is not in the registry' do
+    let(:missing_version_response) do
+      {
+        versions: {
+          '4.17.20': { license: 'MIT', description: 'older', homepage: '' }
+        }
+      }.to_json
+    end
+
+    before do
+      stub_request(:get, 'https://registry.npmjs.org/lodash')
+        .to_return(status: 200, body: missing_version_response)
+    end
+
+    it 'skips the package instead of crashing on nil license access', :aggregate_failures do
+      packages = {}
+      expect { parser.parse('yarn.lock', packages) }
+        .not_to(raise_error)
+      expect(packages).to(be_empty)
+    end
+  end
+
+  context 'when the registry response lacks a versions key' do
+    before do
+      stub_request(:get, 'https://registry.npmjs.org/lodash')
+        .to_return(status: 200, body: { _id: 'lodash', name: 'lodash' }.to_json)
+    end
+
+    it 'skips the package instead of raising', :aggregate_failures do
+      packages = {}
+      expect { parser.parse('yarn.lock', packages) }
+        .not_to(raise_error)
+      expect(packages).to(be_empty)
+    end
+  end
+
   context 'when license is Unlicense' do
     let(:unlicense_response) do
       {

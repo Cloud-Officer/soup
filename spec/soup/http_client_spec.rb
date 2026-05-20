@@ -21,7 +21,7 @@ RSpec.describe(SOUP::HttpClient) do
 
       it 'retries on timeout and succeeds on third attempt', :aggregate_failures do
         expect { described_class.get(url) }
-          .to(output(/Retrying/).to_stdout)
+          .to(output(/Retrying/).to_stderr)
         expect(WebMock).to(have_requested(:get, url).times(3))
       end
     end
@@ -31,7 +31,7 @@ RSpec.describe(SOUP::HttpClient) do
 
       expect do
         described_class.get(url)
-      end.to(raise_error(Net::OpenTimeout).and(output(/Aborting/).to_stdout))
+      end.to(raise_error(Net::OpenTimeout).and(output(/Aborting/).to_stderr))
 
       expect(WebMock).to(have_requested(:get, url).times(4))
     end
@@ -50,7 +50,7 @@ RSpec.describe(SOUP::HttpClient) do
 
       expect do
         described_class.get(url, max_retries: 1)
-      end.to(raise_error(Net::OpenTimeout).and(output(/Aborting/).to_stdout))
+      end.to(raise_error(Net::OpenTimeout).and(output(/Aborting/).to_stderr))
 
       expect(WebMock).to(have_requested(:get, url).times(2))
     end

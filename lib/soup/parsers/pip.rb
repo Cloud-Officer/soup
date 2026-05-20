@@ -6,6 +6,9 @@ require_relative 'base'
 
 module SOUP
   class PIPParser < BaseParser
+    LOOSE_CONSTRAINT_PATTERN = /[<>!~]/
+    private_constant :LOOSE_CONSTRAINT_PATTERN
+
     def parse(file, packages)
       main_file =
         if File.exist?(file.gsub('.txt', '.in'))
@@ -21,9 +24,16 @@ module SOUP
         next if line.include?('#')
 
         line = line.slice(0, line.index(';')) if line.include?(';')
-        pip_package, version = line.strip.split('==')
+        pip_package, version = line.strip.split('==', 2)
 
         next if pip_package&.strip&.empty?
+
+        if version.nil? || version.strip.empty?
+          warn("Skipping `#{line.strip}` in #{file}: only exact `==` version pins are supported (loose constraints like >=/~=/!= are not supported)")
+          next
+        end
+
+        next if pip_package.match?(LOOSE_CONSTRAINT_PATTERN)
 
         work_items << [pip_package, version]
       end
@@ -37,9 +47,10 @@ module SOUP
 
     def fetch_package(file, main_file, pip_package, version)
       puts("Checking #{pip_package} #{version}...")
-      response = HttpClient.get("https://pypi.python.org/pypi/#{pip_package.sub(/\[[^\]]+\]/, '')}/json")
+      url = "https://pypi.python.org/pypi/#{pip_package.sub(/\[[^\]]+\]/, '')}/json"
+      response = HttpClient.get(url)
 
-      raise(response.message) unless response.code == 200
+      raise(http_error_message(response, url: url, package: "#{pip_package}==#{version}")) unless response.code == 200
 
       package_details = JSON.parse(response.body)
       info = package_details['info']

@@ -149,6 +149,25 @@ RSpec.describe(SOUP::PIPParser) do
     end
   end
 
+  context 'when a requirement uses a non-`==` constraint' do
+    before do
+      allow(File).to(
+        receive(:foreach).with('requirements.txt')
+                         .and_yield("requests>=2.31.0\n")
+                         .and_yield("flask~=3.0.0\n")
+                         .and_yield("django!=4.0\n")
+      )
+    end
+
+    it 'skips loose constraints with a stderr warning instead of issuing a doomed 404 request', :aggregate_failures do
+      packages = {}
+      expect { parser.parse('requirements.txt', packages) }
+        .to(output(/only exact `==` version pins are supported/).to_stderr)
+      expect(WebMock).not_to(have_requested(:get, /pypi\.python\.org/))
+      expect(packages).to(be_empty)
+    end
+  end
+
   context 'when license is empty and no classifiers exist' do
     let(:empty_license_response) do
       {

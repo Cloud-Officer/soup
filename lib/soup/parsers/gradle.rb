@@ -9,9 +9,12 @@ module SOUP
     REPOSITORY_URLS = %w[https://maven.google.com https://jcenter.bintray.com https://plugins.gradle.org/m2/ https://jitpack.io https://oss.sonatype.org/content/repositories/snapshots/ https://maven.pkg.github.com/skgmn/].freeze
     private_constant :REPOSITORY_URLS
 
+    MAIN_FILE_NAMES = %w[build.gradle build.gradle.kts].freeze
+    private_constant :MAIN_FILE_NAMES
+
     def parse(file, packages)
       lock_file = File.readlines(file)
-      main_file = File.read(file.sub(/(?:buildscript-)?gradle\.lockfile\z/, 'build.gradle'))
+      main_file = read_main_gradle_file(file)
       is_buildscript = File.basename(file) == 'buildscript-gradle.lockfile'
 
       work_items =
@@ -38,6 +41,20 @@ module SOUP
     end
 
     private
+
+    # Try Groovy DSL first then Kotlin DSL. Kotlin DSL (build.gradle.kts) is the
+    # Gradle 8.x+ default for new Android/Kotlin projects, so a parser that only
+    # tries build.gradle would crash on modern projects.
+    def read_main_gradle_file(file)
+      MAIN_FILE_NAMES.each do |name|
+        candidate = file.sub(/(?:buildscript-)?gradle\.lockfile\z/, name)
+        return File.read(candidate)
+      rescue Errno::ENOENT
+        next
+      end
+
+      raise("No build.gradle or build.gradle.kts found alongside #{file}")
+    end
 
     def fetch_package(file, main_file, group_id, artifact_id, version)
       puts("Checking #{group_id}:#{artifact_id} #{version}...")
@@ -66,7 +83,7 @@ module SOUP
       end
 
       if response.code != 200
-        puts("Could not find #{group_id}:#{artifact_id} #{version}...")
+        warn("Could not find #{group_id}:#{artifact_id} #{version}...")
         return
       end
 

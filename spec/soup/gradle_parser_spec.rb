@@ -175,6 +175,36 @@ RSpec.describe(SOUP::GradleParser) do
     end
   end
 
+  context 'when only build.gradle.kts (Kotlin DSL) exists' do
+    before do
+      allow(File).to(receive(:read).with('build.gradle').and_raise(Errno::ENOENT))
+      allow(File).to(receive(:read).with('build.gradle.kts').and_return(main_file))
+
+      stub_request(:get, %r{search\.maven\.org/solrsearch/select})
+        .to_return(status: 200, body: maven_response)
+    end
+
+    it 'falls back to build.gradle.kts instead of crashing', :aggregate_failures do
+      packages = {}
+      expect { parser.parse('buildscript-gradle.lockfile', packages) }
+        .not_to(raise_error)
+      expect(packages).to(have_key('com.example:library'))
+    end
+  end
+
+  context 'when neither build.gradle nor build.gradle.kts exists' do
+    before do
+      allow(File).to(receive(:read).with('build.gradle').and_raise(Errno::ENOENT))
+      allow(File).to(receive(:read).with('build.gradle.kts').and_raise(Errno::ENOENT))
+    end
+
+    it 'raises a clear error rather than a bare ENOENT' do
+      packages = {}
+      expect { parser.parse('buildscript-gradle.lockfile', packages) }
+        .to(raise_error(/No build\.gradle or build\.gradle\.kts found/))
+    end
+  end
+
   context 'when parsing an application gradle.lockfile (runtime classpath)' do
     let(:runtime_lock_content) do
       [

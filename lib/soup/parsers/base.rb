@@ -48,5 +48,19 @@ module SOUP
 
       license
     end
+
+    # Build an actionable error message for a non-2xx response.
+    #
+    # Includes status code, reason phrase, URL, the package being processed (when
+    # known), and a truncated body snippet so registry-side failures can be
+    # diagnosed without rerunning under DEBUG.
+    def http_error_message(response, url:, package: nil)
+      parts = ["HTTP #{response.code} #{response.message}"]
+      parts << "package=#{package}" if package
+      parts << "url=#{url}"
+      body = response.body.to_s.strip
+      parts << "body=#{body[0, 200]}" unless body.empty?
+      parts.join(' | ')
+    end
   end
 end

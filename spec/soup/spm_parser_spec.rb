@@ -246,6 +246,56 @@ RSpec.describe(SOUP::SPMParser) do
     end
   end
 
+  context 'when pin is branch-based (no version)' do
+    let(:resolved_file) do
+      {
+        pins: [
+          {
+            identity: 'alamofire',
+            location: 'https://github.com/Alamofire/Alamofire.git',
+            state: { branch: 'main', revision: 'abc123' }
+          }
+        ]
+      }.to_json
+    end
+
+    before do
+      stub_request(:get, 'https://api.github.com/repos/Alamofire/Alamofire')
+        .to_return(status: 200, body: github_response)
+    end
+
+    it 'records the branch as the pin identifier so the SOUP entry is not blank' do
+      packages = {}
+      parser.parse('Package.resolved', packages)
+      expect(packages['Alamofire'].version).to(eq('main'))
+    end
+  end
+
+  context 'when pin is revision-only (no version, no branch)' do
+    let(:resolved_file) do
+      {
+        pins: [
+          {
+            identity: 'alamofire',
+            location: 'https://github.com/Alamofire/Alamofire.git',
+            state: { revision: 'deadbeef' }
+          }
+        ]
+      }.to_json
+    end
+
+    before do
+      stub_request(:get, 'https://api.github.com/repos/Alamofire/Alamofire')
+        .to_return(status: 200, body: github_response)
+    end
+
+    it 'falls back to the revision when neither version nor branch is set' do
+      packages = {}
+      parser.parse('Package.resolved', packages)
+      expect(packages['Alamofire'].version).to(eq('deadbeef'))
+    end
+  end
+
   context 'with bad credentials' do
     before do
       allow(ENV).to(receive(:fetch).with('GITHUB_TOKEN', '').and_return('bad_token'))
