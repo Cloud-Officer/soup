@@ -6,7 +6,15 @@ require_relative 'base'
 
 module SOUP
   class GradleParser < BaseParser
-    REPOSITORY_URLS = %w[https://maven.google.com https://jcenter.bintray.com https://plugins.gradle.org/m2/ https://jitpack.io https://oss.sonatype.org/content/repositories/snapshots/ https://maven.pkg.github.com/skgmn/].freeze
+    # Maven mirrors tried (in order) when search.maven.org has no matching docs.
+    # jcenter.bintray.com (sunset 2022) and the third-party maven.pkg.github.com/skgmn
+    # vendor repo were dropped from the list. Neither served a generic SOUP scan.
+    REPOSITORY_URLS = %w[
+      https://maven.google.com
+      https://plugins.gradle.org/m2/
+      https://jitpack.io
+      https://oss.sonatype.org/content/repositories/snapshots/
+    ].freeze
     private_constant :REPOSITORY_URLS
 
     MAIN_FILE_NAMES = %w[build.gradle build.gradle.kts].freeze

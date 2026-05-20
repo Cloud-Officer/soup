@@ -10,7 +10,6 @@ require_relative 'errors'
 require_relative 'http_client'
 require_relative 'options'
 require_relative 'parsers/bundler'
-# require_relative 'parsers/cocoapods'
 require_relative 'parsers/composer'
 require_relative 'parsers/generic'
 require_relative 'parsers/gradle'
@@ -30,7 +29,10 @@ module SOUP
     'gradle.lockfile': { parser: GradleParser, skip: :skip_gradle },
     'Package.resolved': { parser: SPMParser, skip: :skip_spm },
     'package-lock.json': { parser: NPMParser, skip: :skip_npm },
-    'Podfile.lock': { parser: nil, skip: :skip_cocoapods }, # Disabled: cocoapods-core requires activesupport < 8
+    # Podfile.lock was previously handled by SOUP::CocoaPodsParser. Removed
+    # because cocoapods-core requires activesupport < 8 which is incompatible
+    # with this project's runtime. Track follow-up to restore CocoaPods support
+    # once cocoapods-core picks up activesupport 8.
     'requirements.txt': { parser: PIPParser, skip: :skip_pip },
     'yarn.lock': { parser: YarnParser, skip: :skip_yarn }
   }.freeze
@@ -106,10 +108,14 @@ module SOUP
             next
           end
 
-          puts("Reading file #{file}...")
+          # Skip-flag and nil-parser guards come BEFORE the "Reading file" announce
+          # so the user never sees "Reading file X..." for a file that is then
+          # silently dropped (e.g. --skip_yarn, or Podfile.lock whose registry
+          # entry maps to a nil parser).
           next if @options.public_send(config[:skip])
           next if config[:parser].nil?
 
+          puts("Reading file #{file}...")
           generic_parser.parse(config[:parser].new, file, @detected_packages)
         end
       end

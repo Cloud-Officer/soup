@@ -142,14 +142,12 @@ RSpec.describe(SOUP::GradleParser) do
         stub_request(:get, 'https://maven.google.com/com/example/library/1.0.0/library-1.0.0.pom')
           .to_return(status: 404)
 
-        stub_request(:get, 'https://jcenter.bintray.com/com/example/library/1.0.0/library-1.0.0.pom')
+        stub_request(:get, %r{plugins\.gradle\.org/m2/.*com/example/library/1\.0\.0/library-1\.0\.0\.pom})
           .to_return(status: 200, body: pom_xml)
 
         # Stub remaining repos in case they get hit
-        stub_request(:get, /plugins\.gradle\.org/).to_return(status: 404)
         stub_request(:get, /jitpack\.io/).to_return(status: 404)
         stub_request(:get, /oss\.sonatype\.org/).to_return(status: 404)
-        stub_request(:get, /maven\.pkg\.github\.com/).to_return(status: 404)
       end
 
       it 'tries multiple repository URLs until one succeeds' do
@@ -166,11 +164,9 @@ RSpec.describe(SOUP::GradleParser) do
       # operator sees status + url + truncated body.
       before do
         stub_request(:get, /maven\.google\.com/).to_return(status: 503, body: 'maven.google: gateway timeout')
-        stub_request(:get, /jcenter\.bintray\.com/).to_return(status: 503, body: 'jcenter offline')
         stub_request(:get, /plugins\.gradle\.org/).to_return(status: 503, body: 'plugins offline')
         stub_request(:get, /jitpack\.io/).to_return(status: 503, body: 'jitpack offline')
         stub_request(:get, /oss\.sonatype\.org/).to_return(status: 503, body: 'sonatype offline')
-        stub_request(:get, /maven\.pkg\.github\.com/).to_return(status: 503, body: 'ghcr offline')
       end
 
       it 'warns with http_error_message (status, url, package, truncated body)', :aggregate_failures do
