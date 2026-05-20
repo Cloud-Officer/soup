@@ -30,7 +30,25 @@ module SOUP
       @dependency = false
     end
 
-    attr_accessor :file, :language, :package, :version, :license, :description, :website, :last_verified_at, :risk_level, :requirements, :verification_reasoning, :dependency
+    # Parser-produced fields. Set once during BaseParser#build_package and
+    # treated as read-only afterwards. Accessors stay mutable so existing tests
+    # can patch fixture content, but production code MUST NOT mutate these
+    # after construction.
+    attr_accessor :file, :language, :package, :version, :license, :description, :website, :dependency
+
+    # Verification fields. Filled in by Application#check_packages from the
+    # cache, dependency defaults, or interactive prompts.
+    attr_accessor :last_verified_at, :risk_level, :requirements, :verification_reasoning
+
+    # True when all four verification fields are non-empty (i.e. the package is
+    # ready to be rendered into the SOUP markdown). Use this instead of
+    # ad-hoc presence checks across application.rb.
+    def verified?
+      !last_verified_at.to_s.empty? &&
+        !risk_level.to_s.empty? &&
+        !requirements.to_s.empty? &&
+        !verification_reasoning.to_s.empty?
+    end
 
     def as_json(_options = {})
       {

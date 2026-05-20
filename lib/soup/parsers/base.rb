@@ -63,6 +63,28 @@ module SOUP
       File.join(dir, suffix)
     end
 
+    # Look up a specific package version inside an npm-style registry payload
+    # (whose shape is `{ "versions": { "<version>": { ... } } }`). Returns the
+    # per-version hash, or nil + a stderr warn if the registry response is
+    # malformed or the version is missing. Shared by NPM and Yarn parsers.
+    def lookup_npm_registry_version(payload, name:, version:)
+      versions = payload['versions']
+
+      if versions.nil?
+        warn("Skipping #{name}@#{version}: registry response has no versions key; package omitted from SOUP")
+        return
+      end
+
+      package_details = versions[version]
+
+      if package_details.nil?
+        warn("Skipping #{name}@#{version}: version not present in registry; package omitted from SOUP")
+        return
+      end
+
+      package_details
+    end
+
     # Build an actionable error message for a non-2xx response.
     #
     # Includes status code, reason phrase, URL, the package being processed (when

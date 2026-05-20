@@ -7,8 +7,28 @@ SimpleCov.start do
   minimum_coverage line: 80, branch: 80
 end
 
+require 'fileutils'
+require 'tmpdir'
 require 'webmock/rspec'
 require_relative '../lib/soup/application'
+
+# TEST-12 helpers: write parser fixture files into a per-example tmpdir
+# instead of stubbing File.read / File.foreach / File.readlines. Returns the
+# absolute path of the written file so parser specs can pass it to
+# Parser#parse the same way detect_packages would in production. The tmpdir is
+# cleaned up by an after-each hook in RSpec.configure below.
+module SoupFixtureHelpers
+  def fixture_dir
+    @fixture_dir ||= Dir.mktmpdir('soup-spec-')
+  end
+
+  def write_fixture(relative_path, content)
+    path = File.join(fixture_dir, relative_path)
+    FileUtils.mkdir_p(File.dirname(path))
+    File.write(path, content)
+    path
+  end
+end
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
@@ -27,4 +47,12 @@ RSpec.configure do |config|
 
   # Disable external HTTP requests by default
   WebMock.disable_net_connect!(allow_localhost: true)
+
+  config.include(SoupFixtureHelpers)
+
+  config.after do
+    next unless instance_variable_defined?(:@fixture_dir) && @fixture_dir
+
+    FileUtils.rm_rf(@fixture_dir)
+  end
 end

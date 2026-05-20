@@ -166,4 +166,39 @@ RSpec.describe(SOUP::YarnParser) do
         .to(raise_error(Errno::ENOENT))
     end
   end
+
+  # TEST-12: parser exercised against real lockfile bytes written to a
+  # Dir.mktmpdir via SoupFixtureHelpers, exactly like Application#detect_packages
+  # would invoke it in production. Demonstrates the new pattern; follow-up
+  # work will migrate the remaining parsers spec-by-spec.
+  context 'with a real yarn.lock fixture on disk' do
+    let(:yarn_lock_content) do
+      <<~LOCK
+        # yarn lockfile v1
+
+
+        lodash@^4.17.0:
+          version "4.17.21"
+          resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.21.tgz#..."
+      LOCK
+    end
+
+    let(:package_json_content) { '{"dependencies":{"lodash":"^4.17.0"}}' }
+
+    before do
+      # Let the real YarnLockParser run against on-disk bytes instead of the
+      # literal-path stub from the outer `before`.
+      allow(YarnLockParser::Parser).to(receive(:parse).and_call_original)
+      write_fixture('package.json', package_json_content)
+      stub_request(:get, 'https://registry.npmjs.org/lodash')
+        .to_return(status: 200, body: registry_response)
+    end
+
+    it 'reads the lockfile and writes a Package entry without File stubs' do
+      lockfile_path = write_fixture('yarn.lock', yarn_lock_content)
+      packages = {}
+      parser.parse(lockfile_path, packages)
+      expect(packages['lodash']).to(have_attributes(language: 'JS', version: '4.17.21', license: 'MIT'))
+    end
+  end
 end

@@ -135,4 +135,28 @@ RSpec.describe(SOUP::Package) do
       expect(parsed['language']).to(eq('Ruby'))
     end
   end
+
+  describe '#verified?' do
+    subject(:package) { described_class.new('test-package') }
+
+    it 'is false on a freshly constructed package' do
+      expect(package.verified?).to(be(false))
+    end
+
+    it 'is false when only some verification fields are set', :aggregate_failures do
+      package.last_verified_at = '2026-01-01'
+      package.risk_level = 'Low'
+      expect(package.verified?).to(be(false))
+      package.requirements = 'Required for HTTP'
+      expect(package.verified?).to(be(false))
+    end
+
+    it 'is true once all four verification fields are non-empty' do
+      package.last_verified_at = '2026-01-01'
+      package.risk_level = 'Low'
+      package.requirements = 'Required for HTTP'
+      package.verification_reasoning = 'Well known'
+      expect(package.verified?).to(be(true))
+    end
+  end
 end
