@@ -67,6 +67,26 @@ RSpec.describe(SOUP::Application) do
     ] + skip
   end
 
+  def missing_soup_args
+    [
+      '--soup',
+      '--auto_reply',
+      '--licenses_file',
+      '/nonexistent/path.json',
+      '--exceptions_file',
+      exceptions_file.path,
+      '--cache_file',
+      cache_file.path,
+      '--markdown_file',
+      markdown_file
+    ] + skip_all_parsers
+  end
+
+  def write_existing_soup_files(cache_content, markdown_content)
+    File.write(cache_file.path, cache_content)
+    File.write(markdown_file, markdown_content)
+  end
+
   def soup_nonexistent_cache_args
     [
       '--soup',
@@ -164,6 +184,18 @@ RSpec.describe(SOUP::Application) do
         app = described_class.new(missing_licenses_args)
         expect { app.execute }
           .to(raise_error(/Configuration file not found/))
+      end
+
+      # Regression test for BUG-08: when --soup is enabled (default) and
+      # validate_config! raises before any state is populated, the ensure
+      # block must NOT overwrite existing .soup.json / docs/soup.md with
+      # empty content.
+      it 'in --soup mode, preserves the existing cache and markdown when validate_config! raises', :aggregate_failures do
+        write_existing_soup_files('{"existing/pkg":{"version":"1.0.0"}}', "# Existing SOUP\n")
+        expect { described_class.new(missing_soup_args).execute }
+          .to(raise_error(/Configuration file not found/))
+        expect(File.read(cache_file.path)).to(eq('{"existing/pkg":{"version":"1.0.0"}}'))
+        expect(File.read(markdown_file)).to(eq("# Existing SOUP\n"))
       end
     end
 

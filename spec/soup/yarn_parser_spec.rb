@@ -111,6 +111,23 @@ RSpec.describe(SOUP::YarnParser) do
     end
   end
 
+  context 'when YarnLockParser returns nil (Yarn Berry / v2+ lockfile)' do
+    # Regression test for BUG-01: yarn_lock_parser 0.1.0 returns nil from
+    # Parser.parse when compatible? is false (Yarn v2+). Without the guard
+    # in yarn.rb#parse the next line raises NoMethodError on NilClass and
+    # the whole run aborts.
+    before do
+      allow(YarnLockParser::Parser).to(receive(:parse).with('yarn.lock').and_return(nil))
+    end
+
+    it 'raises a clear unsupported-format error', :aggregate_failures do
+      packages = {}
+      expect { parser.parse('yarn.lock', packages) }
+        .to(raise_error(/Unsupported yarn\.lock format/))
+      expect(packages).to(be_empty)
+    end
+  end
+
   context 'when license is Unlicense' do
     let(:unlicense_response) do
       {
