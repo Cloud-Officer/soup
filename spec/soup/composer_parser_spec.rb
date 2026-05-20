@@ -30,11 +30,11 @@ RSpec.describe(SOUP::ComposerParser) do
 
   let(:packages) { {} }
 
-  before do
+  before do |example|
     allow(File).to(receive(:read).and_call_original)
     allow(File).to(receive(:read).with('composer.lock').and_return(lock_file))
     allow(File).to(receive(:read).with('composer.json').and_return(main_file))
-    parser.parse('composer.lock', packages)
+    parser.parse('composer.lock', packages) if example.metadata.fetch(:auto_parse, true)
   end
 
   it 'parses packages and packages-dev', :aggregate_failures do
@@ -157,6 +157,25 @@ RSpec.describe(SOUP::ComposerParser) do
     end
   end
 
+  # TEST-04: graceful malformed-lockfile cases. Structurally-empty and
+  # unknown-shape JSON should fall through the existing `|| []` guards
+  # without raising.
+  context 'with structurally empty (but valid JSON) composer.lock' do
+    let(:lock_file) { '{}' }
+
+    it 'parses without raising and adds no packages' do
+      expect(packages).to(be_empty)
+    end
+  end
+
+  context 'with composer.lock that lacks both packages and packages-dev keys' do
+    let(:lock_file) { '{"foo": "bar"}' }
+
+    it 'parses without raising and adds no packages' do
+      expect(packages).to(be_empty)
+    end
+  end
+
   context 'with URL license' do
     let(:lock_file) do
       {
@@ -175,6 +194,36 @@ RSpec.describe(SOUP::ComposerParser) do
 
     it 'converts URL license to NOASSERTION' do
       expect(packages['vendor/url-pkg'].license).to(eq('NOASSERTION'))
+    end
+  end
+
+  # TEST-04: malformed-JSON cases use auto_parse: false so the top-level
+  # before-hook does not invoke parser.parse before the example body has
+  # a chance to assert on the expected exception.
+  context 'with malformed composer.lock JSON', auto_parse: false do
+    let(:lock_file) { 'not json' }
+
+    it 'raises JSON::ParserError on non-JSON garbage' do
+      expect { parser.parse('composer.lock', packages) }
+        .to(raise_error(JSON::ParserError))
+    end
+
+    context 'with empty composer.lock content' do
+      let(:lock_file) { '' }
+
+      it 'raises JSON::ParserError' do
+        expect { parser.parse('composer.lock', packages) }
+          .to(raise_error(JSON::ParserError))
+      end
+    end
+
+    context 'with truncated JSON in composer.lock' do
+      let(:lock_file) { '{"packages":[{"name":"vendor/x"' }
+
+      it 'raises JSON::ParserError' do
+        expect { parser.parse('composer.lock', packages) }
+          .to(raise_error(JSON::ParserError))
+      end
     end
   end
 end

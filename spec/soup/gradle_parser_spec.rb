@@ -255,4 +255,57 @@ RSpec.describe(SOUP::GradleParser) do
       expect(packages['androidx.activity:activity-compose'].dependency).to(be(false))
     end
   end
+
+  # TEST-04: malformed-lockfile coverage. The gradle lockfile is a plain
+  # text format; the parser tolerates empty input and comment-only files,
+  # and skips lines that don't have a key=value shape.
+  describe '#parse with malformed input' do
+    let(:packages) { {} }
+
+    before do
+      allow(File).to(receive(:read).and_call_original)
+      allow(File).to(receive(:read).with('build.gradle').and_return("dependencies {}\n"))
+      allow(File).to(receive(:read).with('build.gradle.kts').and_raise(Errno::ENOENT))
+    end
+
+    context 'with an empty gradle.lockfile' do
+      before do
+        allow(File).to(receive(:readlines).with('buildscript-gradle.lockfile').and_return([]))
+      end
+
+      it 'parses without raising and adds no packages', :aggregate_failures do
+        expect { parser.parse('buildscript-gradle.lockfile', packages) }
+          .not_to(raise_error)
+        expect(packages).to(be_empty)
+      end
+    end
+
+    context 'with a comment-only gradle.lockfile' do
+      let(:lines) { ["# This is a Gradle generated file\n", "# Do not edit\n"] }
+
+      before do
+        allow(File).to(receive(:readlines).with('buildscript-gradle.lockfile').and_return(lines))
+      end
+
+      it 'parses without raising and adds no packages', :aggregate_failures do
+        expect { parser.parse('buildscript-gradle.lockfile', packages) }
+          .not_to(raise_error)
+        expect(packages).to(be_empty)
+      end
+    end
+
+    context 'with malformed lines missing the = separator' do
+      let(:lines) { ["garbage line without equals\n", "another garbage line\n"] }
+
+      before do
+        allow(File).to(receive(:readlines).with('buildscript-gradle.lockfile').and_return(lines))
+      end
+
+      it 'parses without raising and adds no packages (silently skipped)', :aggregate_failures do
+        expect { parser.parse('buildscript-gradle.lockfile', packages) }
+          .not_to(raise_error)
+        expect(packages).to(be_empty)
+      end
+    end
+  end
 end

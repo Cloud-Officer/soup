@@ -192,4 +192,42 @@ RSpec.describe(SOUP::PIPParser) do
       expect(packages['pkg'].license).to(be_nil)
     end
   end
+
+  # TEST-04: malformed-input coverage. requirements.txt is a plain text format;
+  # the parser skips blank/comment lines and raises on lines with loose
+  # constraints (covered in the existing "loose constraints" context).
+  describe '#parse with malformed input' do
+    let(:packages) { {} }
+
+    before do
+      allow(File).to(receive(:exist?).and_call_original)
+      allow(File).to(receive(:exist?).with('requirements.in').and_return(false))
+    end
+
+    context 'with an empty requirements.txt' do
+      before do
+        allow(File).to(receive(:foreach).with('requirements.txt'))
+      end
+
+      it 'parses without raising and adds no packages', :aggregate_failures do
+        expect { parser.parse('requirements.txt', packages) }
+          .not_to(raise_error)
+        expect(packages).to(be_empty)
+      end
+    end
+
+    context 'with a comment-and-blank-line-only requirements.txt' do
+      before do
+        ["# header comment\n", "\n", "  \n", "# another comment\n"].each do |line|
+          allow(File).to(receive(:foreach).with('requirements.txt').and_yield(line))
+        end
+      end
+
+      it 'parses without raising and adds no packages', :aggregate_failures do
+        expect { parser.parse('requirements.txt', packages) }
+          .not_to(raise_error)
+        expect(packages).to(be_empty)
+      end
+    end
+  end
 end

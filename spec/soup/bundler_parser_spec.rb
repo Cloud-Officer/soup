@@ -116,4 +116,40 @@ RSpec.describe(SOUP::BundlerParser) do
       expect(packages['test-gem'].dependency).to(be(true))
     end
   end
+
+  # TEST-04: malformed-lockfile coverage. Locks in current behavior so future
+  # error-handling improvements are deliberate, not accidental.
+  describe '#parse with malformed input' do
+    let(:packages) { {} }
+
+    before do
+      # Override the top-level stub so the parser's Bundler::LockfileParser.new
+      # actually runs against the test content rather than the instance_double.
+      allow(Bundler::LockfileParser).to(receive(:new).and_call_original)
+    end
+
+    context 'with an empty Gemfile.lock' do
+      before do
+        allow(Bundler).to(receive(:read_file).with('Gemfile.lock').and_return(''))
+      end
+
+      it 'parses without raising and adds no packages', :aggregate_failures do
+        expect { parser.parse('Gemfile.lock', packages) }
+          .not_to(raise_error)
+        expect(packages).to(be_empty)
+      end
+    end
+
+    context 'with garbage content that yields no specs' do
+      before do
+        allow(Bundler).to(receive(:read_file).with('Gemfile.lock').and_return("not a lockfile\n"))
+      end
+
+      it 'parses without raising and adds no packages', :aggregate_failures do
+        expect { parser.parse('Gemfile.lock', packages) }
+          .not_to(raise_error)
+        expect(packages).to(be_empty)
+      end
+    end
+  end
 end
