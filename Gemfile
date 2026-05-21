@@ -10,7 +10,6 @@ gem 'json', '>= 2.6.0'
 gem 'nokogiri', '>= 1.16.0'
 gem 'optparse', '>= 0.2.0'
 gem 'parallel', '>= 1.22.0'
-gem 'semantic', '>= 1.6.1'
 gem 'tty-prompt', '>= 0.23.1'
 gem 'yarn_lock_parser', '>= 0.1.0'
 

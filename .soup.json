@@ -42,7 +42,7 @@
     "license": "Ruby",
     "description": "Support for encoding and decoding binary data using a Base64 representation.",
     "website": "https://github.com/ruby/base64",
-    "last_verified_at": "2023-08-11",
+    "last_verified_at": "2026-05-21",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -54,7 +54,7 @@
     "license": "Ruby",
     "description": "This library provides arbitrary-precision decimal floating-point number class.",
     "website": "https://github.com/ruby/bigdecimal",
-    "last_verified_at": "2023-10-26",
+    "last_verified_at": "2026-05-21",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -78,7 +78,7 @@
     "license": "MIT",
     "description": "Generic connection pool for Ruby",
     "website": "https://github.com/mperham/connection_pool",
-    "last_verified_at": "2023-10-26",
+    "last_verified_at": "2026-05-21",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -138,7 +138,7 @@
     "license": "Ruby",
     "description": "Distributed object system for Ruby",
     "website": "https://github.com/ruby/drb",
-    "last_verified_at": "2023-10-26",
+    "last_verified_at": "2026-05-21",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -198,7 +198,7 @@
     "license": "MIT",
     "description": "A Language Server Protocol SDK",
     "website": "https://github.com/mtsmfm/language_server-protocol-ruby",
-    "last_verified_at": "2023-06-29",
+    "last_verified_at": "2026-05-21",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -234,7 +234,7 @@
     "license": "MIT",
     "description": "A minimal mime type library",
     "website": "https://github.com/discourse/mini_mime",
-    "last_verified_at": "2023-03-30",
+    "last_verified_at": "2026-05-21",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -354,7 +354,7 @@
     "license": "Ruby",
     "description": "Racc is an LALR(1) parser generator.",
     "website": "https://github.com/ruby/racc",
-    "last_verified_at": "2023-06-09",
+    "last_verified_at": "2026-05-21",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -462,7 +462,7 @@
     "license": "MIT",
     "description": "RuboCop is a Ruby code style checking and code formatting tool.",
     "website": "https://rubocop.org/",
-    "last_verified_at": "2023-06-12",
+    "last_verified_at": "2026-05-21",
     "risk_level": "Low",
     "requirements": "Ruby linter",
     "verification_reasoning": "Most popular gem on rubygems"
@@ -472,9 +472,9 @@
     "package": "rubocop-ast",
     "version": "1.49.1",
     "license": "MIT",
-    "description": "  RuboCop's Node and NodePattern classes.",
+    "description": "    RuboCop's Node and NodePattern classes.",
     "website": "https://www.rubocop.org/",
-    "last_verified_at": "2023-06-12",
+    "last_verified_at": "2026-05-21",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -544,7 +544,7 @@
     "package": "rubocop-thread_safety",
     "version": "0.7.3",
     "license": "MIT",
-    "description": "  Thread-safety checks via static analysis.",
+    "description": "    Thread-safety checks via static analysis.",
     "website": "https://github.com/rubocop/rubocop-thread_safety",
     "last_verified_at": "2024-09-16",
     "risk_level": "Low",
@@ -574,18 +574,6 @@
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
-  },
-  "semantic": {
-    "language": "Ruby",
-    "package": "semantic",
-    "version": "1.6.1",
-    "license": "MIT",
-    "description": "Semantic Version utility class for parsing, storing, and comparing versions",
-    "website": "https://github.com/jlindsey/semantic",
-    "last_verified_at": "2026-02-25",
-    "risk_level": "Low",
-    "requirements": "Used to manipulate package versions.",
-    "verification_reasoning": "Very popular on rubygems.org"
   },
   "simplecov": {
     "language": "Ruby",
@@ -748,7 +736,7 @@
     "package": "wisper",
     "version": "2.0.1",
     "license": "MIT",
-    "description": "  A micro library providing objects with Publish-Subscribe capabilities.",
+    "description": "    A micro library providing objects with Publish-Subscribe capabilities.",
     "website": "https://github.com/krisleech/wisper",
     "last_verified_at": "2024-08-07",
     "risk_level": "Low",
@@ -762,7 +750,7 @@
     "license": "MIT",
     "description": "Parser for yarn.lock files.",
     "website": "https://rubygems.org/yarn_lock_parser",
-    "last_verified_at": "2023-06-08",
+    "last_verified_at": "2026-05-21",
     "risk_level": "Low",
     "requirements": "Read yarn lock file",
     "verification_reasoning": "Popular gem"
