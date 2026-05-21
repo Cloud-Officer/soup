@@ -38,7 +38,7 @@ The following package managers are supported:
 * SPM (Package.resolved)
 * Yarn (yarn.lock)
 
-Note: CocoaPods support is implemented but currently disabled due to a dependency conflict. The `cocoapods-core` gem requires `activesupport < 8`, which is incompatible with the current ActiveSupport version used by this project.
+Note: CocoaPods (`Podfile.lock`) support was removed pending upstream compatibility. The `cocoapods-core` gem requires `activesupport < 8`, which is incompatible with the ActiveSupport version this project depends on. `Podfile.lock` files are currently skipped silently; support will be reinstated once `cocoapods-core` upgrades.
 
 The soup file is generated in `./docs/soup.md` and a cache file `.soup.json` is used to preserved previously entered
 choices.

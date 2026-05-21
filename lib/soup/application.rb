@@ -29,10 +29,7 @@ module SOUP
     'gradle.lockfile': { parser: GradleParser, skip: :skip_gradle },
     'Package.resolved': { parser: SPMParser, skip: :skip_spm },
     'package-lock.json': { parser: NPMParser, skip: :skip_npm },
-    # Podfile.lock was previously handled by SOUP::CocoaPodsParser. Removed
-    # because cocoapods-core requires activesupport < 8 which is incompatible
-    # with this project's runtime. Track follow-up to restore CocoaPods support
-    # once cocoapods-core picks up activesupport 8.
+    # Podfile.lock support removed: cocoapods-core requires activesupport < 8.
     'requirements.txt': { parser: PIPParser, skip: :skip_pip },
     'yarn.lock': { parser: YarnParser, skip: :skip_yarn }
   }.freeze
