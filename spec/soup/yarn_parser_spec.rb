@@ -67,12 +67,25 @@ RSpec.describe(SOUP::YarnParser) do
       .to(raise_error(SOUP::RegistryError, /HTTP 500.*lodash.*registry\.npmjs\.org/m))
   end
 
-  it 'handles timeout gracefully', :aggregate_failures do
-    stub_request(:get, 'https://registry.npmjs.org/lodash').to_timeout
-    packages = {}
-    expect { parser.parse('yarn.lock', packages) }
-      .not_to(raise_error)
-    expect(packages).to(be_empty)
+  # TEST-305: assert the full retry loop ran and the user saw the
+  # "Aborting after N retries" warning before the parser skipped the
+  # package, not just that parse did not raise.
+  context 'when the registry times out' do
+    let(:url) { 'https://registry.npmjs.org/lodash' }
+    let(:packages) { {} }
+
+    before { stub_request(:get, url).to_timeout }
+
+    it 'emits the "Aborting after N retries" stderr warning' do
+      expect { parser.parse('yarn.lock', packages) }
+        .to(output(/Aborting after \d+ retries/).to_stderr)
+    end
+
+    it 'retries max_retries+1 times before skipping the package', :aggregate_failures do
+      parser.parse('yarn.lock', packages)
+      expect(packages).to(be_empty)
+      expect(a_request(:get, url)).to(have_been_made.times(SOUP::HttpClient.max_retries + 1))
+    end
   end
 
   context 'when the resolved version is not in the registry' do
@@ -199,6 +212,55 @@ RSpec.describe(SOUP::YarnParser) do
       packages = {}
       parser.parse(lockfile_path, packages)
       expect(packages['lodash']).to(have_attributes(language: 'JS', version: '4.17.21', license: 'MIT'))
+    end
+  end
+
+  # TEST-306: parity with bundler / composer which both cover an explicit
+  # empty-lockfile context. yarn_lock_parser 0.1.0 returns nil for empty
+  # input, so the parser surfaces the same UnsupportedFormatError as the
+  # Yarn Berry case (BUG-01) but via a real on-disk file rather than a stub.
+  context 'with an empty yarn.lock fixture on disk' do
+    let(:packages) { {} }
+    let(:lockfile_path) do
+      write_fixture('package.json', '{}')
+      write_fixture('yarn.lock', '')
+    end
+
+    before { allow(YarnLockParser::Parser).to(receive(:parse).and_call_original) }
+
+    it 'raises UnsupportedFormatError when YarnLockParser cannot parse the file', :aggregate_failures do
+      expect { parser.parse(lockfile_path, packages) }
+        .to(raise_error(SOUP::UnsupportedFormatError, /Unsupported yarn\.lock format/))
+      expect(packages).to(be_empty)
+    end
+  end
+
+  # TEST-303: exercise parallel_each at a meaningful fan-out width so a
+  # parser-local concurrency or ordering regression in Yarn is caught
+  # by the spec suite, not just by NPM's existing scale guard.
+  context 'with 100 packages (Parallel.map fan-out)' do
+    let(:parsed_lock) do
+      (1..100).map { |i| { name: "pkg-#{i}", version: '1.0.0' } }
+    end
+
+    let(:main_file) do
+      deps = (1..100).to_h { |i| ["pkg-#{i}", '^1.0.0'] }
+      { dependencies: deps }.to_json
+    end
+
+    before do
+      (1..100).each do |i|
+        body = { versions: { '1.0.0': { license: 'MIT', description: "pkg-#{i}", homepage: '' } } }.to_json
+        stub_request(:get, "https://registry.npmjs.org/pkg-#{i}").to_return(status: 200, body: body)
+      end
+    end
+
+    it 'parses all 100 packages without raising and adds them to the hash', :aggregate_failures do
+      packages = {}
+      parser.parse('yarn.lock', packages)
+      expect(packages.size).to(eq(100))
+      expect(packages['pkg-1']).to(have_attributes(language: 'JS', version: '1.0.0', license: 'MIT'))
+      expect(packages['pkg-100']).to(have_attributes(language: 'JS', version: '1.0.0', license: 'MIT'))
     end
   end
 end

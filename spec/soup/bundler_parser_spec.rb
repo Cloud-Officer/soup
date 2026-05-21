@@ -203,4 +203,31 @@ RSpec.describe(SOUP::BundlerParser) do
       end
     end
   end
+
+  # TEST-303: exercise parallel_each at a meaningful fan-out width so a
+  # parser-local concurrency or ordering regression in Bundler is caught
+  # by the spec suite, not just by NPM's existing scale guard.
+  context 'with 100 packages (Parallel.map fan-out)' do
+    let(:specs) do
+      (1..100).map do |i|
+        instance_double(Bundler::LazySpecification, name: "gem-#{i}", version: Gem::Version.new('1.0.0'))
+      end
+    end
+    let(:lock_file) { instance_double(Bundler::LockfileParser, specs: specs) }
+
+    before do
+      (1..100).each do |i|
+        stub_request(:get, "https://api.rubygems.org/api/v2/rubygems/gem-#{i}/versions/1.0.0.json")
+          .to_return(status: 200, body: v2_response_body)
+      end
+    end
+
+    it 'parses all 100 gems without raising and adds them to the hash', :aggregate_failures do
+      packages = {}
+      parser.parse('Gemfile.lock', packages)
+      expect(packages.size).to(eq(100))
+      expect(packages['gem-1']).to(have_attributes(license: 'MIT', version: '1.0.0'))
+      expect(packages['gem-100']).to(have_attributes(license: 'MIT', version: '1.0.0'))
+    end
+  end
 end
