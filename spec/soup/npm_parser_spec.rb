@@ -73,12 +73,25 @@ RSpec.describe(SOUP::NPMParser) do
     end
   end
 
-  it 'skips on timeout', :aggregate_failures do
-    stub_request(:get, 'https://registry.npmjs.org/lodash').to_timeout
-    packages = {}
-    expect { parser.parse('package-lock.json', packages) }
-      .not_to(raise_error)
-    expect(packages).to(be_empty)
+  # TEST-305: assert the full retry loop ran and the user saw the
+  # "Aborting after N retries" warning before the parser skipped the
+  # package, not just that parse did not raise.
+  context 'when the registry times out' do
+    let(:url) { 'https://registry.npmjs.org/lodash' }
+    let(:packages) { {} }
+
+    before { stub_request(:get, url).to_timeout }
+
+    it 'emits the "Aborting after N retries" stderr warning' do
+      expect { parser.parse('package-lock.json', packages) }
+        .to(output(/Aborting after \d+ retries/).to_stderr)
+    end
+
+    it 'retries max_retries+1 times before skipping the package', :aggregate_failures do
+      parser.parse('package-lock.json', packages)
+      expect(packages).to(be_empty)
+      expect(a_request(:get, url)).to(have_been_made.times(SOUP::HttpClient.max_retries + 1))
+    end
   end
 
   context 'when license is Unlicense' do

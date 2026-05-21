@@ -273,4 +273,36 @@ RSpec.describe(SOUP::PIPParser) do
       end
     end
   end
+
+  # TEST-303: exercise parallel_each at a meaningful fan-out width so a
+  # parser-local concurrency or ordering regression in PIP is caught
+  # by the spec suite, not just by NPM's existing scale guard.
+  context 'with 100 packages (Parallel.map fan-out)' do
+    let(:requirements_content) do
+      (1..100).map { |i| "pkg-#{i}==1.0.0\n" }
+              .join
+    end
+
+    before do
+      (1..100).each do |i|
+        body = {
+          info: {
+            summary: "pkg-#{i}",
+            home_page: 'https://example.com',
+            classifiers: ['License :: OSI Approved :: MIT License'],
+            license: ''
+          }
+        }.to_json
+        stub_request(:get, "https://pypi.python.org/pypi/pkg-#{i}/json").to_return(status: 200, body: body)
+      end
+    end
+
+    it 'parses all 100 requirements without raising and adds them to the hash', :aggregate_failures do
+      packages = {}
+      parser.parse('requirements.txt', packages)
+      expect(packages.size).to(eq(100))
+      expect(packages['pkg-1']).to(have_attributes(language: 'Python', version: '1.0.0'))
+      expect(packages['pkg-100']).to(have_attributes(language: 'Python', version: '1.0.0'))
+    end
+  end
 end

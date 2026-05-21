@@ -369,4 +369,46 @@ RSpec.describe(SOUP::GradleParser) do
       end
     end
   end
+
+  # TEST-303: exercise parallel_each at a meaningful fan-out width so a
+  # parser-local concurrency or ordering regression in Gradle is caught
+  # by the spec suite, not just by NPM's existing scale guard.
+  context 'with 100 packages (Parallel.map fan-out)' do
+    let(:lock_content) do
+      (1..100).map { |i| "com.example:lib-#{i}:1.0.0=classpath\n" }
+    end
+
+    let(:main_file) do
+      (1..100).map { |i| %(classpath "com.example:lib-#{i}:1.0.0") }
+              .join("\n")
+    end
+
+    let(:maven_response_for) do
+      lambda do |i|
+        {
+          response: {
+            numFound: 1,
+            docs: [
+              { l: 'Apache-2.0', p: "lib-#{i} description", home_page: 'https://example.com' }
+            ]
+          }
+        }.to_json
+      end
+    end
+
+    before do
+      (1..100).each do |i|
+        stub_request(:get, %r{search\.maven\.org/solrsearch/select.*a:%22lib-#{i}%22})
+          .to_return(status: 200, body: maven_response_for.call(i))
+      end
+    end
+
+    it 'parses all 100 classpath entries without raising and adds them to the hash', :aggregate_failures do
+      packages = {}
+      parser.parse('buildscript-gradle.lockfile', packages)
+      expect(packages.size).to(eq(100))
+      expect(packages['com.example:lib-1']).to(have_attributes(language: 'Kotlin', version: '1.0.0', license: 'Apache-2.0'))
+      expect(packages['com.example:lib-100']).to(have_attributes(language: 'Kotlin', version: '1.0.0', license: 'Apache-2.0'))
+    end
+  end
 end

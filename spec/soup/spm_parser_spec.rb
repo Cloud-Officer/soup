@@ -449,4 +449,47 @@ RSpec.describe(SOUP::SPMParser) do
       end
     end
   end
+
+  # TEST-303: exercise parallel_each at a meaningful fan-out width so a
+  # parser-local concurrency or ordering regression in SPM is caught
+  # by the spec suite, not just by NPM's existing scale guard.
+  context 'with 100 packages (Parallel.map fan-out)' do
+    let(:resolved_file) do
+      pins =
+        (1..100).map do |i|
+          {
+            identity: "pkg-#{i}",
+            location: "https://github.com/example-org/pkg-#{i}.git",
+            state: { version: '1.0.0' }
+          }
+        end
+      { pins: pins }.to_json
+    end
+
+    let(:main_file_content) do
+      (1..100).map { |i| %(.package(url: "https://github.com/example-org/pkg-#{i}.git", from: "1.0.0")) }
+              .join("\n")
+    end
+
+    before do
+      (1..100).each do |i|
+        body = {
+          name: "pkg-#{i}",
+          private: false,
+          license: { spdx_id: 'MIT' },
+          description: "pkg-#{i} description",
+          html_url: "https://github.com/example-org/pkg-#{i}"
+        }.to_json
+        stub_request(:get, "https://api.github.com/repos/example-org/pkg-#{i}").to_return(status: 200, body: body)
+      end
+    end
+
+    it 'parses all 100 pins without raising and adds them to the hash', :aggregate_failures do
+      packages = {}
+      parser.parse('Package.resolved', packages)
+      expect(packages.size).to(eq(100))
+      expect(packages['pkg-1']).to(have_attributes(language: 'Swift', version: '1.0.0', license: 'MIT'))
+      expect(packages['pkg-100']).to(have_attributes(language: 'Swift', version: '1.0.0', license: 'MIT'))
+    end
+  end
 end
