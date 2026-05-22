@@ -6,7 +6,7 @@
     "license": "MIT",
     "description": "A toolkit of support libraries and Ruby core extensions extracted from the Rails framework",
     "website": "https://rubyonrails.org",
-    "last_verified_at": "2026-02-25",
+    "last_verified_at": "2026-05-22",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -18,7 +18,7 @@
     "license": "Apache-2.0",
     "description": "Addressable is an alternative implementation to the URI implementation that is",
     "website": "https://github.com/sporkmonger/addressable",
-    "last_verified_at": "2026-02-25",
+    "last_verified_at": "2026-05-22",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -30,7 +30,7 @@
     "license": "MIT",
     "description": "A library for working with Abstract Syntax Trees.",
     "website": "https://whitequark.github.io/ast/",
-    "last_verified_at": "2026-02-25",
+    "last_verified_at": "2026-05-22",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -42,7 +42,7 @@
     "license": "Ruby",
     "description": "Support for encoding and decoding binary data using a Base64 representation.",
     "website": "https://github.com/ruby/base64",
-    "last_verified_at": "2026-05-21",
+    "last_verified_at": "2026-05-22",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -54,7 +54,7 @@
     "license": "Ruby",
     "description": "This library provides arbitrary-precision decimal floating-point number class.",
     "website": "https://github.com/ruby/bigdecimal",
-    "last_verified_at": "2026-05-21",
+    "last_verified_at": "2026-05-22",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -66,7 +66,7 @@
     "license": "MIT",
     "description": "Modern concurrency tools including agents, futures, promises, thread pools, actors, supervisors, and more.",
     "website": "http://www.concurrent-ruby.com",
-    "last_verified_at": "2026-02-25",
+    "last_verified_at": "2026-05-22",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -78,7 +78,7 @@
     "license": "MIT",
     "description": "Generic connection pool for Ruby",
     "website": "https://github.com/mperham/connection_pool",
-    "last_verified_at": "2026-05-21",
+    "last_verified_at": "2026-05-22",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -90,7 +90,7 @@
     "license": "MIT",
     "description": "Really simple JSON and XML parsing, ripped from Merb and Rails.",
     "website": "https://github.com/jnunemaker/crack",
-    "last_verified_at": "2026-02-25",
+    "last_verified_at": "2026-05-22",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -102,7 +102,7 @@
     "license": "Ruby",
     "description": "The CSV library provides a complete interface to CSV files and data",
     "website": "https://github.com/ruby/csv",
-    "last_verified_at": "2024-04-29",
+    "last_verified_at": "2026-05-22",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -114,7 +114,7 @@
     "license": "MIT",
     "description": "Diff::LCS computes the difference between two Enumerable sequences using the",
     "website": "https://github.com/halostatue/diff-lcs",
-    "last_verified_at": "2026-02-25",
+    "last_verified_at": "2026-05-22",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -126,7 +126,7 @@
     "license": "MIT",
     "description": "Docile treats the methods of a given ruby object as a DSL (domain specific language) within a given block",
     "website": "https://ms-ati.github.io/docile/",
-    "last_verified_at": "2026-02-25",
+    "last_verified_at": "2026-05-22",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -138,7 +138,7 @@
     "license": "Ruby",
     "description": "Distributed object system for Ruby",
     "website": "https://github.com/ruby/drb",
-    "last_verified_at": "2026-05-21",
+    "last_verified_at": "2026-05-22",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -150,7 +150,7 @@
     "license": "MIT",
     "description": " Hashdiff is a diff lib to compute the smallest difference between two hashes",
     "website": "https://github.com/liufengyun/hashdiff",
-    "last_verified_at": "2026-02-25",
+    "last_verified_at": "2026-05-22",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -162,7 +162,7 @@
     "license": "MIT",
     "description": "Makes http fun! Also, makes consuming restful web services dead easy.",
     "website": "https://github.com/jnunemaker/httparty",
-    "last_verified_at": "2026-02-25",
+    "last_verified_at": "2026-05-22",
     "risk_level": "Medium",
     "requirements": "Makes http fun! Also, makes consuming restful web services dead easy.",
     "verification_reasoning": "Very popular on rubygems.org"
@@ -174,7 +174,7 @@
     "license": "MIT",
     "description": "New wave Internationalization support for Ruby.",
     "website": "https://github.com/ruby-i18n/i18n",
-    "last_verified_at": "2026-02-25",
+    "last_verified_at": "2026-05-22",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -186,7 +186,7 @@
     "license": "Ruby",
     "description": "A JSON implementation as a JRuby extension.",
     "website": "https://github.com/ruby/json",
-    "last_verified_at": "2026-02-25",
+    "last_verified_at": "2026-05-22",
     "risk_level": "Low",
     "requirements": "Used to read package manager and cache files.",
     "verification_reasoning": "Very popular on rubygems.org"
@@ -198,7 +198,7 @@
     "license": "MIT",
     "description": "A Language Server Protocol SDK",
     "website": "https://github.com/mtsmfm/language_server-protocol-ruby",
-    "last_verified_at": "2026-05-21",
+    "last_verified_at": "2026-05-22",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -210,7 +210,7 @@
     "license": "MIT",
     "description": "A plugin specification for linter and formatter rulesets",
     "website": "https://github.com/standardrb/lint_roller",
-    "last_verified_at": "2025-02-15",
+    "last_verified_at": "2026-05-22",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -222,7 +222,7 @@
     "license": "Ruby",
     "description": "Provides a simple logging utility for outputting messages.",
     "website": "https://github.com/ruby/logger",
-    "last_verified_at": "2024-08-12",
+    "last_verified_at": "2026-05-22",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -234,7 +234,7 @@
     "license": "MIT",
     "description": "A minimal mime type library",
     "website": "https://github.com/discourse/mini_mime",
-    "last_verified_at": "2026-05-21",
+    "last_verified_at": "2026-05-22",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -246,7 +246,7 @@
     "license": "MIT",
     "description": "minitest provides a complete suite of testing facilities supporting",
     "website": "https://minite.st/",
-    "last_verified_at": "2026-02-25",
+    "last_verified_at": "2026-05-22",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -258,7 +258,7 @@
     "license": "MIT",
     "description": "Provides swappable XML backends utilizing LibXML, Nokogiri, Ox, or REXML.",
     "website": "https://github.com/sferik/multi_xml",
-    "last_verified_at": "2026-02-25",
+    "last_verified_at": "2026-05-22",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -270,7 +270,7 @@
     "license": "MIT",
     "description": "Nokogiri (鋸) makes it easy and painless to work with XML and HTML from Ruby",
     "website": "https://nokogiri.org",
-    "last_verified_at": "2024-05-15",
+    "last_verified_at": "2026-05-22",
     "risk_level": "Low",
     "requirements": "XML parser",
     "verification_reasoning": "Most popular library"
@@ -282,7 +282,7 @@
     "license": "Ruby",
     "description": "OptionParser is a class for command-line option analysis",
     "website": "https://github.com/ruby/optparse",
-    "last_verified_at": "2026-02-25",
+    "last_verified_at": "2026-05-22",
     "risk_level": "Low",
     "requirements": "Used to parse command line arguments.",
     "verification_reasoning": "Very popular on rubygems.org"
@@ -294,7 +294,7 @@
     "license": "MIT",
     "description": "Run any kind of code in parallel processes",
     "website": "https://github.com/grosser/parallel",
-    "last_verified_at": "2026-05-14",
+    "last_verified_at": "2026-05-22",
     "risk_level": "Low",
     "requirements": "Used to parallelize HTTP fetches across CPU cores in each parser.",
     "verification_reasoning": "Very popular on rubygems.org"
@@ -306,7 +306,7 @@
     "license": "MIT",
     "description": "A Ruby parser written in pure Ruby.",
     "website": "https://github.com/whitequark/parser",
-    "last_verified_at": "2026-02-25",
+    "last_verified_at": "2026-05-22",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -318,7 +318,7 @@
     "license": "MIT",
     "description": "Terminal strings styling with intuitive and clean API.",
     "website": "https://ttytoolkit.org",
-    "last_verified_at": "2024-08-07",
+    "last_verified_at": "2026-05-22",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -330,7 +330,7 @@
     "license": "MIT",
     "description": "Prism Ruby parser",
     "website": "https://github.com/ruby/prism",
-    "last_verified_at": "2025-03-31",
+    "last_verified_at": "2026-05-22",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -342,7 +342,7 @@
     "license": "MIT",
     "description": "PublicSuffix can parse and decompose a domain name into top level domain, domain and subdomains.",
     "website": "https://simonecarletti.com/code/publicsuffix-ruby",
-    "last_verified_at": "2026-02-25",
+    "last_verified_at": "2026-05-22",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -354,7 +354,7 @@
     "license": "Ruby",
     "description": "Racc is an LALR(1) parser generator.",
     "website": "https://github.com/ruby/racc",
-    "last_verified_at": "2026-05-21",
+    "last_verified_at": "2026-05-22",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -366,7 +366,7 @@
     "license": "MIT",
     "description": "Colorize printed text on ANSI terminals",
     "website": "https://github.com/sickill/rainbow",
-    "last_verified_at": "2026-02-25",
+    "last_verified_at": "2026-05-22",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -378,7 +378,7 @@
     "license": "MIT",
     "description": "A library for tokenizing, lexing, and parsing Ruby regular expressions.",
     "website": "https://github.com/ammar/regexp_parser",
-    "last_verified_at": "2026-02-25",
+    "last_verified_at": "2026-05-22",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -390,7 +390,7 @@
     "license": "BSD-2-Clause",
     "description": "An XML toolkit for Ruby",
     "website": "https://github.com/ruby/rexml",
-    "last_verified_at": "2026-02-25",
+    "last_verified_at": "2026-05-22",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -402,7 +402,7 @@
     "license": "MIT",
     "description": "BDD for Ruby",
     "website": "https://rspec.info",
-    "last_verified_at": "2026-02-25",
+    "last_verified_at": "2026-05-22",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -414,7 +414,7 @@
     "license": "MIT",
     "description": "BDD for Ruby",
     "website": "https://rspec.info",
-    "last_verified_at": "2026-02-25",
+    "last_verified_at": "2026-05-22",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -426,7 +426,7 @@
     "license": "MIT",
     "description": "rspec-expectations provides a simple, readable API to express expected outcomes of a code example.",
     "website": "https://rspec.info",
-    "last_verified_at": "2026-02-25",
+    "last_verified_at": "2026-05-22",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -438,7 +438,7 @@
     "license": "MIT",
     "description": "RSpec's 'test double' framework, with support for stubbing and mocking",
     "website": "https://rspec.info",
-    "last_verified_at": "2026-02-25",
+    "last_verified_at": "2026-05-22",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -450,7 +450,7 @@
     "license": "MIT",
     "description": "Support utilities for RSpec gems",
     "website": "https://rspec.info",
-    "last_verified_at": "2026-02-25",
+    "last_verified_at": "2026-05-22",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -462,7 +462,7 @@
     "license": "MIT",
     "description": "RuboCop is a Ruby code style checking and code formatting tool.",
     "website": "https://rubocop.org/",
-    "last_verified_at": "2026-05-21",
+    "last_verified_at": "2026-05-22",
     "risk_level": "Low",
     "requirements": "Ruby linter",
     "verification_reasoning": "Most popular gem on rubygems"
@@ -474,7 +474,7 @@
     "license": "MIT",
     "description": "    RuboCop's Node and NodePattern classes.",
     "website": "https://www.rubocop.org/",
-    "last_verified_at": "2026-05-21",
+    "last_verified_at": "2026-05-22",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -486,7 +486,7 @@
     "license": "MIT",
     "description": "Code style checking for Capybara test files (RSpec, Cucumber, Minitest).",
     "website": "https://github.com/rubocop/rubocop-capybara",
-    "last_verified_at": "2024-09-16",
+    "last_verified_at": "2026-05-22",
     "risk_level": "Low",
     "requirements": "Ruby linter",
     "verification_reasoning": "Most popular gem"
@@ -498,7 +498,7 @@
     "license": "MIT",
     "description": "A collection of RuboCop cops to improve GraphQL-related code",
     "website": "https://github.com/DmitryTsepelev/rubocop-graphql",
-    "last_verified_at": "2024-09-16",
+    "last_verified_at": "2026-05-22",
     "risk_level": "Low",
     "requirements": "Ruby linter",
     "verification_reasoning": "Most popular gem"
@@ -510,7 +510,7 @@
     "license": "MIT",
     "description": "Automatic Minitest code style checking tool.",
     "website": "https://docs.rubocop.org/rubocop-minitest/",
-    "last_verified_at": "2024-09-16",
+    "last_verified_at": "2026-05-22",
     "risk_level": "Low",
     "requirements": "Ruby linter",
     "verification_reasoning": "Most popular gem"
@@ -522,7 +522,7 @@
     "license": "MIT",
     "description": "A collection of RuboCop cops to check for performance optimizations",
     "website": "https://docs.rubocop.org/rubocop-performance/",
-    "last_verified_at": "2024-05-30",
+    "last_verified_at": "2026-05-22",
     "risk_level": "Low",
     "requirements": "A collection of RuboCop cops to check for performance optimizations in Ruby code",
     "verification_reasoning": "Most popular gem"
@@ -534,7 +534,7 @@
     "license": "MIT",
     "description": "Code style checking for RSpec files.",
     "website": "https://github.com/rubocop/rubocop-rspec",
-    "last_verified_at": "2024-05-30",
+    "last_verified_at": "2026-05-22",
     "risk_level": "Low",
     "requirements": "Code style checking for RSpec files. A plugin for the RuboCop code style enforcing & linting tool",
     "verification_reasoning": "Most popular gem"
@@ -546,7 +546,7 @@
     "license": "MIT",
     "description": "    Thread-safety checks via static analysis.",
     "website": "https://github.com/rubocop/rubocop-thread_safety",
-    "last_verified_at": "2024-09-16",
+    "last_verified_at": "2026-05-22",
     "risk_level": "Low",
     "requirements": "Ruby linter",
     "verification_reasoning": "Most popular gem"
@@ -558,7 +558,7 @@
     "license": "MIT",
     "description": "Ruby/ProgressBar is an extremely flexible text progress bar library for Ruby",
     "website": "https://github.com/jfelchner/ruby-progressbar",
-    "last_verified_at": "2026-02-25",
+    "last_verified_at": "2026-05-22",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -570,7 +570,7 @@
     "license": "Ruby",
     "description": "Interface for secure random number generator.",
     "website": "https://github.com/ruby/securerandom",
-    "last_verified_at": "2024-08-12",
+    "last_verified_at": "2026-05-22",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -582,7 +582,7 @@
     "license": "MIT",
     "description": "Code coverage for Ruby with a powerful configuration library and automatic merging of coverage across test suites",
     "website": "https://github.com/simplecov-ruby/simplecov",
-    "last_verified_at": "2026-02-25",
+    "last_verified_at": "2026-05-22",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -594,7 +594,7 @@
     "license": "MIT",
     "description": "Default HTML formatter for SimpleCov code coverage tool for ruby 2.4+",
     "website": "https://github.com/simplecov-ruby/simplecov-html",
-    "last_verified_at": "2026-02-25",
+    "last_verified_at": "2026-05-22",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -606,7 +606,7 @@
     "license": "MIT",
     "description": "JSON formatter for SimpleCov",
     "website": "https://github.com/fede-moya/simplecov_json_formatter",
-    "last_verified_at": "2026-02-25",
+    "last_verified_at": "2026-05-22",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -618,7 +618,7 @@
     "license": "MIT",
     "description": "Terminal color capabilities detection",
     "website": "https://ttytoolkit.org",
-    "last_verified_at": "2024-08-07",
+    "last_verified_at": "2026-05-22",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -630,7 +630,7 @@
     "license": "MIT",
     "description": "The purpose of this library is to help move the terminal cursor around and manipulate text by using intuitive method calls.",
     "website": "https://ttytoolkit.org",
-    "last_verified_at": "2024-08-07",
+    "last_verified_at": "2026-05-22",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -642,7 +642,7 @@
     "license": "MIT",
     "description": "A beautiful and powerful interactive command line prompt with a robust API for getting and validating complex inputs.",
     "website": "https://ttytoolkit.org",
-    "last_verified_at": "2024-08-07",
+    "last_verified_at": "2026-05-22",
     "risk_level": "Low",
     "requirements": "Prompt for TTY",
     "verification_reasoning": "Most popular on RubyGem"
@@ -654,7 +654,7 @@
     "license": "MIT",
     "description": "A set of methods for processing keyboard input in character, line and multiline modes",
     "website": "https://ttytoolkit.org",
-    "last_verified_at": "2024-08-07",
+    "last_verified_at": "2026-05-22",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -666,7 +666,7 @@
     "license": "MIT",
     "description": "Terminal screen size detection that works on Linux, macOS and Windows systems and supports Ruby MRI, JRuby, TruffleRuby and Rubinius interpreters.",
     "website": "https://ttytoolkit.org",
-    "last_verified_at": "2024-08-07",
+    "last_verified_at": "2026-05-22",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -678,7 +678,7 @@
     "license": "MIT",
     "description": "TZInfo provides access to time zone data and allows times to be converted using time zone rules.",
     "website": "https://tzinfo.github.io",
-    "last_verified_at": "2026-02-25",
+    "last_verified_at": "2026-05-22",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -690,7 +690,7 @@
     "license": "MIT",
     "description": "[Unicode 17.0.0] Determines the monospace display width of a string using EastAsianWidth.txt, Unicode general category, Emoji specification, and other data.",
     "website": "https://github.com/janlelis/unicode-display_width",
-    "last_verified_at": "2026-02-25",
+    "last_verified_at": "2026-05-22",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -702,7 +702,7 @@
     "license": "MIT",
     "description": "[Emoji 17.0] Provides Unicode Emoji data and regexes, incorporating the latest Unicode and Emoji standards",
     "website": "https://github.com/janlelis/unicode-emoji",
-    "last_verified_at": "2024-11-27",
+    "last_verified_at": "2026-05-22",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -714,7 +714,7 @@
     "license": "Ruby",
     "description": "URI is a module providing classes to handle Uniform Resource Identifiers",
     "website": "https://github.com/ruby/uri",
-    "last_verified_at": "2024-12-29",
+    "last_verified_at": "2026-05-22",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -726,7 +726,7 @@
     "license": "MIT",
     "description": "WebMock allows stubbing HTTP requests and setting expectations on HTTP requests.",
     "website": "https://github.com/bblimke/webmock",
-    "last_verified_at": "2026-02-25",
+    "last_verified_at": "2026-05-22",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -738,7 +738,7 @@
     "license": "MIT",
     "description": "    A micro library providing objects with Publish-Subscribe capabilities.",
     "website": "https://github.com/krisleech/wisper",
-    "last_verified_at": "2024-08-07",
+    "last_verified_at": "2026-05-22",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -750,7 +750,7 @@
     "license": "MIT",
     "description": "Parser for yarn.lock files.",
     "website": "https://rubygems.org/yarn_lock_parser",
-    "last_verified_at": "2026-05-21",
+    "last_verified_at": "2026-05-22",
     "risk_level": "Low",
     "requirements": "Read yarn lock file",
     "verification_reasoning": "Popular gem"
