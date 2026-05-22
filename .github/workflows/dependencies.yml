@@ -41,9 +41,9 @@ jobs:
     - name: Update Dependencies
       shell: bash
       run: |
-        git config --global --add url."https://${GH_PAT}:x-oauth-basic@github.com/".insteadOf ssh://git@github.com:
-        git config --global --add url."https://${GH_PAT}:x-oauth-basic@github.com/".insteadOf https://github.com/
-        git config --global --add url."https://${GH_PAT}:x-oauth-basic@github.com/".insteadOf git@github.com:
+        git config --global --add url."https://${GH_PAT}:x-oauth-basic@github.com/${{github.repository_owner}}/".insteadOf ssh://git@github.com:${{github.repository_owner}}/
+        git config --global --add url."https://${GH_PAT}:x-oauth-basic@github.com/${{github.repository_owner}}/".insteadOf https://github.com/${{github.repository_owner}}/
+        git config --global --add url."https://${GH_PAT}:x-oauth-basic@github.com/${{github.repository_owner}}/".insteadOf git@github.com:${{github.repository_owner}}/
 
         bundle config set frozen false ; bundle update
       env:

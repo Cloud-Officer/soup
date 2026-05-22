@@ -9,9 +9,7 @@ name: Auto-approve for code owners
     - ready_for_review
     - synchronize
 permissions:
-  contents: write
-  issues: write
-  pull-requests: write
+  contents: read
 concurrency:
   group: auto-approve-${{github.event.pull_request.number}}
   cancel-in-progress: true

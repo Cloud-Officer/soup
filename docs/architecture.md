@@ -43,10 +43,10 @@
 │  │  Bundler   │ │  Composer  │ │   Gradle   │ │    NPM     │ │    PIP     │ │
 │  │  (Ruby)    │ │   (PHP)    │ │  (Kotlin)  │ │   (JS)     │ │  (Python)  │ │
 │  └────────────┘ └────────────┘ └────────────┘ └────────────┘ └────────────┘ │
-│  ┌────────────┐ ┌────────────┐ ┌────────────┐                               │
-│  │    SPM     │ │    Yarn    │ │  CocoaPods │                               │
-│  │  (Swift)   │ │   (JS)     │ │  (Swift)*  │  * Currently disabled         │
-│  └────────────┘ └────────────┘ └────────────┘                               │
+│  ┌────────────┐ ┌────────────┐                                              │
+│  │    SPM     │ │    Yarn    │                                              │
+│  │  (Swift)   │ │   (JS)     │                                              │
+│  └────────────┘ └────────────┘                                              │
 └─────────────────────────────────────────────────────────────────────────────┘
                                       │
                                       ▼
@@ -74,8 +74,9 @@
 2. **Application** (`lib/soup/application.rb`): Orchestrates the entire workflow from detection to output generation
 3. **Options** (`lib/soup/options.rb`): Parses command-line arguments and configures application behavior
 4. **Package** (`lib/soup/package.rb`): Data structure representing a third-party dependency with all IEC 62304 required metadata
-5. **Parsers** (`lib/soup/parsers/`): Language-specific parsers that read lock files and fetch metadata from package registries
+5. **Parsers** (`lib/soup/parsers/`): Language-specific parsers that read lock files and fetch metadata from package registries; each inherits shared fetching, normalization, and parallelization logic from `SOUP::BaseParser`
 6. **Status** (`lib/soup/status.rb`): Defines exit codes for the application
+7. **Errors** (`lib/soup/errors.rb`): Defines the `SOUP::Error` exception hierarchy raised throughout the application
 
 ## Software units
 
@@ -111,6 +112,7 @@
 - `SOUP::Options`
 - `SOUP::Package`
 - `SOUP::Status`
+- `SOUP::Error` hierarchy
 - All parser classes
 
 **External Dependencies:**
@@ -130,7 +132,7 @@
 
 - `parse`: Parses command-line arguments and returns configured options object
 - Configuration attributes: `cache_file`, `markdown_file`, `licenses_file`, `exceptions_file`, `ignored_folders`
-- Skip flags: `skip_bundler`, `skip_cocoapods`, `skip_composer`, `skip_gradle`, `skip_npm`, `skip_pip`, `skip_spm`, `skip_yarn`
+- Skip flags: `skip_bundler`, `skip_composer`, `skip_gradle`, `skip_npm`, `skip_pip`, `skip_spm`, `skip_yarn`
 - Mode flags: `licenses_check`, `soup_check`, `no_prompt`, `auto_reply`
 
 **External Dependencies:**
@@ -162,6 +164,23 @@
 - `ERROR_EXIT_CODE`: 1
 - `FAILURE_EXIT_CODE`: 2
 
+### SOUP::Error Hierarchy
+
+**Purpose:** Defines the structured exception hierarchy raised throughout the application. All errors descend from `SOUP::Error` (a `StandardError`) so the top-level rescue in `bin/soup.rb` catches every soup-internal error.
+
+**Location:** `lib/soup/errors.rb`
+
+**Key Components:**
+
+- `Error`: Base class for all soup-raised errors
+- `ConfigurationError`: Missing, unreadable, or malformed configuration file
+- `InvalidLockfileError`: Structurally malformed or unsupported lock file
+- `UnsupportedFormatError`: Recognized lock file with an unsupported format version (subclass of `InvalidLockfileError`)
+- `RegistryError`: Unrecoverable package metadata lookup failure
+- `AuthenticationError`: Registry authentication failure (subclass of `RegistryError`)
+- `RateLimitError`: Registry rate-limit response (subclass of `RegistryError`)
+- `MissingMetadataError`: Required IEC 62304 metadata missing in `--no_prompt` mode or after prompting
+
 ### SOUP::HttpClient
 
 **Purpose:** Centralized HTTP GET utility with timeout and retry logic.
@@ -190,6 +209,25 @@
 
 - `parse(parser, file, packages)`: Validates arguments and delegates to specific parser
 
+### SOUP::BaseParser
+
+**Purpose:** Abstract base class providing the shared logic inherited by every language-specific parser: parallel metadata fetching, package construction, license normalization, and sibling-file resolution.
+
+**Location:** `lib/soup/parsers/base.rb`
+
+**Key Components:**
+
+- `parse(file, packages)`: Abstract method that raises `NotImplementedError` unless overridden by a subclass
+- `parallel_each(work_items, packages, &)`: Fetches metadata for the work items concurrently via `Parallel.map(..., in_threads: HttpClient::THREAD_COUNT)` and collects the results
+- `build_package(...)`: Constructs a `SOUP::Package` with normalized fields
+- `normalize_license(license)`: Maps Unlicense and URL-style license values to `NOASSERTION`
+- `sibling_file(file, suffix)`: Resolves a sibling manifest path next to a lock file
+- `NOASSERTION_LICENSE`: Public constant for the `NOASSERTION` license value
+
+**External Dependencies:**
+
+- `parallel`
+
 ### SOUP::BundlerParser
 
 **Purpose:** Parses Ruby Gemfile.lock files and fetches metadata from RubyGems API.
@@ -198,28 +236,12 @@
 
 **Key Components:**
 
-- `parse(file, packages)`: Parses lock file and fetches package details from RubyGems, fetching metadata for all specs in parallel via `Parallel.map(..., in_threads: HttpClient::THREAD_COUNT)`
+- `parse(file, packages)`: Parses lock file and fetches package details from RubyGems, fetching metadata for all specs in parallel via the inherited `parallel_each` helper (`BaseParser`)
 
 **External Dependencies:**
 
 - `bundler`
 - `parallel`
-
-### SOUP::CocoaPodsParser
-
-**Purpose:** Parses Swift Podfile.lock files and fetches metadata from the local CocoaPods trunk repository. Currently disabled because cocoapods-core requires activesupport < 8.
-
-**Location:** `lib/soup/parsers/cocoapods.rb`
-
-**Key Components:**
-
-- `parse(file, packages)`: Parses lock file, resolves specifications from local trunk source, and extracts package metadata
-
-**External Dependencies:**
-
-- `active_support`
-- `cocoapods-core` (conditionally loaded on macOS only)
-- `semantic`
 
 ### SOUP::ComposerParser
 
@@ -239,7 +261,7 @@
 
 **Key Components:**
 
-- `parse(file, packages)`: Parses lock file and fetches package details from Maven Central or fallback repositories, in parallel via `Parallel.map(..., in_threads: HttpClient::THREAD_COUNT)`. Selects `classpath` entries for `buildscript-gradle.lockfile` and non-test, non-debug `RuntimeClasspath` entries for `gradle.lockfile`
+- `parse(file, packages)`: Parses lock file and fetches package details from Maven Central or fallback repositories, in parallel via the inherited `parallel_each` helper (`BaseParser`). Selects `classpath` entries for `buildscript-gradle.lockfile` and non-test, non-debug `RuntimeClasspath` entries for `gradle.lockfile`
 - `REPOSITORY_URLS`: List of Maven repository URLs for fallback lookups
 
 **External Dependencies:**
@@ -255,7 +277,7 @@
 
 **Key Components:**
 
-- `parse(file, packages)`: Parses lock file and fetches package details from NPM registry in parallel via `Parallel.map(..., in_threads: HttpClient::THREAD_COUNT)`
+- `parse(file, packages)`: Parses lock file and fetches package details from NPM registry in parallel via the inherited `parallel_each` helper (`BaseParser`)
 
 **External Dependencies:**
 
@@ -269,7 +291,7 @@
 
 **Key Components:**
 
-- `parse(file, packages)`: Parses requirements file and fetches package details from PyPI in parallel via `Parallel.map(..., in_threads: HttpClient::THREAD_COUNT)`
+- `parse(file, packages)`: Parses requirements file and fetches package details from PyPI in parallel via the inherited `parallel_each` helper (`BaseParser`)
 
 **External Dependencies:**
 
@@ -283,7 +305,7 @@
 
 **Key Components:**
 
-- `parse(file, packages)`: Parses resolved file and fetches package details from GitHub API in parallel via `Parallel.map(..., in_threads: HttpClient::THREAD_COUNT)`
+- `parse(file, packages)`: Parses resolved file and fetches package details from GitHub API in parallel via the inherited `parallel_each` helper (`BaseParser`)
 - Supports `GITHUB_TOKEN` environment variable for rate limit handling
 
 **External Dependencies:**
@@ -298,7 +320,7 @@
 
 **Key Components:**
 
-- `parse(file, packages)`: Parses lock file and fetches package details from NPM registry in parallel via `Parallel.map(..., in_threads: HttpClient::THREAD_COUNT)`
+- `parse(file, packages)`: Parses lock file and fetches package details from NPM registry in parallel via the inherited `parallel_each` helper (`BaseParser`)
 
 **External Dependencies:**
 
@@ -366,7 +388,7 @@ Validation criteria for SOUP entries: Accuracy (Requirements match actual usage)
 
 **Purpose:** Validates that all dependencies use approved open-source licenses.
 
-**Location:** `lib/soup/application.rb` in `check_packages` method
+**Location:** `lib/soup/application.rb` in `validate_license` method (invoked from `check_packages`)
 
 **Implementation:**
 
@@ -409,12 +431,12 @@ Validation criteria for SOUP entries: Accuracy (Requirements match actual usage)
 
 **Purpose:** Speeds up registry lookups by fetching package metadata concurrently instead of serially.
 
-**Location:** `parse` method of the Bundler, Gradle, NPM, PIP, SPM, and Yarn parsers in `lib/soup/parsers/`
+**Location:** `parallel_each` in `lib/soup/parsers/base.rb` (`SOUP::BaseParser`), invoked from the `parse` method of the Bundler, Gradle, NPM, PIP, SPM, and Yarn parsers
 
 **Implementation:**
 
 1. Builds a work-item list of packages discovered in the lock file
-2. Processes the list with `Parallel.map(work_items, in_threads: HttpClient::THREAD_COUNT)`
+2. Processes the list with `Parallel.map(work_items, in_threads: HttpClient::THREAD_COUNT)` inside `BaseParser#parallel_each`
 3. `THREAD_COUNT` is `Etc.nprocessors`, sizing the thread pool to the available CPU cores
 4. Each thread fetches metadata through `SOUP::HttpClient.get` (which applies its own timeout and retry logic)
 
@@ -431,13 +453,16 @@ Validation criteria for SOUP entries: Accuracy (Requirements match actual usage)
 
 ### Error Handling
 
+Recoverable failures raise a subclass of `SOUP::Error` (`lib/soup/errors.rb`); the top-level rescue in `bin/soup.rb` catches them and reports a message.
+
 | Failure Mode | Handling | Location |
 | :--- | :--- | :--- |
-| Invalid command-line options | Catches `OptionParser::InvalidOption`, displays error, exits with error code | `lib/soup/application.rb` in `configure_options` method |
-| API rate limiting | Detects rate limit messages, suggests setting `GITHUB_TOKEN` | `lib/soup/parsers/spm.rb` in `parse` method |
+| Invalid command-line options | Catches `OptionParser::ParseError`, displays error, exits with error code | `lib/soup/application.rb` in `configure_options` method |
+| Missing or malformed config file | Raises `ConfigurationError` when a configuration file is absent or contains invalid JSON | `lib/soup/application.rb` in `validate_config!` method |
+| API rate limiting | Raises `RateLimitError` (and `AuthenticationError` for bad credentials), suggesting `GITHUB_TOKEN` | `lib/soup/parsers/spm.rb` in `parse` method |
 | Network timeouts | Retry up to 3 times via `SOUP::HttpClient` | `lib/soup/http_client.rb` in `get` method |
 | Missing package metadata | Logs warning and continues processing other packages | NPM, Gradle parsers |
-| Missing required IEC 62304 fields | Raises error in `--no_prompt` mode, prompts user otherwise | `lib/soup/application.rb` in `check_packages` method |
+| Missing required IEC 62304 fields | Raises `MissingMetadataError` in `--no_prompt` mode, prompts user otherwise | `lib/soup/application.rb` in `prompt_missing_field` / `ensure_metadata_complete!` methods |
 | Partial execution failure | Persists partial state via `ensure` block so progress is not lost | `lib/soup/application.rb` in `execute` method |
 | Unhandled exceptions | Displays error message; backtrace only shown when `ENV['DEBUG']` is set | `bin/soup.rb` top-level rescue |
 
@@ -446,8 +471,8 @@ Validation criteria for SOUP entries: Accuracy (Requirements match actual usage)
 | Control | Description | Implementation |
 | :--- | :--- | :--- |
 | ReDoS prevention | Uses non-backtracking regex pattern for markdown sanitization | `lib/soup/application.rb` in `markdown_cell` method |
-| HTML entity sanitization | Uses Nokogiri to decode HTML entities in descriptions | `lib/soup/application.rb` in `check_packages` method |
-| License compliance | Validates all dependencies against approved license list | `lib/soup/application.rb` in `check_packages` method |
+| HTML entity sanitization | Uses Nokogiri to decode HTML entities in descriptions | `lib/soup/application.rb` in `sanitize_markdown_description` method |
+| License compliance | Validates all dependencies against approved license list | `lib/soup/application.rb` in `validate_license` method |
 | Directory traversal prevention | Excludes `node_modules/` and `vendor/` from scanning | `lib/soup/application.rb` in `detect_packages` method |
 | API token handling | Uses environment variable for GitHub token, never logged | `lib/soup/parsers/spm.rb` in `parse` method |
 
