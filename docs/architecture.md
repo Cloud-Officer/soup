@@ -149,6 +149,7 @@
 
 - `self.sanitize_description(text, first_sentence:, strip_markdown:)`: Class method that sanitizes package descriptions by returning nil for nil/empty input, extracting the first sentence, wrapping URLs, and stripping markdown characters
 - Attributes: `file`, `language`, `package`, `version`, `license`, `description`, `website`, `last_verified_at`, `risk_level`, `requirements`, `verification_reasoning`, `dependency`
+- `verified?`: Returns true when all four verification fields (`last_verified_at`, `risk_level`, `requirements`, `verification_reasoning`) are non-empty
 - `as_json`: Serializes package to JSON format
 - `to_json`: JSON string representation
 
@@ -162,7 +163,6 @@
 
 - `SUCCESS_EXIT_CODE`: 0
 - `ERROR_EXIT_CODE`: 1
-- `FAILURE_EXIT_CODE`: 2
 
 ### SOUP::Error Hierarchy
 
@@ -189,10 +189,12 @@
 
 **Key Components:**
 
-- `MAX_RETRIES`: Maximum retry attempts (3)
-- `DEFAULT_TIMEOUT`: HTTP request timeout in seconds (5)
+- `DEFAULT_MAX_RETRIES`: Default maximum retry attempts (3); private constant
+- `DEFAULT_TIMEOUT_SECONDS`: Default HTTP request timeout in seconds (5); private constant
 - `THREAD_COUNT`: Public constant set to `Etc.nprocessors`; used by all parsers as the thread-pool size for parallel metadata fetching
-- `self.get(url, max_retries:, **options)`: Performs HTTP GET with automatic retry on `Net::OpenTimeout` and `Net::ReadTimeout`
+- `self.max_retries`: Returns the retry count, overridable at runtime via the `SOUP_HTTP_MAX_RETRIES` environment variable
+- `self.default_timeout`: Returns the request timeout in seconds, overridable at runtime via the `SOUP_HTTP_TIMEOUT` environment variable
+- `self.get(url, max_retries: nil, **options)`: Performs HTTP GET with automatic retry on `Net::OpenTimeout` and `Net::ReadTimeout`
 
 **External Dependencies:**
 
@@ -219,9 +221,12 @@
 
 - `parse(file, packages)`: Abstract method that raises `NotImplementedError` unless overridden by a subclass
 - `parallel_each(work_items, packages, &)`: Fetches metadata for the work items concurrently via `Parallel.map(..., in_threads: HttpClient::THREAD_COUNT)` and collects the results
+- `collect_packages(results, packages)`: Compacts the fetched results and keys them by package name into the packages hash
 - `build_package(...)`: Constructs a `SOUP::Package` with normalized fields
 - `normalize_license(license)`: Maps Unlicense and URL-style license values to `NOASSERTION`
 - `sibling_file(file, suffix)`: Resolves a sibling manifest path next to a lock file
+- `lookup_npm_registry_version(payload, name:, version:)`: Extracts a specific version hash from an npm-style registry payload; shared by the NPM and Yarn parsers
+- `http_error_message(response, url:, package:)`: Builds an actionable error message (status code, URL, package, truncated body) for non-2xx responses
 - `NOASSERTION_LICENSE`: Public constant for the `NOASSERTION` license value
 
 **External Dependencies:**
@@ -420,11 +425,11 @@ Validation criteria for SOUP entries: Accuracy (Requirements match actual usage)
 
 **Implementation:**
 
-1. Attempts HTTP GET request with `DEFAULT_TIMEOUT` (5 seconds)
+1. Attempts HTTP GET request with the configured timeout (`DEFAULT_TIMEOUT_SECONDS`, 5 seconds by default; overridable via `SOUP_HTTP_TIMEOUT`)
 2. On `Net::OpenTimeout` or `Net::ReadTimeout`:
    - Increments retry counter
    - Logs retry attempt with counter
-   - Retries up to `MAX_RETRIES` (3) times
+   - Retries up to the configured maximum (`DEFAULT_MAX_RETRIES`, 3 by default; overridable via `SOUP_HTTP_MAX_RETRIES`)
    - Raises the exception after max retries are exhausted
 
 ### Parallel Metadata Fetching Algorithm
@@ -464,7 +469,7 @@ Recoverable failures raise a subclass of `SOUP::Error` (`lib/soup/errors.rb`); t
 | Missing package metadata | Logs warning and continues processing other packages | NPM, Gradle parsers |
 | Missing required IEC 62304 fields | Raises `MissingMetadataError` in `--no_prompt` mode, prompts user otherwise | `lib/soup/application.rb` in `prompt_missing_field` / `ensure_metadata_complete!` methods |
 | Partial execution failure | Persists partial state via `ensure` block so progress is not lost | `lib/soup/application.rb` in `execute` method |
-| Unhandled exceptions | Displays error message; backtrace only shown when `ENV['DEBUG']` is set | `bin/soup.rb` top-level rescue |
+| Unhandled exceptions | Displays error message and the top frames of the backtrace; full backtrace shown only when `ENV['DEBUG']` is set | `bin/soup.rb` top-level rescue |
 
 ### Security Controls
 
@@ -480,7 +485,7 @@ Recoverable failures raise a subclass of `SOUP::Error` (`lib/soup/errors.rb`); t
 
 | Control | Description |
 | :--- | :--- |
-| Exit codes | Defined exit codes for success (0), error (1), and failure (2) |
+| Exit codes | Defined exit codes for success (0) and error (1) |
 | Cache persistence | User-entered metadata cached in `.soup.json` to avoid re-entry |
 | CI/CD mode | `--no_prompt` flag for non-interactive execution |
 | Selective parsing | Skip flags allow excluding specific package managers |
