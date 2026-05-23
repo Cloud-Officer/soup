@@ -68,6 +68,11 @@ Style/TopLevelMethodDefinition:
   Enabled: false
 Style/YodaExpression:
   Enabled: false
+# Autocorrect for this cop collapses multi-line method signatures and can drop
+# inline `# rubocop:disable` directives in the process. See:
+# https://docs.rubocop.org/rubocop/latest/cops_style.html#stylemultilinemethodsignature
+Style/MultilineMethodSignature:
+  Enabled: false
 Style/HashSyntax:
   EnforcedShorthandSyntax: never
 Minitest/NoTestCases:
