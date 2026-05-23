@@ -25,7 +25,8 @@ module SOUP
     # Locate the Swift manifest associated with a Package.resolved file.
     # Tries, in order: the sibling Package.swift (or matching <Name>.swift),
     # the enclosing Tuist/Dependencies.swift if the resolved file lives under a
-    # Tuist directory, and finally the sibling <Name>.xcodeproj/project.pbxproj.
+    # Tuist directory, the sibling <Name>.xcodeproj/project.pbxproj, and finally
+    # the project.pbxproj of an enclosing *.xcodeproj higher up the tree.
     # Path joining uses File.dirname + File.basename so directories containing
     # dots in their name do not corrupt the candidate paths.
     def read_main_swift_file(file)
@@ -40,6 +41,30 @@ module SOUP
 
       xcodeproj = path_join(dir, "#{base}.xcodeproj/project.pbxproj")
       return File.read(xcodeproj) if File.exist?(xcodeproj)
+
+      enclosing_pbxproj = enclosing_xcodeproj_pbxproj(dir)
+      return File.read(enclosing_pbxproj) if enclosing_pbxproj
+
+      nil
+    end
+
+    # Standard Xcode-managed SPM places Package.resolved deep inside the project
+    # bundle, e.g. <Name>.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
+    # (or under a sibling .xcworkspace). None of the adjacent-file checks match
+    # that layout, so walk up the ancestors and return the project.pbxproj of the
+    # first enclosing *.xcodeproj. That pbxproj names the direct package
+    # dependencies, which is all read_main_swift_file is consulted for.
+    def enclosing_xcodeproj_pbxproj(dir)
+      current = File.expand_path(dir)
+
+      while current != File.dirname(current)
+        if File.extname(current) == '.xcodeproj'
+          pbxproj = File.join(current, 'project.pbxproj')
+          return pbxproj if File.exist?(pbxproj)
+        end
+
+        current = File.dirname(current)
+      end
 
       nil
     end

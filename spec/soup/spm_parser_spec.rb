@@ -193,6 +193,32 @@ RSpec.describe(SOUP::SPMParser) do
     end
   end
 
+  context 'when Package.resolved is nested inside an Xcode-managed .xcodeproj bundle' do
+    # Regression test: a standard Xcode project (not an SPM package, not Tuist)
+    # stores Package.resolved at
+    # <Name>.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved.
+    # None of the adjacent-file checks match, so the parser must walk up to the
+    # enclosing .xcodeproj/project.pbxproj. Pre-fix this raised
+    # InvalidLockfileError and aborted the whole soup run.
+    let(:lockfile_path) do
+      write_fixture('MyApp.xcodeproj/project.pbxproj', main_file_content)
+      write_fixture('MyApp.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved', resolved_file)
+    end
+
+    before do
+      stub_request(:get, 'https://api.github.com/repos/Alamofire/Alamofire')
+        .to_return(status: 200, body: github_response)
+    end
+
+    it 'reads the enclosing project.pbxproj as the main file', :aggregate_failures do
+      packages = {}
+      parser.parse(lockfile_path, packages)
+      expect(packages).to(have_key('Alamofire'))
+      # Named in the pbxproj => treated as a direct dependency, not transitive.
+      expect(packages['Alamofire'].dependency).to(be(false))
+    end
+  end
+
   context 'when the project directory contains a dot in its name' do
     # Regression test for BUG-011: a previous implementation used
     # file.split('.').first to derive the xcodeproj path, which truncated
