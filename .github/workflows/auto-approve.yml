@@ -75,7 +75,17 @@ jobs:
     - name: Approve PR
       shell: bash
       if: steps.check.outputs.is_owner == 'true'
-      run: gh pr review --approve "$PR"
+      run: |
+        set -euo pipefail
+
+        APPROVER=$(gh api user --jq .login)
+        if [ "$APPROVER" = "$AUTHOR" ]; then
+          echo "Approver $APPROVER is the PR author; skipping self-approval."
+          exit 0
+        fi
+
+        gh pr review --approve "$PR"
       env:
         GH_TOKEN: "${{secrets.GH_BOT_PAT}}"
+        AUTHOR: "${{github.event.pull_request.user.login}}"
         PR: "${{github.event.pull_request.number}}"
