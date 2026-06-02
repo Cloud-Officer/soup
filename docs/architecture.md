@@ -225,6 +225,7 @@
 - `build_package(...)`: Constructs a `SOUP::Package` with normalized fields
 - `normalize_license(license)`: Maps Unlicense and URL-style license values to `NOASSERTION`
 - `sibling_file(file, suffix)`: Resolves a sibling manifest path next to a lock file
+- `manifest_mentions?(main_file, token)`: Token-boundary test for whether a dependency is declared directly in a source-code manifest; matches only when `token` is not flanked by identifier characters so a name that is a substring of another coordinate (e.g. `androidx.core:core` vs `androidx.core:core-ktx`) is not misclassified. Used by the Gradle and SPM parsers
 - `lookup_npm_registry_version(payload, name:, version:)`: Extracts a specific version hash from an npm-style registry payload; shared by the NPM and Yarn parsers
 - `http_error_message(response, url:, package:)`: Builds an actionable error message (status code, URL, package, truncated body) for non-2xx responses
 - `NOASSERTION_LICENSE`: Public constant for the `NOASSERTION` license value
@@ -311,6 +312,7 @@
 **Key Components:**
 
 - `parse(file, packages)`: Parses resolved file and fetches package details from GitHub API in parallel via the inherited `parallel_each` helper (`BaseParser`)
+- Resolves the direct-dependency manifest for `Package.resolved` files that are nested inside an Xcode project bundle by trying, in order, a sibling `Package.swift` (or matching `<Name>.swift`), a sibling `<Name>.xcodeproj/project.pbxproj`, and finally the `project.pbxproj` of an enclosing `*.xcodeproj` higher up the tree; the resolved manifest is passed to `manifest_mentions?` to classify direct vs transitive dependencies
 - Supports `GITHUB_TOKEN` environment variable for rate limit handling
 
 **External Dependencies:**
@@ -403,6 +405,18 @@ Validation criteria for SOUP entries: Accuracy (Requirements match actual usage)
    - Checks if license contains any authorized license substring (case-insensitive)
    - Checks if package is in exceptions list
    - Reports error if license is not approved and not `NOASSERTION`
+
+### Direct vs Transitive Dependency Classification Algorithm
+
+**Purpose:** Classifies each detected package as a direct dependency (declared in the project's manifest) or a transitive dependency (pulled in only by other packages), recorded in `SOUP::Package#dependency`.
+
+**Location:** Per-parser, using helpers in `lib/soup/parsers/base.rb` (`SOUP::BaseParser`)
+
+**Implementation:**
+
+1. For parsers whose manifest is structured data that can be parsed into an exact dependency set (Bundler, Composer, NPM, PIP, Yarn), the direct dependency names are read from the manifest (e.g. `Gemfile` dependencies, the sibling `requirements.in`) and matched against package names with an exact-name comparison
+2. For parsers whose manifest is source code that cannot be parsed into an exact set (Gradle build scripts, Swift `Package.swift`/`pbxproj`), `manifest_mentions?(main_file, token)` performs a token-boundary regex match so a name that is a substring of another coordinate is not misclassified
+3. A package is marked transitive (`dependency: true`) when it is not found among the direct dependencies
 
 ### Markdown Sanitization Algorithm
 
