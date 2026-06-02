@@ -19,7 +19,7 @@ permissions:
   contents: read
   pull-requests: read
 env:
-  RUBY-BUNDLER-CACHE: 'false'
+  RUBY-BUNDLER-CACHE: true
 concurrency:
   group: build-${{github.ref}}
   cancel-in-progress: true
@@ -201,6 +201,6 @@ jobs:
         GITHUB_TOKEN: "${{secrets.GH_PAT}}"
     - name: RSpec
       shell: bash
-      run: bundle exec rspec
+      run: bundle exec rspec --format documentation
       env:
         GITHUB_TOKEN: "${{secrets.GH_PAT}}"

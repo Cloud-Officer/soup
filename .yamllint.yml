@@ -3,22 +3,30 @@ rules:
   trailing-spaces: disable
   line-length: disable
 ignore: |
-  node_modules/
-  vendor/
+  # ghb:excluded-dirs:start - managed by github-build from config/languages.yaml; do not edit by hand
   .build/
-  Pods/
-  Carthage/
-  DerivedData/
-  venv/
-  .venv/
   .bundle/
+  .git/
   .gradle/
+  .hg/
   .m2/
-  dist/
-  build/
-  target/
   .npm/
-  .yarn/
   .pnpm/
-  tmp/
-  var/
+  .pytest_cache/
+  .svn/
+  .venv/
+  .yarn/
+  __pycache__/
+  build/
+  Carthage/
+  coverage/
+  DerivedData/
+  dist/
+  env/
+  Libraries/
+  node_modules/
+  Pods/
+  target/
+  vendor/
+  venv/
+  # ghb:excluded-dirs:end
