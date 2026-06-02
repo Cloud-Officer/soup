@@ -7,8 +7,13 @@ RSpec.describe(SOUP::BundlerParser) do
     instance_double(Bundler::LazySpecification, name: 'test-gem', version: Gem::Version.new('1.0.0'))
   end
 
-  let(:lock_file)         { instance_double(Bundler::LockfileParser, specs: [spec]) }
-  let(:main_file_content) { "gem 'test-gem'"                                        }
+  # DEPENDENCIES section of the lockfile = the directly declared gems. test-gem
+  # is present here, so it is classified as a direct dependency by default.
+  let(:lock_file) do
+    # rubocop:disable Style/StringHashKeys -- DEPENDENCIES keys are gem-name strings.
+    instance_double(Bundler::LockfileParser, specs: [spec], dependencies: { 'test-gem' => nil })
+    # rubocop:enable Style/StringHashKeys
+  end
 
   let(:v2_response_body) do
     {
@@ -21,8 +26,6 @@ RSpec.describe(SOUP::BundlerParser) do
   before do
     allow(Bundler::LockfileParser).to(receive(:new).and_return(lock_file))
     allow(Bundler).to(receive(:read_file).with('Gemfile.lock').and_return(''))
-    allow(File).to(receive(:read).and_call_original)
-    allow(File).to(receive(:read).with('Gemfile').and_return(main_file_content))
   end
 
   context 'when v2 API succeeds' do
@@ -102,15 +105,42 @@ RSpec.describe(SOUP::BundlerParser) do
     end
   end
 
-  context 'when gem is not in main file' do
-    before do
-      allow(File).to(receive(:read).with('Gemfile').and_return("gem 'other-gem'"))
+  context 'when gem is not a direct dependency' do
+    # test-gem resolved in specs but absent from the DEPENDENCIES section.
+    let(:lock_file) do
+      # rubocop:disable Style/StringHashKeys -- DEPENDENCIES keys are gem-name strings.
+      instance_double(Bundler::LockfileParser, specs: [spec], dependencies: { 'other-gem' => nil })
+      # rubocop:enable Style/StringHashKeys
+    end
 
+    before do
       stub_request(:get, 'https://api.rubygems.org/api/v2/rubygems/test-gem/versions/1.0.0.json')
         .to_return(status: 200, body: v2_response_body)
     end
 
     it 'marks transitive dependencies' do
+      packages = {}
+      parser.parse('Gemfile.lock', packages)
+      expect(packages['test-gem'].dependency).to(be(true))
+    end
+  end
+
+  # BUG-003 regression: a transitive gem whose name is a substring of a direct
+  # dependency (test-gem within test-gem-extras) must NOT be mis-flagged as
+  # direct. The previous String#include? scan of the Gemfile classified it wrong.
+  context 'when a transitive gem name is a substring of a direct dependency' do
+    let(:lock_file) do
+      # rubocop:disable Style/StringHashKeys -- DEPENDENCIES keys are gem-name strings.
+      instance_double(Bundler::LockfileParser, specs: [spec], dependencies: { 'test-gem-extras' => nil })
+      # rubocop:enable Style/StringHashKeys
+    end
+
+    before do
+      stub_request(:get, 'https://api.rubygems.org/api/v2/rubygems/test-gem/versions/1.0.0.json')
+        .to_return(status: 200, body: v2_response_body)
+    end
+
+    it 'classifies the substring gem as transitive' do
       packages = {}
       parser.parse('Gemfile.lock', packages)
       expect(packages['test-gem'].dependency).to(be(true))
@@ -213,7 +243,7 @@ RSpec.describe(SOUP::BundlerParser) do
         instance_double(Bundler::LazySpecification, name: "gem-#{i}", version: Gem::Version.new('1.0.0'))
       end
     end
-    let(:lock_file) { instance_double(Bundler::LockfileParser, specs: specs) }
+    let(:lock_file) { instance_double(Bundler::LockfileParser, specs: specs, dependencies: {}) }
 
     before do
       (1..100).each do |i|

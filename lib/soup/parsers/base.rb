@@ -63,6 +63,22 @@ module SOUP
       File.join(dir, suffix)
     end
 
+    # Token-boundary test for "is this dependency declared directly in the
+    # manifest". A bare String#include? misclassifies a package whose name is a
+    # substring of another manifest token (e.g. coordinate androidx.core:core
+    # matching androidx.core:core-ktx, or repo Alamofire matching AlamofireImage).
+    # `token` matches only when it is not flanked by identifier characters
+    # (letters, digits, '_', '-'); '.', ':', '/', and quotes therefore act as
+    # boundaries, so Gradle "group:artifact" still matches "group:artifact:1.2.3"
+    # and a Swift repo name still matches ".../Alamofire.git".
+    #
+    # Used only by parsers whose manifest is source code (Gradle build scripts,
+    # Swift Package.swift/pbxproj) and so cannot be parsed into an exact
+    # dependency set the way the npm/yarn/composer/bundler manifests can.
+    def manifest_mentions?(main_file, token)
+      main_file.match?(/(?<![\w-])#{Regexp.escape(token)}(?![\w-])/)
+    end
+
     # Look up a specific package version inside an npm-style registry payload
     # (whose shape is `{ "versions": { "<version>": { ... } } }`). Returns the
     # per-version hash, or nil + a stderr warn if the registry response is

@@ -123,7 +123,7 @@ module SOUP
         license: package_details.dig('license', 'spdx_id')&.strip,
         description: Package.sanitize_description(package_details['description'], first_sentence: true),
         website: package_details['html_url']&.strip,
-        dependency: !main_file.include?(package_details['name'])
+        dependency: !manifest_mentions?(main_file, package_details['name'])
       )
     end
 

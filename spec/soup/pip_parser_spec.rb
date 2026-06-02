@@ -124,6 +124,53 @@ RSpec.describe(SOUP::PIPParser) do
     end
   end
 
+  # BUG-003 regression: a transitive package whose name is a substring of a
+  # declared requirement (requests within requests-oauthlib) must NOT be flagged
+  # direct. The old String#include? scan of requirements.in mis-classified it.
+  context 'when a transitive package name is a substring of a declared requirement' do
+    before do
+      allow(File).to(receive(:exist?).with('requirements.in').and_return(true))
+      allow(File).to(receive(:read).and_call_original)
+      allow(File).to(receive(:read).with('requirements.in').and_return("requests-oauthlib\n"))
+
+      foreach_stub = receive(:foreach).with('requirements.txt')
+      "requests==2.31.0\n".lines.each { |line| foreach_stub.and_yield(line) }
+      allow(File).to(foreach_stub)
+
+      stub_request(:get, 'https://pypi.python.org/pypi/requests/json')
+        .to_return(status: 200, body: requests_response)
+    end
+
+    it 'classifies the substring package as transitive' do
+      packages = {}
+      parser.parse('requirements.txt', packages)
+      expect(packages['requests'].dependency).to(be(true))
+    end
+  end
+
+  # The .in / lockfile names are compared with PEP 503 normalization, so a
+  # declared "Flask_Login" still matches the resolved "flask-login".
+  context 'when the declared name differs only by case and separators' do
+    before do
+      allow(File).to(receive(:exist?).with('requirements.in').and_return(true))
+      allow(File).to(receive(:read).and_call_original)
+      allow(File).to(receive(:read).with('requirements.in').and_return("Flask_Login\n"))
+
+      foreach_stub = receive(:foreach).with('requirements.txt')
+      "flask-login==0.6.3\n".lines.each { |line| foreach_stub.and_yield(line) }
+      allow(File).to(foreach_stub)
+
+      stub_request(:get, 'https://pypi.python.org/pypi/flask-login/json')
+        .to_return(status: 200, body: flask_response)
+    end
+
+    it 'classifies the normalized match as a direct dependency' do
+      packages = {}
+      parser.parse('requirements.txt', packages)
+      expect(packages['flask-login'].dependency).to(be(false))
+    end
+  end
+
   context 'when home_page is nil' do
     let(:nil_homepage_response) do
       {

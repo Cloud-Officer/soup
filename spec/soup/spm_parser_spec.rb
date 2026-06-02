@@ -73,6 +73,26 @@ RSpec.describe(SOUP::SPMParser) do
     end
   end
 
+  # BUG-003 regression: a transitive package whose repo name is a substring of a
+  # declared package (Alamofire within AlamofireImage) must NOT be flagged
+  # direct. The old String#include? scan of the manifest mis-classified it;
+  # manifest_mentions? anchors on a non-identifier boundary.
+  context 'when a package name is a substring of a declared package' do
+    let(:main_file_content) { '.package(url: "https://github.com/SomeOrg/AlamofireImage.git", from: "1.0.0")' }
+
+    before do
+      stub_request(:get, 'https://api.github.com/repos/Alamofire/Alamofire')
+        .to_return(status: 200, body: github_response)
+    end
+
+    it 'classifies the substring package as transitive', :aggregate_failures do
+      packages = {}
+      parser.parse('Package.resolved', packages)
+      expect(packages).to(have_key('Alamofire'))
+      expect(packages['Alamofire'].dependency).to(be(true))
+    end
+  end
+
   context 'when repository has no license' do
     let(:no_license_response) do
       {

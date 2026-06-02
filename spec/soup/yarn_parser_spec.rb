@@ -44,6 +44,25 @@ RSpec.describe(SOUP::YarnParser) do
     end
   end
 
+  # BUG-003 regression: a transitive package whose name is a substring of a
+  # declared dependency (lodash within lodash-es) must NOT be flagged direct.
+  # The old String#include? scan of package.json mis-classified it.
+  context 'when a transitive package name is a substring of a dependency' do
+    let(:parsed_lock) { [{ name: 'lodash', version: '4.17.21' }] }
+    let(:main_file)   { '{"dependencies":{"lodash-es":"^4.17.0"}}' }
+
+    before do
+      stub_request(:get, 'https://registry.npmjs.org/lodash')
+        .to_return(status: 200, body: registry_response)
+    end
+
+    it 'classifies the substring package as transitive' do
+      packages = {}
+      parser.parse('yarn.lock', packages)
+      expect(packages['lodash'].dependency).to(be(true))
+    end
+  end
+
   context 'when package.json has vendor dependency' do
     before do
       allow(File).to(
