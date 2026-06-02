@@ -9,16 +9,19 @@ module SOUP
   class BundlerParser < BaseParser
     def parse(file, packages)
       lock_file = Bundler::LockfileParser.new(Bundler.read_file(file))
-      main_file = File.read(file.sub(/\.lock$/, ''))
+      # The lockfile's DEPENDENCIES section lists exactly the gems declared in
+      # the Gemfile (direct deps); everything else in specs is transitive. This
+      # is an exact name match, unlike a String#include? scan of the Gemfile.
+      direct_deps = lock_file.dependencies.keys
 
       parallel_each(lock_file.specs, packages) do |spec|
-        fetch_package(file, main_file, spec)
+        fetch_package(file, direct_deps, spec)
       end
     end
 
     private
 
-    def fetch_package(file, main_file, spec)
+    def fetch_package(file, direct_deps, spec)
       puts("Checking #{spec.name} #{spec.version}...")
       version_url = "https://api.rubygems.org/api/v2/rubygems/#{spec.name}/versions/#{spec.version}.json"
       response = HttpClient.get(version_url)
@@ -46,7 +49,7 @@ module SOUP
         license: package_details['licenses']&.first&.strip,
         description: Package.sanitize_description(package_details['info'], first_sentence: true),
         website: package_details['homepage_uri']&.strip,
-        dependency: !main_file.include?(spec.name)
+        dependency: !direct_deps.include?(spec.name)
       )
     end
   end

@@ -8,7 +8,11 @@ module SOUP
   class ComposerParser < BaseParser
     def parse(file, packages)
       lock_file = JSON.parse(File.read(file))
-      main_file = File.read(sibling_file(file, 'composer.json'))
+      main_file_json = JSON.parse(File.read(sibling_file(file, 'composer.json')))
+      # require / require-dev keys are exact "vendor/name" strings (direct deps);
+      # match those instead of substring-scanning the raw composer.json text.
+      direct_deps = (main_file_json['require'] || {}).keys |
+                    (main_file_json['require-dev'] || {}).keys
       all_packages = (lock_file['packages'] || []) + (lock_file['packages-dev'] || [])
 
       all_packages.each do |php_package|
@@ -22,7 +26,7 @@ module SOUP
           license: extract_composer_license(php_package['license']),
           description: Package.sanitize_description(php_package['description'], first_sentence: true),
           website: php_package['homepage']&.strip,
-          dependency: !main_file.include?(php_package['name'])
+          dependency: !direct_deps.include?(php_package['name'])
         )
         packages[package.package] = package
       end

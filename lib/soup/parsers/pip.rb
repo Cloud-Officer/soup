@@ -9,13 +9,13 @@ module SOUP
     LOOSE_CONSTRAINT_PATTERN = /[<>!~]/
     private_constant :LOOSE_CONSTRAINT_PATTERN
 
+    # Leading distribution name of a requirement line, before any extras,
+    # version constraint, or environment marker (PEP 508).
+    REQUIREMENT_NAME_PATTERN = /\A[A-Za-z0-9._-]+/
+    private_constant :REQUIREMENT_NAME_PATTERN
+
     def parse(file, packages)
-      main_file =
-        if File.exist?(file.gsub('.txt', '.in'))
-          File.read(file.gsub('.txt', '.in'))
-        else
-          ''
-        end
+      direct_deps = read_direct_dependencies(file)
 
       work_items = []
       File.foreach(file) do |line|
@@ -39,13 +39,37 @@ module SOUP
       end
 
       parallel_each(work_items, packages) do |pip_package, version|
-        fetch_package(file, main_file, pip_package, version)
+        fetch_package(file, direct_deps, pip_package, version)
       end
     end
 
     private
 
-    def fetch_package(file, main_file, pip_package, version)
+    # Direct dependencies are the names declared in the sibling requirements.in
+    # (the compiled-from source). Returns PEP 503-normalized names for exact
+    # comparison; an empty list (no .in file) leaves every package transitive,
+    # matching the previous empty-main_file behavior.
+    def read_direct_dependencies(file)
+      in_file = file.gsub('.txt', '.in')
+      return [] unless File.exist?(in_file)
+
+      File.read(in_file).each_line.filter_map do |line|
+        line = line.split('#', 2).first.to_s.strip
+        next if line.empty?
+        next if line.start_with?('-') # pip directives such as -r, -c, --hash
+
+        match = line.match(REQUIREMENT_NAME_PATTERN)
+        normalize_pip_name(match.to_s) if match
+      end
+    end
+
+    # PEP 503 name normalization: lowercase, with runs of -, _ and . collapsed
+    # to a single -, so e.g. "Foo.Bar" and "foo_bar" compare equal.
+    def normalize_pip_name(name)
+      name.downcase.gsub(/[-_.]+/, '-')
+    end
+
+    def fetch_package(file, direct_deps, pip_package, version)
       puts("Checking #{pip_package} #{version}...")
       url = "https://pypi.python.org/pypi/#{pip_package.sub(/\[[^\]]+\]/, '')}/json"
       response = HttpClient.get(url)
@@ -63,7 +87,7 @@ module SOUP
         license: extract_pip_license(info),
         description: Package.sanitize_description(info['summary'], first_sentence: true),
         website: info['home_page']&.strip,
-        dependency: !main_file.include?(pip_package)
+        dependency: !direct_deps.include?(normalize_pip_name(pip_package.sub(/\[[^\]]+\]/, '')))
       )
     end
 

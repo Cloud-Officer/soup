@@ -105,7 +105,7 @@ module SOUP
         license: license,
         description: Package.sanitize_description(description),
         website: website,
-        dependency: !main_file.include?("#{group_id}:#{artifact_id}")
+        dependency: !manifest_mentions?(main_file, "#{group_id}:#{artifact_id}")
       )
     end
   end

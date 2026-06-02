@@ -65,6 +65,24 @@ RSpec.describe(SOUP::ComposerParser) do
     expect(packages['vendor/dev-pkg'].dependency).to(be(true))
   end
 
+  # BUG-003 regression: a transitive package whose name is a substring of a
+  # declared require (vendor/main within vendor/main-pkg) must NOT be flagged
+  # direct. The old String#include? scan of composer.json mis-classified it.
+  context 'when a transitive package name is a substring of a required package' do
+    let(:lock_file) do
+      {
+        packages: [
+          { name: 'vendor/main', version: '1.0.0', license: ['MIT'], description: 'Substring pkg', homepage: '' }
+        ],
+        'packages-dev': []
+      }.to_json
+    end
+
+    it 'classifies the substring package as transitive' do
+      expect(packages['vendor/main'].dependency).to(be(true))
+    end
+  end
+
   context 'with parentheses in license' do
     let(:lock_file) do
       {

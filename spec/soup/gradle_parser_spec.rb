@@ -193,6 +193,26 @@ RSpec.describe(SOUP::GradleParser) do
     end
   end
 
+  # BUG-003 regression: a transitive coordinate whose name is a substring of a
+  # declared dependency (com.example:lib within com.example:library) must NOT be
+  # flagged direct. The old String#include? scan of build.gradle mis-classified
+  # it; manifest_mentions? anchors on a non-identifier boundary.
+  context 'when a transitive coordinate is a substring of a declared dependency' do
+    let(:lock_content) { ["com.example:lib:1.0.0=classpath\n"]   }
+    let(:main_file)    { 'classpath "com.example:library:1.0.0"' }
+
+    before do
+      stub_request(:get, %r{search\.maven\.org/solrsearch/select})
+        .to_return(status: 200, body: maven_response)
+    end
+
+    it 'classifies the substring coordinate as transitive' do
+      packages = {}
+      parser.parse('buildscript-gradle.lockfile', packages)
+      expect(packages['com.example:lib'].dependency).to(be(true))
+    end
+  end
+
   context 'when only build.gradle.kts (Kotlin DSL) exists' do
     before do
       allow(File).to(receive(:read).with('build.gradle').and_raise(Errno::ENOENT))
