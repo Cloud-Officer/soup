@@ -1,6 +1,31 @@
 # Dependency directories
-vendor/
+# ghb:excluded-dirs:start - managed by github-build from config/languages.yaml; do not edit by hand
+.build/
+.bundle/
+.git/
+.gradle/
+.hg/
+.m2/
+.npm/
+.pnpm/
+.pytest_cache/
+.svn/
+.venv/
+.yarn/
+__pycache__/
+build/
+Carthage/
+coverage/
+DerivedData/
+dist/
+env/
+Libraries/
 node_modules/
+Pods/
+target/
+vendor/
+venv/
+# ghb:excluded-dirs:end
 
 # Test files - Go
 *_test.go
@@ -14,6 +39,10 @@ node_modules/
 **/*.test.ts
 **/*.spec.js
 **/*.spec.ts
+
+# Workflow DSL scripts (Claude Code): not standard modules, validated by the
+# Workflow runtime rather than static analysis
+**/*.workflow.js
 
 # Test directories
 **/test/
