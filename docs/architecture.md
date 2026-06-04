@@ -312,7 +312,7 @@
 **Key Components:**
 
 - `parse(file, packages)`: Parses resolved file and fetches package details from GitHub API in parallel via the inherited `parallel_each` helper (`BaseParser`)
-- Resolves the direct-dependency manifest for `Package.resolved` files that are nested inside an Xcode project bundle by trying, in order, a sibling `Package.swift` (or matching `<Name>.swift`), a sibling `<Name>.xcodeproj/project.pbxproj`, and finally the `project.pbxproj` of an enclosing `*.xcodeproj` higher up the tree; the resolved manifest is passed to `manifest_mentions?` to classify direct vs transitive dependencies
+- Resolves the direct-dependency manifest for `Package.resolved` files that are nested inside an Xcode project bundle by trying, in order, a sibling `Package.swift` (or matching `<Name>.swift`), an enclosing `Tuist/Dependencies.swift` when the resolved file lives under a Tuist directory, a sibling `<Name>.xcodeproj/project.pbxproj`, and finally the `project.pbxproj` of an enclosing `*.xcodeproj` higher up the tree; the resolved manifest is passed to `manifest_mentions?` to classify direct vs transitive dependencies
 - Supports `GITHUB_TOKEN` environment variable for rate limit handling
 
 **External Dependencies:**
