@@ -1,0 +1,39 @@
+# Trivy scanner configuration
+# https://trivy.dev/latest/docs/references/configuration/config-file/
+#
+# scan.skip-dirs lists directories Trivy ignores. The block between the
+# ghb:excluded-dirs sentinels is managed by github-build from
+# config/languages.yaml -- do not edit it by hand. Add your own project-specific
+# directories OUTSIDE the sentinels (e.g. below the end marker); they are
+# preserved across rebuilds.
+#
+# Vulnerability/CVE IDs to ignore go in .trivyignore, not here.
+scan:
+  skip-dirs:
+    # ghb:excluded-dirs:start - managed by github-build from config/languages.yaml; do not edit by hand
+    - "**/.build"
+    - "**/.bundle"
+    - "**/.git"
+    - "**/.gradle"
+    - "**/.hg"
+    - "**/.m2"
+    - "**/.npm"
+    - "**/.pnpm"
+    - "**/.pytest_cache"
+    - "**/.svn"
+    - "**/.venv"
+    - "**/.yarn"
+    - "**/__pycache__"
+    - "**/build"
+    - "**/Carthage"
+    - "**/coverage"
+    - "**/DerivedData"
+    - "**/dist"
+    - "**/env"
+    - "**/Libraries"
+    - "**/node_modules"
+    - "**/Pods"
+    - "**/target"
+    - "**/vendor"
+    - "**/venv"
+    # ghb:excluded-dirs:end
