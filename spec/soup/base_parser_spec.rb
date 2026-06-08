@@ -90,13 +90,13 @@ RSpec.describe(SOUP::BaseParser) do
       it 'omits the body section entirely when the body is empty', :aggregate_failures do
         response.body = ''
         message = parser.http_error_message(response, url: 'https://x/y', package: 'p')
-        expect(message).not_to(match(/body=/))
+        expect(message).not_to(include('body='))
         expect(message).to(include('HTTP 503'))
       end
 
       it 'omits the package section when no package is given' do
         message = parser.http_error_message(response, url: 'https://x/y')
-        expect(message).not_to(match(/package=/))
+        expect(message).not_to(include('package='))
       end
 
       it 'truncates a long body to 200 characters' do
