@@ -215,6 +215,33 @@ RSpec.describe(SOUP::PIPParser) do
     end
   end
 
+  # BUG-001 regression: a pinned package carrying a trailing inline comment
+  # (PEP 508 / `pip-compile --annotation-style=line`) must be parsed, not
+  # silently dropped. Before the fix, `next if line.include?('#')` skipped the
+  # whole line; full-line comments must still be skipped via the blank guard.
+  context 'when a requirement line has a trailing inline comment' do
+    before do
+      allow(File).to(
+        receive(:foreach).with('requirements.txt')
+                         .and_yield("# full-line comment\n")
+                         .and_yield("requests==2.31.0  # security pin\n")
+                         .and_yield("flask==3.0.0  # pinned for CVE\n")
+      )
+      stub_request(:get, 'https://pypi.python.org/pypi/requests/json')
+        .to_return(status: 200, body: requests_response)
+      stub_request(:get, 'https://pypi.python.org/pypi/flask/json')
+        .to_return(status: 200, body: flask_response)
+    end
+
+    it 'strips the inline comment and parses the package', :aggregate_failures do
+      packages = {}
+      parser.parse('requirements.txt', packages)
+      expect(packages['requests'].version).to(eq('2.31.0'))
+      expect(packages['flask'].version).to(eq('3.0.0'))
+      expect(packages.size).to(eq(2))
+    end
+  end
+
   context 'when license is empty and no classifiers exist' do
     let(:empty_license_response) do
       {

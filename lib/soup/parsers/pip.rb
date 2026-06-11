@@ -19,9 +19,11 @@ module SOUP
 
       work_items = []
       File.foreach(file) do |line|
+        # Strip inline/full-line comments first (mirrors read_direct_dependencies)
+        # so pinned packages with trailing comments such as
+        # `requests==2.31.0  # security pin` are not silently dropped.
+        line = line.split('#', 2).first.to_s
         next if line.strip.empty?
-
-        next if line.include?('#')
 
         line = line.slice(0, line.index(';')) if line.include?(';')
         pip_package, version = line.strip.split('==', 2)
