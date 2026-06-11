@@ -13,6 +13,8 @@ require_relative 'parsers/bundler'
 require_relative 'parsers/composer'
 require_relative 'parsers/generic'
 require_relative 'parsers/gradle'
+require_relative 'parsers/importmap'
+require_relative 'parsers/manual'
 require_relative 'parsers/npm'
 require_relative 'parsers/pip'
 require_relative 'parsers/spm'
@@ -27,6 +29,7 @@ module SOUP
     'composer.lock': { parser: ComposerParser, skip: :skip_composer },
     'Gemfile.lock': { parser: BundlerParser, skip: :skip_bundler },
     'gradle.lockfile': { parser: GradleParser, skip: :skip_gradle },
+    'importmap.rb': { parser: ImportmapParser, skip: :skip_importmap },
     'Package.resolved': { parser: SPMParser, skip: :skip_spm },
     'package-lock.json': { parser: NPMParser, skip: :skip_npm },
     # Podfile.lock support removed: cocoapods-core requires activesupport < 8.
@@ -114,6 +117,41 @@ module SOUP
 
           puts("Reading file #{file}...")
           generic_parser.parse(config[:parser].new, file, @detected_packages)
+        end
+      end
+
+      parse_manual_entries
+      enforce_vendored_coverage
+    end
+
+    # Manually-declared SOUP entries cover vendored/proprietary components that
+    # no package manager resolves. Parsed after the auto-detected packages so a
+    # project can override an auto-detected entry by package name if needed.
+    def parse_manual_entries
+      return if @options.manual_file.to_s.empty?
+      return unless File.exist?(@options.manual_file)
+
+      puts("Reading file #{@options.manual_file}...")
+      ManualParser.new.parse(@options.manual_file, @detected_packages)
+    end
+
+    # Fail the run if a committed vendored JS file (matched by --vendored_globs)
+    # has no SOUP entry, so dropping a new third-party file into the repo cannot
+    # silently bypass the register. Coverage is matched on the entry's `file`
+    # path or basename.
+    def enforce_vendored_coverage
+      return if @options.vendored_globs.empty?
+
+      declared = @detected_packages.values.filter_map { |package| package.file unless package.file.to_s.empty? }
+      declared_basenames = declared.map { |path| File.basename(path) }
+
+      @options.vendored_globs.each do |glob|
+        Dir.glob(File.join(Dir.pwd, glob)).each do |file|
+          relative = file.sub("#{Dir.pwd}/", '')
+          next if declared.include?(relative) || declared_basenames.include?(File.basename(file))
+
+          warn("Vendored file #{relative} has no SOUP entry; add it to #{@options.manual_file}!")
+          @exit_code = Status::ERROR_EXIT_CODE
         end
       end
     end
