@@ -33,12 +33,23 @@ The following package managers are supported:
 * Bundler (Gemfile.lock)
 * Composer (composer.lock)
 * Gradle (buildscript-gradle.lockfile, gradle.lockfile)
+* Importmap (config/importmap.rb)
 * NPM (package-lock.json)
 * PIP (requirements.txt)
 * SPM (Package.resolved)
 * Yarn (yarn.lock)
 
 Note: CocoaPods (`Podfile.lock`) support was removed pending upstream compatibility. The `cocoapods-core` gem requires `activesupport < 8`, which is incompatible with the ActiveSupport version this project depends on. `Podfile.lock` files are currently skipped silently; support will be reinstated once `cocoapods-core` upgrades.
+
+For Rails projects using importmap-rails, each `pin '<name>', to: '<https…>'` in `config/importmap.rb` is treated as a
+third-party JavaScript SOUP entry; its npm package and version are derived from the CDN URL and looked up on the npm
+registry. Non-http pins (local first-party assets, `@hotwired/*`, vendored `*.js`) are skipped.
+
+Components that no package manager can resolve — vendored files committed to the repo and proprietary/commercial
+components with no public registry entry — are declared in a manual entries file (default `config/soup-manual.json`), a
+JSON array of objects with at least a `package` key (plus optional `language`, `version`, `license`, `description`,
+`website`, `file`, and the verification fields). When `--vendored_globs` is set, the run fails if any file matching those
+globs has no manual entry, so dropping a new vendored library into the repo cannot silently bypass the register.
 
 The soup file is generated in `./docs/soup.md` and a cache file `.soup.json` is used to preserved previously entered
 choices.
@@ -71,16 +82,19 @@ options
                                      Comma separated list of folders to ignore
         --licenses                   Check for open source licenses compliance
         --licenses_file file         Path to authorized licenses file
+        --manual_file file           Path to manually-declared SOUP entries (vendored/proprietary components)
         --markdown_file file         Path to generated markdown file
         --no_prompt                  Do not prompt for missing information and fail immediately
         --skip_bundler               Ignore Ruby/Bundler/Gemfile/Gemfile.lock even if detected
         --skip_composer              Ignore PHP/Composer/composer.json/composer.lock even if detected
         --skip_gradle                Ignore Kotlin/Gradle/build.gradle/buildscript-gradle.lockfile/gradle.lockfile even if detected
+        --skip_importmap             Ignore Rails/importmap config/importmap.rb even if detected
         --skip_npm                   Ignore JS/NPM/package.json/package-lock.json even if detected
         --skip_pip                   Ignore Python/PIP/requirements.txt even if detected
         --skip_spm                   Ignore Swift/SPM/Package.swift/Package.resolved even if detected
         --skip_yarn                  Ignore JS/Yarn/package.json/yarn.lock even if detected
         --soup                       Check for missing information and generate the soup.md file
+        --vendored_globs globs       Comma separated globs of vendored JS files that must each have a manual SOUP entry
         --auto_reply                 Auto reply to questions prompt
     -h, --help                       Show this message
 

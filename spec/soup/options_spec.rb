@@ -138,5 +138,24 @@ RSpec.describe(SOUP::Options) do
       expect { described_class.new(['--unknown_flag']).parse }
         .to(raise_error(OptionParser::InvalidOption))
     end
+
+    context 'with importmap and vendored JS options' do
+      let(:parsed) do
+        described_class.new(['--skip_importmap', '--manual_file', 'm.json', '--vendored_globs', 'a/*.js,b/c.js']).parse
+      end
+
+      it 'defaults the manual file, skip_importmap and vendored globs', :aggregate_failures do
+        options = described_class.new([]).parse
+        expect(options.manual_file).to(eq('./config/soup-manual.json'))
+        expect(options.skip_importmap).to(be(false))
+        expect(options.vendored_globs).to(eq([]))
+      end
+
+      it 'parses --skip_importmap, --manual_file and --vendored_globs', :aggregate_failures do
+        expect(parsed.skip_importmap).to(be(true))
+        expect(parsed.manual_file).to(eq('m.json'))
+        expect(parsed.vendored_globs).to(eq(['a/*.js', 'b/c.js']))
+      end
+    end
   end
 end

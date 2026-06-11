@@ -14,17 +14,20 @@ module SOUP
       @ignored_folders = []
       @licenses_check = false
       @licenses_file = "#{__dir__}/../../config/licenses.json"
+      @manual_file = './config/soup-manual.json'
       @markdown_file = './docs/soup.md'
       @no_prompt = false
       @parser = OptionParser.new
       @skip_bundler = false
       @skip_composer = false
       @skip_gradle = false
+      @skip_importmap = false
       @skip_npm = false
       @skip_pip = false
       @skip_spm = false
       @skip_yarn = false
       @soup_check = false
+      @vendored_globs = []
 
       setup_parser
     end
@@ -33,10 +36,10 @@ module SOUP
     attr_reader :auto_reply, :licenses_check, :no_prompt, :soup_check
 
     # File-path flags
-    attr_reader :cache_file, :exceptions_file, :licenses_file, :markdown_file, :ignored_folders
+    attr_reader :cache_file, :exceptions_file, :licenses_file, :manual_file, :markdown_file, :ignored_folders, :vendored_globs
 
     # Per-package-manager skip flags
-    attr_reader :skip_bundler, :skip_composer, :skip_gradle, :skip_npm, :skip_pip, :skip_spm, :skip_yarn
+    attr_reader :skip_bundler, :skip_composer, :skip_gradle, :skip_importmap, :skip_npm, :skip_pip, :skip_spm, :skip_yarn
 
     def parse
       @parser.parse!(@argv)
@@ -76,6 +79,10 @@ module SOUP
         @licenses_file = file
       end
 
+      @parser.on('', '--manual_file file', 'Path to manually-declared SOUP entries (vendored/proprietary components)') do |file|
+        @manual_file = file
+      end
+
       @parser.on('', '--markdown_file file', 'Path to generated markdown file') do |file|
         @markdown_file = file
       end
@@ -96,6 +103,10 @@ module SOUP
         @skip_gradle = true
       end
 
+      @parser.on('', '--skip_importmap', 'Ignore Rails/importmap config/importmap.rb even if detected') do
+        @skip_importmap = true
+      end
+
       @parser.on('', '--skip_npm', 'Ignore JS/NPM/package.json/package-lock.json even if detected') do
         @skip_npm = true
       end
@@ -114,6 +125,10 @@ module SOUP
 
       @parser.on('', '--soup', 'Check for missing information and generate the soup.md file') do
         @soup_check = true
+      end
+
+      @parser.on('', '--vendored_globs globs', 'Comma separated globs of vendored JS files that must each have a manual SOUP entry') do |globs|
+        @vendored_globs = globs.split(',')
       end
 
       @parser.on('', '--auto_reply', 'Auto reply to questions prompt') do
