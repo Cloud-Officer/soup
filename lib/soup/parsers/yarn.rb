@@ -62,7 +62,7 @@ module SOUP
         file: file,
         language: 'JS',
         version: version,
-        license: package_details['license'],
+        license: npm_registry_license(package_details['license']),
         description: Package.sanitize_description(package_details['description'], strip_markdown: true),
         website: package_details['homepage'],
         dependency: !direct_deps.include?(name)
