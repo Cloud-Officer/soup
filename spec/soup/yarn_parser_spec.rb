@@ -185,6 +185,37 @@ RSpec.describe(SOUP::YarnParser) do
     end
   end
 
+  # BUG-002 regression: the npm registry returns the legacy object-form
+  # license {"type": "MIT", "url": "..."} for older package versions. Before
+  # the fix YarnParser passed the Hash straight to build_package, and it later
+  # crashed Application#validate_license's `license.downcase` with
+  # NoMethodError, aborting the whole scan. NPMParser already guarded this.
+  context 'when the registry returns the legacy object-form license' do
+    let(:object_license_response) do
+      {
+        versions: {
+          '4.17.21': {
+            license: { type: 'MIT', url: 'https://github.com/lodash/lodash/blob/master/LICENSE' },
+            description: 'Lodash',
+            homepage: 'https://lodash.com/'
+          }
+        }
+      }.to_json
+    end
+
+    before do
+      stub_request(:get, 'https://registry.npmjs.org/lodash')
+        .to_return(status: 200, body: object_license_response)
+    end
+
+    it 'normalizes the object form to its type string instead of crashing', :aggregate_failures do
+      packages = {}
+      expect { parser.parse('yarn.lock', packages) }
+        .not_to(raise_error)
+      expect(packages['lodash'].license).to(eq('MIT'))
+    end
+  end
+
   # TEST-05: race where Dir.glob found the lockfile but it was deleted /
   # unreadable before YarnLockParser::Parser.parse ran.
   context 'when yarn.lock cannot be read' do

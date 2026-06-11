@@ -101,6 +101,17 @@ module SOUP
       package_details
     end
 
+    # Coerce an npm-registry `license` field to a plain string. The registry
+    # returns it as a String ("MIT") for modern packages but as the legacy
+    # object form `{ "type": "MIT", "url": "..." }` for older versions. Left
+    # untouched, a Hash flows through normalize_license and reaches
+    # Application#validate_license, where `license.downcase` raises
+    # NoMethodError and aborts the whole run. Shared by NPM and Yarn parsers,
+    # which consume the identical registry.npmjs.org per-version payload.
+    def npm_registry_license(raw_license)
+      raw_license.is_a?(Hash) ? raw_license['type'].to_s : raw_license.to_s
+    end
+
     # Build an actionable error message for a non-2xx response.
     #
     # Includes status code, reason phrase, URL, the package being processed (when

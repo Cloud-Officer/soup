@@ -33,6 +33,7 @@ RSpec.describe(SOUP::BaseParser) do
                :collect_packages,
                :build_package,
                :normalize_license,
+               :npm_registry_license,
                :http_error_message
       end
     end
@@ -74,6 +75,26 @@ RSpec.describe(SOUP::BaseParser) do
 
       it 'passes through a normal SPDX identifier' do
         expect(parser.normalize_license('MIT')).to(eq('MIT'))
+      end
+    end
+
+    # BUG-002: the npm registry returns `license` as a String for modern
+    # packages but as the legacy object form {"type": "...", "url": "..."} for
+    # older versions. The Hash must be coerced to its type string so it never
+    # reaches Application#validate_license's unguarded `.downcase`.
+    describe '#npm_registry_license' do
+      it 'passes a plain string license through unchanged' do
+        expect(parser.npm_registry_license('MIT')).to(eq('MIT'))
+      end
+
+      it 'extracts the type from the legacy object form' do
+        # String keys mirror the parsed-JSON shape the helper indexes with ['type'].
+        object_license = { 'type' => 'MIT', 'url' => 'https://x/y' } # rubocop:disable Style/StringHashKeys
+        expect(parser.npm_registry_license(object_license)).to(eq('MIT'))
+      end
+
+      it 'returns an empty string for nil so normalize_license stays Hash-free' do
+        expect(parser.npm_registry_license(nil)).to(eq(''))
       end
     end
 
