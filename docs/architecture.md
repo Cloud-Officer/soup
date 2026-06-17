@@ -43,10 +43,10 @@
 │  │  Bundler   │ │  Composer  │ │   Gradle   │ │    NPM     │ │    PIP     │ │
 │  │  (Ruby)    │ │   (PHP)    │ │  (Kotlin)  │ │   (JS)     │ │  (Python)  │ │
 │  └────────────┘ └────────────┘ └────────────┘ └────────────┘ └────────────┘ │
-│  ┌────────────┐ ┌────────────┐                                              │
-│  │    SPM     │ │    Yarn    │                                              │
-│  │  (Swift)   │ │   (JS)     │                                              │
-│  └────────────┘ └────────────┘                                              │
+│  ┌────────────┐ ┌────────────┐ ┌────────────┐ ┌────────────┐                │
+│  │    SPM     │ │    Yarn    │ │ Importmap  │ │   Manual   │                │
+│  │  (Swift)   │ │   (JS)     │ │  (Rails)   │ │ (vendored) │                │
+│  └────────────┘ └────────────┘ └────────────┘ └────────────┘                │
 └─────────────────────────────────────────────────────────────────────────────┘
                                       │
                                       ▼
@@ -74,7 +74,7 @@
 2. **Application** (`lib/soup/application.rb`): Orchestrates the entire workflow from detection to output generation
 3. **Options** (`lib/soup/options.rb`): Parses command-line arguments and configures application behavior
 4. **Package** (`lib/soup/package.rb`): Data structure representing a third-party dependency with all IEC 62304 required metadata
-5. **Parsers** (`lib/soup/parsers/`): Language-specific parsers that read lock files and fetch metadata from package registries; each inherits shared fetching, normalization, and parallelization logic from `SOUP::BaseParser`
+5. **Parsers** (`lib/soup/parsers/`): Language-specific parsers that read lock files and fetch metadata from package registries; each inherits shared fetching, normalization, and parallelization logic from `SOUP::BaseParser`. The `ImportmapParser` resolves CDN-pinned dependencies from a Rails `config/importmap.rb`, and the `ManualParser` reads manually-declared entries for vendored/proprietary components that no registry can resolve
 6. **Status** (`lib/soup/status.rb`): Defines exit codes for the application
 7. **Errors** (`lib/soup/errors.rb`): Defines the `SOUP::Error` exception hierarchy raised throughout the application
 
@@ -102,7 +102,9 @@
 - `initialize(argv)`: Configures options and initializes state
 - `execute`: Main entry point that runs the detection, checking, and output workflow. Uses an `ensure` block to persist partial state on failure
 - `validate_config!`: Validates that configuration files exist and contain valid JSON
-- `detect_packages`: Scans for lock files and invokes appropriate parsers
+- `detect_packages`: Scans for lock files and invokes appropriate parsers, then runs `parse_manual_entries` and `enforce_vendored_coverage`
+- `parse_manual_entries`: Invokes `ManualParser` on the manual entries file (default `config/soup-manual.json`) when it exists; parsed after auto-detected packages so a project can override an auto-detected entry by package name
+- `enforce_vendored_coverage`: Fails the run (sets the error exit code) when a committed file matched by `--vendored_globs` has no SOUP entry, matched on the entry's `file` path or basename
 - `read_cached_packages`: Loads previously entered user choices from cache
 - `check_packages`: Validates licenses and prompts for missing IEC 62304 metadata
 - `save_files`: Writes cache and markdown documentation files
@@ -131,8 +133,8 @@
 **Key Components:**
 
 - `parse`: Parses command-line arguments and returns configured options object
-- Configuration attributes: `cache_file`, `markdown_file`, `licenses_file`, `exceptions_file`, `ignored_folders`
-- Skip flags: `skip_bundler`, `skip_composer`, `skip_gradle`, `skip_npm`, `skip_pip`, `skip_spm`, `skip_yarn`
+- Configuration attributes: `cache_file`, `markdown_file`, `licenses_file`, `exceptions_file`, `manual_file`, `ignored_folders`, `vendored_globs`
+- Skip flags: `skip_bundler`, `skip_composer`, `skip_gradle`, `skip_importmap`, `skip_npm`, `skip_pip`, `skip_spm`, `skip_yarn`
 - Mode flags: `licenses_check`, `soup_check`, `no_prompt`, `auto_reply`
 
 **External Dependencies:**
@@ -334,6 +336,31 @@
 - `parallel`
 - `yarn_lock_parser`
 
+### SOUP::ImportmapParser
+
+**Purpose:** Parses a Rails importmap pin file (`config/importmap.rb`) and treats CDN-pinned dependencies as third-party SOUP, fetching metadata from the NPM registry.
+
+**Location:** `lib/soup/parsers/importmap.rb`
+
+**Key Components:**
+
+- `parse(file, packages)`: Reads `pin` directives, keeps only pins that resolve to an http(s) CDN URL (esm.sh, jspm.io, jsdelivr), derives the npm package name and version from the URL, and fetches metadata in parallel via the inherited `parallel_each` helper (`BaseParser`). Local/vendored pins (e.g. `application`, `@hotwired/*`, `*.js` under `vendor/`) are skipped. Unpinned "latest" pins resolve to the registry's latest dist-tag
+- `PIN_REGEX`: Private constant matching `pin "name", to: "url"` directives
+- Reuses `lookup_npm_registry_version` (`BaseParser`) for registry payload extraction
+
+### SOUP::ManualParser
+
+**Purpose:** Reads manually-declared SOUP entries from a JSON file (default `config/soup-manual.json`) for vendored files and proprietary/commercial components that no package manager or registry can resolve.
+
+**Location:** `lib/soup/parsers/manual.rb`
+
+**Key Components:**
+
+- `parse(file, packages)`: Parses a JSON array of entry objects, raising `InvalidLockfileError` if the file is not an array or an entry lacks a non-empty `package`; each entry becomes a `SOUP::Package`
+- Each entry supports `package` (required), plus optional `language`, `version`, `license`, `description`, `website`, and `file`; the `file` path lets the vendored-file coverage check (`Application#enforce_vendored_coverage`) match a committed file to its entry
+- Entries may pre-declare verification fields (`risk_level`, `requirements`, `verification_reasoning`); otherwise they fall back to the cache or prompt like any other package
+- `REQUIRED_KEY`: Private constant for the required `package` field
+
 ## Software of Unknown Provenance
 
 See [soup.md](soup.md) for the complete list of third-party dependencies. The `soup.md` file is auto-generated by the `soup` tool itself; never edit it directly. All metadata is sourced from `.soup.json` (cache) and the lock files at the project root.
@@ -417,6 +444,19 @@ Validation criteria for SOUP entries: Accuracy (Requirements match actual usage)
 1. For parsers whose manifest is structured data that can be parsed into an exact dependency set (Bundler, Composer, NPM, PIP, Yarn), the direct dependency names are read from the manifest (e.g. `Gemfile` dependencies, the sibling `requirements.in`) and matched against package names with an exact-name comparison
 2. For parsers whose manifest is source code that cannot be parsed into an exact set (Gradle build scripts, Swift `Package.swift`/`pbxproj`), `manifest_mentions?(main_file, token)` performs a token-boundary regex match so a name that is a substring of another coordinate is not misclassified
 3. A package is marked transitive (`dependency: true`) when it is not found among the direct dependencies
+
+### Vendored Coverage Enforcement Algorithm
+
+**Purpose:** Ensures that committed vendored JS files cannot silently bypass the SOUP register by requiring each one to have a corresponding entry.
+
+**Location:** `lib/soup/application.rb` in `enforce_vendored_coverage` method
+
+**Implementation:**
+
+1. Returns early when no `--vendored_globs` are configured
+2. Collects the `file` paths (and their basenames) declared by detected/manual packages
+3. For each glob, expands matching files under the project root
+4. Reports an error and sets the error exit code for any matched file whose relative path or basename is not declared, instructing the user to add it to the manual entries file
 
 ### Markdown Sanitization Algorithm
 
@@ -504,3 +544,5 @@ Recoverable failures raise a subclass of `SOUP::Error` (`lib/soup/errors.rb`); t
 | CI/CD mode | `--no_prompt` flag for non-interactive execution |
 | Selective parsing | Skip flags allow excluding specific package managers |
 | Folder exclusion | `--ignored_folders` allows excluding directories from scanning |
+| Vendored coverage gate | `--vendored_globs` fails the run when a committed vendored file has no SOUP entry |
+| Manual SOUP entries | `--manual_file` declares vendored/proprietary components with no registry source |
