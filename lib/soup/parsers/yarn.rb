@@ -42,7 +42,6 @@ module SOUP
     def fetch_package(file, direct_deps, js_package)
       name = js_package[:name]
       version = js_package[:version]
-      puts("Checking #{name} #{version}...")
       url = "https://registry.npmjs.org/#{name}"
 
       begin

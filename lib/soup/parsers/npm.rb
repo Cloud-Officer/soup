@@ -26,7 +26,6 @@ module SOUP
 
     def fetch_package(file, direct_deps, key, value)
       name = key.split('node_modules/').last
-      puts("Checking #{name} #{value['version']}...")
       url = "https://registry.npmjs.org/#{name}"
 
       begin

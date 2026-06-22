@@ -92,7 +92,6 @@ module SOUP
     def fetch_package(file, main_file, token, pin)
       pin_id = pin['identity'] || pin['package']
       version = pin_version(pin)
-      puts("Checking #{pin_id} #{version}...")
       url = "https://api.github.com/repos/#{github_repo_path(pin['location'] || pin['repositoryURL'])}"
 
       response =
