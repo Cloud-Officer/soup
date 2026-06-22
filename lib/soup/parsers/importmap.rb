@@ -53,7 +53,6 @@ module SOUP
     end
 
     def fetch_package(file, name, version)
-      puts("Checking #{name} #{version || 'latest'}...")
       url = "#{REGISTRY_ROOT}/#{name}"
 
       begin

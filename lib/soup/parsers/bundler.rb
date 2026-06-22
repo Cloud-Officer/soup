@@ -22,7 +22,6 @@ module SOUP
     private
 
     def fetch_package(file, direct_deps, spec)
-      puts("Checking #{spec.name} #{spec.version}...")
       version_url = "https://api.rubygems.org/api/v2/rubygems/#{spec.name}/versions/#{spec.version}.json"
       response = HttpClient.get(version_url)
 

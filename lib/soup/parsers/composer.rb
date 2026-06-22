@@ -16,8 +16,6 @@ module SOUP
       all_packages = (lock_file['packages'] || []) + (lock_file['packages-dev'] || [])
 
       all_packages.each do |php_package|
-        puts("Checking #{php_package['name']} #{php_package['version']}...")
-
         package = build_package(
           name: php_package['name'],
           file: file,

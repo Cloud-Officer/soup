@@ -72,7 +72,6 @@ module SOUP
     end
 
     def fetch_package(file, direct_deps, pip_package, version)
-      puts("Checking #{pip_package} #{version}...")
       url = "https://pypi.python.org/pypi/#{pip_package.sub(/\[[^\]]+\]/, '')}/json"
       response = HttpClient.get(url)
 

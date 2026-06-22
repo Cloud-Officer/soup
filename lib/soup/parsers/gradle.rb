@@ -65,7 +65,6 @@ module SOUP
     end
 
     def fetch_package(file, main_file, group_id, artifact_id, version)
-      puts("Checking #{group_id}:#{artifact_id} #{version}...")
       last_url = "https://search.maven.org/solrsearch/select?q=g:%22#{group_id}%22+AND+a:%22#{artifact_id}%22+AND+v:%22#{version}%22&rows=1&wt=json"
       response = HttpClient.get(last_url)
 
