@@ -269,8 +269,10 @@
 
 **Key Components:**
 
-- `parse(file, packages)`: Parses lock file and fetches package details from Maven Central or fallback repositories, in parallel via the inherited `parallel_each` helper (`BaseParser`). Selects `classpath` entries for `buildscript-gradle.lockfile` and non-test, non-debug `RuntimeClasspath` entries for `gradle.lockfile`
-- `REPOSITORY_URLS`: List of Maven repository URLs for fallback lookups
+- `parse(file, packages)`: Parses lock file and fetches package details, in parallel via the inherited `parallel_each` helper (`BaseParser`). Selects `classpath` entries for `buildscript-gradle.lockfile` and non-test, non-debug `RuntimeClasspath` entries for `gradle.lockfile`
+- `fetch_package(...)`: Queries the `search.maven.org` solrsearch endpoint first; when it returns no single match, or times out (the endpoint is chronically flaky), the lookup degrades to the per-repository POM mirrors in `REPOSITORY_URLS` rather than aborting the run. A coordinate that no source resolves is warned and skipped
+- `safe_get(url)`: Wraps `HttpClient.get` so a `Net::OpenTimeout`/`Net::ReadTimeout` on one mirror is swallowed (warned, returns nil) and the caller falls through to the next source, instead of `Parallel.map` propagating the exception and aborting every other in-flight lookup
+- `REPOSITORY_URLS`: Private constant listing the Maven POM mirror URLs (e.g. `maven.google.com`) tried in order when the primary endpoint has no match
 
 **External Dependencies:**
 
@@ -520,6 +522,7 @@ Recoverable failures raise a subclass of `SOUP::Error` (`lib/soup/errors.rb`); t
 | Missing or malformed config file | Raises `ConfigurationError` when a configuration file is absent or contains invalid JSON | `lib/soup/application.rb` in `validate_config!` method |
 | API rate limiting | Raises `RateLimitError` (and `AuthenticationError` for bad credentials), suggesting `GITHUB_TOKEN` | `lib/soup/parsers/spm.rb` in `parse` method |
 | Network timeouts | Retry up to 3 times via `SOUP::HttpClient` | `lib/soup/http_client.rb` in `get` method |
+| Maven source timeout | A timed-out `search.maven.org` query or POM mirror is skipped (warned) and the lookup falls through to the next source; the scan is not aborted | `lib/soup/parsers/gradle.rb` in `fetch_package` / `safe_get` methods |
 | Missing package metadata | Logs warning and continues processing other packages | NPM, Gradle parsers |
 | Missing required IEC 62304 fields | Raises `MissingMetadataError` in `--no_prompt` mode, prompts user otherwise | `lib/soup/application.rb` in `prompt_missing_field` / `ensure_metadata_complete!` methods |
 | Partial execution failure | Persists partial state via `ensure` block so progress is not lost | `lib/soup/application.rb` in `execute` method |
