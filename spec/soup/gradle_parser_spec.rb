@@ -178,6 +178,59 @@ RSpec.describe(SOUP::GradleParser) do
     end
   end
 
+  # Regression: search.maven.org's solrsearch endpoint chronically stops
+  # responding (Net::ReadTimeout). HttpClient re-raises after its retries, and
+  # that exception used to propagate through Parallel.map and abort the entire
+  # SOUP run. It must instead fall through to the per-repository POM mirrors.
+  context 'when Maven Central search times out' do
+    let(:pom_xml) do
+      <<~XML
+        <?xml version="1.0" encoding="UTF-8"?>
+        <project>
+          <licenses>
+            <license>
+              <name>MIT License</name>
+            </license>
+          </licenses>
+          <description>Fallback description</description>
+          <url>https://fallback.example.com</url>
+        </project>
+      XML
+    end
+
+    context 'with a fallback repository that resolves the package' do
+      before do
+        stub_request(:get, %r{search\.maven\.org/solrsearch/select}).to_timeout
+        stub_request(:get, 'https://maven.google.com/com/example/library/1.0.0/library-1.0.0.pom')
+          .to_return(status: 200, body: pom_xml)
+      end
+
+      it 'falls through to the POM mirror instead of aborting', :aggregate_failures do
+        packages = {}
+        expect { parser.parse('buildscript-gradle.lockfile', packages) }
+          .not_to(raise_error)
+        expect(packages['com.example:library'].license).to(eq('MIT License'))
+      end
+    end
+
+    context 'when every source also times out' do
+      before do
+        stub_request(:get, /search\.maven\.org/).to_timeout
+        stub_request(:get, /maven\.google\.com/).to_timeout
+        stub_request(:get, /plugins\.gradle\.org/).to_timeout
+        stub_request(:get, /jitpack\.io/).to_timeout
+        stub_request(:get, /oss\.sonatype\.org/).to_timeout
+      end
+
+      it 'warns and skips the package without raising', :aggregate_failures do
+        packages = {}
+        expect { parser.parse('buildscript-gradle.lockfile', packages) }
+          .to(output(/all Maven lookups timed out/).to_stderr)
+        expect(packages).to(be_empty)
+      end
+    end
+  end
+
   context 'when package is not in main file' do
     before do
       stub_request(:get, %r{search\.maven\.org/solrsearch/select})
