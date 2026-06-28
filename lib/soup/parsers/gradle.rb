@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'net/http'
 require 'nokogiri'
 
 require_relative 'base'
@@ -66,33 +67,42 @@ module SOUP
 
     def fetch_package(file, main_file, group_id, artifact_id, version)
       last_url = "https://search.maven.org/solrsearch/select?q=g:%22#{group_id}%22+AND+a:%22#{artifact_id}%22+AND+v:%22#{version}%22&rows=1&wt=json"
-      response = HttpClient.get(last_url)
+      # search.maven.org's solrsearch endpoint is chronically flaky and regularly
+      # stops responding entirely (Net::ReadTimeout). When that happens we must
+      # still try the per-repository POM fallbacks below (maven.google.com et al.
+      # serve the Android/AndroidX artifacts that dominate a Gradle scan), so a
+      # dead primary is treated as "no match" rather than aborting the whole run.
+      response = safe_get(last_url)
 
-      parsed = JSON.parse(response.body) if response.code == 200
+      parsed = JSON.parse(response.body) if response&.code == 200
       docs = parsed&.dig('response', 'docs')
 
-      if response.code == 200 && docs&.length == 1
+      resolved = false
+
+      if response&.code == 200 && docs&.length == 1
         license = docs[0]['l']
         description = docs[0]['p']
         website = docs[0]['home_page']
+        resolved = true
       else
         REPOSITORY_URLS.each do |url|
           last_url = "#{url}/#{group_id.tr('.', '/')}/#{artifact_id}/#{version}/#{artifact_id}-#{version}.pom"
-          response = HttpClient.get(last_url)
+          response = safe_get(last_url)
 
-          next unless response.code == 200
+          next unless response&.code == 200
 
           xml_doc = Nokogiri::XML(response.body)
           xml_doc.remove_namespaces!
           license = xml_doc.xpath('//licenses/license/name').text
           description = xml_doc.xpath('//description').text
           website = xml_doc.xpath('/project/url').text
+          resolved = true
           break
         end
       end
 
-      if response.code != 200
-        warn(http_error_message(response, url: last_url, package: "#{group_id}:#{artifact_id} #{version}"))
+      unless resolved
+        warn(unresolved_message(response, url: last_url, package: "#{group_id}:#{artifact_id} #{version}"))
         return
       end
 
@@ -106,6 +116,28 @@ module SOUP
         website: website,
         dependency: !manifest_mentions?(main_file, "#{group_id}:#{artifact_id}")
       )
+    end
+
+    # HttpClient.get re-raises Net::OpenTimeout/Net::ReadTimeout once its retries
+    # are exhausted. For a multi-mirror parser an unreachable mirror should not
+    # kill the scan (Parallel.map propagates the first exception and aborts every
+    # other in-flight lookup), so we swallow the timeout, warn, and return nil so
+    # the caller falls through to the next source.
+    def safe_get(url)
+      HttpClient.get(url)
+    rescue Net::OpenTimeout, Net::ReadTimeout => e
+      warn("Error: #{e.message}. Skipping #{url} after retries.")
+      nil
+    end
+
+    # Build the "could not resolve this coordinate" warning. With a final
+    # response in hand we surface its status/url/body via http_error_message;
+    # when every source timed out (response is nil) there is no HTTP status to
+    # report, so we note that instead.
+    def unresolved_message(response, url:, package:)
+      return http_error_message(response, url: url, package: package) if response
+
+      "Skipping #{package}: all Maven lookups timed out (last url=#{url})"
     end
   end
 end
