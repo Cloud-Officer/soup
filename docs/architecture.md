@@ -12,14 +12,14 @@
 
 ```text
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                              CLI Entry Point                                 │
-│                              bin/soup.rb                                     │
+│                              CLI Entry Point                                │
+│                              bin/soup.rb                                    │
 └─────────────────────────────────────────────────────────────────────────────┘
                                       │
                                       ▼
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                             SOUP::Application                                │
-│                          lib/soup/application.rb                             │
+│                             SOUP::Application                               │
+│                          lib/soup/application.rb                            │
 │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────┐ │
 │  │   detect    │  │    read     │  │    check    │  │       save          │ │
 │  │  packages   │──│   cached    │──│  packages   │──│      files          │ │
@@ -29,16 +29,18 @@
          │                                   │
          ▼                                   ▼
 ┌─────────────────────────┐    ┌──────────────────────────────────────────────┐
-│    SOUP::Options        │    │              SOUP::Package                    │
-│  lib/soup/options.rb    │    │           lib/soup/package.rb                 │
-│                         │    │                                               │
-│  Command-line parsing   │    │  Data model for package information           │
+│    SOUP::Options        │    │              SOUP::Package                   │
+│  lib/soup/options.rb    │    │           lib/soup/package.rb                │
+│                         │    │                                              │
+│  Command-line parsing   │    │  Data model for package information          │
 └─────────────────────────┘    └──────────────────────────────────────────────┘
-         │
-         ▼
+
+              Application#detect_packages → SOUP::GenericParser
+                                      │
+                                      ▼
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                           Package Manager Parsers                            │
-│                           lib/soup/parsers/                                  │
+│                           Package Manager Parsers                           │
+│                           lib/soup/parsers/                                 │
 │  ┌────────────┐ ┌────────────┐ ┌────────────┐ ┌────────────┐ ┌────────────┐ │
 │  │  Bundler   │ │  Composer  │ │   Gradle   │ │    NPM     │ │    PIP     │ │
 │  │  (Ruby)    │ │   (PHP)    │ │  (Kotlin)  │ │   (JS)     │ │  (Python)  │ │
@@ -51,7 +53,14 @@
                                       │
                                       ▼
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                          External Package Registries                         │
+│                             SOUP::HttpClient                                │
+│                          lib/soup/http_client.rb                            │
+│        Shared timeout, retry, and Etc.nprocessors thread-pool sizing        │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                      │
+                                      ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                          External Package Registries                        │
 │  ┌────────────┐ ┌────────────┐ ┌────────────┐ ┌────────────┐ ┌────────────┐ │
 │  │ RubyGems   │ │   Maven    │ │    NPM     │ │   PyPI     │ │  GitHub    │ │
 │  │    API     │ │    API     │ │  Registry  │ │    API     │ │    API     │ │
@@ -60,10 +69,10 @@
                                       │
                                       ▼
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                              Output Files                                    │
+│                              Output Files                                   │
 │  ┌─────────────────────────────┐  ┌─────────────────────────────────────┐   │
 │  │     .soup.json              │  │         docs/soup.md                │   │
-│  │  (Cache for user choices)   │  │   (Generated SOUP documentation)   │   │
+│  │  (Cache for user choices)   │  │   (Generated SOUP documentation)    │   │
 │  └─────────────────────────────┘  └─────────────────────────────────────┘   │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
@@ -89,7 +98,7 @@
 
 **Key Components:**
 
-- `RISK_LEVELS_SCREEN`: IEC 62304 risk level definitions (Low, Medium, High)
+- `RISK_LEVELS_SCREEN`: Private constant holding the IEC 62304 risk level prompt choices (Low, Medium, High); the first entry is the default applied to transitive dependencies and by `--auto_reply`
 
 ### SOUP::Application
 
@@ -100,7 +109,7 @@
 **Key Components:**
 
 - `PARSER_REGISTRY`: Private module-level constant (`module SOUP`) mapping lock file names to parser classes and skip flags
-- `DEPENDENCY_TEXT`: Value written into `requirements` and `verification_reasoning` for transitive dependencies
+- `DEPENDENCY_TEXT`: Top-level constant holding the value written into `requirements` and `verification_reasoning` for transitive dependencies
 - `initialize(argv)`: Configures options and initializes state
 - `execute`: Main entry point that runs the detection, checking, and output workflow. Uses an `ensure` block to persist partial state on failure
 - `validate_config!`: Validates that configuration files exist and contain valid JSON
@@ -313,6 +322,8 @@
 - `read_direct_dependencies(file)`: Reads the sibling `requirements.in` (the compiled-from source) for the direct dependency names; with no `.in` file every package stays transitive
 - `normalize_pip_name(name)`: PEP 503 name normalization (lowercase, runs of `-`, `_`, `.` collapsed to `-`) so direct/transitive matching is case- and separator-insensitive
 - `extract_pip_license(info)`: Prefers the PyPI trove `License ::` classifiers and falls back to the raw `license` field
+- `LOOSE_CONSTRAINT_PATTERN`: Private constant matching the `<`, `>`, `!`, `~` characters that mark an unsupported non-exact pin
+- `REQUIREMENT_NAME_PATTERN`: Private constant matching the leading PEP 508 distribution name of a `requirements.in` line, before any extras, constraint, or environment marker
 
 **External Dependencies:**
 
@@ -330,7 +341,8 @@
 - `pin_version(pin)`: Resolves the pinned identifier, taking the state's `version`, `branch`, or `revision` so branch- and revision-based pins are recorded rather than left empty
 - `github_repo_path(location)`: Extracts `owner/repo` from the HTTPS, HTTPS-with-`.git`, or SSH form of a pin location
 - `github_error_message(response)`: Reads GitHub's actionable error text from the JSON body's `message` field (where the rate-limit and bad-credentials strings live) rather than the HTTP reason phrase
-- Resolves the direct-dependency manifest for `Package.resolved` files that are nested inside an Xcode project bundle by trying, in order, a sibling `Package.swift` (or matching `<Name>.swift`), an enclosing `Tuist/Dependencies.swift` when the resolved file lives under a Tuist directory, a sibling `<Name>.xcodeproj/project.pbxproj`, and finally the `project.pbxproj` of an enclosing `*.xcodeproj` higher up the tree; the resolved manifest is passed to `manifest_mentions?` to classify direct vs transitive dependencies
+- `read_main_swift_file(file)`: Resolves the direct-dependency manifest for `Package.resolved` files that are nested inside an Xcode project bundle by trying, in order, a sibling `Package.swift` (or matching `<Name>.swift`), an enclosing `Tuist/Dependencies.swift` when the resolved file lives under a Tuist directory, a sibling `<Name>.xcodeproj/project.pbxproj`, and finally the `project.pbxproj` of an enclosing `*.xcodeproj` higher up the tree (`enclosing_xcodeproj_pbxproj`, `tuist_dependencies_path`, `path_join` are its helpers). `parse` raises `InvalidLockfileError` when none of them resolves; otherwise the manifest is passed to `manifest_mentions?` to classify direct vs transitive dependencies
+- `GITHUB_URL_NOISE`: Private constant stripping the GitHub host prefix and `.git` suffix consumed by `github_repo_path`
 - Supports `GITHUB_TOKEN` environment variable for rate limit handling
 
 **External Dependencies:**
@@ -430,11 +442,13 @@ Validation criteria for SOUP entries: Accuracy (Requirements match actual usage)
 
 **Implementation:**
 
-1. Iterates through known package manager lock file names
+1. Iterates through the `PARSER_REGISTRY` lock file names
 2. Uses glob pattern to find matching files recursively
 3. Excludes `node_modules/` and `vendor/` directories
 4. Excludes user-specified ignored folders
-5. Delegates to appropriate parser based on file name
+5. Skips files whose package manager is disabled by a skip flag, or whose registry entry maps to no parser — both guards run before the "Reading file" announcement so a dropped file is never announced
+6. Delegates to the appropriate parser through `SOUP::GenericParser`, which type-checks the parser, file path, and packages hash
+7. Runs `parse_manual_entries` and then `enforce_vendored_coverage` once every lock file has been parsed
 
 **Complexity:** O(n) where n is the number of files in the project
 
@@ -541,9 +555,11 @@ Recoverable failures raise a subclass of `SOUP::Error` (`lib/soup/errors.rb`); t
 | API rate limiting | Raises `RateLimitError` (and `AuthenticationError` for bad credentials), suggesting `GITHUB_TOKEN` | `lib/soup/parsers/spm.rb` in `fetch_package` / `github_error_message` methods |
 | Network timeouts | Retry up to 3 times via `SOUP::HttpClient`, then re-raise | `lib/soup/http_client.rb` in `get` method |
 | Registry timeout after retries | The single package is warned about and omitted from the SOUP register rather than aborting the scan | `lib/soup/parsers/npm.rb`, `yarn.rb`, `importmap.rb` in `fetch_package` methods |
+| Non-2xx registry response | Raises `RegistryError` carrying the status, URL, package, and truncated body built by `http_error_message` | `lib/soup/parsers/bundler.rb`, `pip.rb`, `yarn.rb` in `fetch_package` methods |
 | Unsupported lock file format | Raises `UnsupportedFormatError` for a `package-lock.json` below `lockfileVersion` 2 and for a `yarn.lock` that is not Yarn v1 | `lib/soup/parsers/npm.rb`, `yarn.rb` in `parse` methods |
 | Malformed manual entries file | Raises `InvalidLockfileError` when the file is not a JSON array or an entry lacks a non-empty `package` | `lib/soup/parsers/manual.rb` in `parse` method |
 | Missing Gradle build script | Raises `InvalidLockfileError` when neither `build.gradle` nor `build.gradle.kts` sits alongside the lock file | `lib/soup/parsers/gradle.rb` in `read_main_gradle_file` method |
+| Missing Swift manifest | Raises `InvalidLockfileError` when no `Package.swift`, Tuist `Dependencies.swift`, or enclosing `project.pbxproj` can be resolved for a `Package.resolved` | `lib/soup/parsers/spm.rb` in `parse` / `read_main_swift_file` methods |
 | Maven source timeout | A timed-out `search.maven.org` query or POM mirror is skipped (warned) and the lookup falls through to the next source; the scan is not aborted | `lib/soup/parsers/gradle.rb` in `fetch_package` / `safe_get` methods |
 | Missing package metadata | Logs warning and continues processing other packages | NPM, Gradle, SPM, Importmap parsers; `lookup_npm_registry_version` in `lib/soup/parsers/base.rb` |
 | Missing required IEC 62304 fields | Raises `MissingMetadataError` in `--no_prompt` mode, prompts user otherwise | `lib/soup/application.rb` in `prompt_missing_field` / `ensure_metadata_complete!` methods |
