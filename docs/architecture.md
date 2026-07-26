@@ -75,8 +75,9 @@
 3. **Options** (`lib/soup/options.rb`): Parses command-line arguments and configures application behavior
 4. **Package** (`lib/soup/package.rb`): Data structure representing a third-party dependency with all IEC 62304 required metadata
 5. **Parsers** (`lib/soup/parsers/`): Language-specific parsers that read lock files and fetch metadata from package registries; each inherits shared fetching, normalization, and parallelization logic from `SOUP::BaseParser`. The `ImportmapParser` resolves CDN-pinned dependencies from a Rails `config/importmap.rb`, and the `ManualParser` reads manually-declared entries for vendored/proprietary components that no registry can resolve
-6. **Status** (`lib/soup/status.rb`): Defines exit codes for the application
-7. **Errors** (`lib/soup/errors.rb`): Defines the `SOUP::Error` exception hierarchy raised throughout the application
+6. **HttpClient** (`lib/soup/http_client.rb`): Single HTTP entry point used by every parser; applies the shared timeout, retry, and thread-pool sizing
+7. **Status** (`lib/soup/status.rb`): Defines exit codes for the application
+8. **Errors** (`lib/soup/errors.rb`): Defines the `SOUP::Error` exception hierarchy raised throughout the application
 
 ## Software units
 
@@ -98,7 +99,8 @@
 
 **Key Components:**
 
-- `PARSER_REGISTRY`: Maps lock file names to parser classes and skip flags
+- `PARSER_REGISTRY`: Private module-level constant (`module SOUP`) mapping lock file names to parser classes and skip flags
+- `DEPENDENCY_TEXT`: Value written into `requirements` and `verification_reasoning` for transitive dependencies
 - `initialize(argv)`: Configures options and initializes state
 - `execute`: Main entry point that runs the detection, checking, and output workflow. Uses an `ensure` block to persist partial state on failure
 - `validate_config!`: Validates that configuration files exist and contain valid JSON
@@ -106,8 +108,8 @@
 - `parse_manual_entries`: Invokes `ManualParser` on the manual entries file (default `config/soup-manual.json`) when it exists; parsed after auto-detected packages so a project can override an auto-detected entry by package name
 - `enforce_vendored_coverage`: Fails the run (sets the error exit code) when a committed file matched by `--vendored_globs` has no SOUP entry, matched on the entry's `file` path or basename
 - `read_cached_packages`: Loads previously entered user choices from cache
-- `check_packages`: Validates licenses and prompts for missing IEC 62304 metadata
-- `save_files`: Writes cache and markdown documentation files
+- `check_packages`: Validates licenses, then for each package applies cached metadata, applies the transitive-dependency defaults (`apply_dependency_defaults` writes the lowest risk level and `DEPENDENCY_TEXT`), prompts for anything still missing, stamps `last_verified_at`, and appends the markdown row
+- `save_files`: Writes cache and markdown documentation files, returning early when nothing has been detected yet so an early failure (e.g. `validate_config!` raising) cannot overwrite an existing `.soup.json` with `{}`
 
 **Internal Dependencies:**
 
@@ -225,10 +227,11 @@
 - `parallel_each(work_items, packages, &)`: Fetches metadata for the work items concurrently via `Parallel.map(..., in_threads: HttpClient::THREAD_COUNT)` and collects the results
 - `collect_packages(results, packages)`: Compacts the fetched results and keys them by package name into the packages hash
 - `build_package(...)`: Constructs a `SOUP::Package` with normalized fields
-- `normalize_license(license)`: Maps Unlicense and URL-style license values to `NOASSERTION`
+- `normalize_license(license)`: Maps Unlicense and URL-style license values to `NOASSERTION`; `UNLICENSE_PATTERN` is the private constant it matches on
 - `sibling_file(file, suffix)`: Resolves a sibling manifest path next to a lock file
 - `manifest_mentions?(main_file, token)`: Token-boundary test for whether a dependency is declared directly in a source-code manifest; matches only when `token` is not flanked by identifier characters so a name that is a substring of another coordinate (e.g. `androidx.core:core` vs `androidx.core:core-ktx`) is not misclassified. Used by the Gradle and SPM parsers
-- `lookup_npm_registry_version(payload, name:, version:)`: Extracts a specific version hash from an npm-style registry payload; shared by the NPM and Yarn parsers
+- `lookup_npm_registry_version(payload, name:, version:)`: Extracts a specific version hash from an npm-style registry payload; shared by the NPM, Yarn, and Importmap parsers
+- `npm_registry_license(raw_license)`: Coerces the npm registry `license` field to a plain string, so the legacy object form (`{"type": "MIT", "url": ...}`) returned for older package versions does not reach `validate_license` as a Hash; shared by the NPM and Yarn parsers
 - `http_error_message(response, url:, package:)`: Builds an actionable error message (status code, URL, package, truncated body) for non-2xx responses
 - `NOASSERTION_LICENSE`: Public constant for the `NOASSERTION` license value
 
@@ -244,7 +247,8 @@
 
 **Key Components:**
 
-- `parse(file, packages)`: Parses lock file and fetches package details from RubyGems, fetching metadata for all specs in parallel via the inherited `parallel_each` helper (`BaseParser`)
+- `parse(file, packages)`: Parses lock file via `Bundler::LockfileParser` and fetches package details from RubyGems, fetching metadata for all specs in parallel via the inherited `parallel_each` helper (`BaseParser`). Direct dependencies are the lock file's `DEPENDENCIES` section, which lists exactly the gems declared in the `Gemfile`
+- `fetch_package(...)`: Queries the versioned RubyGems endpoint first; when that version is not published (e.g. a platform-specific or yanked release) it resolves the gem's latest version and re-queries, raising `RegistryError` only when both lookups fail
 
 **External Dependencies:**
 
@@ -259,7 +263,8 @@
 
 **Key Components:**
 
-- `parse(file, packages)`: Parses lock file and extracts package metadata
+- `parse(file, packages)`: Parses `packages` and `packages-dev` from the lock file and extracts metadata entirely from the lock file itself; the only parser that makes no registry call, so it does not use `parallel_each`. Direct dependencies are the exact `require`/`require-dev` keys of the sibling `composer.json`
+- `extract_composer_license(raw)`: Normalizes the Composer `license` field, which the schema permits as either a single string or an array of SPDX strings
 
 ### SOUP::GradleParser
 
@@ -272,7 +277,10 @@
 - `parse(file, packages)`: Parses lock file and fetches package details, in parallel via the inherited `parallel_each` helper (`BaseParser`). Selects `classpath` entries for `buildscript-gradle.lockfile` and non-test, non-debug `RuntimeClasspath` entries for `gradle.lockfile`
 - `fetch_package(...)`: Queries the `search.maven.org` solrsearch endpoint first; when it returns no single match, or times out (the endpoint is chronically flaky), the lookup degrades to the per-repository POM mirrors in `REPOSITORY_URLS` rather than aborting the run. A coordinate that no source resolves is warned and skipped
 - `safe_get(url)`: Wraps `HttpClient.get` so a `Net::OpenTimeout`/`Net::ReadTimeout` on one mirror is swallowed (warned, returns nil) and the caller falls through to the next source, instead of `Parallel.map` propagating the exception and aborting every other in-flight lookup
-- `REPOSITORY_URLS`: Private constant listing the Maven POM mirror URLs (e.g. `maven.google.com`) tried in order when the primary endpoint has no match
+- `read_main_gradle_file(file)`: Resolves the build script next to the lock file, trying the Groovy DSL `build.gradle` then the Kotlin DSL `build.gradle.kts` (the Gradle 8.x+ default for new Android/Kotlin projects); raises `InvalidLockfileError` when neither exists. The contents are passed to `manifest_mentions?` for direct/transitive classification
+- `unresolved_message(response, url:, package:)`: Builds the skip warning, falling back to an "all Maven lookups timed out" message when every source timed out and there is no HTTP status to report
+- `REPOSITORY_URLS`: Private constant listing the Maven POM mirror URLs (`maven.google.com`, `plugins.gradle.org/m2`, `jitpack.io`, the Sonatype snapshots repo) tried in order when the primary endpoint has no match
+- `MAIN_FILE_NAMES`: Private constant listing the build script names tried by `read_main_gradle_file`
 
 **External Dependencies:**
 
@@ -287,7 +295,7 @@
 
 **Key Components:**
 
-- `parse(file, packages)`: Parses lock file and fetches package details from NPM registry in parallel via the inherited `parallel_each` helper (`BaseParser`)
+- `parse(file, packages)`: Parses lock file and fetches package details from NPM registry in parallel via the inherited `parallel_each` helper (`BaseParser`). Requires `lockfileVersion` 2 or later (a lock file with no `packages` key raises `UnsupportedFormatError`); `dev` entries are excluded, and direct dependencies are the exact `dependencies`/`devDependencies` keys of the sibling `package.json`
 
 **External Dependencies:**
 
@@ -301,7 +309,10 @@
 
 **Key Components:**
 
-- `parse(file, packages)`: Parses requirements file and fetches package details from PyPI in parallel via the inherited `parallel_each` helper (`BaseParser`)
+- `parse(file, packages)`: Parses requirements file and fetches package details from PyPI in parallel via the inherited `parallel_each` helper (`BaseParser`). Only exact `==` pins are supported; comments and PEP 508 environment markers are stripped, and a line carrying a loose constraint (`>=`, `~=`, `!=`, `<`, `>`) is warned about and skipped
+- `read_direct_dependencies(file)`: Reads the sibling `requirements.in` (the compiled-from source) for the direct dependency names; with no `.in` file every package stays transitive
+- `normalize_pip_name(name)`: PEP 503 name normalization (lowercase, runs of `-`, `_`, `.` collapsed to `-`) so direct/transitive matching is case- and separator-insensitive
+- `extract_pip_license(info)`: Prefers the PyPI trove `License ::` classifiers and falls back to the raw `license` field
 
 **External Dependencies:**
 
@@ -315,7 +326,10 @@
 
 **Key Components:**
 
-- `parse(file, packages)`: Parses resolved file and fetches package details from GitHub API in parallel via the inherited `parallel_each` helper (`BaseParser`)
+- `parse(file, packages)`: Parses resolved file (both the v1 `object` wrapper and the flat v2+ shape) and fetches package details from GitHub API in parallel via the inherited `parallel_each` helper (`BaseParser`); private repositories are skipped
+- `pin_version(pin)`: Resolves the pinned identifier, taking the state's `version`, `branch`, or `revision` so branch- and revision-based pins are recorded rather than left empty
+- `github_repo_path(location)`: Extracts `owner/repo` from the HTTPS, HTTPS-with-`.git`, or SSH form of a pin location
+- `github_error_message(response)`: Reads GitHub's actionable error text from the JSON body's `message` field (where the rate-limit and bad-credentials strings live) rather than the HTTP reason phrase
 - Resolves the direct-dependency manifest for `Package.resolved` files that are nested inside an Xcode project bundle by trying, in order, a sibling `Package.swift` (or matching `<Name>.swift`), an enclosing `Tuist/Dependencies.swift` when the resolved file lives under a Tuist directory, a sibling `<Name>.xcodeproj/project.pbxproj`, and finally the `project.pbxproj` of an enclosing `*.xcodeproj` higher up the tree; the resolved manifest is passed to `manifest_mentions?` to classify direct vs transitive dependencies
 - Supports `GITHUB_TOKEN` environment variable for rate limit handling
 
@@ -331,7 +345,9 @@
 
 **Key Components:**
 
-- `parse(file, packages)`: Parses lock file and fetches package details from NPM registry in parallel via the inherited `parallel_each` helper (`BaseParser`)
+- `parse(file, packages)`: Parses lock file and fetches package details from NPM registry in parallel via the inherited `parallel_each` helper (`BaseParser`). Only Yarn v1 lock files are supported — an unparseable file raises `UnsupportedFormatError`. Locally vendored packages whose `package.json` spec starts with `file:vendor` are excluded
+- `manifest_dependency_specs(main_file_json)`: Merges the sibling `package.json` `dependencies`, `devDependencies`, `optionalDependencies`, and `peerDependencies` into a name-to-spec map that drives both the direct-dependency flag and the `file:vendor` exclusion
+- `DEPENDENCY_SECTIONS`: Private constant listing the four `package.json` dependency sections read above
 
 **External Dependencies:**
 
@@ -347,8 +363,10 @@
 **Key Components:**
 
 - `parse(file, packages)`: Reads `pin` directives, keeps only pins that resolve to an http(s) CDN URL (esm.sh, jspm.io, jsdelivr), derives the npm package name and version from the URL, and fetches metadata in parallel via the inherited `parallel_each` helper (`BaseParser`). Local/vendored pins (e.g. `application`, `@hotwired/*`, `*.js` under `vendor/`) are skipped. Unpinned "latest" pins resolve to the registry's latest dist-tag
+- `name_and_version_from_url(url)`: Strips the protocol/host and CDN routing prefix, then reads the scoped or plain npm package name and the optional `@version` that follows it
 - `PIN_REGEX`: Private constant matching `pin "name", to: "url"` directives
-- Reuses `lookup_npm_registry_version` (`BaseParser`) for registry payload extraction
+- `REGISTRY_ROOT`: Private constant for the npm registry base URL
+- Reuses `lookup_npm_registry_version` (`BaseParser`) for registry payload extraction. Every importmap pin is recorded as a direct dependency (`dependency: false`)
 
 ### SOUP::ManualParser
 
@@ -443,7 +461,7 @@ Validation criteria for SOUP entries: Accuracy (Requirements match actual usage)
 
 **Implementation:**
 
-1. For parsers whose manifest is structured data that can be parsed into an exact dependency set (Bundler, Composer, NPM, PIP, Yarn), the direct dependency names are read from the manifest (e.g. `Gemfile` dependencies, the sibling `requirements.in`) and matched against package names with an exact-name comparison
+1. For parsers whose manifest is structured data that can be parsed into an exact dependency set (Bundler, Composer, NPM, PIP, Yarn), the direct dependency names are read from that data (the lock file's `DEPENDENCIES` section for Bundler, the sibling `composer.json`/`package.json` dependency sections, the sibling `requirements.in` for PIP) and matched against package names with an exact-name comparison — PEP 503-normalized for PIP so case and `-`/`_`/`.` separators compare equal
 2. For parsers whose manifest is source code that cannot be parsed into an exact set (Gradle build scripts, Swift `Package.swift`/`pbxproj`), `manifest_mentions?(main_file, token)` performs a token-boundary regex match so a name that is a substring of another coordinate is not misclassified
 3. A package is marked transitive (`dependency: true`) when it is not found among the direct dependencies
 
@@ -492,7 +510,7 @@ Validation criteria for SOUP entries: Accuracy (Requirements match actual usage)
 
 **Purpose:** Speeds up registry lookups by fetching package metadata concurrently instead of serially.
 
-**Location:** `parallel_each` in `lib/soup/parsers/base.rb` (`SOUP::BaseParser`), invoked from the `parse` method of the Bundler, Gradle, NPM, PIP, SPM, and Yarn parsers
+**Location:** `parallel_each` in `lib/soup/parsers/base.rb` (`SOUP::BaseParser`), invoked from the `parse` method of the Bundler, Gradle, Importmap, NPM, PIP, SPM, and Yarn parsers. The Composer and Manual parsers resolve everything locally and so do not use it
 
 **Implementation:**
 
@@ -520,10 +538,14 @@ Recoverable failures raise a subclass of `SOUP::Error` (`lib/soup/errors.rb`); t
 | :--- | :--- | :--- |
 | Invalid command-line options | Catches `OptionParser::ParseError`, displays error, exits with error code | `lib/soup/application.rb` in `configure_options` method |
 | Missing or malformed config file | Raises `ConfigurationError` when a configuration file is absent or contains invalid JSON | `lib/soup/application.rb` in `validate_config!` method |
-| API rate limiting | Raises `RateLimitError` (and `AuthenticationError` for bad credentials), suggesting `GITHUB_TOKEN` | `lib/soup/parsers/spm.rb` in `parse` method |
-| Network timeouts | Retry up to 3 times via `SOUP::HttpClient` | `lib/soup/http_client.rb` in `get` method |
+| API rate limiting | Raises `RateLimitError` (and `AuthenticationError` for bad credentials), suggesting `GITHUB_TOKEN` | `lib/soup/parsers/spm.rb` in `fetch_package` / `github_error_message` methods |
+| Network timeouts | Retry up to 3 times via `SOUP::HttpClient`, then re-raise | `lib/soup/http_client.rb` in `get` method |
+| Registry timeout after retries | The single package is warned about and omitted from the SOUP register rather than aborting the scan | `lib/soup/parsers/npm.rb`, `yarn.rb`, `importmap.rb` in `fetch_package` methods |
+| Unsupported lock file format | Raises `UnsupportedFormatError` for a `package-lock.json` below `lockfileVersion` 2 and for a `yarn.lock` that is not Yarn v1 | `lib/soup/parsers/npm.rb`, `yarn.rb` in `parse` methods |
+| Malformed manual entries file | Raises `InvalidLockfileError` when the file is not a JSON array or an entry lacks a non-empty `package` | `lib/soup/parsers/manual.rb` in `parse` method |
+| Missing Gradle build script | Raises `InvalidLockfileError` when neither `build.gradle` nor `build.gradle.kts` sits alongside the lock file | `lib/soup/parsers/gradle.rb` in `read_main_gradle_file` method |
 | Maven source timeout | A timed-out `search.maven.org` query or POM mirror is skipped (warned) and the lookup falls through to the next source; the scan is not aborted | `lib/soup/parsers/gradle.rb` in `fetch_package` / `safe_get` methods |
-| Missing package metadata | Logs warning and continues processing other packages | NPM, Gradle parsers |
+| Missing package metadata | Logs warning and continues processing other packages | NPM, Gradle, SPM, Importmap parsers; `lookup_npm_registry_version` in `lib/soup/parsers/base.rb` |
 | Missing required IEC 62304 fields | Raises `MissingMetadataError` in `--no_prompt` mode, prompts user otherwise | `lib/soup/application.rb` in `prompt_missing_field` / `ensure_metadata_complete!` methods |
 | Partial execution failure | Persists partial state via `ensure` block so progress is not lost | `lib/soup/application.rb` in `execute` method |
 | Unhandled exceptions | Displays error message and the top frames of the backtrace; full backtrace shown only when `ENV['DEBUG']` is set | `bin/soup.rb` top-level rescue |
@@ -545,6 +567,8 @@ Recoverable failures raise a subclass of `SOUP::Error` (`lib/soup/errors.rb`); t
 | Exit codes | Defined exit codes for success (0) and error (1) |
 | Cache persistence | User-entered metadata cached in `.soup.json` to avoid re-entry |
 | CI/CD mode | `--no_prompt` flag for non-interactive execution |
+| Unattended defaults | `--auto_reply` fills missing metadata with the lowest risk level and `Dependency` instead of prompting |
+| Debug diagnostics | `DEBUG` environment variable prints the full backtrace on an unhandled error |
 | Selective parsing | Skip flags allow excluding specific package managers |
 | Folder exclusion | `--ignored_folders` allows excluding directories from scanning |
 | Vendored coverage gate | `--vendored_globs` fails the run when a committed vendored file has no SOUP entry |
