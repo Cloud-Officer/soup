@@ -58,7 +58,20 @@ choices.
 
 Prerequisites are Ruby >= 4.0 and Bundler.
 
-You can run `bundle install` and then run the command `soup`.
+You can clone the repository, install the dependencies and run the executable directly:
+
+```bash
+git clone https://github.com/Cloud-Officer/soup.git
+cd soup
+bundle install
+./bin/soup.rb --help
+```
+
+To make it available as `soup` from anywhere, symlink the executable into your path:
+
+```bash
+ln -s "$(pwd)/bin/soup.rb" /usr/local/bin/soup
+```
 
 You can install via [Homebrew](https://github.com/Cloud-Officer/homebrew-ci).
 
@@ -107,6 +120,7 @@ options
 | `GITHUB_TOKEN`          | Optional | GitHub personal access token for SPM dependency lookups. Required when processing many Swift packages to avoid GitHub API rate limiting. [Create one here](https://github.com/settings/tokens). |
 | `SOUP_HTTP_TIMEOUT`     | Optional | Per-request HTTP timeout in seconds (integer). Defaults to `5`. Raise this on slow corporate proxies or rate-limited mirrors.                                                                   |
 | `SOUP_HTTP_MAX_RETRIES` | Optional | Number of retries on transient timeouts (integer). Defaults to `3`. Each retry uses the same timeout.                                                                                           |
+| `DEBUG`                 | Optional | When set to any value, print the full backtrace on an unhandled error instead of the first few frames.                                                                                          |
 
 The tool works without `GITHUB_TOKEN` for non-SPM projects. When processing SPM dependencies, unauthenticated GitHub
 API requests are limited to 60 per hour. Setting `GITHUB_TOKEN` increases this to 5,000 per hour.

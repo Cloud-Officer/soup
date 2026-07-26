@@ -170,12 +170,12 @@ module SOUP
     end
 
     def check_packages
-      licenses = JSON.parse(File.read(@options.licenses_file)).map!(&:downcase)
+      license_pattern = Regexp.union(JSON.parse(File.read(@options.licenses_file)).map!(&:downcase))
       exceptions = JSON.parse(File.read(@options.exceptions_file))
       prompt = TTY::Prompt.new
 
       @detected_packages.each do |name, package|
-        validate_license(package, licenses, exceptions)
+        validate_license(package, license_pattern, exceptions)
 
         next unless @options.soup_check
 
@@ -190,10 +190,10 @@ module SOUP
       end
     end
 
-    def validate_license(package, licenses, exceptions)
+    def validate_license(package, license_pattern, exceptions)
       return unless @options.licenses_check
       return if package.license.nil? || package.license.empty?
-      return if licenses.any? { |license| package.license.downcase.include?(license) }
+      return if package.license.downcase.match?(license_pattern)
       return if exceptions.include?(package.package)
 
       warn("Invalid license #{package.license} found in #{package.file} in package #{package.package}!")
