@@ -72,15 +72,12 @@ module SOUP
       package_details = lookup_npm_registry_version(payload, name: name, version: resolved_version)
       return if package_details.nil?
 
-      raw_license = package_details['license']
-      license = raw_license.is_a?(Hash) ? raw_license['type'].to_s : raw_license.to_s
-
       build_package(
         name: name,
         file: file,
         language: 'JS',
         version: resolved_version,
-        license: license,
+        license: npm_registry_license(package_details['license']),
         description: Package.sanitize_description(package_details['description'], strip_markdown: true),
         website: package_details['homepage'],
         dependency: false
