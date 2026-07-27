@@ -106,8 +106,9 @@ module SOUP
     # object form `{ "type": "MIT", "url": "..." }` for older versions. Left
     # untouched, a Hash flows through normalize_license and reaches
     # Application#validate_license, where `license.downcase` raises
-    # NoMethodError and aborts the whole run. Shared by NPM and Yarn parsers,
-    # which consume the identical registry.npmjs.org per-version payload.
+    # NoMethodError and aborts the whole run. Shared by the NPM, Yarn, and
+    # Importmap parsers, which consume the identical registry.npmjs.org
+    # per-version payload.
     def npm_registry_license(raw_license)
       raw_license.is_a?(Hash) ? raw_license['type'].to_s : raw_license.to_s
     end

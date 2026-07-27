@@ -84,6 +84,44 @@ RSpec.describe(SOUP::ImportmapParser) do
     end
   end
 
+  # QUAL-002: the npm registry returns `license` as a plain String for modern
+  # packages but as the legacy object form { "type": ..., "url": ... } for older
+  # ones. Importmap consumes the same per-version payload as the NPM and Yarn
+  # parsers, so it must coerce it the same way -- an uncoerced Hash flows through
+  # to Application#validate_license, where `license.downcase` raises NoMethodError
+  # and aborts the entire run. These examples cover the importmap call site, which
+  # previously only ever exercised the String form.
+  context 'when the registry returns a legacy object-form license' do
+    let(:importmap) { "pin 'marked', to: 'https://esm.sh/marked@12.0.0'\n" }
+
+    def licensed_body(license, version = '12.0.0')
+      entry = { description: 'desc', homepage: 'https://example.com/' }
+      entry[:license] = license unless license.nil?
+
+      { 'dist-tags': { latest: version }, versions: { version => entry } }.to_json
+    end
+
+    before do
+      stub_request(:get, 'https://registry.npmjs.org/marked')
+        .to_return(status: 200, body: licensed_body({ type: 'MIT', url: 'https://example.com/LICENSE' }))
+    end
+
+    it 'coerces the object to its type string rather than leaving a Hash', :aggregate_failures do
+      expect(packages['marked'].license).to(eq('MIT'))
+      expect(packages['marked'].license).to(be_a(String))
+    end
+
+    context 'when the registry omits the license entirely' do
+      before do
+        stub_request(:get, 'https://registry.npmjs.org/marked').to_return(status: 200, body: licensed_body(nil))
+      end
+
+      it 'yields an empty string rather than a nil that breaks downstream matching' do
+        expect(packages['marked'].license).to(eq(''))
+      end
+    end
+  end
+
   context 'when the version is absent from the registry' do
     let(:importmap) { "pin 'marked', to: 'https://esm.sh/marked@99.0.0'\n" }
 
