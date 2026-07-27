@@ -24,7 +24,7 @@ GEM
     crack (1.0.1)
       bigdecimal
       rexml
-    csv (3.3.5)
+    csv (3.3.6)
     diff-lcs (1.6.2)
     drb (2.2.3)
     hashdiff (1.2.1)
@@ -116,7 +116,7 @@ GEM
       rubocop-ast (>= 1.44.0, < 2.0)
     ruby-progressbar (1.13.0)
     securerandom (0.4.1)
-    simplecov (1.0.2)
+    simplecov (1.0.3)
     tty-color (0.6.0)
     tty-cursor (0.7.1)
     tty-prompt (0.23.1)
