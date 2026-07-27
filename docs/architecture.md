@@ -109,7 +109,7 @@
 **Key Components:**
 
 - `PARSER_REGISTRY`: Private module-level constant (`module SOUP`) mapping lock file names to parser classes and skip flags
-- `DEPENDENCY_TEXT`: Top-level constant holding the value written into `requirements` and `verification_reasoning` for transitive dependencies
+- `DEPENDENCY_TEXT`: Private module-level constant (`module SOUP`) holding the value written into `requirements` and `verification_reasoning` for transitive dependencies
 - `initialize(argv)`: Configures options and initializes state
 - `execute`: Main entry point that runs the detection, checking, and output workflow. Uses an `ensure` block to persist partial state on failure
 - `validate_config!`: Validates that configuration files exist and contain valid JSON
