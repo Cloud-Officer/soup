@@ -30,11 +30,16 @@ RSpec.describe(SOUP::ComposerParser) do
 
   let(:packages) { {} }
 
+  # TEST-12: lockfile and its sibling composer.json are written to a per-example
+  # tmpdir, so the parser resolves composer.json through the real sibling_file
+  # path handling rather than File.read stubs keyed to bare basenames.
+  def lockfile_path
+    write_fixture('composer.json', main_file)
+    write_fixture('composer.lock', lock_file)
+  end
+
   before do |example|
-    allow(File).to(receive(:read).and_call_original)
-    allow(File).to(receive(:read).with('composer.lock').and_return(lock_file))
-    allow(File).to(receive(:read).with('composer.json').and_return(main_file))
-    parser.parse('composer.lock', packages) if example.metadata.fetch(:auto_parse, true)
+    parser.parse(lockfile_path, packages) if example.metadata.fetch(:auto_parse, true)
   end
 
   it 'parses packages and packages-dev', :aggregate_failures do
@@ -179,8 +184,7 @@ RSpec.describe(SOUP::ComposerParser) do
     # Regression test for BUG-04: pre-fix the parser used file.gsub('lock',
     # 'json'), an unanchored substring substitution that corrupted any path
     # containing "lock" (e.g. /Users/sherlock/proj/composer.lock).
-    let(:lock_file_path) { '/Users/sherlock/proj/composer.lock' }
-    let(:main_file_path) { '/Users/sherlock/proj/composer.json' }
+    let(:main_file) { '{"require":{"vendor/x":"^1.0"}}' }
     let(:lock_file) do
       {
         packages: [
@@ -190,10 +194,11 @@ RSpec.describe(SOUP::ComposerParser) do
       }.to_json
     end
 
-    before do
-      allow(File).to(receive(:read).with(lock_file_path).and_return(lock_file))
-      allow(File).to(receive(:read).with(main_file_path).and_return('{"require":{"vendor/x":"^1.0"}}'))
-      parser.parse(lock_file_path, packages)
+    # A real directory named "sherlock" on disk, so the path actually contains
+    # the "lock" substring the old gsub corrupted.
+    let(:lockfile_path) do
+      write_fixture('sherlock/proj/composer.json', main_file)
+      write_fixture('sherlock/proj/composer.lock', lock_file)
     end
 
     it 'reads composer.json from the same directory without corrupting the path' do
@@ -271,12 +276,12 @@ RSpec.describe(SOUP::ComposerParser) do
   # backtrace. Locking in current behavior so a future improvement (clearer
   # message) is deliberate.
   context 'when the lockfile itself is missing at read time', auto_parse: false do
-    before do
-      allow(File).to(receive(:read).with('composer.lock').and_raise(Errno::ENOENT.new('composer.lock')))
-    end
+    # Points at a path inside the fixture dir that was never written, so the
+    # real File.read raises ENOENT instead of a stub simulating it.
+    let(:lockfile_path) { File.join(fixture_dir, 'gone', 'composer.lock') }
 
     it 'surfaces Errno::ENOENT' do
-      expect { parser.parse('composer.lock', packages) }
+      expect { parser.parse(lockfile_path, packages) }
         .to(raise_error(Errno::ENOENT))
     end
   end
@@ -288,7 +293,7 @@ RSpec.describe(SOUP::ComposerParser) do
     let(:lock_file) { 'not json' }
 
     it 'raises JSON::ParserError on non-JSON garbage' do
-      expect { parser.parse('composer.lock', packages) }
+      expect { parser.parse(lockfile_path, packages) }
         .to(raise_error(JSON::ParserError))
     end
 
@@ -296,7 +301,7 @@ RSpec.describe(SOUP::ComposerParser) do
       let(:lock_file) { '' }
 
       it 'raises JSON::ParserError' do
-        expect { parser.parse('composer.lock', packages) }
+        expect { parser.parse(lockfile_path, packages) }
           .to(raise_error(JSON::ParserError))
       end
     end
@@ -305,18 +310,15 @@ RSpec.describe(SOUP::ComposerParser) do
       let(:lock_file) { '{"packages":[{"name":"vendor/x"' }
 
       it 'raises JSON::ParserError' do
-        expect { parser.parse('composer.lock', packages) }
+        expect { parser.parse(lockfile_path, packages) }
           .to(raise_error(JSON::ParserError))
       end
     end
   end
 
-  # TEST-12 follow-up: parser exercised against real lockfile bytes via
-  # SoupFixtureHelpers. Uses auto_parse: false so the outer before-hook does
-  # not invoke parser.parse with the stubbed 'composer.lock' literal before
-  # the example writes its real fixture path.
-  context 'with real fixture files on disk', auto_parse: false do
-    let(:tmpdir_lock_content) do
+  # TEST-12: a minimal single-package lockfile read straight off disk.
+  context 'with a single-package lockfile on disk' do
+    let(:lock_file) do
       {
         packages: [
           {
@@ -332,9 +334,6 @@ RSpec.describe(SOUP::ComposerParser) do
     end
 
     it 'reads the lockfile + composer.json from disk without File stubs' do
-      write_fixture('composer.json', '{"require":{"vendor/main-pkg":"^1.0"}}')
-      lockfile_path = write_fixture('composer.lock', tmpdir_lock_content)
-      parser.parse(lockfile_path, packages)
       expect(packages['vendor/main-pkg']).to(have_attributes(language: 'PHP', version: '1.0.0', license: 'MIT'))
     end
   end

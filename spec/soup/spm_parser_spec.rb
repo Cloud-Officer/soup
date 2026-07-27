@@ -27,12 +27,22 @@ RSpec.describe(SOUP::SPMParser) do
     }.to_json
   end
 
+  def lockfile_path
+    write_fixture(manifest_name, main_file_content) unless manifest_name.nil?
+    write_fixture(resolved_name, resolved_file)
+  end
+
+  # TEST-12: Package.resolved and whichever Swift manifest the case needs are
+  # written to a per-example tmpdir. The manifest-discovery chain (Package.swift
+  # -> Tuist/Dependencies.swift -> *.xcodeproj/project.pbxproj -> enclosing
+  # pbxproj) is then driven by which files actually exist on disk, exercising the
+  # parser's real File.exist? walk instead of a stubbed one.
+  def manifest_name = 'Package.swift'
+
+  def resolved_name = 'Package.resolved'
+
+  # ENV stubbing is out of scope for the TEST-12 fixture migration.
   before do
-    allow(File).to(receive(:read).and_call_original)
-    allow(File).to(receive(:read).with('Package.resolved').and_return(resolved_file))
-    allow(File).to(receive(:exist?).and_call_original)
-    allow(File).to(receive(:exist?).with('Package.swift').and_return(true))
-    allow(File).to(receive(:read).with('Package.swift').and_return(main_file_content))
     allow(ENV).to(receive(:fetch).and_call_original)
     allow(ENV).to(receive(:fetch).with('GITHUB_TOKEN', '').and_return(''))
   end
@@ -45,7 +55,7 @@ RSpec.describe(SOUP::SPMParser) do
 
     let(:packages) do
       result = {}
-      parser.parse('Package.resolved', result)
+      parser.parse(lockfile_path, result)
       result
     end
 
@@ -68,7 +78,7 @@ RSpec.describe(SOUP::SPMParser) do
 
     it 'sends GitHub token header when GITHUB_TOKEN is set' do
       packages = {}
-      parser.parse('Package.resolved', packages)
+      parser.parse(lockfile_path, packages)
       expect(packages).to(have_key('Alamofire'))
     end
   end
@@ -87,7 +97,7 @@ RSpec.describe(SOUP::SPMParser) do
 
     it 'classifies the substring package as transitive', :aggregate_failures do
       packages = {}
-      parser.parse('Package.resolved', packages)
+      parser.parse(lockfile_path, packages)
       expect(packages).to(have_key('Alamofire'))
       expect(packages['Alamofire'].dependency).to(be(true))
     end
@@ -111,7 +121,7 @@ RSpec.describe(SOUP::SPMParser) do
 
     it 'handles repositories with no license', :aggregate_failures do
       packages = {}
-      parser.parse('Package.resolved', packages)
+      parser.parse(lockfile_path, packages)
       expect(packages).to(have_key('Alamofire'))
       expect(packages['Alamofire'].license).to(be_nil)
     end
@@ -135,7 +145,7 @@ RSpec.describe(SOUP::SPMParser) do
 
     it 'skips private repositories' do
       packages = {}
-      parser.parse('Package.resolved', packages)
+      parser.parse(lockfile_path, packages)
       expect(packages).to(be_empty)
     end
   end
@@ -162,7 +172,7 @@ RSpec.describe(SOUP::SPMParser) do
 
     it 'supports old format' do
       packages = {}
-      parser.parse('Package.resolved', packages)
+      parser.parse(lockfile_path, packages)
       expect(packages).to(have_key('Alamofire'))
     end
   end
@@ -175,40 +185,38 @@ RSpec.describe(SOUP::SPMParser) do
 
     it 'skips non-200 responses' do
       packages = {}
-      parser.parse('Package.resolved', packages)
+      parser.parse(lockfile_path, packages)
       expect(packages).to(be_empty)
     end
   end
 
   context 'when Package.swift does not exist but Tuist Dependencies.swift does' do
+    let(:manifest_name) { 'Tuist/Dependencies.swift' }
+    let(:resolved_name) { 'Tuist/Package.resolved'   }
+
     before do
-      allow(File).to(receive(:read).with('Tuist/Package.resolved').and_return(resolved_file))
-      allow(File).to(receive(:exist?).with('Tuist/Package.swift').and_return(false))
-      allow(File).to(receive(:exist?).with('Tuist/Dependencies.swift').and_return(true))
-      allow(File).to(receive(:read).with('Tuist/Dependencies.swift').and_return(main_file_content))
       stub_request(:get, 'https://api.github.com/repos/Alamofire/Alamofire')
         .to_return(status: 200, body: github_response)
     end
 
     it 'uses Tuist Dependencies.swift as main file' do
       packages = {}
-      parser.parse('Tuist/Package.resolved', packages)
+      parser.parse(lockfile_path, packages)
       expect(packages).to(have_key('Alamofire'))
     end
   end
 
   context 'when only xcodeproj exists' do
+    let(:manifest_name) { 'Package.xcodeproj/project.pbxproj' }
+
     before do
-      allow(File).to(receive(:exist?).with('Package.swift').and_return(false))
-      allow(File).to(receive(:exist?).with('Package.xcodeproj/project.pbxproj').and_return(true))
-      allow(File).to(receive(:read).with('Package.xcodeproj/project.pbxproj').and_return(main_file_content))
       stub_request(:get, 'https://api.github.com/repos/Alamofire/Alamofire')
         .to_return(status: 200, body: github_response)
     end
 
     it 'uses xcodeproj as main file' do
       packages = {}
-      parser.parse('Package.resolved', packages)
+      parser.parse(lockfile_path, packages)
       expect(packages).to(have_key('Alamofire'))
     end
   end
@@ -243,32 +251,31 @@ RSpec.describe(SOUP::SPMParser) do
     # Regression test for BUG-011: a previous implementation used
     # file.split('.').first to derive the xcodeproj path, which truncated
     # any path whose parent directory contained a dot.
+    # A real directory literally named "foo.bar" on disk, so the path genuinely
+    # contains the dot that the old split('.').first truncated at.
+    let(:manifest_name) { 'foo.bar/MyProject/Package.xcodeproj/project.pbxproj' }
+    let(:resolved_name) { 'foo.bar/MyProject/Package.resolved'                  }
+
     before do
-      allow(File).to(receive(:read).with('/Users/foo.bar/MyProject/Package.resolved').and_return(resolved_file))
-      allow(File).to(receive(:exist?).with('/Users/foo.bar/MyProject/Package.swift').and_return(false))
-      allow(File).to(receive(:exist?).with('/Users/foo.bar/MyProject/Package.xcodeproj/project.pbxproj').and_return(true))
-      allow(File).to(receive(:read).with('/Users/foo.bar/MyProject/Package.xcodeproj/project.pbxproj').and_return(main_file_content))
       stub_request(:get, 'https://api.github.com/repos/Alamofire/Alamofire')
         .to_return(status: 200, body: github_response)
     end
 
     it 'resolves the xcodeproj sibling path without truncating at the first dot', :aggregate_failures do
       packages = {}
-      expect { parser.parse('/Users/foo.bar/MyProject/Package.resolved', packages) }
+      expect { parser.parse(lockfile_path, packages) }
         .not_to(raise_error)
       expect(packages).to(have_key('Alamofire'))
     end
   end
 
   context 'when no main file exists' do
-    before do
-      allow(File).to(receive(:exist?).with('Package.swift').and_return(false))
-      allow(File).to(receive(:exist?).with('Package.xcodeproj/project.pbxproj').and_return(false))
-    end
+    # No Swift manifest of any name is written to the fixture dir.
+    let(:manifest_name) { nil }
 
     it 'raises a SOUP::InvalidLockfileError naming the file' do
       packages = {}
-      expect { parser.parse('Package.resolved', packages) }
+      expect { parser.parse(lockfile_path, packages) }
         .to(raise_error(SOUP::InvalidLockfileError, /No Swift main file found/))
     end
   end
@@ -293,7 +300,7 @@ RSpec.describe(SOUP::SPMParser) do
 
     it 'handles git@ repository URLs' do
       packages = {}
-      parser.parse('Package.resolved', packages)
+      parser.parse(lockfile_path, packages)
       expect(packages).to(have_key('Alamofire'))
     end
   end
@@ -306,7 +313,7 @@ RSpec.describe(SOUP::SPMParser) do
 
     it 'raises on rate limit' do
       packages = {}
-      expect { parser.parse('Package.resolved', packages) }
+      expect { parser.parse(lockfile_path, packages) }
         .to(raise_error(SOUP::RateLimitError, /rate limit/))
     end
   end
@@ -326,7 +333,7 @@ RSpec.describe(SOUP::SPMParser) do
 
     it 'raises on rate limit even when the reason phrase does not contain the keyword' do
       packages = {}
-      expect { parser.parse('Package.resolved', packages) }
+      expect { parser.parse(lockfile_path, packages) }
         .to(raise_error(SOUP::RateLimitError, /rate limit/))
     end
   end
@@ -343,7 +350,7 @@ RSpec.describe(SOUP::SPMParser) do
 
     it 'warns with status + url + package context and omits the package', :aggregate_failures do
       packages = {}
-      expect { parser.parse('Package.resolved', packages) }
+      expect { parser.parse(lockfile_path, packages) }
         .to(output(%r{HTTP 502 .*package=alamofire.*url=https://api\.github\.com/repos/Alamofire/Alamofire.*body=<html>upstream timeout</html>}m).to_stderr)
       expect(packages).to(be_empty)
     end
@@ -369,7 +376,7 @@ RSpec.describe(SOUP::SPMParser) do
 
     it 'records the branch as the pin identifier so the SOUP entry is not blank' do
       packages = {}
-      parser.parse('Package.resolved', packages)
+      parser.parse(lockfile_path, packages)
       expect(packages['Alamofire'].version).to(eq('main'))
     end
   end
@@ -394,7 +401,7 @@ RSpec.describe(SOUP::SPMParser) do
 
     it 'falls back to the revision when neither version nor branch is set' do
       packages = {}
-      parser.parse('Package.resolved', packages)
+      parser.parse(lockfile_path, packages)
       expect(packages['Alamofire'].version).to(eq('deadbeef'))
     end
   end
@@ -408,7 +415,7 @@ RSpec.describe(SOUP::SPMParser) do
 
     it 'raises on bad credentials' do
       packages = {}
-      expect { parser.parse('Package.resolved', packages) }
+      expect { parser.parse(lockfile_path, packages) }
         .to(raise_error(SOUP::AuthenticationError, /Bad credentials/))
     end
   end
@@ -419,37 +426,37 @@ RSpec.describe(SOUP::SPMParser) do
     let(:packages) { {} }
 
     context 'with empty Package.resolved content' do
-      before { allow(File).to(receive(:read).with('Package.resolved').and_return('')) }
+      let(:resolved_file) { '' }
 
       it 'raises JSON::ParserError' do
-        expect { parser.parse('Package.resolved', packages) }
+        expect { parser.parse(lockfile_path, packages) }
           .to(raise_error(JSON::ParserError))
       end
     end
 
     context 'with truncated JSON in Package.resolved' do
-      before { allow(File).to(receive(:read).with('Package.resolved').and_return('{"pins":[{"identity":"alamofire"')) }
+      let(:resolved_file) { '{"pins":[{"identity":"alamofire"' }
 
       it 'raises JSON::ParserError' do
-        expect { parser.parse('Package.resolved', packages) }
+        expect { parser.parse(lockfile_path, packages) }
           .to(raise_error(JSON::ParserError))
       end
     end
 
     context 'with non-JSON garbage in Package.resolved' do
-      before { allow(File).to(receive(:read).with('Package.resolved').and_return('not json')) }
+      let(:resolved_file) { 'not json' }
 
       it 'raises JSON::ParserError' do
-        expect { parser.parse('Package.resolved', packages) }
+        expect { parser.parse(lockfile_path, packages) }
           .to(raise_error(JSON::ParserError))
       end
     end
 
     context 'with valid JSON but empty pins array' do
-      before { allow(File).to(receive(:read).with('Package.resolved').and_return('{"pins":[]}')) }
+      let(:resolved_file) { '{"pins":[]}' }
 
       it 'parses without raising and adds no packages', :aggregate_failures do
-        expect { parser.parse('Package.resolved', packages) }
+        expect { parser.parse(lockfile_path, packages) }
           .not_to(raise_error)
         expect(packages).to(be_empty)
       end
@@ -458,24 +465,20 @@ RSpec.describe(SOUP::SPMParser) do
     # TEST-05: race where Dir.glob found the lockfile but it was deleted /
     # unreadable before File.read ran.
     context 'when Package.resolved cannot be read' do
-      before do
-        allow(File).to(
-          receive(:read)
-                    .with('Package.resolved').and_raise(Errno::ENOENT.new('Package.resolved'))
-        )
-      end
+      # A path inside the fixture dir that was never written, so the real
+      # File.read raises ENOENT instead of a stub simulating it.
+      let(:lockfile_path) { File.join(fixture_dir, 'gone', 'Package.resolved') }
 
       it 'surfaces Errno::ENOENT' do
-        expect { parser.parse('Package.resolved', packages) }
+        expect { parser.parse(lockfile_path, packages) }
           .to(raise_error(Errno::ENOENT))
       end
     end
 
-    # TEST-12 follow-up: parser exercised against real Package.resolved bytes
-    # via SoupFixtureHelpers, demonstrating the no-stub pattern for spm.
-    context 'with real Package.resolved + Package.swift fixtures on disk' do
+    # TEST-12: a well-formed Package.resolved plus sibling Package.swift, read
+    # straight off disk with the full GitHub metadata response.
+    context 'with a well-formed Package.resolved on disk' do
       before do
-        allow(File).to(receive(:exist?).and_call_original)
         body = {
           name: 'Alamofire',
           private: false,
@@ -488,8 +491,6 @@ RSpec.describe(SOUP::SPMParser) do
       end
 
       it 'reads Package.resolved + sibling Package.swift from disk without File stubs' do
-        write_fixture('Package.swift', '.package(url: "https://github.com/Alamofire/Alamofire.git", from: "5.0.0")')
-        lockfile_path = write_fixture('Package.resolved', resolved_file)
         parser.parse(lockfile_path, packages)
         expect(packages['Alamofire']).to(have_attributes(language: 'Swift', version: '5.9.0', license: 'MIT'))
       end
@@ -532,10 +533,33 @@ RSpec.describe(SOUP::SPMParser) do
 
     it 'parses all 100 pins without raising and adds them to the hash', :aggregate_failures do
       packages = {}
-      parser.parse('Package.resolved', packages)
+      parser.parse(lockfile_path, packages)
       expect(packages.size).to(eq(100))
       expect(packages['pkg-1']).to(have_attributes(language: 'Swift', version: '1.0.0', license: 'MIT'))
       expect(packages['pkg-100']).to(have_attributes(language: 'Swift', version: '1.0.0', license: 'MIT'))
+    end
+  end
+
+  # CONS-007: the dir == '.' branch was previously covered only incidentally, by
+  # specs that stubbed File.read and so passed 'Package.resolved' rather than a
+  # real path. Now that every fixture is an absolute tmpdir path, the helper is
+  # asserted directly, the same way base_parser_spec exposes BaseParser's own
+  # protected helpers.
+  describe '#path_join' do
+    subject(:helper) { helper_class.new }
+
+    let(:helper_class) do
+      Class.new(described_class) do
+        public :path_join
+      end
+    end
+
+    it 'returns the bare suffix when the directory is "."' do
+      expect(helper.path_join('.', 'Package.swift')).to(eq('Package.swift'))
+    end
+
+    it 'joins the suffix onto a real directory without a leading "./"' do
+      expect(helper.path_join('/tmp/proj', 'Package.swift')).to(eq('/tmp/proj/Package.swift'))
     end
   end
 end

@@ -102,12 +102,15 @@ RSpec.describe(SOUP::Application) do
     ] + skip_all_parsers
   end
 
+  # TEST-12: the lockfile and its sibling composer.json are written to a
+  # per-example tmpdir and Dir.glob is pointed at the real path, so the parser
+  # reads actual bytes. Dir stubbing stays -- detect_packages globs Dir.pwd, and
+  # Dir is not File stubbing.
   def stub_composer_files(lock_content, json_content)
+    write_fixture('composer.json', json_content)
+    lockfile_path = write_fixture('composer.lock', lock_content)
     allow(Dir).to(receive(:glob).and_return([]))
-    allow(Dir).to(receive(:glob).with("#{Dir.pwd}/**/composer.lock").and_return(['composer.lock']))
-    allow(File).to(receive(:read).and_call_original)
-    allow(File).to(receive(:read).with('composer.lock').and_return(lock_content))
-    allow(File).to(receive(:read).with('composer.json').and_return(json_content))
+    allow(Dir).to(receive(:glob).with("#{Dir.pwd}/**/composer.lock").and_return([lockfile_path]))
   end
 
   def default_composer_lock

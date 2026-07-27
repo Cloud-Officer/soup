@@ -10,7 +10,6 @@ RSpec.describe(SOUP::YarnParser) do
   end
 
   let(:main_file) { '{"dependencies":{"lodash":"^4.17.0"}}' }
-
   let(:registry_response) do
     {
       versions: {
@@ -23,10 +22,22 @@ RSpec.describe(SOUP::YarnParser) do
     }.to_json
   end
 
+  # TEST-12: both the lockfile and its sibling package.json are written to a
+  # per-example tmpdir, so the parser resolves package.json through the same
+  # sibling_file path handling production uses instead of a File.read stub keyed
+  # to a bare basename.
+  def lockfile_path
+    write_fixture('package.json', main_file)
+    write_fixture('yarn.lock', yarn_lock_content)
+  end
+
+  def yarn_lock_content = "# yarn lockfile v1\n"
+
+  # YarnLockParser is third-party, not File, stubbing -- it stays, but is keyed
+  # to the real fixture path. Contexts that want the library to actually run
+  # re-stub this same constraint with and_call_original.
   before do
-    allow(YarnLockParser::Parser).to(receive(:parse).with('yarn.lock').and_return(parsed_lock))
-    allow(File).to(receive(:read).and_call_original)
-    allow(File).to(receive(:read).with('package.json').and_return(main_file))
+    allow(YarnLockParser::Parser).to(receive(:parse).with(lockfile_path).and_return(parsed_lock))
   end
 
   context 'with successful registry response' do
@@ -37,7 +48,7 @@ RSpec.describe(SOUP::YarnParser) do
 
     it 'parses via YarnLockParser and calls NPM registry', :aggregate_failures do
       packages = {}
-      parser.parse('yarn.lock', packages)
+      parser.parse(lockfile_path, packages)
       expect(packages['lodash'].language).to(eq('JS'))
       expect(packages['lodash'].version).to(eq('4.17.21'))
       expect(packages['lodash'].license).to(eq('MIT'))
@@ -58,22 +69,17 @@ RSpec.describe(SOUP::YarnParser) do
 
     it 'classifies the substring package as transitive' do
       packages = {}
-      parser.parse('yarn.lock', packages)
+      parser.parse(lockfile_path, packages)
       expect(packages['lodash'].dependency).to(be(true))
     end
   end
 
   context 'when package.json has vendor dependency' do
-    before do
-      allow(File).to(
-        receive(:read).with('package.json')
-                                         .and_return('{"dependencies":{"lodash": "file:vendor/lodash"}}')
-      )
-    end
+    let(:main_file) { '{"dependencies":{"lodash": "file:vendor/lodash"}}' }
 
     it 'skips vendor packages' do
       packages = {}
-      parser.parse('yarn.lock', packages)
+      parser.parse(lockfile_path, packages)
       expect(packages).to(be_empty)
     end
   end
@@ -82,7 +88,7 @@ RSpec.describe(SOUP::YarnParser) do
     stub_request(:get, 'https://registry.npmjs.org/lodash')
       .to_return(status: 500, body: 'Server Error')
     packages = {}
-    expect { parser.parse('yarn.lock', packages) }
+    expect { parser.parse(lockfile_path, packages) }
       .to(raise_error(SOUP::RegistryError, /HTTP 500.*lodash.*registry\.npmjs\.org/m))
   end
 
@@ -90,18 +96,18 @@ RSpec.describe(SOUP::YarnParser) do
   # "Aborting after N retries" warning before the parser skipped the
   # package, not just that parse did not raise.
   context 'when the registry times out' do
-    let(:url) { 'https://registry.npmjs.org/lodash' }
-    let(:packages) { {} }
+    let(:url)      { 'https://registry.npmjs.org/lodash' }
+    let(:packages) { {}                                  }
 
     before { stub_request(:get, url).to_timeout }
 
     it 'emits the "Aborting after N retries" stderr warning' do
-      expect { parser.parse('yarn.lock', packages) }
+      expect { parser.parse(lockfile_path, packages) }
         .to(output(/Aborting after \d+ retries/).to_stderr)
     end
 
     it 'retries max_retries+1 times before skipping the package', :aggregate_failures do
-      parser.parse('yarn.lock', packages)
+      parser.parse(lockfile_path, packages)
       expect(packages).to(be_empty)
       expect(a_request(:get, url)).to(have_been_made.times(SOUP::HttpClient.max_retries + 1))
     end
@@ -110,7 +116,7 @@ RSpec.describe(SOUP::YarnParser) do
     # BaseParser#npm_registry_response, named from the `label` this parser
     # passes. A timeout is skipped here even though a non-200 raises.
     it 'names the package as name@version in the skip warning' do
-      expect { parser.parse('yarn.lock', packages) }
+      expect { parser.parse(lockfile_path, packages) }
         .to(output(/Skipping lodash@4\.17\.21: network timeout after retries/).to_stderr)
     end
   end
@@ -131,7 +137,7 @@ RSpec.describe(SOUP::YarnParser) do
 
     it 'skips the package instead of crashing on nil license access', :aggregate_failures do
       packages = {}
-      expect { parser.parse('yarn.lock', packages) }
+      expect { parser.parse(lockfile_path, packages) }
         .not_to(raise_error)
       expect(packages).to(be_empty)
     end
@@ -145,7 +151,7 @@ RSpec.describe(SOUP::YarnParser) do
 
     it 'skips the package instead of raising', :aggregate_failures do
       packages = {}
-      expect { parser.parse('yarn.lock', packages) }
+      expect { parser.parse(lockfile_path, packages) }
         .not_to(raise_error)
       expect(packages).to(be_empty)
     end
@@ -157,12 +163,12 @@ RSpec.describe(SOUP::YarnParser) do
     # in yarn.rb#parse the next line raises NoMethodError on NilClass and
     # the whole run aborts.
     before do
-      allow(YarnLockParser::Parser).to(receive(:parse).with('yarn.lock').and_return(nil))
+      allow(YarnLockParser::Parser).to(receive(:parse).with(lockfile_path).and_return(nil))
     end
 
     it 'raises a clear unsupported-format error', :aggregate_failures do
       packages = {}
-      expect { parser.parse('yarn.lock', packages) }
+      expect { parser.parse(lockfile_path, packages) }
         .to(raise_error(SOUP::UnsupportedFormatError, /Unsupported yarn\.lock format/))
       expect(packages).to(be_empty)
     end
@@ -188,7 +194,7 @@ RSpec.describe(SOUP::YarnParser) do
 
     it 'converts Unlicense to NOASSERTION' do
       packages = {}
-      parser.parse('yarn.lock', packages)
+      parser.parse(lockfile_path, packages)
       expect(packages['lodash'].license).to(eq('NOASSERTION'))
     end
   end
@@ -218,7 +224,7 @@ RSpec.describe(SOUP::YarnParser) do
 
     it 'normalizes the object form to its type string instead of crashing', :aggregate_failures do
       packages = {}
-      expect { parser.parse('yarn.lock', packages) }
+      expect { parser.parse(lockfile_path, packages) }
         .not_to(raise_error)
       expect(packages['lodash'].license).to(eq('MIT'))
     end
@@ -228,20 +234,19 @@ RSpec.describe(SOUP::YarnParser) do
   # unreadable before YarnLockParser::Parser.parse ran.
   context 'when yarn.lock cannot be read' do
     before do
-      allow(YarnLockParser::Parser).to(receive(:parse).with('yarn.lock').and_raise(Errno::ENOENT.new('yarn.lock')))
+      allow(YarnLockParser::Parser).to(receive(:parse).with(lockfile_path).and_raise(Errno::ENOENT.new('yarn.lock')))
     end
 
     it 'surfaces Errno::ENOENT' do
       packages = {}
-      expect { parser.parse('yarn.lock', packages) }
+      expect { parser.parse(lockfile_path, packages) }
         .to(raise_error(Errno::ENOENT))
     end
   end
 
-  # TEST-12: parser exercised against real lockfile bytes written to a
-  # Dir.mktmpdir via SoupFixtureHelpers, exactly like Application#detect_packages
-  # would invoke it in production. Demonstrates the new pattern; follow-up
-  # work will migrate the remaining parsers spec-by-spec.
+  # TEST-12: parser exercised against real lockfile bytes, with the real
+  # YarnLockParser running, exactly like Application#detect_packages would
+  # invoke it in production.
   context 'with a real yarn.lock fixture on disk' do
     let(:yarn_lock_content) do
       <<~LOCK
@@ -254,19 +259,15 @@ RSpec.describe(SOUP::YarnParser) do
       LOCK
     end
 
-    let(:package_json_content) { '{"dependencies":{"lodash":"^4.17.0"}}' }
-
     before do
       # Let the real YarnLockParser run against on-disk bytes instead of the
-      # literal-path stub from the outer `before`.
-      allow(YarnLockParser::Parser).to(receive(:parse).and_call_original)
-      write_fixture('package.json', package_json_content)
+      # canned parsed_lock from the outer `before`.
+      allow(YarnLockParser::Parser).to(receive(:parse).with(lockfile_path).and_call_original)
       stub_request(:get, 'https://registry.npmjs.org/lodash')
         .to_return(status: 200, body: registry_response)
     end
 
     it 'reads the lockfile and writes a Package entry without File stubs' do
-      lockfile_path = write_fixture('yarn.lock', yarn_lock_content)
       packages = {}
       parser.parse(lockfile_path, packages)
       expect(packages['lodash']).to(have_attributes(language: 'JS', version: '4.17.21', license: 'MIT'))
@@ -279,12 +280,10 @@ RSpec.describe(SOUP::YarnParser) do
   # Yarn Berry case (BUG-01) but via a real on-disk file rather than a stub.
   context 'with an empty yarn.lock fixture on disk' do
     let(:packages) { {} }
-    let(:lockfile_path) do
-      write_fixture('package.json', '{}')
-      write_fixture('yarn.lock', '')
-    end
+    let(:main_file)         { '{}' }
+    let(:yarn_lock_content) { ''   }
 
-    before { allow(YarnLockParser::Parser).to(receive(:parse).and_call_original) }
+    before { allow(YarnLockParser::Parser).to(receive(:parse).with(lockfile_path).and_call_original) }
 
     it 'raises UnsupportedFormatError when YarnLockParser cannot parse the file', :aggregate_failures do
       expect { parser.parse(lockfile_path, packages) }
@@ -315,7 +314,7 @@ RSpec.describe(SOUP::YarnParser) do
 
     it 'parses all 100 packages without raising and adds them to the hash', :aggregate_failures do
       packages = {}
-      parser.parse('yarn.lock', packages)
+      parser.parse(lockfile_path, packages)
       expect(packages.size).to(eq(100))
       expect(packages['pkg-1']).to(have_attributes(language: 'JS', version: '1.0.0', license: 'MIT'))
       expect(packages['pkg-100']).to(have_attributes(language: 'JS', version: '1.0.0', license: 'MIT'))

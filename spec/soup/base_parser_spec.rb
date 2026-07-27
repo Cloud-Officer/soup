@@ -34,6 +34,7 @@ RSpec.describe(SOUP::BaseParser) do
                :build_package,
                :normalize_license,
                :npm_registry_license,
+               :sibling_file,
                :http_error_message
       end
     end
@@ -95,6 +96,25 @@ RSpec.describe(SOUP::BaseParser) do
 
       it 'returns an empty string for nil so normalize_license stays Hash-free' do
         expect(parser.npm_registry_license(nil)).to(eq(''))
+      end
+    end
+
+    # CONS-007: before the TEST-12 fixture migration, the bare-basename branch
+    # was covered only incidentally, by parser specs that stubbed File.read and
+    # so passed 'composer.lock' rather than a real path. Now that every fixture
+    # is a real absolute tmpdir path, the helper is asserted directly instead.
+    describe '#sibling_file' do
+      it 'returns the bare suffix when the file has no directory component' do
+        expect(parser.sibling_file('composer.lock', 'composer.json')).to(eq('composer.json'))
+      end
+
+      it 'joins the suffix onto the file\'s directory for a nested path' do
+        expect(parser.sibling_file('/tmp/proj/composer.lock', 'composer.json')).to(eq('/tmp/proj/composer.json'))
+      end
+
+      it 'does not corrupt a directory whose name contains the lockfile name' do
+        expect(parser.sibling_file('/Users/sherlock/composer.lock', 'composer.json'))
+          .to(eq('/Users/sherlock/composer.json'))
       end
     end
 
