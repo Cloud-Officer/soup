@@ -16,9 +16,6 @@ module SOUP
     PIN_REGEX = /\bpin\s+["']([^"']+)["']\s*,\s*to:\s*["']([^"']+)["']/
     private_constant :PIN_REGEX
 
-    REGISTRY_ROOT = 'https://registry.npmjs.org'
-    private_constant :REGISTRY_ROOT
-
     def parse(file, packages)
       work_items =
         File.foreach(file).filter_map do |line|
@@ -53,17 +50,13 @@ module SOUP
     end
 
     def fetch_package(file, name, version)
-      url = "#{REGISTRY_ROOT}/#{name}"
-
-      begin
-        response = HttpClient.get(url)
-      rescue Net::OpenTimeout, Net::ReadTimeout => e
-        warn("Skipping #{name}: network timeout after retries (#{e.message}); package omitted from SOUP")
-        return
-      end
+      # No label override: the version is only known after this response, so the
+      # timeout warning names the package alone.
+      response = npm_registry_response(name: name)
+      return if response.nil?
 
       if response.code != 200
-        warn(http_error_message(response, url: url, package: name))
+        warn(http_error_message(response, url: npm_registry_url(name), package: name))
         return
       end
 
@@ -72,14 +65,11 @@ module SOUP
       package_details = lookup_npm_registry_version(payload, name: name, version: resolved_version)
       return if package_details.nil?
 
-      build_package(
-        name: name,
+      build_npm_registry_package(
         file: file,
-        language: 'JS',
+        name: name,
         version: resolved_version,
-        license: npm_registry_license(package_details['license']),
-        description: Package.sanitize_description(package_details['description'], strip_markdown: true),
-        website: package_details['homepage'],
+        package_details: package_details,
         dependency: false
       )
     end
