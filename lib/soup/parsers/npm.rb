@@ -26,31 +26,25 @@ module SOUP
 
     def fetch_package(file, direct_deps, key, value)
       name = key.split('node_modules/').last
-      url = "https://registry.npmjs.org/#{name}"
+      version = value['version']
+      label = "#{name}@#{version}"
 
-      begin
-        response = HttpClient.get(url)
-      rescue Net::OpenTimeout, Net::ReadTimeout => e
-        warn("Skipping #{name}@#{value['version']}: network timeout after retries (#{e.message}); package omitted from SOUP")
-        return
-      end
+      response = npm_registry_response(name: name, label: label)
+      return if response.nil?
 
       if response.code != 200
-        warn(http_error_message(response, url: url, package: "#{name}@#{value['version']}"))
+        warn(http_error_message(response, url: npm_registry_url(name), package: label))
         return
       end
 
-      package_details = lookup_npm_registry_version(JSON.parse(response.body), name: name, version: value['version'])
+      package_details = lookup_npm_registry_version(JSON.parse(response.body), name: name, version: version)
       return if package_details.nil?
 
-      build_package(
-        name: name,
+      build_npm_registry_package(
         file: file,
-        language: 'JS',
-        version: value['version'],
-        license: npm_registry_license(package_details['license']),
-        description: Package.sanitize_description(package_details['description'], strip_markdown: true),
-        website: package_details['homepage'],
+        name: name,
+        version: version,
+        package_details: package_details,
         dependency: !direct_deps.include?(name)
       )
     end

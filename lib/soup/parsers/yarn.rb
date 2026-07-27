@@ -42,28 +42,23 @@ module SOUP
     def fetch_package(file, direct_deps, js_package)
       name = js_package[:name]
       version = js_package[:version]
-      url = "https://registry.npmjs.org/#{name}"
+      label = "#{name}@#{version}"
 
-      begin
-        response = HttpClient.get(url)
-      rescue Net::OpenTimeout, Net::ReadTimeout => e
-        warn("Skipping #{name}@#{version}: network timeout after retries (#{e.message}); package omitted from SOUP")
-        return
-      end
+      response = npm_registry_response(name: name, label: label)
+      return if response.nil?
 
-      raise(RegistryError, http_error_message(response, url: url, package: "#{name}@#{version}")) unless response.code == 200
+      # Unlike the NPM and Importmap parsers, a non-200 here aborts the whole
+      # scan rather than skipping the package. CONS-001 tracks unifying that.
+      raise(RegistryError, http_error_message(response, url: npm_registry_url(name), package: label)) unless response.code == 200
 
       package_details = lookup_npm_registry_version(JSON.parse(response.body), name: name, version: version)
       return if package_details.nil?
 
-      build_package(
-        name: name,
+      build_npm_registry_package(
         file: file,
-        language: 'JS',
+        name: name,
         version: version,
-        license: npm_registry_license(package_details['license']),
-        description: Package.sanitize_description(package_details['description'], strip_markdown: true),
-        website: package_details['homepage'],
+        package_details: package_details,
         dependency: !direct_deps.include?(name)
       )
     end

@@ -122,6 +122,24 @@ RSpec.describe(SOUP::ImportmapParser) do
     end
   end
 
+  # QUAL-001: the GET + post-retry timeout rescue now lives in
+  # BaseParser#npm_registry_response. Importmap is the one caller that does NOT
+  # pass a `label`, because the version is only resolved from the response it is
+  # still waiting on -- so its warning must name the package alone, with no
+  # "@version" suffix (unlike the NPM and Yarn parsers). This path had no spec
+  # before the extraction.
+  context 'when the registry times out' do
+    let(:importmap) { "pin 'marked', to: 'https://esm.sh/marked@12.0.0'\n" }
+
+    before { stub_request(:get, 'https://registry.npmjs.org/marked').to_timeout }
+
+    it 'skips the package and names it without a version in the warning', :aggregate_failures do
+      expect { packages }
+        .to(output(/Skipping marked: network timeout after retries/).to_stderr)
+      expect(packages).to(be_empty)
+    end
+  end
+
   context 'when the version is absent from the registry' do
     let(:importmap) { "pin 'marked', to: 'https://esm.sh/marked@99.0.0'\n" }
 

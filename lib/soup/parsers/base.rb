@@ -14,6 +14,9 @@ module SOUP
     UNLICENSE_PATTERN = 'Unlicense'
     private_constant :UNLICENSE_PATTERN
 
+    NPM_REGISTRY_ROOT = 'https://registry.npmjs.org'
+    private_constant :NPM_REGISTRY_ROOT
+
     def parse(_file, _packages)
       raise(NotImplementedError, "#{self.class} must implement #parse")
     end
@@ -111,6 +114,47 @@ module SOUP
     # per-version payload.
     def npm_registry_license(raw_license)
       raw_license.is_a?(Hash) ? raw_license['type'].to_s : raw_license.to_s
+    end
+
+    # Packument URL for an npm package name.
+    def npm_registry_url(name)
+      "#{NPM_REGISTRY_ROOT}/#{name}"
+    end
+
+    # GET a package's npm packument, absorbing the post-retry timeout that all
+    # three npm consumers (NPM, Yarn, Importmap) treat identically: warn and
+    # omit the package rather than kill the scan. Returns nil in that case, so
+    # callers guard with `return if response.nil?`.
+    #
+    # `label` is what the warning names the package as -- NPM and Yarn know the
+    # version up front and pass "name@version", while Importmap resolves the
+    # version from this very response and so can only name the package.
+    #
+    # Deliberately stops short of the non-200 branch: NPM and Importmap warn and
+    # skip there, Yarn raises RegistryError and aborts the run. Unifying that
+    # split is CONS-001, so each caller keeps its own policy.
+    def npm_registry_response(name:, label: name)
+      HttpClient.get(npm_registry_url(name))
+    rescue Net::OpenTimeout, Net::ReadTimeout => e
+      warn("Skipping #{label}: network timeout after retries (#{e.message}); package omitted from SOUP")
+      nil
+    end
+
+    # Build a Package from an npm-registry per-version payload. The three npm
+    # consumers share the JS language tag and the license/description/website
+    # extraction; they differ only in how the version became known and whether
+    # the package is a direct dependency.
+    def build_npm_registry_package(file:, name:, version:, package_details:, dependency:)
+      build_package(
+        name: name,
+        file: file,
+        language: 'JS',
+        version: version,
+        license: npm_registry_license(package_details['license']),
+        description: Package.sanitize_description(package_details['description'], strip_markdown: true),
+        website: package_details['homepage'],
+        dependency: dependency
+      )
     end
 
     # Build an actionable error message for a non-2xx response.

@@ -92,6 +92,15 @@ RSpec.describe(SOUP::NPMParser) do
       expect(packages).to(be_empty)
       expect(a_request(:get, url)).to(have_been_made.times(SOUP::HttpClient.max_retries + 1))
     end
+
+    # QUAL-001: the warning is emitted by the shared
+    # BaseParser#npm_registry_response, which names the package from the `label`
+    # this parser passes. NPM knows the version up front, so it must stay
+    # "name@version" -- Importmap, which cannot, deliberately omits it.
+    it 'names the package as name@version in the skip warning' do
+      expect { parser.parse('package-lock.json', packages) }
+        .to(output(/Skipping lodash@4\.17\.21: network timeout after retries/).to_stderr)
+    end
   end
 
   context 'when license is Unlicense' do
