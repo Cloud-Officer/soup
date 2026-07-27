@@ -46,14 +46,16 @@ RSpec.describe(SOUP::PIPParser) do
     }.to_json
   end
 
-  before do
-    allow(File).to(receive(:exist?).and_call_original)
-    allow(File).to(receive(:exist?).with('requirements.in').and_return(false))
-    allow(File).to(receive(:foreach).and_call_original)
-    foreach_stub = receive(:foreach).with('requirements.txt')
-    requirements_content.lines.each { |line| foreach_stub.and_yield(line) }
-    allow(File).to(foreach_stub)
+  def requirements_path
+    write_fixture('requirements.in', requirements_in_content) unless requirements_in_content.nil?
+    write_fixture('requirements.txt', requirements_content)
   end
+
+  # TEST-12: requirements.txt (and the sibling requirements.in, when the case
+  # needs one) are written to a per-example tmpdir. Whether the .in file exists
+  # is expressed by writing it or not, so the parser's real File.exist? check
+  # runs instead of a stubbed one.
+  def requirements_in_content = nil
 
   context 'when parsing all three packages' do
     before do
@@ -67,7 +69,7 @@ RSpec.describe(SOUP::PIPParser) do
 
     let(:packages) do
       result = {}
-      parser.parse('requirements.txt', result)
+      parser.parse(requirements_path, result)
       result
     end
 
@@ -101,15 +103,10 @@ RSpec.describe(SOUP::PIPParser) do
   end
 
   context 'when .in file exists for dependency detection' do
+    let(:requirements_in_content) { "requests\n"                       }
+    let(:requirements_content)    { "requests==2.31.0\nflask==3.0.0\n" }
+
     before do
-      allow(File).to(receive(:exist?).with('requirements.in').and_return(true))
-      allow(File).to(receive(:read).and_call_original)
-      allow(File).to(receive(:read).with('requirements.in').and_return("requests\n"))
-
-      foreach_stub = receive(:foreach).with('requirements.txt')
-      "requests==2.31.0\nflask==3.0.0\n".lines.each { |line| foreach_stub.and_yield(line) }
-      allow(File).to(foreach_stub)
-
       stub_request(:get, 'https://pypi.org/pypi/requests/json')
         .to_return(status: 200, body: requests_response)
       stub_request(:get, 'https://pypi.org/pypi/flask/json')
@@ -118,7 +115,7 @@ RSpec.describe(SOUP::PIPParser) do
 
     it 'uses .in file for dependency detection if it exists', :aggregate_failures do
       packages = {}
-      parser.parse('requirements.txt', packages)
+      parser.parse(requirements_path, packages)
       expect(packages['requests'].dependency).to(be(false))
       expect(packages['flask'].dependency).to(be(true))
     end
@@ -128,22 +125,17 @@ RSpec.describe(SOUP::PIPParser) do
   # declared requirement (requests within requests-oauthlib) must NOT be flagged
   # direct. The old String#include? scan of requirements.in mis-classified it.
   context 'when a transitive package name is a substring of a declared requirement' do
+    let(:requirements_in_content) { "requests-oauthlib\n" }
+    let(:requirements_content) { "requests==2.31.0\n" }
+
     before do
-      allow(File).to(receive(:exist?).with('requirements.in').and_return(true))
-      allow(File).to(receive(:read).and_call_original)
-      allow(File).to(receive(:read).with('requirements.in').and_return("requests-oauthlib\n"))
-
-      foreach_stub = receive(:foreach).with('requirements.txt')
-      "requests==2.31.0\n".lines.each { |line| foreach_stub.and_yield(line) }
-      allow(File).to(foreach_stub)
-
       stub_request(:get, 'https://pypi.org/pypi/requests/json')
         .to_return(status: 200, body: requests_response)
     end
 
     it 'classifies the substring package as transitive' do
       packages = {}
-      parser.parse('requirements.txt', packages)
+      parser.parse(requirements_path, packages)
       expect(packages['requests'].dependency).to(be(true))
     end
   end
@@ -151,27 +143,24 @@ RSpec.describe(SOUP::PIPParser) do
   # The .in / lockfile names are compared with PEP 503 normalization, so a
   # declared "Flask_Login" still matches the resolved "flask-login".
   context 'when the declared name differs only by case and separators' do
+    let(:requirements_in_content) { "Flask_Login\n" }
+    let(:requirements_content) { "flask-login==0.6.3\n" }
+
     before do
-      allow(File).to(receive(:exist?).with('requirements.in').and_return(true))
-      allow(File).to(receive(:read).and_call_original)
-      allow(File).to(receive(:read).with('requirements.in').and_return("Flask_Login\n"))
-
-      foreach_stub = receive(:foreach).with('requirements.txt')
-      "flask-login==0.6.3\n".lines.each { |line| foreach_stub.and_yield(line) }
-      allow(File).to(foreach_stub)
-
       stub_request(:get, 'https://pypi.org/pypi/flask-login/json')
         .to_return(status: 200, body: flask_response)
     end
 
     it 'classifies the normalized match as a direct dependency' do
       packages = {}
-      parser.parse('requirements.txt', packages)
+      parser.parse(requirements_path, packages)
       expect(packages['flask-login'].dependency).to(be(false))
     end
   end
 
   context 'when home_page is nil' do
+    let(:requirements_content) { "simple==1.0.0\n" }
+
     let(:nil_homepage_response) do
       {
         info: {
@@ -184,14 +173,13 @@ RSpec.describe(SOUP::PIPParser) do
     end
 
     before do
-      allow(File).to(receive(:foreach).with('requirements.txt').and_yield("simple==1.0.0\n"))
       stub_request(:get, 'https://pypi.org/pypi/simple/json')
         .to_return(status: 200, body: nil_homepage_response)
     end
 
     it 'handles nil home_page' do
       packages = {}
-      parser.parse('requirements.txt', packages)
+      parser.parse(requirements_path, packages)
       expect(packages['simple'].website).to(be_nil)
     end
   end
@@ -202,8 +190,9 @@ RSpec.describe(SOUP::PIPParser) do
   # expectation fails on a revert instead of merely erroring on an unregistered
   # request.
   context 'when resolving the PyPI registry host' do
+    let(:requirements_content) { "requests==2.31.0\n" }
+
     before do
-      allow(File).to(receive(:foreach).with('requirements.txt').and_yield("requests==2.31.0\n"))
       stub_request(:get, 'https://pypi.org/pypi/requests/json')
         .to_return(status: 200, body: requests_response)
       stub_request(:get, 'https://pypi.python.org/pypi/requests/json')
@@ -212,25 +201,18 @@ RSpec.describe(SOUP::PIPParser) do
 
     it 'queries pypi.org and never the retired pypi.python.org domain', :aggregate_failures do
       packages = {}
-      parser.parse('requirements.txt', packages)
+      parser.parse(requirements_path, packages)
       expect(a_request(:get, 'https://pypi.org/pypi/requests/json')).to(have_been_made)
       expect(a_request(:get, 'https://pypi.python.org/pypi/requests/json')).not_to(have_been_made)
     end
   end
 
   context 'when a requirement uses a non-`==` constraint' do
-    before do
-      allow(File).to(
-        receive(:foreach).with('requirements.txt')
-                         .and_yield("requests>=2.31.0\n")
-                         .and_yield("flask~=3.0.0\n")
-                         .and_yield("django!=4.0\n")
-      )
-    end
+    let(:requirements_content) { "requests>=2.31.0\nflask~=3.0.0\ndjango!=4.0\n" }
 
     it 'skips loose constraints with a stderr warning instead of issuing a doomed 404 request', :aggregate_failures do
       packages = {}
-      expect { parser.parse('requirements.txt', packages) }
+      expect { parser.parse(requirements_path, packages) }
         .to(output(/only exact `==` version pins are supported/).to_stderr)
       expect(WebMock).not_to(have_requested(:get, /pypi\.org/))
       expect(packages).to(be_empty)
@@ -242,13 +224,11 @@ RSpec.describe(SOUP::PIPParser) do
   # silently dropped. Before the fix, `next if line.include?('#')` skipped the
   # whole line; full-line comments must still be skipped via the blank guard.
   context 'when a requirement line has a trailing inline comment' do
+    let(:requirements_content) do
+      "# full-line comment\nrequests==2.31.0  # security pin\nflask==3.0.0  # pinned for CVE\n"
+    end
+
     before do
-      allow(File).to(
-        receive(:foreach).with('requirements.txt')
-                         .and_yield("# full-line comment\n")
-                         .and_yield("requests==2.31.0  # security pin\n")
-                         .and_yield("flask==3.0.0  # pinned for CVE\n")
-      )
       stub_request(:get, 'https://pypi.org/pypi/requests/json')
         .to_return(status: 200, body: requests_response)
       stub_request(:get, 'https://pypi.org/pypi/flask/json')
@@ -257,7 +237,7 @@ RSpec.describe(SOUP::PIPParser) do
 
     it 'strips the inline comment and parses the package', :aggregate_failures do
       packages = {}
-      parser.parse('requirements.txt', packages)
+      parser.parse(requirements_path, packages)
       expect(packages['requests'].version).to(eq('2.31.0'))
       expect(packages['flask'].version).to(eq('3.0.0'))
       expect(packages.size).to(eq(2))
@@ -265,6 +245,8 @@ RSpec.describe(SOUP::PIPParser) do
   end
 
   context 'when license is empty and no classifiers exist' do
+    let(:requirements_content) { "pkg==1.0.0\n" }
+
     let(:empty_license_response) do
       {
         info: {
@@ -277,14 +259,13 @@ RSpec.describe(SOUP::PIPParser) do
     end
 
     before do
-      allow(File).to(receive(:foreach).with('requirements.txt').and_yield("pkg==1.0.0\n"))
       stub_request(:get, 'https://pypi.org/pypi/pkg/json')
         .to_return(status: 200, body: empty_license_response)
     end
 
     it 'handles empty license and no classifiers' do
       packages = {}
-      parser.parse('requirements.txt', packages)
+      parser.parse(requirements_path, packages)
       expect(packages['pkg'].license).to(be_nil)
     end
   end
@@ -295,32 +276,21 @@ RSpec.describe(SOUP::PIPParser) do
   describe '#parse with malformed input' do
     let(:packages) { {} }
 
-    before do
-      allow(File).to(receive(:exist?).and_call_original)
-      allow(File).to(receive(:exist?).with('requirements.in').and_return(false))
-    end
-
     context 'with an empty requirements.txt' do
-      before do
-        allow(File).to(receive(:foreach).with('requirements.txt'))
-      end
+      let(:requirements_content) { '' }
 
       it 'parses without raising and adds no packages', :aggregate_failures do
-        expect { parser.parse('requirements.txt', packages) }
+        expect { parser.parse(requirements_path, packages) }
           .not_to(raise_error)
         expect(packages).to(be_empty)
       end
     end
 
     context 'with a comment-and-blank-line-only requirements.txt' do
-      before do
-        ["# header comment\n", "\n", "  \n", "# another comment\n"].each do |line|
-          allow(File).to(receive(:foreach).with('requirements.txt').and_yield(line))
-        end
-      end
+      let(:requirements_content) { "# header comment\n\n  \n# another comment\n" }
 
       it 'parses without raising and adds no packages', :aggregate_failures do
-        expect { parser.parse('requirements.txt', packages) }
+        expect { parser.parse(requirements_path, packages) }
           .not_to(raise_error)
         expect(packages).to(be_empty)
       end
@@ -329,27 +299,19 @@ RSpec.describe(SOUP::PIPParser) do
     # TEST-05: race where Dir.glob found the lockfile but it was deleted /
     # unreadable before File.foreach ran.
     context 'when requirements.txt cannot be read' do
-      before do
-        allow(File).to(
-          receive(:foreach)
-                    .with('requirements.txt').and_raise(Errno::ENOENT.new('requirements.txt'))
-        )
-      end
+      # A path inside the fixture dir that was never written, so the real
+      # File.foreach raises ENOENT instead of a stub simulating it.
+      def requirements_path = File.join(fixture_dir, 'gone', 'requirements.txt')
 
       it 'surfaces Errno::ENOENT' do
-        expect { parser.parse('requirements.txt', packages) }
+        expect { parser.parse(requirements_path, packages) }
           .to(raise_error(Errno::ENOENT))
       end
     end
 
-    # TEST-12 follow-up: parser exercised against a real requirements.txt
-    # via SoupFixtureHelpers. Stubs the .in / foreach defaults from the outer
-    # before are bypassed via and_call_original so real File.foreach reads
-    # the tmpdir fixture.
-    context 'with a real requirements.txt fixture on disk' do
+    # TEST-12: a requirements.txt mixing pins, comments and blank lines.
+    context 'with pins mixed among comments and blank lines' do
       before do
-        allow(File).to(receive(:exist?).and_call_original)
-        allow(File).to(receive(:foreach).and_call_original)
         body = {
           info: {
             summary: 'HTTP library',
@@ -362,9 +324,10 @@ RSpec.describe(SOUP::PIPParser) do
           .to_return(status: 200, body: body)
       end
 
+      let(:requirements_content) { "# top-level comment\nrequests==2.31.0\n\n" }
+
       it 'reads pinned requirements from disk and skips comments/blanks' do
-        lockfile_path = write_fixture('requirements.txt', "# top-level comment\nrequests==2.31.0\n\n")
-        parser.parse(lockfile_path, packages)
+        parser.parse(requirements_path, packages)
         expect(packages['requests']).to(have_attributes(language: 'Python', version: '2.31.0'))
       end
     end
@@ -395,7 +358,7 @@ RSpec.describe(SOUP::PIPParser) do
 
     it 'parses all 100 requirements without raising and adds them to the hash', :aggregate_failures do
       packages = {}
-      parser.parse('requirements.txt', packages)
+      parser.parse(requirements_path, packages)
       expect(packages.size).to(eq(100))
       expect(packages['pkg-1']).to(have_attributes(language: 'Python', version: '1.0.0'))
       expect(packages['pkg-100']).to(have_attributes(language: 'Python', version: '1.0.0'))
