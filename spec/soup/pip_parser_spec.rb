@@ -57,11 +57,11 @@ RSpec.describe(SOUP::PIPParser) do
 
   context 'when parsing all three packages' do
     before do
-      stub_request(:get, 'https://pypi.python.org/pypi/requests/json')
+      stub_request(:get, 'https://pypi.org/pypi/requests/json')
         .to_return(status: 200, body: requests_response)
-      stub_request(:get, 'https://pypi.python.org/pypi/flask/json')
+      stub_request(:get, 'https://pypi.org/pypi/flask/json')
         .to_return(status: 200, body: flask_response)
-      stub_request(:get, 'https://pypi.python.org/pypi/boto3/json')
+      stub_request(:get, 'https://pypi.org/pypi/boto3/json')
         .to_return(status: 200, body: boto3_response)
     end
 
@@ -84,7 +84,7 @@ RSpec.describe(SOUP::PIPParser) do
 
     it 'strips extras brackets from package name in URL' do
       packages
-      expect(a_request(:get, 'https://pypi.python.org/pypi/boto3/json')).to(have_been_made)
+      expect(a_request(:get, 'https://pypi.org/pypi/boto3/json')).to(have_been_made)
     end
 
     it 'extracts license from classifiers first' do
@@ -110,9 +110,9 @@ RSpec.describe(SOUP::PIPParser) do
       "requests==2.31.0\nflask==3.0.0\n".lines.each { |line| foreach_stub.and_yield(line) }
       allow(File).to(foreach_stub)
 
-      stub_request(:get, 'https://pypi.python.org/pypi/requests/json')
+      stub_request(:get, 'https://pypi.org/pypi/requests/json')
         .to_return(status: 200, body: requests_response)
-      stub_request(:get, 'https://pypi.python.org/pypi/flask/json')
+      stub_request(:get, 'https://pypi.org/pypi/flask/json')
         .to_return(status: 200, body: flask_response)
     end
 
@@ -137,7 +137,7 @@ RSpec.describe(SOUP::PIPParser) do
       "requests==2.31.0\n".lines.each { |line| foreach_stub.and_yield(line) }
       allow(File).to(foreach_stub)
 
-      stub_request(:get, 'https://pypi.python.org/pypi/requests/json')
+      stub_request(:get, 'https://pypi.org/pypi/requests/json')
         .to_return(status: 200, body: requests_response)
     end
 
@@ -160,7 +160,7 @@ RSpec.describe(SOUP::PIPParser) do
       "flask-login==0.6.3\n".lines.each { |line| foreach_stub.and_yield(line) }
       allow(File).to(foreach_stub)
 
-      stub_request(:get, 'https://pypi.python.org/pypi/flask-login/json')
+      stub_request(:get, 'https://pypi.org/pypi/flask-login/json')
         .to_return(status: 200, body: flask_response)
     end
 
@@ -185,7 +185,7 @@ RSpec.describe(SOUP::PIPParser) do
 
     before do
       allow(File).to(receive(:foreach).with('requirements.txt').and_yield("simple==1.0.0\n"))
-      stub_request(:get, 'https://pypi.python.org/pypi/simple/json')
+      stub_request(:get, 'https://pypi.org/pypi/simple/json')
         .to_return(status: 200, body: nil_homepage_response)
     end
 
@@ -193,6 +193,28 @@ RSpec.describe(SOUP::PIPParser) do
       packages = {}
       parser.parse('requirements.txt', packages)
       expect(packages['simple'].website).to(be_nil)
+    end
+  end
+
+  # QUAL-003 regression: pypi.python.org was retired in April 2018 and only
+  # answers through a permanent 301 to pypi.org, costing an extra round-trip per
+  # package against the HTTP timeout. Both domains are stubbed here so the
+  # expectation fails on a revert instead of merely erroring on an unregistered
+  # request.
+  context 'when resolving the PyPI registry host' do
+    before do
+      allow(File).to(receive(:foreach).with('requirements.txt').and_yield("requests==2.31.0\n"))
+      stub_request(:get, 'https://pypi.org/pypi/requests/json')
+        .to_return(status: 200, body: requests_response)
+      stub_request(:get, 'https://pypi.python.org/pypi/requests/json')
+        .to_return(status: 200, body: requests_response)
+    end
+
+    it 'queries pypi.org and never the retired pypi.python.org domain', :aggregate_failures do
+      packages = {}
+      parser.parse('requirements.txt', packages)
+      expect(a_request(:get, 'https://pypi.org/pypi/requests/json')).to(have_been_made)
+      expect(a_request(:get, 'https://pypi.python.org/pypi/requests/json')).not_to(have_been_made)
     end
   end
 
@@ -210,7 +232,7 @@ RSpec.describe(SOUP::PIPParser) do
       packages = {}
       expect { parser.parse('requirements.txt', packages) }
         .to(output(/only exact `==` version pins are supported/).to_stderr)
-      expect(WebMock).not_to(have_requested(:get, /pypi\.python\.org/))
+      expect(WebMock).not_to(have_requested(:get, /pypi\.org/))
       expect(packages).to(be_empty)
     end
   end
@@ -227,9 +249,9 @@ RSpec.describe(SOUP::PIPParser) do
                          .and_yield("requests==2.31.0  # security pin\n")
                          .and_yield("flask==3.0.0  # pinned for CVE\n")
       )
-      stub_request(:get, 'https://pypi.python.org/pypi/requests/json')
+      stub_request(:get, 'https://pypi.org/pypi/requests/json')
         .to_return(status: 200, body: requests_response)
-      stub_request(:get, 'https://pypi.python.org/pypi/flask/json')
+      stub_request(:get, 'https://pypi.org/pypi/flask/json')
         .to_return(status: 200, body: flask_response)
     end
 
@@ -256,7 +278,7 @@ RSpec.describe(SOUP::PIPParser) do
 
     before do
       allow(File).to(receive(:foreach).with('requirements.txt').and_yield("pkg==1.0.0\n"))
-      stub_request(:get, 'https://pypi.python.org/pypi/pkg/json')
+      stub_request(:get, 'https://pypi.org/pypi/pkg/json')
         .to_return(status: 200, body: empty_license_response)
     end
 
@@ -336,7 +358,7 @@ RSpec.describe(SOUP::PIPParser) do
             license: ''
           }
         }.to_json
-        stub_request(:get, 'https://pypi.python.org/pypi/requests/json')
+        stub_request(:get, 'https://pypi.org/pypi/requests/json')
           .to_return(status: 200, body: body)
       end
 
@@ -367,7 +389,7 @@ RSpec.describe(SOUP::PIPParser) do
             license: ''
           }
         }.to_json
-        stub_request(:get, "https://pypi.python.org/pypi/pkg-#{i}/json").to_return(status: 200, body: body)
+        stub_request(:get, "https://pypi.org/pypi/pkg-#{i}/json").to_return(status: 200, body: body)
       end
     end
 
