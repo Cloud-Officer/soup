@@ -108,12 +108,10 @@ module SOUP
             next
           end
 
-          # Skip-flag and nil-parser guards come BEFORE the "Reading file" announce
-          # so the user never sees "Reading file X..." for a file that is then
-          # silently dropped (e.g. --skip_yarn, or Podfile.lock whose registry
-          # entry maps to a nil parser).
+          # The skip-flag guard comes BEFORE the "Reading file" announce so the
+          # user never sees "Reading file X..." for a file that is then silently
+          # dropped (e.g. --skip_yarn).
           next if @options.public_send(config[:skip])
-          next if config[:parser].nil?
 
           puts("Reading file #{file}...")
           generic_parser.parse(config[:parser].new, file, @detected_packages)
