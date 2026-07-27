@@ -150,6 +150,26 @@ RSpec.describe(SOUP::Application) do
     '{"require":{"valid/pkg":"^1.0","bad/pkg":"^2.0","excepted-pkg":"^3.0","noassert/pkg":"^4.0"}}'
   end
 
+  # COM-001 regression: detect_packages used to carry a `next if
+  # config[:parser].nil?` guard justified by a Podfile.lock entry that no longer
+  # exists in the registry. The guard was removed as dead code, which is only
+  # safe while every entry maps to a concrete parser: a nil placeholder would
+  # now blow up on `config[:parser].new`. These examples lock that invariant in,
+  # so reintroducing a nil entry fails here instead of at runtime. The registry
+  # is private_constant, hence the module_eval reach-in.
+  describe 'PARSER_REGISTRY' do
+    subject(:registry) { SOUP.module_eval('PARSER_REGISTRY', __FILE__, __LINE__) }
+
+    it 'maps every package file to a concrete parser class, never nil' do
+      expect(registry.reject { |_file, config| config[:parser].is_a?(Class) }).to(be_empty)
+    end
+
+    it 'names a skip option that Options actually defines for every entry' do
+      options = SOUP::Options.new(['--licenses', '--licenses_file', licenses_file.path, '--exceptions_file', exceptions_file.path]).parse
+      expect(registry.reject { |_file, config| options.respond_to?(config[:skip]) }).to(be_empty)
+    end
+  end
+
   describe '#execute' do
     it 'runs successfully with --licenses only and no detected packages' do
       app = described_class.new(licenses_args)
