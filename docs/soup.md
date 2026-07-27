@@ -10,7 +10,7 @@
 | Ruby | concurrent-ruby | 1.3.8 | MIT | Modern concurrency tools including agents, futures, promises, thread pools, actors, supervisors, and more. | <http://www.concurrent-ruby.com> | 2026-05-22 | Low | Dependency | Dependency |
 | Ruby | connection_pool | 3.0.2 | MIT | Generic connection pool for Ruby | <https://github.com/mperham/connection_pool> | 2026-05-22 | Low | Dependency | Dependency |
 | Ruby | crack | 1.0.1 | MIT | Really simple JSON and XML parsing, ripped from Merb and Rails. | <https://github.com/jnunemaker/crack> | 2026-05-22 | Low | Dependency | Dependency |
-| Ruby | csv | 3.3.5 | Ruby | The CSV library provides a complete interface to CSV files and data | <https://github.com/ruby/csv> | 2026-05-22 | Low | Dependency | Dependency |
+| Ruby | csv | 3.3.6 | Ruby | The CSV library provides a complete interface to CSV files and data | <https://github.com/ruby/csv> | 2026-05-22 | Low | Dependency | Dependency |
 | Ruby | diff-lcs | 1.6.2 | MIT | Diff::LCS computes the difference between two Enumerable sequences using the | <https://github.com/halostatue/diff-lcs> | 2026-05-22 | Low | Dependency | Dependency |
 | Ruby | drb | 2.2.3 | Ruby | Distributed object system for Ruby | <https://github.com/ruby/drb> | 2026-05-22 | Low | Dependency | Dependency |
 | Ruby | hashdiff | 1.2.1 | MIT | Hashdiff is a diff lib to compute the smallest difference between two hashes | <https://github.com/liufengyun/hashdiff> | 2026-05-22 | Low | Dependency | Dependency |
@@ -49,7 +49,7 @@
 | Ruby | rubocop-thread_safety | 0.7.3 | MIT | Thread-safety checks via static analysis. | <https://github.com/rubocop/rubocop-thread_safety> | 2026-05-22 | Low | Ruby linter | Most popular gem |
 | Ruby | ruby-progressbar | 1.13.0 | MIT | Ruby/ProgressBar is an extremely flexible text progress bar library for Ruby | <https://github.com/jfelchner/ruby-progressbar> | 2026-05-22 | Low | Dependency | Dependency |
 | Ruby | securerandom | 0.4.1 | Ruby | Interface for secure random number generator. | <https://github.com/ruby/securerandom> | 2026-05-22 | Low | Dependency | Dependency |
-| Ruby | simplecov | 1.0.2 | MIT | Code coverage for Ruby with a powerful configuration library and automatic merging of coverage across test suites | <https://github.com/simplecov-ruby/simplecov> | 2026-05-22 | Low | Dependency | Dependency |
+| Ruby | simplecov | 1.0.3 | MIT | Code coverage for Ruby with a powerful configuration library and automatic merging of coverage across test suites | <https://github.com/simplecov-ruby/simplecov> | 2026-05-22 | Low | Dependency | Dependency |
 | Ruby | tty-color | 0.6.0 | MIT | Terminal color capabilities detection | <https://ttytoolkit.org> | 2026-05-22 | Low | Dependency | Dependency |
 | Ruby | tty-cursor | 0.7.1 | MIT | The purpose of this library is to help move the terminal cursor around and manipulate text by using intuitive method calls. | <https://ttytoolkit.org> | 2026-05-22 | Low | Dependency | Dependency |
 | Ruby | tty-prompt | 0.23.1 | MIT | A beautiful and powerful interactive command line prompt with a robust API for getting and validating complex inputs. | <https://ttytoolkit.org> | 2026-05-22 | Low | Prompt for TTY | Most popular on RubyGem |
