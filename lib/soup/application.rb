@@ -21,9 +21,10 @@ require_relative 'parsers/spm'
 require_relative 'parsers/yarn'
 require_relative 'status'
 
-DEPENDENCY_TEXT = 'Dependency'
-
 module SOUP
+  DEPENDENCY_TEXT = 'Dependency'
+  private_constant :DEPENDENCY_TEXT
+
   PARSER_REGISTRY = {
     'buildscript-gradle.lockfile': { parser: GradleParser, skip: :skip_gradle },
     'composer.lock': { parser: ComposerParser, skip: :skip_composer },

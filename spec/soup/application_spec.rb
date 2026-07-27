@@ -153,6 +153,24 @@ RSpec.describe(SOUP::Application) do
     '{"require":{"valid/pkg":"^1.0","bad/pkg":"^2.0","excepted-pkg":"^3.0","noassert/pkg":"^4.0"}}'
   end
 
+  # CONS-006 regression: DEPENDENCY_TEXT used to be defined at the top level of
+  # application.rb, so merely requiring soup leaked ::DEPENDENCY_TEXT into the
+  # host program's Object namespace. It is now module-scoped and private, like
+  # PARSER_REGISTRY below. The value itself stays covered by the markdown-output
+  # example that asserts a transitive package renders "Dependency".
+  describe 'DEPENDENCY_TEXT' do
+    it 'does not leak into the global Object namespace' do
+      expect(Object.const_defined?(:DEPENDENCY_TEXT)).to(be(false))
+    end
+
+    # Qualified access is what private_constant actually guards; Module#const_get
+    # deliberately bypasses it, so asserting on const_get would pass either way.
+    it 'is private on SOUP rather than publicly reachable' do
+      expect { SOUP::DEPENDENCY_TEXT.to_s }
+        .to(raise_error(NameError, /private constant/))
+    end
+  end
+
   # COM-001 regression: detect_packages used to carry a `next if
   # config[:parser].nil?` guard justified by a Podfile.lock entry that no longer
   # exists in the registry. The guard was removed as dead code, which is only
