@@ -39,7 +39,7 @@ The following package managers are supported:
 * SPM (Package.resolved)
 * Yarn (yarn.lock)
 
-Note: CocoaPods (`Podfile.lock`) support was removed pending upstream compatibility. The `cocoapods-core` gem requires `activesupport < 8`, which is incompatible with the ActiveSupport version this project depends on. `Podfile.lock` files are currently skipped silently; support will be reinstated once `cocoapods-core` upgrades.
+Note: CocoaPods (`Podfile.lock`) support is not currently implemented, so `Podfile.lock` files are skipped silently. It was originally removed because `cocoapods-core` requires `activesupport < 8` while this project declared `activesupport >= 7.1.0`. That unused declaration has since been dropped, so the version conflict no longer applies; reinstating CocoaPods support is tracked separately.
 
 For Rails projects using importmap-rails, each `pin '<name>', to: '<https…>'` in `config/importmap.rb` is treated as a
 third-party JavaScript SOUP entry; its npm package and version are derived from the CDN URL and looked up on the npm

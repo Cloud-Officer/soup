@@ -2,9 +2,8 @@
 
 source 'https://rubygems.org'
 
-gem 'activesupport', '>= 7.1.0'
 gem 'bundler', '>= 2.3.0'
-# gem 'cocoapods', '>= 1.14.0' # Disabled: requires activesupport < 8
+# gem 'cocoapods', '>= 1.14.0' # Not implemented; its activesupport < 8 pin no longer conflicts
 gem 'httparty', '>= 0.20.0'
 gem 'json', '>= 2.6.0'
 gem 'nokogiri', '>= 1.16.0'
