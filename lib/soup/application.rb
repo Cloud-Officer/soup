@@ -67,12 +67,33 @@ module SOUP
       [@options.licenses_file, @options.exceptions_file].each do |file|
         raise(ConfigurationError, "Configuration file not found: #{file}") unless File.exist?(file)
 
-        begin
-          JSON.parse(File.read(file))
-        rescue JSON::ParserError => e
-          raise(ConfigurationError, "Invalid JSON in configuration file #{file}: #{e.message}")
-        end
+        validate_json!(file)
       end
+
+      validate_cache_file!
+    end
+
+    # The cache is optional -- absent on a first run -- so it is only checked
+    # when it exists and when --soup will actually read it.
+    #
+    # It is validated HERE rather than in read_cached_packages because by that
+    # point detect_packages has already populated @detected_packages. A parse
+    # error raised there escapes through the ensure-block save, which then
+    # rewrites .soup.json with metadata-less entries and blanks docs/soup.md --
+    # silently discarding previously entered IEC 62304 risk, requirements and
+    # verification reasoning. Failing before any state exists lets save_files'
+    # empty-state guard keep both files untouched.
+    def validate_cache_file!
+      return unless @options.soup_check
+      return unless File.exist?(@options.cache_file)
+
+      validate_json!(@options.cache_file, label: 'cache file')
+    end
+
+    def validate_json!(file, label: 'configuration file')
+      JSON.parse(File.read(file))
+    rescue JSON::ParserError => e
+      raise(ConfigurationError, "Invalid JSON in #{label} #{file}: #{e.message}")
     end
 
     def markdown_cell(value)
