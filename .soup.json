@@ -1,16 +1,4 @@
 {
-  "activesupport": {
-    "language": "Ruby",
-    "package": "activesupport",
-    "version": "8.1.3",
-    "license": "MIT",
-    "description": "A toolkit of support libraries and Ruby core extensions extracted from the Rails framework",
-    "website": "https://rubyonrails.org",
-    "last_verified_at": "2026-05-22",
-    "risk_level": "Low",
-    "requirements": "Dependency",
-    "verification_reasoning": "Dependency"
-  },
   "addressable": {
     "language": "Ruby",
     "package": "addressable",
@@ -35,18 +23,6 @@
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
   },
-  "base64": {
-    "language": "Ruby",
-    "package": "base64",
-    "version": "0.3.0",
-    "license": "Ruby",
-    "description": "Support for encoding and decoding binary data using a Base64 representation.",
-    "website": "https://github.com/ruby/base64",
-    "last_verified_at": "2026-05-22",
-    "risk_level": "Low",
-    "requirements": "Dependency",
-    "verification_reasoning": "Dependency"
-  },
   "bigdecimal": {
     "language": "Ruby",
     "package": "bigdecimal",
@@ -54,30 +30,6 @@
     "license": "Ruby",
     "description": "This library provides arbitrary-precision decimal floating-point number class.",
     "website": "https://github.com/ruby/bigdecimal",
-    "last_verified_at": "2026-05-22",
-    "risk_level": "Low",
-    "requirements": "Dependency",
-    "verification_reasoning": "Dependency"
-  },
-  "concurrent-ruby": {
-    "language": "Ruby",
-    "package": "concurrent-ruby",
-    "version": "1.3.8",
-    "license": "MIT",
-    "description": "Modern concurrency tools including agents, futures, promises, thread pools, actors, supervisors, and more.",
-    "website": "http://www.concurrent-ruby.com",
-    "last_verified_at": "2026-05-22",
-    "risk_level": "Low",
-    "requirements": "Dependency",
-    "verification_reasoning": "Dependency"
-  },
-  "connection_pool": {
-    "language": "Ruby",
-    "package": "connection_pool",
-    "version": "3.0.2",
-    "license": "MIT",
-    "description": "Generic connection pool for Ruby",
-    "website": "https://github.com/mperham/connection_pool",
     "last_verified_at": "2026-05-22",
     "risk_level": "Low",
     "requirements": "Dependency",
@@ -119,18 +71,6 @@
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
   },
-  "drb": {
-    "language": "Ruby",
-    "package": "drb",
-    "version": "2.2.3",
-    "license": "Ruby",
-    "description": "Distributed object system for Ruby",
-    "website": "https://github.com/ruby/drb",
-    "last_verified_at": "2026-05-22",
-    "risk_level": "Low",
-    "requirements": "Dependency",
-    "verification_reasoning": "Dependency"
-  },
   "hashdiff": {
     "language": "Ruby",
     "package": "hashdiff",
@@ -154,18 +94,6 @@
     "risk_level": "Medium",
     "requirements": "Makes http fun! Also, makes consuming restful web services dead easy.",
     "verification_reasoning": "Very popular on rubygems.org"
-  },
-  "i18n": {
-    "language": "Ruby",
-    "package": "i18n",
-    "version": "1.15.2",
-    "license": "MIT",
-    "description": "New wave Internationalization support for Ruby.",
-    "website": "https://github.com/ruby-i18n/i18n",
-    "last_verified_at": "2026-05-22",
-    "risk_level": "Low",
-    "requirements": "Dependency",
-    "verification_reasoning": "Dependency"
   },
   "json": {
     "language": "Ruby",
@@ -203,18 +131,6 @@
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
   },
-  "logger": {
-    "language": "Ruby",
-    "package": "logger",
-    "version": "1.7.0",
-    "license": "Ruby",
-    "description": "Provides a simple logging utility for outputting messages.",
-    "website": "https://github.com/ruby/logger",
-    "last_verified_at": "2026-05-22",
-    "risk_level": "Low",
-    "requirements": "Dependency",
-    "verification_reasoning": "Dependency"
-  },
   "mini_mime": {
     "language": "Ruby",
     "package": "mini_mime",
@@ -222,18 +138,6 @@
     "license": "MIT",
     "description": "A minimal mime type library",
     "website": "https://github.com/discourse/mini_mime",
-    "last_verified_at": "2026-05-22",
-    "risk_level": "Low",
-    "requirements": "Dependency",
-    "verification_reasoning": "Dependency"
-  },
-  "minitest": {
-    "language": "Ruby",
-    "package": "minitest",
-    "version": "6.0.6",
-    "license": "MIT",
-    "description": "minitest provides a complete suite of testing facilities supporting",
-    "website": "https://minite.st/",
     "last_verified_at": "2026-05-22",
     "risk_level": "Low",
     "requirements": "Dependency",
@@ -551,18 +455,6 @@
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
   },
-  "securerandom": {
-    "language": "Ruby",
-    "package": "securerandom",
-    "version": "0.4.1",
-    "license": "Ruby",
-    "description": "Interface for secure random number generator.",
-    "website": "https://github.com/ruby/securerandom",
-    "last_verified_at": "2026-05-22",
-    "risk_level": "Low",
-    "requirements": "Dependency",
-    "verification_reasoning": "Dependency"
-  },
   "simplecov": {
     "language": "Ruby",
     "package": "simplecov",
@@ -635,18 +527,6 @@
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
   },
-  "tzinfo": {
-    "language": "Ruby",
-    "package": "tzinfo",
-    "version": "2.0.6",
-    "license": "MIT",
-    "description": "TZInfo provides access to time zone data and allows times to be converted using time zone rules.",
-    "website": "https://tzinfo.github.io",
-    "last_verified_at": "2026-05-22",
-    "risk_level": "Low",
-    "requirements": "Dependency",
-    "verification_reasoning": "Dependency"
-  },
   "unicode-display_width": {
     "language": "Ruby",
     "package": "unicode-display_width",
@@ -666,18 +546,6 @@
     "license": "MIT",
     "description": "[Emoji 17.0] Provides Unicode Emoji data and regexes, incorporating the latest Unicode and Emoji standards",
     "website": "https://github.com/janlelis/unicode-emoji",
-    "last_verified_at": "2026-05-22",
-    "risk_level": "Low",
-    "requirements": "Dependency",
-    "verification_reasoning": "Dependency"
-  },
-  "uri": {
-    "language": "Ruby",
-    "package": "uri",
-    "version": "1.1.1",
-    "license": "Ruby",
-    "description": "URI is a module providing classes to handle Uniform Resource Identifiers",
-    "website": "https://github.com/ruby/uri",
     "last_verified_at": "2026-05-22",
     "risk_level": "Low",
     "requirements": "Dependency",
