@@ -305,6 +305,37 @@ RSpec.describe(SOUP::Application) do
       end
     end
 
+    # CFG-001: the cache was the only JSON input not validated at startup.
+    # read_cached_packages parsed it AFTER detect_packages had populated
+    # @detected_packages, so a raw JSON::ParserError escaped through the
+    # ensure-block save -- rewriting .soup.json with metadata-less entries and
+    # blanking docs/soup.md, discarding previously entered IEC 62304 risk,
+    # requirements and verification reasoning. Composer is stubbed here so
+    # detection genuinely populates state; without the fix save_files' empty
+    # -state guard would not fire and both files would be clobbered.
+    context 'when the cache file has invalid JSON' do
+      def corrupt_cache = '{"existing/pkg": {"version": "1.0.0"'
+
+      def existing_markdown = "# Existing SOUP\n"
+
+      before do
+        stub_composer_files(default_composer_lock, default_composer_json)
+        write_existing_soup_files(corrupt_cache, existing_markdown)
+      end
+
+      it 'raises a ConfigurationError naming the cache file' do
+        expect { described_class.new(soup_args(skip: skip_parsers_except_composer)).execute }
+          .to(raise_error(SOUP::ConfigurationError, /Invalid JSON in cache file/))
+      end
+
+      it 'leaves the existing cache and markdown untouched', :aggregate_failures do
+        expect { described_class.new(soup_args(skip: skip_parsers_except_composer)).execute }
+          .to(raise_error(SOUP::ConfigurationError))
+        expect(File.read(cache_file.path)).to(eq(corrupt_cache))
+        expect(File.read(markdown_file)).to(eq(existing_markdown))
+      end
+    end
+
     context 'when config file has invalid JSON' do
       let(:bad_file) do
         file = Tempfile.new(['bad', '.json'])
