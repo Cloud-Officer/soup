@@ -33,6 +33,43 @@ RSpec.describe(SOUP::Application) do
     %w[--skip_bundler --skip_gradle --skip_npm --skip_pip --skip_spm --skip_yarn]
   end
 
+  def skip_parsers_except_pip
+    %w[--skip_bundler --skip_composer --skip_gradle --skip_npm --skip_spm --skip_yarn]
+  end
+
+  # Point detect_packages at a real requirements.txt whose registry lookup 404s,
+  # so the PIP parser produces an unresolved package entry.
+  def stub_unresolved_pip_package
+    requirements = write_fixture('requirements.txt', "requests==2.31.0\n")
+    allow(Dir).to(receive(:glob).and_return([]))
+    allow(Dir).to(receive(:glob).with("#{Dir.pwd}/**/requirements.txt").and_return([requirements]))
+    stub_request(:get, 'https://pypi.org/pypi/requests/json').to_return(status: 404, body: 'Not Found')
+  end
+
+  def cached_requests_entry(version:)
+    {
+      requests: {
+        language: 'Python',
+        package: 'requests',
+        version: version,
+        license: 'Apache Software License',
+        description: 'HTTP for humans',
+        website: 'https://requests.readthedocs.io',
+        last_verified_at: '2026-01-01',
+        risk_level: 'Low',
+        requirements: 'Cached requirements',
+        verification_reasoning: 'Cached reasoning'
+      }
+    }.to_json
+  end
+
+  # Runs a --soup scan over the stubbed requirements.txt and returns the entry
+  # save_files wrote back to .soup.json.
+  def scan_and_read_cached_requests
+    described_class.new(soup_args(skip: skip_parsers_except_pip)).execute
+    JSON.parse(File.read(cache_file.path))['requests']
+  end
+
   def licenses_args(extra: [], skip: skip_all_parsers)
     ['--licenses', '--licenses_file', licenses_file.path, '--exceptions_file', exceptions_file.path] + extra + skip
   end
@@ -188,6 +225,34 @@ RSpec.describe(SOUP::Application) do
     it 'names a skip option that Options actually defines for every entry' do
       options = SOUP::Options.new(['--licenses', '--licenses_file', licenses_file.path, '--exceptions_file', exceptions_file.path]).parse
       expect(registry.reject { |_file, config| options.respond_to?(config[:skip]) }).to(be_empty)
+    end
+  end
+
+  # CONS-001: a package whose registry lookup fails is still recorded, so the
+  # register enumerates every component. When a previous run resolved it, that
+  # metadata is restored rather than downgraded to NOASSERTION.
+  describe 'unresolved packages' do
+    before { stub_unresolved_pip_package }
+
+    it 'records the package with NOASSERTION when nothing was cached', :aggregate_failures do
+      entry = scan_and_read_cached_requests
+      expect(entry['license']).to(eq('NOASSERTION'))
+      expect(entry['version']).to(eq('2.31.0'))
+    end
+
+    it 'restores license, description and website from a same-version cache entry', :aggregate_failures do
+      File.write(cache_file.path, cached_requests_entry(version: '2.31.0'))
+      entry = scan_and_read_cached_requests
+      expect(entry['license']).to(eq('Apache Software License'))
+      expect(entry['description']).to(eq('HTTP for humans'))
+      expect(entry['website']).to(eq('https://requests.readthedocs.io'))
+    end
+
+    # Licenses change between releases, so an older version's metadata must not
+    # be carried onto a newly pinned one.
+    it 'does not restore metadata cached against a different version' do
+      File.write(cache_file.path, cached_requests_entry(version: '1.0.0'))
+      expect(scan_and_read_cached_requests['license']).to(eq('NOASSERTION'))
     end
   end
 

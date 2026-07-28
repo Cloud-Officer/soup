@@ -68,10 +68,11 @@ RSpec.describe(SOUP::NPMParser) do
         .to_return(status: 404, body: 'Not Found')
     end
 
-    it 'skips on non-200 response' do
+    it 'records the package as unresolved rather than dropping it', :aggregate_failures do
       packages = {}
       parser.parse(lockfile_path, packages)
-      expect(packages).to(be_empty)
+      expect(packages['lodash']).to(have_attributes(version: '4.17.21', language: 'JS', license: 'NOASSERTION'))
+      expect(packages['lodash'].unresolved).to(be(true))
     end
   end
 
@@ -89,9 +90,9 @@ RSpec.describe(SOUP::NPMParser) do
         .to(output(/Aborting after \d+ retries/).to_stderr)
     end
 
-    it 'retries max_retries+1 times before skipping the package', :aggregate_failures do
+    it 'retries max_retries+1 times before recording the package as unresolved', :aggregate_failures do
       parser.parse(lockfile_path, packages)
-      expect(packages).to(be_empty)
+      expect(packages['lodash']).to(have_attributes(version: '4.17.21', license: 'NOASSERTION'))
       expect(a_request(:get, url)).to(have_been_made.times(SOUP::HttpClient.max_retries + 1))
     end
 
@@ -136,10 +137,11 @@ RSpec.describe(SOUP::NPMParser) do
         .to_return(status: 200, body: { versions: {} }.to_json)
     end
 
-    it 'handles version not found in registry' do
+    it 'records the package as unresolved when its version is absent', :aggregate_failures do
       packages = {}
       parser.parse(lockfile_path, packages)
-      expect(packages).to(be_empty)
+      expect(packages['lodash']).to(have_attributes(version: '4.17.21', license: 'NOASSERTION'))
+      expect(packages['lodash'].unresolved).to(be(true))
     end
   end
 
@@ -149,11 +151,12 @@ RSpec.describe(SOUP::NPMParser) do
         .to_return(status: 200, body: { _id: 'lodash', name: 'lodash', time: {} }.to_json)
     end
 
-    it 'handles unpublished or stub-only packages without raising', :aggregate_failures do
+    it 'records unpublished or stub-only packages without raising', :aggregate_failures do
       packages = {}
       expect { parser.parse(lockfile_path, packages) }
         .not_to(raise_error)
-      expect(packages).to(be_empty)
+      expect(packages['lodash']).to(have_attributes(license: 'NOASSERTION'))
+      expect(packages['lodash'].unresolved).to(be(true))
     end
   end
 

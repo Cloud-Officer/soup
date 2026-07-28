@@ -57,10 +57,11 @@ RSpec.describe(SOUP::SPMParser) do
 
     before { stub_request(:get, 'https://api.github.com/repos/Alamofire/Alamofire').to_timeout }
 
-    it 'skips the pin instead of aborting the scan', :aggregate_failures do
+    it 'records the pin as unresolved instead of aborting the scan', :aggregate_failures do
       expect { parser.parse(lockfile_path, packages) }
         .not_to(raise_error)
-      expect(packages).to(be_empty)
+      expect(packages['alamofire']).to(have_attributes(version: '5.9.0', language: 'Swift', license: 'NOASSERTION'))
+      expect(packages['alamofire'].unresolved).to(be(true))
     end
 
     it 'names the pin in the skip warning' do
@@ -165,10 +166,15 @@ RSpec.describe(SOUP::SPMParser) do
         .to_return(status: 200, body: private_response)
     end
 
-    it 'skips private repositories' do
+    # CONS-001: a private repository is still a SOUP component. The lookup
+    # succeeded, so it is recorded with the real metadata rather than dropped --
+    # and it is NOT marked unresolved, because nothing failed.
+    it 'records private repositories with the metadata GitHub returned', :aggregate_failures do
       packages = {}
-      parser.parse(lockfile_path, packages)
-      expect(packages).to(be_empty)
+      expect { parser.parse(lockfile_path, packages) }
+        .to(output(/private repository/).to_stderr)
+      expect(packages).not_to(be_empty)
+      expect(packages.values.first.unresolved).to(be(false))
     end
   end
 
@@ -205,10 +211,11 @@ RSpec.describe(SOUP::SPMParser) do
         .to_return(status: [404, 'Not Found'], body: '{}')
     end
 
-    it 'skips non-200 responses' do
+    it 'records the pin as unresolved on a non-200 response', :aggregate_failures do
       packages = {}
       parser.parse(lockfile_path, packages)
-      expect(packages).to(be_empty)
+      expect(packages['alamofire']).to(have_attributes(language: 'Swift', license: 'NOASSERTION'))
+      expect(packages['alamofire'].unresolved).to(be(true))
     end
   end
 
@@ -370,11 +377,12 @@ RSpec.describe(SOUP::SPMParser) do
         .to_return(status: [502, 'Bad Gateway'], body: '<html>upstream timeout</html>')
     end
 
-    it 'warns with status + url + package context and omits the package', :aggregate_failures do
+    it 'warns with status + url + package context and records the pin', :aggregate_failures do
       packages = {}
       expect { parser.parse(lockfile_path, packages) }
         .to(output(%r{HTTP 502 .*package=alamofire.*url=https://api\.github\.com/repos/Alamofire/Alamofire.*body=<html>upstream timeout</html>}m).to_stderr)
-      expect(packages).to(be_empty)
+      expect(packages['alamofire']).to(have_attributes(license: 'NOASSERTION'))
+      expect(packages['alamofire'].unresolved).to(be(true))
     end
   end
 

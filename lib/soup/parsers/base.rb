@@ -44,6 +44,33 @@ module SOUP
       package
     end
 
+    # Record a package whose registry lookup failed -- a timeout, a 404 for a
+    # package that is simply not in the public registry, or a 403 for a private
+    # one. A SOUP register must enumerate every component, so a failed lookup is
+    # a metadata gap, not evidence the dependency is absent: dropping the entry
+    # would understate the register, and aborting the run would discard every
+    # other package resolved so far.
+    #
+    # The entry carries everything the lockfile already told us (name, version,
+    # direct/transitive) and marks the license NOASSERTION, which
+    # Application#validate_license reports without failing the build. When a
+    # previous run resolved this package, Application restores the richer
+    # metadata from .soup.json, so a transient outage never blanks the register.
+    def unresolved_package(name:, file:, language:, version:, dependency:)
+      package = build_package(
+        name: name,
+        file: file,
+        language: language,
+        version: version,
+        license: NOASSERTION_LICENSE,
+        description: nil,
+        website: nil,
+        dependency: dependency
+      )
+      package.unresolved = true
+      package
+    end
+
     def normalize_license(license)
       return license if license.nil?
       return license if license.respond_to?(:empty?) && license.empty?
@@ -90,14 +117,14 @@ module SOUP
       versions = payload['versions']
 
       if versions.nil?
-        warn("Skipping #{name}@#{version}: registry response has no versions key; package omitted from SOUP")
+        warn("Skipping #{name}@#{version}: registry response has no versions key; recorded without registry metadata")
         return
       end
 
       package_details = versions[version]
 
       if package_details.nil?
-        warn("Skipping #{name}@#{version}: version not present in registry; package omitted from SOUP")
+        warn("Skipping #{name}@#{version}: version not present in registry; recorded without registry metadata")
         return
       end
 
@@ -130,13 +157,15 @@ module SOUP
     #
     # `label` names what is being skipped: the package for the single-source
     # parsers, the URL itself for gradle's mirror loop. `outcome` states what
-    # happens next, because a timeout omits the package for most parsers but for
-    # gradle only advances to the next repository -- claiming omission there
-    # would be false whenever a later mirror resolves the coordinate.
+    # happens next, because most parsers record the package without registry
+    # metadata while gradle only advances to the next repository -- claiming
+    # either outcome for the other would be false.
     #
-    # Deliberately stops short of the non-200 branch: the parsers disagree on
-    # whether that warns-and-skips or raises, and unifying it is CONS-001.
-    def registry_response(url, label:, outcome: 'package omitted from SOUP', **)
+    # A nil return and a non-200 are handled the same way by every caller: warn,
+    # then record the package via unresolved_package. Only SPM's rate-limit and
+    # bad-credentials responses still abort, because those are global conditions
+    # that would fail every remaining lookup identically.
+    def registry_response(url, label:, outcome: 'recorded without registry metadata', **)
       HttpClient.get(url, **)
     rescue Net::OpenTimeout, Net::ReadTimeout => e
       warn("Skipping #{label}: network timeout after retries (#{e.message}); #{outcome}")

@@ -84,12 +84,21 @@ RSpec.describe(SOUP::YarnParser) do
     end
   end
 
-  it 'raises a SOUP::RegistryError on non-200 response' do
-    stub_request(:get, 'https://registry.npmjs.org/lodash')
-      .to_return(status: 500, body: 'Server Error')
-    packages = {}
-    expect { parser.parse(lockfile_path, packages) }
-      .to(raise_error(SOUP::RegistryError, /HTTP 500.*lodash.*registry\.npmjs\.org/m))
+  # CONS-001: a non-200 used to raise RegistryError here and abort the entire
+  # scan, while the NPM parser hitting the identical endpoint merely skipped the
+  # package. All seven parsers now record the package with what the lockfile
+  # knows, so one flaky 5xx can no longer destroy a whole yarn scan.
+  context 'with a non-200 response' do
+    let(:packages) { {} }
+
+    before { stub_request(:get, 'https://registry.npmjs.org/lodash').to_return(status: 500, body: 'Server Error') }
+
+    it 'records the package as unresolved instead of aborting the scan', :aggregate_failures do
+      expect { parser.parse(lockfile_path, packages) }
+        .to(output(/HTTP 500.*lodash.*registry\.npmjs\.org/m).to_stderr)
+      expect(packages['lodash']).to(have_attributes(version: '4.17.21', language: 'JS', license: 'NOASSERTION'))
+      expect(packages['lodash'].unresolved).to(be(true))
+    end
   end
 
   # TEST-305: assert the full retry loop ran and the user saw the
@@ -106,9 +115,9 @@ RSpec.describe(SOUP::YarnParser) do
         .to(output(/Aborting after \d+ retries/).to_stderr)
     end
 
-    it 'retries max_retries+1 times before skipping the package', :aggregate_failures do
+    it 'retries max_retries+1 times before recording the package as unresolved', :aggregate_failures do
       parser.parse(lockfile_path, packages)
-      expect(packages).to(be_empty)
+      expect(packages['lodash']).to(have_attributes(version: '4.17.21', license: 'NOASSERTION'))
       expect(a_request(:get, url)).to(have_been_made.times(SOUP::HttpClient.max_retries + 1))
     end
 
@@ -135,11 +144,12 @@ RSpec.describe(SOUP::YarnParser) do
         .to_return(status: 200, body: missing_version_response)
     end
 
-    it 'skips the package instead of crashing on nil license access', :aggregate_failures do
+    it 'records the package as unresolved instead of crashing on nil license access', :aggregate_failures do
       packages = {}
       expect { parser.parse(lockfile_path, packages) }
         .not_to(raise_error)
-      expect(packages).to(be_empty)
+      expect(packages['lodash']).to(have_attributes(version: '4.17.21', license: 'NOASSERTION'))
+      expect(packages['lodash'].unresolved).to(be(true))
     end
   end
 
@@ -149,11 +159,12 @@ RSpec.describe(SOUP::YarnParser) do
         .to_return(status: 200, body: { _id: 'lodash', name: 'lodash' }.to_json)
     end
 
-    it 'skips the package instead of raising', :aggregate_failures do
+    it 'records the package as unresolved instead of raising', :aggregate_failures do
       packages = {}
       expect { parser.parse(lockfile_path, packages) }
         .not_to(raise_error)
-      expect(packages).to(be_empty)
+      expect(packages['lodash']).to(have_attributes(license: 'NOASSERTION'))
+      expect(packages['lodash'].unresolved).to(be(true))
     end
   end
 

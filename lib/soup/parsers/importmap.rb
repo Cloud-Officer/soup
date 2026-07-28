@@ -53,17 +53,17 @@ module SOUP
       # No label override: the version is only known after this response, so the
       # timeout warning names the package alone.
       response = npm_registry_response(name: name)
-      return if response.nil?
+      return unresolved_package(name: name, file: file, language: 'JS', version: version, dependency: false) if response.nil?
 
       if response.code != 200
         warn(http_error_message(response, url: npm_registry_url(name), package: name))
-        return
+        return unresolved_package(name: name, file: file, language: 'JS', version: version, dependency: false)
       end
 
       payload = JSON.parse(response.body)
       resolved_version = version || payload.dig('dist-tags', 'latest')
       package_details = lookup_npm_registry_version(payload, name: name, version: resolved_version)
-      return if package_details.nil?
+      return unresolved_package(name: name, file: file, language: 'JS', version: resolved_version, dependency: false) if package_details.nil?
 
       build_npm_registry_package(
         file: file,

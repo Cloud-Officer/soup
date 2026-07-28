@@ -38,10 +38,11 @@ RSpec.describe(SOUP::BundlerParser) do
 
     before { stub_request(:get, url).to_timeout }
 
-    it 'skips the gem instead of aborting the scan', :aggregate_failures do
+    it 'records the gem as unresolved instead of aborting the scan', :aggregate_failures do
       expect { parser.parse('Gemfile.lock', packages) }
         .not_to(raise_error)
-      expect(packages).to(be_empty)
+      expect(packages['test-gem']).to(have_attributes(version: '1.0.0', language: 'Ruby', license: 'NOASSERTION'))
+      expect(packages['test-gem'].unresolved).to(be(true))
     end
 
     it 'names the gem in the skip warning' do
@@ -95,15 +96,34 @@ RSpec.describe(SOUP::BundlerParser) do
     # its own timeout guard. A timeout means rubygems.org is unreachable after
     # every retry, so the remaining fallbacks would time out too -- the gem is
     # skipped rather than walking the rest of the chain.
+    # CONS-001: the final fallback returning a non-200 used to raise and abort.
+    context 'when the resolved-version fallback returns a non-200' do
+      let(:packages) { {} }
+
+      before do
+        stub_request(:get, 'https://api.rubygems.org/api/v1/versions/test-gem/latest.json')
+          .to_return(status: 200, body: { version: '2.0.0' }.to_json)
+        stub_request(:get, 'https://api.rubygems.org/api/v2/rubygems/test-gem/versions/2.0.0.json')
+          .to_return(status: 404, body: 'Not Found')
+      end
+
+      it 'warns and records the gem as unresolved', :aggregate_failures do
+        expect { parser.parse('Gemfile.lock', packages) }
+          .to(output(/HTTP 404.*test-gem 2\.0\.0/m).to_stderr)
+        expect(packages['test-gem']).to(have_attributes(version: '1.0.0', license: 'NOASSERTION'))
+        expect(packages['test-gem'].unresolved).to(be(true))
+      end
+    end
+
     context 'when the latest-version lookup times out' do
       let(:packages) { {} }
 
       before { stub_request(:get, 'https://api.rubygems.org/api/v1/versions/test-gem/latest.json').to_timeout }
 
-      it 'skips the gem without attempting the remaining fallback', :aggregate_failures do
+      it 'records the gem without attempting the remaining fallback', :aggregate_failures do
         expect { parser.parse('Gemfile.lock', packages) }
           .not_to(raise_error)
-        expect(packages).to(be_empty)
+        expect(packages['test-gem']).to(have_attributes(version: '1.0.0', license: 'NOASSERTION'))
         expect(a_request(:get, %r{api/v2/rubygems/test-gem/versions/2\.0\.0\.json})).not_to(have_been_made)
       end
     end
@@ -117,10 +137,10 @@ RSpec.describe(SOUP::BundlerParser) do
         stub_request(:get, 'https://api.rubygems.org/api/v2/rubygems/test-gem/versions/2.0.0.json').to_timeout
       end
 
-      it 'skips the gem and names the resolved version in the warning', :aggregate_failures do
+      it 'records the gem and names the resolved version in the warning', :aggregate_failures do
         expect { parser.parse('Gemfile.lock', packages) }
           .to(output(/Skipping test-gem 2\.0\.0: network timeout after retries/).to_stderr)
-        expect(packages).to(be_empty)
+        expect(packages['test-gem']).to(have_attributes(version: '1.0.0', license: 'NOASSERTION'))
       end
     end
 
@@ -130,10 +150,14 @@ RSpec.describe(SOUP::BundlerParser) do
           .to_return(status: 500, body: 'Internal Server Error', headers: { Status: 'Internal Server Error' })
       end
 
-      it 'raises a SOUP::RegistryError with status + url + package context' do
+      # CONS-001: this used to raise RegistryError and abort the whole scan.
+      # Every parser now records the gem with what the lockfile already knows.
+      it 'warns with status + url + package context and records the gem', :aggregate_failures do
         packages = {}
         expect { parser.parse('Gemfile.lock', packages) }
-          .to(raise_error(SOUP::RegistryError, /HTTP 500.*test-gem.*api\.rubygems\.org/m))
+          .to(output(/HTTP 500.*test-gem.*api\.rubygems\.org/m).to_stderr)
+        expect(packages['test-gem']).to(have_attributes(version: '1.0.0', license: 'NOASSERTION'))
+        expect(packages['test-gem'].unresolved).to(be(true))
       end
     end
   end

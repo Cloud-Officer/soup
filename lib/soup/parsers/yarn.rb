@@ -43,23 +43,25 @@ module SOUP
       name = js_package[:name]
       version = js_package[:version]
       label = "#{name}@#{version}"
+      dependency = !direct_deps.include?(name)
 
       response = npm_registry_response(name: name, label: label)
-      return if response.nil?
+      return unresolved_package(name: name, file: file, language: 'JS', version: version, dependency: dependency) if response.nil?
 
-      # Unlike the NPM and Importmap parsers, a non-200 here aborts the whole
-      # scan rather than skipping the package. CONS-001 tracks unifying that.
-      raise(RegistryError, http_error_message(response, url: npm_registry_url(name), package: label)) unless response.code == 200
+      if response.code != 200
+        warn(http_error_message(response, url: npm_registry_url(name), package: label))
+        return unresolved_package(name: name, file: file, language: 'JS', version: version, dependency: dependency)
+      end
 
       package_details = lookup_npm_registry_version(JSON.parse(response.body), name: name, version: version)
-      return if package_details.nil?
+      return unresolved_package(name: name, file: file, language: 'JS', version: version, dependency: dependency) if package_details.nil?
 
       build_npm_registry_package(
         file: file,
         name: name,
         version: version,
         package_details: package_details,
-        dependency: !direct_deps.include?(name)
+        dependency: dependency
       )
     end
   end

@@ -101,9 +101,11 @@ module SOUP
         end
       end
 
+      coordinate = "#{group_id}:#{artifact_id}"
+
       unless resolved
-        warn(unresolved_message(response, url: last_url, package: "#{group_id}:#{artifact_id} #{version}"))
-        return
+        warn(unresolved_message(response, url: last_url, package: "#{coordinate} #{version}"))
+        return unresolved_package(name: coordinate, file: file, language: 'Kotlin', version: version, dependency: !manifest_mentions?(main_file, coordinate))
       end
 
       build_package(

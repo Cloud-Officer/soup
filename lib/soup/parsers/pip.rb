@@ -77,10 +77,14 @@ module SOUP
 
     def fetch_package(file, direct_deps, pip_package, version)
       url = "https://pypi.org/pypi/#{pip_package.sub(/\[[^\]]+\]/, '')}/json"
+      dependency = !direct_deps.include?(normalize_pip_name(pip_package.sub(/\[[^\]]+\]/, '')))
       response = registry_response(url, label: "#{pip_package}==#{version}")
-      return if response.nil?
+      return unresolved_package(name: pip_package, file: file, language: 'Python', version: version, dependency: dependency) if response.nil?
 
-      raise(RegistryError, http_error_message(response, url: url, package: "#{pip_package}==#{version}")) unless response.code == 200
+      if response.code != 200
+        warn(http_error_message(response, url: url, package: "#{pip_package}==#{version}"))
+        return unresolved_package(name: pip_package, file: file, language: 'Python', version: version, dependency: dependency)
+      end
 
       package_details = JSON.parse(response.body)
       info = package_details['info']
@@ -93,7 +97,7 @@ module SOUP
         license: extract_pip_license(info),
         description: Package.sanitize_description(info['summary'], first_sentence: true),
         website: info['home_page']&.strip,
-        dependency: !direct_deps.include?(normalize_pip_name(pip_package.sub(/\[[^\]]+\]/, '')))
+        dependency: dependency
       )
     end
 

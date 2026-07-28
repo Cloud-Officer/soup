@@ -176,11 +176,12 @@ RSpec.describe(SOUP::GradleParser) do
         stub_request(:get, /oss\.sonatype\.org/).to_return(status: 503, body: 'sonatype offline')
       end
 
-      it 'warns with http_error_message (status, url, package, truncated body)', :aggregate_failures do
+      it 'warns with http_error_message and records the coordinate', :aggregate_failures do
         packages = {}
         expect { parser.parse(lockfile_path, packages) }
           .to(output(/HTTP 503.*com\.example:library 1\.0\.0.*\.pom.*offline/m).to_stderr)
-        expect(packages).to(be_empty)
+        expect(packages['com.example:library']).to(have_attributes(version: '1.0.0', language: 'Kotlin', license: 'NOASSERTION'))
+        expect(packages['com.example:library'].unresolved).to(be(true))
       end
     end
   end
@@ -229,11 +230,12 @@ RSpec.describe(SOUP::GradleParser) do
         stub_request(:get, /oss\.sonatype\.org/).to_timeout
       end
 
-      it 'warns and skips the package without raising', :aggregate_failures do
+      it 'warns and records the coordinate without raising', :aggregate_failures do
         packages = {}
         expect { parser.parse(lockfile_path, packages) }
           .to(output(/all Maven lookups timed out/).to_stderr)
-        expect(packages).to(be_empty)
+        expect(packages['com.example:library']).to(have_attributes(version: '1.0.0', license: 'NOASSERTION'))
+        expect(packages['com.example:library'].unresolved).to(be(true))
       end
     end
   end
