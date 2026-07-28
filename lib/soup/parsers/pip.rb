@@ -52,7 +52,11 @@ module SOUP
     # comparison; an empty list (no .in file) leaves every package transitive,
     # matching the previous empty-main_file behavior.
     def read_direct_dependencies(file)
-      in_file = file.gsub('.txt', '.in')
+      # Anchored so a path that merely contains ".txt" (e.g. /builds/my.txt.d/
+      # requirements.txt) is not corrupted, matching the gradle idiom. The .in
+      # file keeps the lockfile's name stem (dev-requirements.txt ->
+      # dev-requirements.in), so sibling_file's fixed-name form does not fit.
+      in_file = file.sub(/\.txt\z/, '.in')
       return [] unless File.exist?(in_file)
 
       File.read(in_file).each_line.filter_map do |line|

@@ -121,6 +121,37 @@ RSpec.describe(SOUP::PIPParser) do
     end
   end
 
+  # CONS-003 regression: the sibling .in path used to be derived with an
+  # unanchored `file.gsub('.txt', '.in')`, which rewrote every ".txt" in the
+  # whole path -- so /builds/my.txt.d/requirements.txt looked for
+  # /builds/my.in.d/requirements.in. That file never exists, so
+  # read_direct_dependencies silently returned [] and every Python package was
+  # misclassified as transitive with no warning. A real directory named
+  # "my.txt.d" is written here so the path genuinely contains the substring.
+  context 'when the lockfile lives in a directory whose name contains ".txt"' do
+    let(:requirements_in_content) { "requests\n"                       }
+    let(:requirements_content)    { "requests==2.31.0\nflask==3.0.0\n" }
+
+    def requirements_path
+      write_fixture('my.txt.d/requirements.in', requirements_in_content)
+      write_fixture('my.txt.d/requirements.txt', requirements_content)
+    end
+
+    before do
+      stub_request(:get, 'https://pypi.org/pypi/requests/json')
+        .to_return(status: 200, body: requests_response)
+      stub_request(:get, 'https://pypi.org/pypi/flask/json')
+        .to_return(status: 200, body: flask_response)
+    end
+
+    it 'still resolves the sibling requirements.in without corrupting the path', :aggregate_failures do
+      packages = {}
+      parser.parse(requirements_path, packages)
+      expect(packages['requests'].dependency).to(be(false))
+      expect(packages['flask'].dependency).to(be(true))
+    end
+  end
+
   # BUG-003 regression: a transitive package whose name is a substring of a
   # declared requirement (requests within requests-oauthlib) must NOT be flagged
   # direct. The old String#include? scan of requirements.in mis-classified it.
