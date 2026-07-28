@@ -79,8 +79,9 @@ RSpec.describe(SOUP::ImportmapParser) do
 
     before { stub_request(:get, 'https://registry.npmjs.org/marked').to_return(status: 404, body: 'Not Found') }
 
-    it 'skips the package' do
-      expect(packages).to(be_empty)
+    it 'records the package as unresolved rather than dropping it', :aggregate_failures do
+      expect(packages['marked']).to(have_attributes(version: '12.0.0', language: 'JS', license: 'NOASSERTION'))
+      expect(packages['marked'].unresolved).to(be(true))
     end
   end
 
@@ -133,10 +134,11 @@ RSpec.describe(SOUP::ImportmapParser) do
 
     before { stub_request(:get, 'https://registry.npmjs.org/marked').to_timeout }
 
-    it 'skips the package and names it without a version in the warning', :aggregate_failures do
+    it 'records the package and names it without a version in the warning', :aggregate_failures do
       expect { packages }
         .to(output(/Skipping marked: network timeout after retries/).to_stderr)
-      expect(packages).to(be_empty)
+      expect(packages['marked']).to(have_attributes(version: '12.0.0', license: 'NOASSERTION'))
+      expect(packages['marked'].unresolved).to(be(true))
     end
   end
 
@@ -145,10 +147,11 @@ RSpec.describe(SOUP::ImportmapParser) do
 
     before { stub_request(:get, 'https://registry.npmjs.org/marked').to_return(status: 200, body: registry_body('12.0.0')) }
 
-    it 'warns and omits the package', :aggregate_failures do
+    it 'warns and records the package as unresolved', :aggregate_failures do
       expect { packages }
         .to(output(/version not present/).to_stderr)
-      expect(packages).to(be_empty)
+      expect(packages['marked']).to(have_attributes(version: '99.0.0', license: 'NOASSERTION'))
+      expect(packages['marked'].unresolved).to(be(true))
     end
   end
 end

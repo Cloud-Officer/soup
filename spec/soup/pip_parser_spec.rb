@@ -121,6 +121,22 @@ RSpec.describe(SOUP::PIPParser) do
     end
   end
 
+  # CONS-001: a 404 usually means the package is private or simply absent from
+  # PyPI. It is still a dependency, so it is recorded rather than dropped.
+  context 'when the registry returns a non-200' do
+    let(:requirements_content) { "requests==2.31.0\n" }
+    let(:packages) { {} }
+
+    before { stub_request(:get, 'https://pypi.org/pypi/requests/json').to_return(status: 404, body: 'Not Found') }
+
+    it 'warns and records the package as unresolved', :aggregate_failures do
+      expect { parser.parse(requirements_path, packages) }
+        .to(output(/HTTP 404.*requests==2\.31\.0/m).to_stderr)
+      expect(packages['requests']).to(have_attributes(version: '2.31.0', language: 'Python', license: 'NOASSERTION'))
+      expect(packages['requests'].unresolved).to(be(true))
+    end
+  end
+
   # CONS-002: HttpClient re-raises Net::ReadTimeout once its retries are
   # exhausted. Before the fix that escaped fetch_package, propagated through
   # Parallel.map, and killed the whole scan with an untyped backtrace. It must
@@ -131,10 +147,11 @@ RSpec.describe(SOUP::PIPParser) do
 
     before { stub_request(:get, 'https://pypi.org/pypi/requests/json').to_timeout }
 
-    it 'skips the package instead of aborting the scan', :aggregate_failures do
+    it 'records the package as unresolved instead of aborting the scan', :aggregate_failures do
       expect { parser.parse(requirements_path, packages) }
         .not_to(raise_error)
-      expect(packages).to(be_empty)
+      expect(packages['requests']).to(have_attributes(version: '2.31.0', language: 'Python', license: 'NOASSERTION'))
+      expect(packages['requests'].unresolved).to(be(true))
     end
 
     it 'names the package as name==version in the skip warning' do

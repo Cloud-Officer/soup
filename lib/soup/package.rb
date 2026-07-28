@@ -28,6 +28,7 @@ module SOUP
       @requirements = ''
       @verification_reasoning = ''
       @dependency = false
+      @unresolved = false
     end
 
     # Parser-produced fields. Set once during BaseParser#build_package and
@@ -39,6 +40,14 @@ module SOUP
     # Verification fields. Filled in by Application#check_packages from the
     # cache, dependency defaults, or interactive prompts.
     attr_accessor :last_verified_at, :risk_level, :requirements, :verification_reasoning
+
+    # True when the registry lookup failed this run (timeout, 404 for a package
+    # absent from the registry, 403 for a private one) so license/description/
+    # website could not be fetched. The entry still belongs in the register --
+    # the dependency exists either way -- so Application#apply_cached_metadata
+    # restores those three fields from .soup.json when a previous run resolved
+    # them. Deliberately not serialized: it describes this run, not the package.
+    attr_accessor :unresolved
 
     # True when all four verification fields are non-empty (i.e. the package is
     # ready to be rendered into the SOUP markdown). Use this instead of

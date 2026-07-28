@@ -101,20 +101,28 @@ module SOUP
           registry_response(url, label: pin_id, headers: { Authorization: "token #{token}" })
         end
 
-      return if response.nil?
+      # The pin identity is all we know when the lookup fails, so it stands in
+      # for the repository name the GitHub payload would otherwise supply.
+      return unresolved_package(name: pin_id, file: file, language: 'Swift', version: version, dependency: !manifest_mentions?(main_file, pin_id)) if response.nil?
 
       unless response.code == 200
+        # Rate limiting and bad credentials are global conditions -- every
+        # remaining lookup would fail the same way -- so they still abort with
+        # actionable guidance rather than filling the register with unresolved
+        # entries.
         combined = github_error_message(response)
         raise(RateLimitError, 'GitHub API: rate limit exceeded. Please set GITHUB_TOKEN to raise the rate limit.') if combined.include?('rate limit')
         raise(AuthenticationError, 'GitHub API: Bad credentials. Please verify GITHUB_TOKEN.') if combined.downcase.include?('bad credentials')
 
         warn(http_error_message(response, url: url, package: pin_id))
-        return
+        return unresolved_package(name: pin_id, file: file, language: 'Swift', version: version, dependency: !manifest_mentions?(main_file, pin_id))
       end
 
       package_details = JSON.parse(response.body)
 
-      return if package_details['private']
+      # A private repository is still a SOUP component, so it is recorded rather
+      # than dropped. The lookup succeeded, so its real metadata is used.
+      warn("#{pin_id} resolves to a private repository; recording it with the metadata GitHub returned") if package_details['private']
 
       build_package(
         name: package_details['name'],
