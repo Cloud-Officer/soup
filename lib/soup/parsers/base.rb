@@ -121,23 +121,34 @@ module SOUP
       "#{NPM_REGISTRY_ROOT}/#{name}"
     end
 
-    # GET a package's npm packument, absorbing the post-retry timeout that all
-    # three npm consumers (NPM, Yarn, Importmap) treat identically: warn and
-    # omit the package rather than kill the scan. Returns nil in that case, so
-    # callers guard with `return if response.nil?`.
+    # GET a registry URL, absorbing the timeout HttpClient re-raises once its
+    # retries are exhausted. Parallel.map propagates the first exception and
+    # aborts every other in-flight lookup, so one unreachable registry must not
+    # kill the whole scan. Returns nil on timeout, so callers guard with
+    # `return if response.nil?` -- or, for a multi-source loop, fall through to
+    # the next source. Every parser that talks to a registry routes through here.
     #
-    # `label` is what the warning names the package as -- NPM and Yarn know the
-    # version up front and pass "name@version", while Importmap resolves the
-    # version from this very response and so can only name the package.
+    # `label` names what is being skipped: the package for the single-source
+    # parsers, the URL itself for gradle's mirror loop. `outcome` states what
+    # happens next, because a timeout omits the package for most parsers but for
+    # gradle only advances to the next repository -- claiming omission there
+    # would be false whenever a later mirror resolves the coordinate.
     #
-    # Deliberately stops short of the non-200 branch: NPM and Importmap warn and
-    # skip there, Yarn raises RegistryError and aborts the run. Unifying that
-    # split is CONS-001, so each caller keeps its own policy.
-    def npm_registry_response(name:, label: name)
-      HttpClient.get(npm_registry_url(name))
+    # Deliberately stops short of the non-200 branch: the parsers disagree on
+    # whether that warns-and-skips or raises, and unifying it is CONS-001.
+    def registry_response(url, label:, outcome: 'package omitted from SOUP', **)
+      HttpClient.get(url, **)
     rescue Net::OpenTimeout, Net::ReadTimeout => e
-      warn("Skipping #{label}: network timeout after retries (#{e.message}); package omitted from SOUP")
+      warn("Skipping #{label}: network timeout after retries (#{e.message}); #{outcome}")
       nil
+    end
+
+    # Convenience wrapper for the three npm consumers (NPM, Yarn, Importmap),
+    # which all resolve the same packument URL from a package name. NPM and Yarn
+    # know the version up front and pass "name@version"; Importmap resolves the
+    # version from this very response and so can only name the package.
+    def npm_registry_response(name:, label: name)
+      registry_response(npm_registry_url(name), label: label)
     end
 
     # Build a Package from an npm-registry per-version payload. The three npm

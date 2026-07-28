@@ -28,6 +28,28 @@ RSpec.describe(SOUP::BundlerParser) do
     allow(Bundler).to(receive(:read_file).with('Gemfile.lock').and_return(''))
   end
 
+  # CONS-002: HttpClient re-raises Net::ReadTimeout once its retries are
+  # exhausted. Before the fix that escaped fetch_package, propagated through
+  # Parallel.map, and killed the whole scan with an untyped backtrace. It must
+  # warn and omit just this gem instead.
+  context 'when the registry times out' do
+    let(:url)      { 'https://api.rubygems.org/api/v2/rubygems/test-gem/versions/1.0.0.json' }
+    let(:packages) { {}                                                                      }
+
+    before { stub_request(:get, url).to_timeout }
+
+    it 'skips the gem instead of aborting the scan', :aggregate_failures do
+      expect { parser.parse('Gemfile.lock', packages) }
+        .not_to(raise_error)
+      expect(packages).to(be_empty)
+    end
+
+    it 'names the gem in the skip warning' do
+      expect { parser.parse('Gemfile.lock', packages) }
+        .to(output(/Skipping test-gem 1\.0\.0: network timeout after retries/).to_stderr)
+    end
+  end
+
   context 'when v2 API succeeds' do
     let(:packages) { {} }
 
@@ -66,6 +88,39 @@ RSpec.describe(SOUP::BundlerParser) do
         packages = {}
         parser.parse('Gemfile.lock', packages)
         expect(packages).to(have_key('test-gem'))
+      end
+    end
+
+    # CONS-002: the fallback chain makes three sequential requests, so each has
+    # its own timeout guard. A timeout means rubygems.org is unreachable after
+    # every retry, so the remaining fallbacks would time out too -- the gem is
+    # skipped rather than walking the rest of the chain.
+    context 'when the latest-version lookup times out' do
+      let(:packages) { {} }
+
+      before { stub_request(:get, 'https://api.rubygems.org/api/v1/versions/test-gem/latest.json').to_timeout }
+
+      it 'skips the gem without attempting the remaining fallback', :aggregate_failures do
+        expect { parser.parse('Gemfile.lock', packages) }
+          .not_to(raise_error)
+        expect(packages).to(be_empty)
+        expect(a_request(:get, %r{api/v2/rubygems/test-gem/versions/2\.0\.0\.json})).not_to(have_been_made)
+      end
+    end
+
+    context 'when the resolved-version fallback times out' do
+      let(:packages) { {} }
+
+      before do
+        stub_request(:get, 'https://api.rubygems.org/api/v1/versions/test-gem/latest.json')
+          .to_return(status: 200, body: { version: '2.0.0' }.to_json)
+        stub_request(:get, 'https://api.rubygems.org/api/v2/rubygems/test-gem/versions/2.0.0.json').to_timeout
+      end
+
+      it 'skips the gem and names the resolved version in the warning', :aggregate_failures do
+        expect { parser.parse('Gemfile.lock', packages) }
+          .to(output(/Skipping test-gem 2\.0\.0: network timeout after retries/).to_stderr)
+        expect(packages).to(be_empty)
       end
     end
 

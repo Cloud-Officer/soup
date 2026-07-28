@@ -96,10 +96,12 @@ module SOUP
 
       response =
         if token.empty?
-          HttpClient.get(url)
+          registry_response(url, label: pin_id)
         else
-          HttpClient.get(url, headers: { Authorization: "token #{token}" })
+          registry_response(url, label: pin_id, headers: { Authorization: "token #{token}" })
         end
+
+      return if response.nil?
 
       unless response.code == 200
         combined = github_error_message(response)
