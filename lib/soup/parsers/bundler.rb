@@ -22,18 +22,25 @@ module SOUP
     private
 
     def fetch_package(file, direct_deps, spec)
+      label = "#{spec.name} #{spec.version}"
       version_url = "https://api.rubygems.org/api/v2/rubygems/#{spec.name}/versions/#{spec.version}.json"
-      response = HttpClient.get(version_url)
+      # A timeout means rubygems.org is unreachable after every retry, so the
+      # remaining fallbacks would time out too -- skip the gem rather than walk
+      # the rest of the chain. CONS-002.
+      response = registry_response(version_url, label: label)
+      return if response.nil?
 
       if response.code != 200
         latest_url = "https://api.rubygems.org/api/v1/versions/#{spec.name}/latest.json"
-        response = HttpClient.get(latest_url)
+        response = registry_response(latest_url, label: label)
+        return if response.nil?
 
-        raise(RegistryError, http_error_message(response, url: latest_url, package: "#{spec.name} #{spec.version}")) unless response.code == 200
+        raise(RegistryError, http_error_message(response, url: latest_url, package: label)) unless response.code == 200
 
         latest_version = JSON.parse(response.body)['version']
         fallback_url = "https://api.rubygems.org/api/v2/rubygems/#{spec.name}/versions/#{latest_version}.json"
-        response = HttpClient.get(fallback_url)
+        response = registry_response(fallback_url, label: "#{spec.name} #{latest_version}")
+        return if response.nil?
 
         raise(RegistryError, http_error_message(response, url: fallback_url, package: "#{spec.name} #{latest_version}")) unless response.code == 200
       end

@@ -47,6 +47,28 @@ RSpec.describe(SOUP::SPMParser) do
     allow(ENV).to(receive(:fetch).with('GITHUB_TOKEN', '').and_return(''))
   end
 
+  # CONS-002: HttpClient re-raises Net::ReadTimeout once its retries are
+  # exhausted. Before the fix that escaped fetch_package, propagated through
+  # Parallel.map, and killed the whole scan with an untyped backtrace -- even
+  # though this parser already warn-and-skipped on a generic non-200, so it was
+  # inconsistent with itself.
+  context 'when the GitHub API times out' do
+    let(:packages) { {} }
+
+    before { stub_request(:get, 'https://api.github.com/repos/Alamofire/Alamofire').to_timeout }
+
+    it 'skips the pin instead of aborting the scan', :aggregate_failures do
+      expect { parser.parse(lockfile_path, packages) }
+        .not_to(raise_error)
+      expect(packages).to(be_empty)
+    end
+
+    it 'names the pin in the skip warning' do
+      expect { parser.parse(lockfile_path, packages) }
+        .to(output(/Skipping alamofire: network timeout after retries/).to_stderr)
+    end
+  end
+
   context 'when parsing Package.resolved with GitHub API success' do
     before do
       stub_request(:get, 'https://api.github.com/repos/Alamofire/Alamofire')

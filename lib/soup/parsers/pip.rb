@@ -77,7 +77,8 @@ module SOUP
 
     def fetch_package(file, direct_deps, pip_package, version)
       url = "https://pypi.org/pypi/#{pip_package.sub(/\[[^\]]+\]/, '')}/json"
-      response = HttpClient.get(url)
+      response = registry_response(url, label: "#{pip_package}==#{version}")
+      return if response.nil?
 
       raise(RegistryError, http_error_message(response, url: url, package: "#{pip_package}==#{version}")) unless response.code == 200
 

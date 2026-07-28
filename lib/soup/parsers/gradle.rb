@@ -72,7 +72,7 @@ module SOUP
       # still try the per-repository POM fallbacks below (maven.google.com et al.
       # serve the Android/AndroidX artifacts that dominate a Gradle scan), so a
       # dead primary is treated as "no match" rather than aborting the whole run.
-      response = safe_get(last_url)
+      response = registry_response(last_url, label: last_url, outcome: 'trying the per-repository POM fallbacks')
 
       parsed = JSON.parse(response.body) if response&.code == 200
       docs = parsed&.dig('response', 'docs')
@@ -87,7 +87,7 @@ module SOUP
       else
         REPOSITORY_URLS.each do |url|
           last_url = "#{url}/#{group_id.tr('.', '/')}/#{artifact_id}/#{version}/#{artifact_id}-#{version}.pom"
-          response = safe_get(last_url)
+          response = registry_response(last_url, label: last_url, outcome: 'trying the next repository')
 
           next unless response&.code == 200
 
@@ -116,18 +116,6 @@ module SOUP
         website: website,
         dependency: !manifest_mentions?(main_file, "#{group_id}:#{artifact_id}")
       )
-    end
-
-    # HttpClient.get re-raises Net::OpenTimeout/Net::ReadTimeout once its retries
-    # are exhausted. For a multi-mirror parser an unreachable mirror should not
-    # kill the scan (Parallel.map propagates the first exception and aborts every
-    # other in-flight lookup), so we swallow the timeout, warn, and return nil so
-    # the caller falls through to the next source.
-    def safe_get(url)
-      HttpClient.get(url)
-    rescue Net::OpenTimeout, Net::ReadTimeout => e
-      warn("Error: #{e.message}. Skipping #{url} after retries.")
-      nil
     end
 
     # Build the "could not resolve this coordinate" warning. With a final

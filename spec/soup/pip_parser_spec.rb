@@ -121,6 +121,28 @@ RSpec.describe(SOUP::PIPParser) do
     end
   end
 
+  # CONS-002: HttpClient re-raises Net::ReadTimeout once its retries are
+  # exhausted. Before the fix that escaped fetch_package, propagated through
+  # Parallel.map, and killed the whole scan with an untyped backtrace. It must
+  # warn and omit just this package instead.
+  context 'when the registry times out' do
+    let(:requirements_content) { "requests==2.31.0\n" }
+    let(:packages) { {} }
+
+    before { stub_request(:get, 'https://pypi.org/pypi/requests/json').to_timeout }
+
+    it 'skips the package instead of aborting the scan', :aggregate_failures do
+      expect { parser.parse(requirements_path, packages) }
+        .not_to(raise_error)
+      expect(packages).to(be_empty)
+    end
+
+    it 'names the package as name==version in the skip warning' do
+      expect { parser.parse(requirements_path, packages) }
+        .to(output(/Skipping requests==2\.31\.0: network timeout after retries/).to_stderr)
+    end
+  end
+
   # CONS-003 regression: the sibling .in path used to be derived with an
   # unanchored `file.gsub('.txt', '.in')`, which rewrote every ".txt" in the
   # whole path -- so /builds/my.txt.d/requirements.txt looked for
