@@ -1,0 +1,22 @@
+# Keep image builds reproducible now that the Dockerfile COPYs the build context
+# instead of cloning: excluding version-control metadata and locally generated
+# artifacts means a build from a developer's working copy produces the same image
+# as one from a clean CI checkout.
+#
+# config/ is deliberately NOT excluded -- Options defaults licenses_file and
+# exceptions_file to config/*.json inside the installed tree, so the tool needs
+# them at runtime.
+
+# Version control and CI definitions
+.git
+.gitignore
+.github
+
+# Locally generated test and coverage artifacts
+coverage
+.rspec_status
+
+# Editor and OS noise
+.DS_Store
+.idea
+.ruby-lsp

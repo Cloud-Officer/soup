@@ -20,13 +20,17 @@ RUN apt-get update && apt-get install --no-install-recommends --yes autoconf aut
 # Add user soup
 RUN useradd -m -s /bin/bash soup && echo 'soup ALL=(ALL) NOPASSWD:ALL' >>/etc/sudoers
 
-# Clone the soup repository
-USER soup
-WORKDIR /home/soup
-RUN git clone https://github.com/Cloud-Officer/soup.git
+# Copy the build context -- the exact commit this image is built from -- rather
+# than cloning the default branch at build time. The publishing workflow checks
+# out the tagged commit and passes it as the build context (context: .), but a
+# `git clone` here ignored that entirely and fetched master HEAD over the
+# network. An image tagged vX.Y.Z could therefore contain code that was never in
+# that tag, the amd64 and arm64 builds could pick up different commits, and the
+# provenance attestation would attest a revision that is not what shipped.
+# Copying also makes the build hermetic and removes the stale-layer-cache risk.
+COPY --chown=soup:soup . /home/soup/soup
 
 # Install soup dependencies and create a symlink
-USER root
 WORKDIR /home/soup/soup
 RUN bundle install && ln -s "/home/soup/soup/bin/soup.rb" "/usr/local/bin/soup"
 
