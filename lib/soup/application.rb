@@ -190,7 +190,7 @@ module SOUP
     end
 
     def check_packages
-      license_pattern = Regexp.union(JSON.parse(File.read(@options.licenses_file)).map!(&:downcase))
+      license_pattern = build_license_pattern
       exceptions = JSON.parse(File.read(@options.exceptions_file))
       prompt = TTY::Prompt.new
 
@@ -208,6 +208,34 @@ module SOUP
 
         append_markdown_row(package)
       end
+    end
+
+    # Build the allowlist matcher from --licenses_file.
+    #
+    # Entries are licence *families* as often as exact identifiers -- "Apache"
+    # is meant to cover "Apache-2.0", "BSD" to cover "BSD-3-Clause" -- so this
+    # cannot be an equality test. It used to be a bare `Regexp.union` of the
+    # entries, which is an unanchored substring match: any licence string that
+    # merely *contained* an entry passed the compliance gate. npm's "UNLICENSED"
+    # (proprietary, no rights granted) contains "Unlicense" and sailed through,
+    # as did anything containing "MIT" or "ISC" as a syllable.
+    #
+    # Each entry is now anchored on word boundaries. `(?<!\w)`/`(?!\w)` rather
+    # than `\b` so an entry ending in punctuation still behaves, and `-`/`.`
+    # deliberately remain boundaries so the family entries keep matching the
+    # versioned identifiers ("apache" matches "apache-2.0") while "unlicense"
+    # no longer matches "unlicensed". Mirrors BaseParser#manifest_mentions?,
+    # which uses the same idiom (that one also excludes `-`, because coordinate
+    # names must not match across a hyphen).
+    #
+    # Regexp.escape guards against an operator putting regex metacharacters in
+    # their own licences.json; Regexp.union of an empty list yields a pattern
+    # that matches nothing, so an empty allowlist fails every licence rather
+    # than passing everything.
+    def build_license_pattern
+      entries = JSON.parse(File.read(@options.licenses_file))
+
+      Regexp.union(entries.map { |entry| /(?<!\w)#{Regexp.escape(entry.downcase)}(?!\w)/ })
     end
 
     def validate_license(package, license_pattern, exceptions)

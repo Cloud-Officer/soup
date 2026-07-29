@@ -117,6 +117,7 @@
 - `parse_manual_entries`: Invokes `ManualParser` on the manual entries file (default `config/soup-manual.json`) when it exists; parsed after auto-detected packages so a project can override an auto-detected entry by package name
 - `enforce_vendored_coverage`: Fails the run (sets the error exit code) when a committed file matched by `--vendored_globs` has no SOUP entry, matched on the entry's `file` path or basename
 - `read_cached_packages`: Loads previously entered user choices from cache
+- `build_license_pattern`: Compiles `--licenses_file` into the allowlist matcher, anchoring every entry on word boundaries so a license that merely contains an allowlisted entry (e.g. npm's proprietary `UNLICENSED` containing `Unlicense`) no longer passes the compliance gate; an empty allowlist matches nothing rather than everything
 - `check_packages`: Validates licenses, then for each package applies cached metadata, applies the transitive-dependency defaults (`apply_dependency_defaults` writes the lowest risk level and `DEPENDENCY_TEXT`), prompts for anything still missing, stamps `last_verified_at`, and appends the markdown row
 - `save_files`: Writes cache and markdown documentation files, returning early when nothing has been detected yet so an early failure (e.g. `validate_config!` raising) cannot overwrite an existing `.soup.json` with `{}`
 
@@ -459,16 +460,20 @@ Validation criteria for SOUP entries: Accuracy (Requirements match actual usage)
 
 **Purpose:** Validates that all dependencies use approved open-source licenses.
 
-**Location:** `lib/soup/application.rb` in `validate_license` method (invoked from `check_packages`)
+**Location:** `lib/soup/application.rb` in `validate_license` and `build_license_pattern` methods (both invoked from `check_packages`)
 
 **Implementation:**
 
-1. Loads authorized licenses from configuration file
+1. `build_license_pattern` loads the authorized licenses and compiles them into a single matcher, anchoring each entry on word boundaries (`(?<!\w)entry(?!\w)`, with `Regexp.escape` applied so operator-supplied entries cannot inject regex metacharacters)
 2. Loads package-specific exceptions from configuration file
 3. For each detected package with a license:
-   - Checks if license contains any authorized license substring (case-insensitive)
+   - Checks if the license matches any authorized entry on a word boundary (case-insensitive)
    - Checks if package is in exceptions list
    - Reports error if license is not approved and not `NOASSERTION`
+
+**Why word boundaries rather than substring or exact match:** allowlist entries are license *families* as often as exact identifiers — `Apache` is meant to cover `Apache-2.0`, `BSD` to cover `BSD-3-Clause` — so an exact-match test would reject nearly every real-world SPDX identifier. A plain substring test (the BUG-004 defect) went too far the other way: any license string that merely *contained* an entry passed the compliance gate, so npm's `UNLICENSED` (proprietary, no rights granted) passed on the strength of containing `Unlicense`. Word boundaries keep `apache` matching `apache-2.0` while stopping `unlicense` from matching `unlicensed`, because `-` and `.` are boundaries but a trailing letter is not.
+
+Word-boundary anchoring cannot rescue an entry that is genuinely a substring of a non-compliant license *name*, so two allowlist entries were removed in the same change: bare `BSL` is replaced by the precise `BSL-1.0` and `BSL 1.0` for Boost, and `Copyright` (which matched virtually any proprietary notice) is dropped entirely. `BSL` is an abbreviation collision rather than a version series: `BSL-1.0` is the Boost Software License, permissive and the only version Boost has ever published, whereas "BSL 1.1" is the **Business** Source License — a different, source-available licence whose real SPDX identifier is `BUSL-1.1`. Both Boost spellings are listed because the `Boost` entry only covers the prose form, and neither `BSL` entry can match a `1.1` string — a bare copyright notice names no license, and `config/exceptions.json` is the intended mechanism for a package whose registry metadata is odd.
 
 ### Direct vs Transitive Dependency Classification Algorithm
 
