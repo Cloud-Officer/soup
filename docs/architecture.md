@@ -207,12 +207,15 @@
 - `THREAD_COUNT`: Public constant set to `Etc.nprocessors`; used by all parsers as the thread-pool size for parallel metadata fetching
 - `self.max_retries`: Returns the retry count, overridable at runtime via the `SOUP_HTTP_MAX_RETRIES` environment variable
 - `self.default_timeout`: Returns the request timeout in seconds, overridable at runtime via the `SOUP_HTTP_TIMEOUT` environment variable
-- `self.get(url, max_retries: nil, **options)`: Performs HTTP GET with automatic retry on `Net::OpenTimeout` and `Net::ReadTimeout`
+- `TRANSIENT_ERRORS`: Public constant listing every network fault treated as retryable — the timeouts (`Net::OpenTimeout`, `Net::ReadTimeout`, `Net::WriteTimeout`), dropped or refused connections (`Errno::ECONNRESET`, `Errno::EPIPE`, `Errno::ECONNREFUSED`, `Errno::EHOSTUNREACH`, `Errno::ENETUNREACH`), DNS failure (`SocketError`), TLS interruption (`OpenSSL::SSL::SSLError`), and truncated replies (`EOFError`, `Net::HTTPBadResponse`). It is the single source of truth: `self.get` retries this list and `BaseParser#registry_response` rescues this same constant, so the two can never drift apart. HTTP status codes are deliberately excluded — a 4xx/5xx is a response for the caller to inspect, not a transport failure
+- `self.get(url, max_retries: nil, **options)`: Performs HTTP GET with automatic retry on every class in `TRANSIENT_ERRORS`, warning with the exception class and message on each attempt and re-raising once retries are exhausted
 
 **External Dependencies:**
 
 - `etc`
 - `httparty`
+- `net/http` (for the `Net::` timeout and bad-response classes in `TRANSIENT_ERRORS`)
+- `openssl` (for `OpenSSL::SSL::SSLError` in `TRANSIENT_ERRORS`)
 
 ### SOUP::GenericParser
 
@@ -285,7 +288,7 @@
 
 - `parse(file, packages)`: Parses lock file and fetches package details, in parallel via the inherited `parallel_each` helper (`BaseParser`). Selects `classpath` entries for `buildscript-gradle.lockfile` and non-test, non-debug `RuntimeClasspath` entries for `gradle.lockfile`
 - `fetch_package(...)`: Queries the `search.maven.org` solrsearch endpoint first; when it returns no single match, or times out (the endpoint is chronically flaky), the lookup degrades to the per-repository POM mirrors in `REPOSITORY_URLS` rather than aborting the run. A coordinate that no source resolves is warned and skipped
-- `safe_get(url)`: Wraps `HttpClient.get` so a `Net::OpenTimeout`/`Net::ReadTimeout` on one mirror is swallowed (warned, returns nil) and the caller falls through to the next source, instead of `Parallel.map` propagating the exception and aborting every other in-flight lookup
+- Mirror failures are absorbed by the inherited `BaseParser#registry_response`, which swallows any `HttpClient::TRANSIENT_ERRORS` fault on one mirror (warned, returns nil) so the caller falls through to the next source, instead of `Parallel.map` propagating the exception and aborting every other in-flight lookup. It is passed an explicit `outcome` (`trying the per-repository POM fallbacks`, then `trying the next repository`) so the warning does not claim the package was recorded
 - `read_main_gradle_file(file)`: Resolves the build script next to the lock file, trying the Groovy DSL `build.gradle` then the Kotlin DSL `build.gradle.kts` (the Gradle 8.x+ default for new Android/Kotlin projects); raises `InvalidLockfileError` when neither exists. The contents are passed to `manifest_mentions?` for direct/transitive classification
 - `unresolved_message(response, url:, package:)`: Builds the skip warning, falling back to an "all Maven lookups timed out" message when every source timed out and there is no HTTP status to report
 - `REPOSITORY_URLS`: Private constant listing the Maven POM mirror URLs (`maven.google.com`, `plugins.gradle.org/m2`, `jitpack.io`, the Sonatype snapshots repo) tried in order when the primary endpoint has no match
@@ -514,11 +517,13 @@ Validation criteria for SOUP entries: Accuracy (Requirements match actual usage)
 **Implementation:**
 
 1. Attempts HTTP GET request with the configured timeout (`DEFAULT_TIMEOUT_SECONDS`, 5 seconds by default; overridable via `SOUP_HTTP_TIMEOUT`)
-2. On `Net::OpenTimeout` or `Net::ReadTimeout`:
+2. On any class in `TRANSIENT_ERRORS` (timeouts, connection resets/refusals, DNS failures, TLS interruptions, truncated replies):
    - Increments retry counter
-   - Logs retry attempt with counter
+   - Logs the retry attempt with the exception class, message, and counter
    - Retries up to the configured maximum (`DEFAULT_MAX_RETRIES`, 3 by default; overridable via `SOUP_HTTP_MAX_RETRIES`)
-   - Raises the exception after max retries are exhausted
+   - Raises the exception after max retries are exhausted, for `BaseParser#registry_response` to convert into a per-package skip
+
+   Restricting this list to the two timeout classes was the ERR-001 defect: every other transient fault bypassed the retry loop on its first attempt and escaped into `Parallel.map`, which propagates the first exception and drops every other in-flight result — so a single connection reset aborted an entire multi-hundred-package scan.
 
 ### Parallel Metadata Fetching Algorithm
 
@@ -554,13 +559,13 @@ Recoverable failures raise a subclass of `SOUP::Error` (`lib/soup/errors.rb`); t
 | Missing or malformed config file | Raises `ConfigurationError` when a configuration file is absent or contains invalid JSON | `lib/soup/application.rb` in `validate_config!` method |
 | API rate limiting | Raises `RateLimitError` (and `AuthenticationError` for bad credentials), suggesting `GITHUB_TOKEN` | `lib/soup/parsers/spm.rb` in `fetch_package` / `github_error_message` methods |
 | Network timeouts | Retry up to 3 times via `SOUP::HttpClient`, then re-raise | `lib/soup/http_client.rb` in `get` method |
-| Registry timeout after retries | The single package is warned about and omitted from the SOUP register rather than aborting the scan | `lib/soup/parsers/npm.rb`, `yarn.rb`, `importmap.rb` in `fetch_package` methods |
+| Transient network fault after retries | Any `HttpClient::TRANSIENT_ERRORS` fault (timeout, connection reset/refusal, DNS failure, TLS interruption, truncated reply) is retried, then the single package is warned about and recorded as unresolved rather than aborting the scan | `lib/soup/parsers/base.rb` in `registry_response`, used by every parser |
 | Non-2xx registry response | Raises `RegistryError` carrying the status, URL, package, and truncated body built by `http_error_message` | `lib/soup/parsers/bundler.rb`, `pip.rb`, `yarn.rb` in `fetch_package` methods |
 | Unsupported lock file format | Raises `UnsupportedFormatError` for a `package-lock.json` below `lockfileVersion` 2 and for a `yarn.lock` that is not Yarn v1 | `lib/soup/parsers/npm.rb`, `yarn.rb` in `parse` methods |
 | Malformed manual entries file | Raises `InvalidLockfileError` when the file is not a JSON array or an entry lacks a non-empty `package` | `lib/soup/parsers/manual.rb` in `parse` method |
 | Missing Gradle build script | Raises `InvalidLockfileError` when neither `build.gradle` nor `build.gradle.kts` sits alongside the lock file | `lib/soup/parsers/gradle.rb` in `read_main_gradle_file` method |
 | Missing Swift manifest | Raises `InvalidLockfileError` when no `Package.swift`, Tuist `Dependencies.swift`, or enclosing `project.pbxproj` can be resolved for a `Package.resolved` | `lib/soup/parsers/spm.rb` in `parse` / `read_main_swift_file` methods |
-| Maven source timeout | A timed-out `search.maven.org` query or POM mirror is skipped (warned) and the lookup falls through to the next source; the scan is not aborted | `lib/soup/parsers/gradle.rb` in `fetch_package` / `safe_get` methods |
+| Maven source unreachable | An unreachable `search.maven.org` query or POM mirror is skipped (warned) and the lookup falls through to the next source; the scan is not aborted | `lib/soup/parsers/gradle.rb` in `fetch_package`, via `BaseParser#registry_response` |
 | Missing package metadata | Logs warning and continues processing other packages | NPM, Gradle, SPM, Importmap parsers; `lookup_npm_registry_version` in `lib/soup/parsers/base.rb` |
 | Missing required IEC 62304 fields | Raises `MissingMetadataError` in `--no_prompt` mode, prompts user otherwise | `lib/soup/application.rb` in `prompt_missing_field` / `ensure_metadata_complete!` methods |
 | Partial execution failure | Persists partial state via `ensure` block so progress is not lost | `lib/soup/application.rb` in `execute` method |

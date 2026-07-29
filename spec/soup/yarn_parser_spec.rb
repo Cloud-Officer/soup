@@ -126,7 +126,7 @@ RSpec.describe(SOUP::YarnParser) do
     # passes. A timeout is skipped here even though a non-200 raises.
     it 'names the package as name@version in the skip warning' do
       expect { parser.parse(lockfile_path, packages) }
-        .to(output(/Skipping lodash@4\.17\.21: network timeout after retries/).to_stderr)
+        .to(output(/Skipping lodash@4\.17\.21: network error after retries/).to_stderr)
     end
   end
 

@@ -47,7 +47,7 @@ RSpec.describe(SOUP::BundlerParser) do
 
     it 'names the gem in the skip warning' do
       expect { parser.parse('Gemfile.lock', packages) }
-        .to(output(/Skipping test-gem 1\.0\.0: network timeout after retries/).to_stderr)
+        .to(output(/Skipping test-gem 1\.0\.0: network error after retries/).to_stderr)
     end
   end
 
@@ -139,7 +139,7 @@ RSpec.describe(SOUP::BundlerParser) do
 
       it 'records the gem and names the resolved version in the warning', :aggregate_failures do
         expect { parser.parse('Gemfile.lock', packages) }
-          .to(output(/Skipping test-gem 2\.0\.0: network timeout after retries/).to_stderr)
+          .to(output(/Skipping test-gem 2\.0\.0: network error after retries/).to_stderr)
         expect(packages['test-gem']).to(have_attributes(version: '1.0.0', license: 'NOASSERTION'))
       end
     end

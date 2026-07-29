@@ -156,10 +156,10 @@ module SOUP
       "#{NPM_REGISTRY_ROOT}/#{name}"
     end
 
-    # GET a registry URL, absorbing the timeout HttpClient re-raises once its
-    # retries are exhausted. Parallel.map propagates the first exception and
+    # GET a registry URL, absorbing the network fault HttpClient re-raises once
+    # its retries are exhausted. Parallel.map propagates the first exception and
     # aborts every other in-flight lookup, so one unreachable registry must not
-    # kill the whole scan. Returns nil on timeout, so callers guard with
+    # kill the whole scan. Returns nil on failure, so callers guard with
     # `return if response.nil?` -- or, for a multi-source loop, fall through to
     # the next source. Every parser that talks to a registry routes through here.
     #
@@ -173,10 +173,16 @@ module SOUP
     # then record the package via unresolved_package. Only SPM's rate-limit and
     # bad-credentials responses still abort, because those are global conditions
     # that would fail every remaining lookup identically.
+    #
+    # The rescue list is HttpClient::TRANSIENT_ERRORS itself rather than a
+    # hand-copied set, so it can never again fall behind what `.get` retries --
+    # the drift that let a connection reset abort an entire scan. The warning
+    # names the exception class because "timeout" was previously claimed for
+    # every fault, which misdescribed resets, DNS failures and TLS errors.
     def registry_response(url, label:, outcome: 'recorded without registry metadata', **)
       HttpClient.get(url, **)
-    rescue Net::OpenTimeout, Net::ReadTimeout => e
-      warn("Skipping #{label}: network timeout after retries (#{e.message}); #{outcome}")
+    rescue *HttpClient::TRANSIENT_ERRORS => e
+      warn("Skipping #{label}: network error after retries (#{e.class}: #{e.message}); #{outcome}")
       nil
     end
 

@@ -55,11 +55,8 @@ RSpec.describe(SOUP::HttpClient) do
       expect(WebMock).to(have_requested(:get, url).times(2))
     end
 
-    # TEST-06: HttpClient.get is a thin retry wrapper that only catches
-    # Net::OpenTimeout / Net::ReadTimeout. These specs lock in the contract
-    # that non-timeout transient errors pass through unchanged (no retry),
-    # and that 4xx/5xx responses are returned to the caller for inspection
-    # rather than raised internally.
+    # TEST-06: 4xx/5xx are *responses*, not transport failures -- they are
+    # returned to the caller for inspection rather than retried or raised.
     it 'returns a 404 response unchanged so callers can decide how to handle it', :aggregate_failures do
       stub_request(:get, url).to_return(status: 404, body: 'Not Found')
       response = described_class.get(url)
@@ -74,18 +71,40 @@ RSpec.describe(SOUP::HttpClient) do
       expect(WebMock).to(have_requested(:get, url).times(1))
     end
 
-    it 'lets Errno::ECONNREFUSED bypass the retry loop and propagate', :aggregate_failures do
-      stub_request(:get, url).to_raise(Errno::ECONNREFUSED.new("connect to #{url} refused"))
-      expect { described_class.get(url) }
-        .to(raise_error(Errno::ECONNREFUSED))
-      expect(WebMock).to(have_requested(:get, url).times(1))
-    end
+    # ERR-001: the retry set used to be Net::OpenTimeout/ReadTimeout only, so
+    # every other transient fault bypassed the retry loop on its first attempt
+    # and escaped into Parallel.map -- which propagates the first exception and
+    # aborts every other in-flight lookup, killing a whole multi-hundred-package
+    # scan over one connection reset. Two of the examples below previously
+    # asserted that bypass as if it were the intended contract.
+    #
+    # Each transient class must now be retried max_retries times and only then
+    # re-raised, so BaseParser#registry_response can turn it into a per-package
+    # skip. Driven from the constant itself so a class added to TRANSIENT_ERRORS
+    # without retry coverage fails here.
+    describe 'transient network faults' do
+      SOUP::HttpClient::TRANSIENT_ERRORS.each do |error_class|
+        it "retries #{error_class} to exhaustion, warns, then re-raises", :aggregate_failures do
+          stub_request(:get, url).to_raise(error_class)
+          expect { described_class.get(url) }
+            .to(raise_error(error_class).and(output(/Aborting after 3 retries/).to_stderr))
+          expect(WebMock).to(have_requested(:get, url).times(4))
+        end
 
-    it 'lets SocketError bypass the retry loop and propagate', :aggregate_failures do
-      stub_request(:get, url).to_raise(SocketError.new('getaddrinfo: nodename nor servname provided'))
-      expect { described_class.get(url) }
-        .to(raise_error(SocketError, /getaddrinfo/))
-      expect(WebMock).to(have_requested(:get, url).times(1))
+        it "recovers when an attempt after #{error_class} succeeds", :aggregate_failures do
+          stub_request(:get, url).to_raise(error_class).then.to_return(status: 200, body: 'ok')
+          expect { expect(described_class.get(url).code).to(eq(200)) }
+            .to(output(%r{Retrying \(1/3\)}).to_stderr)
+          expect(WebMock).to(have_requested(:get, url).times(2))
+        end
+      end
+
+      it 'names the exception class in the warning so resets are not reported as timeouts' do
+        stub_request(:get, url).to_raise(Errno::ECONNRESET)
+
+        expect { described_class.get(url) }
+          .to(raise_error(Errno::ECONNRESET).and(output(/Errno::ECONNRESET/).to_stderr))
+      end
     end
   end
 
