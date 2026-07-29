@@ -203,10 +203,12 @@ RSpec.describe(SOUP::YarnParser) do
         .to_return(status: 200, body: unlicense_response)
     end
 
-    it 'converts Unlicense to NOASSERTION' do
+    # BUG-006: Unlicense is allowlisted in config/licenses.json, so it must
+    # survive parsing intact rather than being downgraded to NOASSERTION.
+    it 'records Unlicense verbatim' do
       packages = {}
       parser.parse(lockfile_path, packages)
-      expect(packages['lodash'].license).to(eq('NOASSERTION'))
+      expect(packages['lodash'].license).to(eq('Unlicense'))
     end
   end
 

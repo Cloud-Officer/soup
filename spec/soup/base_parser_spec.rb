@@ -66,8 +66,16 @@ RSpec.describe(SOUP::BaseParser) do
         expect(parser.normalize_license('')).to(eq(''))
       end
 
-      it 'converts Unlicense to NOASSERTION' do
-        expect(parser.normalize_license('Unlicense')).to(eq('NOASSERTION'))
+      # BUG-006: Unlicense is a real SPDX identifier and config/licenses.json
+      # allowlists it, but normalize_license rewrote it to NOASSERTION before
+      # validation ever saw it -- making the allowlist entry unreachable and
+      # warning "Invalid license NOASSERTION" on every run.
+      it 'passes Unlicense through so the allowlist entry stays reachable' do
+        expect(parser.normalize_license('Unlicense')).to(eq('Unlicense'))
+      end
+
+      it 'passes the "The Unlicense" spelling through as well' do
+        expect(parser.normalize_license('The Unlicense')).to(eq('The Unlicense'))
       end
 
       it 'converts a URL license to NOASSERTION' do

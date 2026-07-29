@@ -11,9 +11,6 @@ module SOUP
     NOASSERTION_LICENSE = 'NOASSERTION'
     public_constant :NOASSERTION_LICENSE
 
-    UNLICENSE_PATTERN = 'Unlicense'
-    private_constant :UNLICENSE_PATTERN
-
     NPM_REGISTRY_ROOT = 'https://registry.npmjs.org'
     private_constant :NPM_REGISTRY_ROOT
 
@@ -71,10 +68,21 @@ module SOUP
       package
     end
 
+    # Downgrade a license value that carries no usable identity to NOASSERTION.
+    #
+    # Only a URL qualifies: registries let publishers point at a licence file
+    # instead of naming one ("https://github.com/x/y/blob/main/LICENSE"), and a
+    # URL states nothing Application#validate_license can match against the
+    # allowlist -- NOASSERTION is the honest SPDX answer.
+    #
+    # Everything else passes through verbatim, "Unlicense" included. It is a
+    # real SPDX identifier (the public-domain dedication) and config/licenses.json
+    # allowlists it, so rewriting it here made that entry unreachable and warned
+    # "Invalid license NOASSERTION" on every run for a licence the project had
+    # deliberately accepted.
     def normalize_license(license)
       return license if license.nil?
       return license if license.respond_to?(:empty?) && license.empty?
-      return NOASSERTION_LICENSE if license.to_s.include?(UNLICENSE_PATTERN)
       return NOASSERTION_LICENSE if license.to_s.start_with?('http')
 
       license

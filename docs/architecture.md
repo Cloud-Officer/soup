@@ -236,7 +236,7 @@
 - `parallel_each(work_items, packages, &)`: Fetches metadata for the work items concurrently via `Parallel.map(..., in_threads: HttpClient::THREAD_COUNT)` and collects the results
 - `collect_packages(results, packages)`: Compacts the fetched results and keys them by package name into the packages hash
 - `build_package(...)`: Constructs a `SOUP::Package` with normalized fields
-- `normalize_license(license)`: Maps Unlicense and URL-style license values to `NOASSERTION`; `UNLICENSE_PATTERN` is the private constant it matches on
+- `normalize_license(license)`: Maps URL-style license values (a link to a licence file names no licence) to `NOASSERTION`; every named identifier, `Unlicense` included, passes through so the `config/licenses.json` allowlist can match it
 - `sibling_file(file, suffix)`: Resolves a sibling manifest path next to a lock file
 - `manifest_mentions?(main_file, token)`: Token-boundary test for whether a dependency is declared directly in a source-code manifest; matches only when `token` is not flanked by identifier characters so a name that is a substring of another coordinate (e.g. `androidx.core:core` vs `androidx.core:core-ktx`) is not misclassified. Used by the Gradle and SPM parsers
 - `lookup_npm_registry_version(payload, name:, version:)`: Extracts a specific version hash from an npm-style registry payload; shared by the NPM, Yarn, and Importmap parsers
