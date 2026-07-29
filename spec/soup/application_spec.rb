@@ -514,14 +514,25 @@ RSpec.describe(SOUP::Application) do
         expect(JSON.parse(File.read('config/licenses.json'))).not_to(include('BSL'))
       end
 
+      # "BSL" is an abbreviation collision, not a version series: BSL-1.0 is the
+      # Boost Software License (permissive, and the only version Boost has ever
+      # had), while "BSL 1.1" is the Business Source License -- a different,
+      # source-available licence whose real SPDX id is BUSL-1.1. Replacing the
+      # bare "BSL" entry has to keep every Boost spelling passing while
+      # rejecting every Business Source one, so both sides are pinned here.
       [
         ['MIT', true],
         ['Apache-2.0', true],
         ['BSD-3-Clause', true],
         ['BSL-1.0', true],
+        ['BSL 1.0', true],
         ['Boost Software License 1.0', true],
+        ['Boost Software License - Version 1.0', true],
         ['Ruby', true],
         ['Business Source License (BSL 1.1)', false],
+        ['BSL-1.1', false],
+        ['BSL 1.1', false],
+        ['BUSL-1.1', false],
         ['Copyright (c) Vendor, all rights reserved', false],
         ['UNLICENSED', false],
         ['GPL-3.0', false],
