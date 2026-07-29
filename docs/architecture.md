@@ -111,14 +111,15 @@
 - `PARSER_REGISTRY`: Private module-level constant (`module SOUP`) mapping lock file names to parser classes and skip flags
 - `DEPENDENCY_TEXT`: Private module-level constant (`module SOUP`) holding the value written into `requirements` and `verification_reasoning` for transitive dependencies
 - `initialize(argv)`: Configures options and initializes state
-- `execute`: Main entry point that runs the detection, checking, and output workflow. Uses an `ensure` block to persist partial state on failure
+- `execute`: Main entry point that runs the detection, checking, and output workflow. On success it calls `save_files` and marks the run complete; if it raises, the `ensure` block routes to `save_partial_state` instead, so a failed run can never take the full-overwrite path
 - `validate_config!`: Validates that configuration files exist and contain valid JSON
 - `detect_packages`: Scans for lock files and invokes appropriate parsers, then runs `parse_manual_entries` and `enforce_vendored_coverage`
 - `parse_manual_entries`: Invokes `ManualParser` on the manual entries file (default `config/soup-manual.json`) when it exists; parsed after auto-detected packages so a project can override an auto-detected entry by package name
 - `enforce_vendored_coverage`: Fails the run (sets the error exit code) when a committed file matched by `--vendored_globs` has no SOUP entry, matched on the entry's `file` path or basename
 - `read_cached_packages`: Loads previously entered user choices from cache
 - `check_packages`: Validates licenses, then for each package applies cached metadata, applies the transitive-dependency defaults (`apply_dependency_defaults` writes the lowest risk level and `DEPENDENCY_TEXT`), prompts for anything still missing, stamps `last_verified_at`, and appends the markdown row
-- `save_files`: Writes cache and markdown documentation files, returning early when nothing has been detected yet so an early failure (e.g. `validate_config!` raising) cannot overwrite an existing `.soup.json` with `{}`
+- `save_files`: The success path. Writes cache and markdown documentation files, replacing both wholesale — which is what lets a removed dependency drop out of the register. Only reached when every package completed `check_packages`
+- `save_partial_state`: The failure path. Persists only the packages that finished the whole `check_packages` iteration (`Package#verified?`), merged over the cache read at startup, so an interrupted run keeps the verification work it did complete without blanking the metadata of packages it never reached. Deliberately does not write the markdown register, because `@markdown` holds only the rows appended before the failure and a stale-but-complete table beats a truncated one
 
 **Internal Dependencies:**
 
@@ -568,7 +569,7 @@ Recoverable failures raise a subclass of `SOUP::Error` (`lib/soup/errors.rb`); t
 | Maven source unreachable | An unreachable `search.maven.org` query or POM mirror is skipped (warned) and the lookup falls through to the next source; the scan is not aborted | `lib/soup/parsers/gradle.rb` in `fetch_package`, via `BaseParser#registry_response` |
 | Missing package metadata | Logs warning and continues processing other packages | NPM, Gradle, SPM, Importmap parsers; `lookup_npm_registry_version` in `lib/soup/parsers/base.rb` |
 | Missing required IEC 62304 fields | Raises `MissingMetadataError` in `--no_prompt` mode, prompts user otherwise | `lib/soup/application.rb` in `prompt_missing_field` / `ensure_metadata_complete!` methods |
-| Partial execution failure | Persists partial state via `ensure` block so progress is not lost | `lib/soup/application.rb` in `execute` method |
+| Partial execution failure | Persists only fully verified packages via the `ensure` block, merged over the existing cache, so progress is not lost and previously recorded IEC 62304 evidence is never blanked; the published markdown register is left untouched rather than truncated | `lib/soup/application.rb` in `execute` / `save_partial_state` methods |
 | Unhandled exceptions | Displays error message and the top frames of the backtrace; full backtrace shown only when `ENV['DEBUG']` is set | `bin/soup.rb` top-level rescue |
 
 ### Security Controls

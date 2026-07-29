@@ -462,36 +462,108 @@ RSpec.describe(SOUP::Application) do
       end
     end
 
+    # BUG-001: the ensure block handed the half-populated @detected_packages
+    # straight to save_files when a run raised part-way through check_packages.
+    # Every package after the failure point had never reached
+    # apply_cached_metadata, so it serialized with blank verification fields and
+    # overwrote the human-entered IEC 62304 evidence in .soup.json, while
+    # docs/soup.md was replaced by a header-only table. One failed --no_prompt
+    # run in CI destroyed the register.
+    #
+    # The ensure-save must still preserve work completed this session, so the
+    # write is now additive: only packages that finished the whole
+    # check_packages iteration are persisted, layered over the cache read at
+    # startup. The previous version of this context asserted merely that the
+    # cache was "not empty" after a failure -- which the destructive behaviour
+    # satisfied by writing blank entries, so it pinned the bug rather than the
+    # intent.
     context 'with partial state on failure' do
-      before do
-        two_pkg_lock = {
+      # Reproduces the issue's scenario exactly, with the failure in the middle
+      # so there is a package on each side of it. Hash order follows the
+      # lockfile:
+      #   aaa/transitive -- absent from require, so classified transitive and
+      #     completed by apply_dependency_defaults: real work done this run.
+      #   mmm/raises     -- direct, no cached metadata, so --no_prompt raises here.
+      #   zzz/cached     -- direct and previously verified, but never reached.
+      #     This is the package the old ensure-save destroyed.
+      def partial_failure_lock
+        {
           packages: [
-            {
-              name: 'first/pkg',
-              version: '1.0.0',
-              license: ['MIT'],
-              description: 'First',
-              homepage: 'https://example.com'
-            },
-            {
-              name: 'second/pkg',
-              version: '2.0.0',
-              license: ['MIT'],
-              description: 'Second',
-              homepage: 'https://example.com'
-            }
+            { name: 'aaa/transitive', version: '1.0.0', license: ['MIT'], description: 'T', homepage: '' },
+            { name: 'mmm/raises', version: '2.0.0', license: ['MIT'], description: 'R', homepage: '' },
+            { name: 'zzz/cached', version: '3.0.0', license: ['MIT'], description: 'C', homepage: '' }
           ],
           'packages-dev': []
         }.to_json
-        stub_composer_files(two_pkg_lock, '{"require":{"first/pkg":"^1.0","second/pkg":"^2.0"}}')
       end
 
-      it 'saves partial state when check_packages raises an exception', :aggregate_failures do
+      def direct_requires
+        '{"require":{"mmm/raises":"^2.0","zzz/cached":"^3.0"}}'
+      end
+
+      # Symbol keys serialize to the same JSON the real cache file holds; the
+      # assertions below read it back with string keys, as JSON.parse returns.
+      def previously_verified_cache
+        {
+          'zzz/cached': {
+            language: 'PHP',
+            package: 'zzz/cached',
+            version: '3.0.0',
+            license: 'MIT',
+            description: 'C',
+            website: '',
+            last_verified_at: '2025-01-01',
+            risk_level: 'High',
+            requirements: 'Critical subsystem',
+            verification_reasoning: 'Audited in 2025'
+          }
+        }
+      end
+
+      def run_expecting_failure
         app = described_class.new(soup_no_prompt_args(skip: skip_parsers_except_composer))
         expect { app.execute }
-          .to(raise_error(SOUP::MissingMetadataError, /No risk level found/))
-        cache_content = JSON.parse(File.read(cache_file.path))
-        expect(cache_content).not_to(be_empty)
+          .to(raise_error(SOUP::MissingMetadataError))
+        JSON.parse(File.read(cache_file.path))
+      end
+
+      before do
+        stub_composer_files(partial_failure_lock, direct_requires)
+        File.write(cache_file.path, JSON.generate(previously_verified_cache))
+      end
+
+      it 'still persists the packages this run finished verifying', :aggregate_failures do
+        cache_content = run_expecting_failure
+        expect(cache_content).to(have_key('aaa/transitive'))
+        expect(cache_content.dig('aaa/transitive', 'risk_level')).not_to(be_empty)
+      end
+
+      it 'does not blank a verified package that the run never reached', :aggregate_failures do
+        cache_content = run_expecting_failure
+        expect(cache_content.dig('zzz/cached', 'risk_level')).to(eq('High'))
+        expect(cache_content.dig('zzz/cached', 'requirements')).to(eq('Critical subsystem'))
+        expect(cache_content.dig('zzz/cached', 'verification_reasoning')).to(eq('Audited in 2025'))
+      end
+
+      it 'does not add the package that raised to the cache as a blank entry' do
+        expect(run_expecting_failure).not_to(have_key('mmm/raises'))
+      end
+
+      # The published register must not be truncated to the header-only table
+      # that @markdown holds when the run dies before appending every row.
+      it 'leaves the existing markdown register untouched' do
+        File.write(markdown_file, "# Software of Unknown Provenance\n\n| existing | row |\n")
+        run_expecting_failure
+        expect(File.read(markdown_file)).to(include('| existing | row |'))
+      end
+
+      # Nothing completed at all, so there is no work to preserve and the cache
+      # on disk must be left exactly as it was -- byte for byte.
+      it 'leaves the cache byte-identical when the run verified nothing' do
+        stub_composer_files(partial_failure_lock, '{"require":{"aaa/transitive":"^1.0","mmm/raises":"^2.0"}}')
+        before_bytes = File.read(cache_file.path)
+        run_expecting_failure
+        expect(File.read(cache_file.path)).to(eq(before_bytes))
       end
     end
 
