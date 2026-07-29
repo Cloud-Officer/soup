@@ -427,6 +427,41 @@ RSpec.describe(SOUP::Application) do
       end
     end
 
+    # BUG-006: config/licenses.json allowlists "Unlicense", but every parser
+    # routed it through normalize_license, which rewrote it to NOASSERTION
+    # before validate_license ran. The allowlist entry was therefore dead and
+    # every Unlicense package warned "Invalid license NOASSERTION" on each run.
+    context 'with an allowlisted Unlicense package' do
+      before do
+        File.write(licenses_file.path, '["MIT", "Apache-2.0", "Unlicense"]')
+        unlicense_lock = {
+          packages: [
+            {
+              name: 'unlicense/pkg',
+              version: '1.0.0',
+              license: ['Unlicense'],
+              description: 'Public domain package',
+              homepage: 'https://example.com'
+            }
+          ],
+          'packages-dev': []
+        }.to_json
+        stub_composer_files(unlicense_lock, '{"require":{"unlicense/pkg":"^1.0"}}')
+      end
+
+      it 'validates against the allowlist without warning', :aggregate_failures do
+        app = described_class.new(licenses_args(skip: skip_parsers_except_composer))
+        expect { expect(app.execute).to(eq(SOUP::Status::SUCCESS_EXIT_CODE)) }
+          .not_to(output(/Invalid license/).to_stderr)
+      end
+
+      it 'records the license as Unlicense rather than NOASSERTION' do
+        app = described_class.new(soup_args(skip: skip_parsers_except_composer))
+        app.execute
+        expect(JSON.parse(File.read(cache_file.path))['unlicense/pkg']['license']).to(eq('Unlicense'))
+      end
+    end
+
     context 'with partial state on failure' do
       before do
         two_pkg_lock = {
