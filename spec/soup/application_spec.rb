@@ -431,6 +431,108 @@ RSpec.describe(SOUP::Application) do
     # routed it through normalize_license, which rewrote it to NOASSERTION
     # before validate_license ran. The allowlist entry was therefore dead and
     # every Unlicense package warned "Invalid license NOASSERTION" on each run.
+    # BUG-004: the allowlist was matched with a bare Regexp.union, i.e. an
+    # unanchored substring test, so any licence string that merely *contained*
+    # an allowlisted entry passed the compliance gate -- the tool's core
+    # function. Entries are now anchored on word boundaries, and the two
+    # allowlist entries that were themselves too broad to be rescued by
+    # anchoring ("Copyright", bare "BSL") are gone from config/licenses.json.
+    describe 'license allowlist matching' do
+      # Drives a real --licenses run over a composer package with the given
+      # licence, against the given allowlist, and reports whether it passed.
+      def license_accepted?(license, allowlist: '["MIT", "Apache", "Unlicense"]')
+        File.write(licenses_file.path, allowlist)
+        lock = {
+          packages: [{ name: 'probe/pkg', version: '1.0.0', license: [license], description: 'x', homepage: '' }],
+          'packages-dev': []
+        }.to_json
+        stub_composer_files(lock, '{"require":{"probe/pkg":"^1.0"}}')
+        app = described_class.new(licenses_args(skip: skip_parsers_except_composer))
+        exit_code = suppress_stderr { app.execute }
+        exit_code == SOUP::Status::SUCCESS_EXIT_CODE
+      end
+
+      def suppress_stderr(&)
+        original = $stderr
+        $stderr = StringIO.new
+        yield
+      ensure
+        $stderr = original
+      end
+
+      # A family entry must still cover the versioned identifiers it exists for
+      # -- this is why the fix anchors on word boundaries rather than switching
+      # to exact-match, which would reject every real-world SPDX id.
+      [
+        ['MIT', 'exact match'],
+        ['Apache-2.0', 'family entry covering a versioned SPDX id'],
+        ['Apache License, Version 2.0', 'family entry inside a prose licence name'],
+        ['Unlicense', 'exact match on a short entry']
+      ].each do |license, why|
+        it "still accepts #{license.inspect} (#{why})" do
+          expect(license_accepted?(license)).to(be(true))
+        end
+      end
+
+      # The headline defect: each of these contains an allowlisted entry as a
+      # substring but is not that licence.
+      [
+        ['UNLICENSED', "npm's proprietary marker, the opposite of Unlicense"],
+        ['MITigated Source License', 'unrelated licence whose name starts with MIT'],
+        ['Apacheish Public License', 'unrelated licence embedding a family name']
+      ].each do |license, why|
+        it "now rejects #{license.inspect} (#{why})" do
+          expect(license_accepted?(license)).to(be(false))
+        end
+      end
+
+      it 'treats an empty allowlist as allowing nothing rather than everything' do
+        expect(license_accepted?('MIT', allowlist: '[]')).to(be(false))
+      end
+
+      it 'escapes regex metacharacters in operator-supplied allowlist entries', :aggregate_failures do
+        expect(license_accepted?('MIT+', allowlist: '["MIT+"]')).to(be(true))
+        # "MIT+" must be a literal, not "MIT" with a one-or-more quantifier.
+        expect(license_accepted?('MITT', allowlist: '["MIT+"]')).to(be(false))
+      end
+    end
+
+    # The shipped config/licenses.json is itself part of the fix: word-boundary
+    # anchoring cannot rescue an entry that is legitimately a substring of a
+    # non-compliant licence name, so those entries had to change.
+    describe 'the shipped config/licenses.json' do
+      subject(:pattern) do
+        entries = JSON.parse(File.read('config/licenses.json'))
+        Regexp.union(entries.map { |entry| /(?<!\w)#{Regexp.escape(entry.downcase)}(?!\w)/ })
+      end
+
+      it 'no longer carries the bare "Copyright" entry that matched any proprietary notice' do
+        expect(JSON.parse(File.read('config/licenses.json'))).not_to(include('Copyright'))
+      end
+
+      it 'no longer carries the bare "BSL" entry that matched Business Source License' do
+        expect(JSON.parse(File.read('config/licenses.json'))).not_to(include('BSL'))
+      end
+
+      [
+        ['MIT', true],
+        ['Apache-2.0', true],
+        ['BSD-3-Clause', true],
+        ['BSL-1.0', true],
+        ['Boost Software License 1.0', true],
+        ['Ruby', true],
+        ['Business Source License (BSL 1.1)', false],
+        ['Copyright (c) Vendor, all rights reserved', false],
+        ['UNLICENSED', false],
+        ['GPL-3.0', false],
+        ['SSPL-1.0', false]
+      ].each do |license, allowed|
+        it "#{allowed ? 'accepts' : 'rejects'} #{license.inspect}" do
+          expect(license.downcase.match?(pattern)).to(be(allowed))
+        end
+      end
+    end
+
     context 'with an allowlisted Unlicense package' do
       before do
         File.write(licenses_file.path, '["MIT", "Apache-2.0", "Unlicense"]')
