@@ -35,6 +35,7 @@ RSpec.describe(SOUP::BaseParser) do
                :normalize_license,
                :npm_registry_license,
                :sibling_file,
+               :registry_response,
                :http_error_message
       end
     end
@@ -115,6 +116,76 @@ RSpec.describe(SOUP::BaseParser) do
       it 'does not corrupt a directory whose name contains the lockfile name' do
         expect(parser.sibling_file('/Users/sherlock/composer.lock', 'composer.json'))
           .to(eq('/Users/sherlock/composer.json'))
+      end
+    end
+
+    # ERR-001: registry_response is the single parser-level rescue every parser
+    # routes through. Its rescue list used to be a hand-copied
+    # "Net::OpenTimeout, Net::ReadTimeout", so any other transient fault escaped
+    # into Parallel.map and aborted the entire scan. It now rescues
+    # HttpClient::TRANSIENT_ERRORS itself, which cannot drift from what .get
+    # retries.
+    describe '#registry_response' do
+      let(:url) { 'https://registry.example.com/pkg' }
+      # One healthy package, one that resets, one more healthy -- routed through
+      # the same parallel_each every parser uses.
+      let(:mixed_batch) do
+        lambda do |packages|
+          parser.parallel_each(%w[good bad good2], packages) do |name|
+            target = name == 'bad' ? "#{url}/bad" : "#{url}/good"
+            build_block.call("pkg-#{name}") if parser.registry_response(target, label: name, max_retries: 0)
+          end
+        end
+      end
+
+      # max_retries: 0 keeps each example to a single request -- the retry
+      # behaviour itself is HttpClient's contract and is covered there.
+      SOUP::HttpClient::TRANSIENT_ERRORS.each do |error_class|
+        it "returns nil and warns instead of letting #{error_class} abort the scan", :aggregate_failures do
+          stub_request(:get, url).to_raise(error_class)
+
+          result = nil
+          expect { result = parser.registry_response(url, label: 'pkg', max_retries: 0) }
+            .to(output(/Skipping pkg: network error after retries/).to_stderr)
+          expect(result).to(be_nil)
+        end
+      end
+
+      it 'names the exception class rather than calling every fault a timeout' do
+        stub_request(:get, url).to_raise(Errno::ECONNRESET)
+
+        expect { parser.registry_response(url, label: 'pkg', max_retries: 0) }
+          .to(output(/Errno::ECONNRESET/).to_stderr)
+      end
+
+      it 'reports the caller-supplied outcome so gradle\'s mirror loop is not misdescribed' do
+        stub_request(:get, url).to_raise(SocketError)
+
+        expect { parser.registry_response(url, label: url, outcome: 'trying next repository', max_retries: 0) }
+          .to(output(/trying next repository/).to_stderr)
+      end
+
+      it 'passes a successful response straight through' do
+        stub_request(:get, url).to_return(status: 200, body: 'ok')
+        expect(parser.registry_response(url, label: 'pkg').code).to(eq(200))
+      end
+
+      # A non-2xx is a response, not a transport fault: callers inspect the code
+      # themselves, so it must not be swallowed into nil here.
+      it 'returns a non-2xx response rather than converting it to nil' do
+        stub_request(:get, url).to_return(status: 404, body: 'Not Found')
+        expect(parser.registry_response(url, label: 'pkg').code).to(eq(404))
+      end
+
+      # The whole point of ERR-001: Parallel.map propagates the first exception
+      # and drops every other in-flight result, so a single reset used to cost
+      # the entire run. The surviving packages must still be collected.
+      it 'lets the rest of a parallel batch survive one package\'s connection reset' do
+        stub_request(:get, "#{url}/bad").to_raise(Errno::ECONNRESET)
+        stub_request(:get, "#{url}/good").to_return(status: 200, body: 'ok')
+        packages = {}
+        mixed_batch.call(packages)
+        expect(packages.keys).to(contain_exactly('pkg-good', 'pkg-good2'))
       end
     end
 

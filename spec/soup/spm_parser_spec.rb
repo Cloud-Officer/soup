@@ -66,7 +66,7 @@ RSpec.describe(SOUP::SPMParser) do
 
     it 'names the pin in the skip warning' do
       expect { parser.parse(lockfile_path, packages) }
-        .to(output(/Skipping alamofire: network timeout after retries/).to_stderr)
+        .to(output(/Skipping alamofire: network error after retries/).to_stderr)
     end
   end
 

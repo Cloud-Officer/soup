@@ -136,7 +136,7 @@ RSpec.describe(SOUP::ImportmapParser) do
 
     it 'records the package and names it without a version in the warning', :aggregate_failures do
       expect { packages }
-        .to(output(/Skipping marked: network timeout after retries/).to_stderr)
+        .to(output(/Skipping marked: network error after retries/).to_stderr)
       expect(packages['marked']).to(have_attributes(version: '12.0.0', license: 'NOASSERTION'))
       expect(packages['marked'].unresolved).to(be(true))
     end
