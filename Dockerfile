@@ -17,8 +17,12 @@ ENV LC_ALL=en_US.UTF-8
 # Update and install dependencies
 RUN apt-get update && apt-get install --no-install-recommends --yes autoconf autogen automake build-essential ca-certificates clang curl file gcc git git-lfs intltool libtool libtool-bin locales make pkg-config ruby ruby-all-dev ruby-build ruby-bundler ruby-dev sudo unzip wget zip && locale-gen en_US.UTF-8 && rm -rf /var/lib/apt/lists/*
 
-# Add user soup
-RUN useradd -m -s /bin/bash soup && echo 'soup ALL=(ALL) NOPASSWD:ALL' >>/etc/sudoers
+# Add user soup. The uid/gid are pinned rather than auto-assigned so the numeric
+# USER below cannot drift: `ubuntu:26.04` already ships an `ubuntu` user at 1000,
+# so an unpinned useradd lands on 1001 today, but that is a property of the base
+# image's account list, not a guarantee. Pinning keeps the built image identical
+# to the auto-assigned one while making the value explicit.
+RUN groupadd -g 1001 soup && useradd -m -u 1001 -g 1001 -s /bin/bash soup && echo 'soup ALL=(ALL) NOPASSWD:ALL' >>/etc/sudoers
 
 # Copy the build context -- the exact commit this image is built from -- rather
 # than cloning the default branch at build time. The publishing workflow checks
@@ -34,9 +38,14 @@ COPY --chown=soup:soup . /home/soup/soup
 WORKDIR /home/soup/soup
 RUN bundle install && ln -s "/home/soup/soup/bin/soup.rb" "/usr/local/bin/soup"
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=5s --retries=3 CMD pgrep sleep > /dev/null || exit 1
+# Health check. Spelled in JSON notation with an explicit shell (DL3025): the
+# check is a shell expression -- a redirect and an `||` -- so it needs one, and
+# naming /bin/sh here is what the bare shell form did implicitly anyway.
+HEALTHCHECK --interval=30s --timeout=5s --retries=3 CMD ["/bin/sh", "-c", "pgrep sleep > /dev/null || exit 1"]
 
-# Entrypoint
-USER soup
+# Entrypoint. Numeric uid (DL3066): a name only resolves against this image's
+# /etc/passwd, so a host or orchestrator matching users by uid -- or a volume
+# mounted with host ownership -- cannot resolve `soup`. 1001 is the uid created
+# above.
+USER 1001
 CMD ["bash", "-c", "sleep 86400"]
