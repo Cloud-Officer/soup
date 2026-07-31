@@ -160,8 +160,9 @@ module SOUP
     # its retries are exhausted. Parallel.map propagates the first exception and
     # aborts every other in-flight lookup, so one unreachable registry must not
     # kill the whole scan. Returns nil on failure, so callers guard with
-    # `return if response.nil?` -- or, for a multi-source loop, fall through to
-    # the next source. Every parser that talks to a registry routes through here.
+    # `return if empty_response?(response)` -- or, for a multi-source loop, fall
+    # through to the next source. Every parser that talks to a registry routes
+    # through here.
     #
     # `label` names what is being skipped: the package for the single-source
     # parsers, the URL itself for gradle's mirror loop. `outcome` states what
@@ -184,6 +185,29 @@ module SOUP
     rescue *HttpClient::TRANSIENT_ERRORS => e
       warn("Skipping #{label}: network error after retries (#{e.class}: #{e.message}); #{outcome}")
       nil
+    end
+
+    # True when a registry lookup produced nothing worth parsing: either no
+    # response at all (registry_response above swallowed a network fault), or a
+    # response whose body is empty, which JSON.parse would only reject. Both
+    # mean the same thing to every caller -- record the package via
+    # unresolved_package.
+    #
+    # This guard used to be spelled `response.nil?`, which covered both cases
+    # only because HTTParty::Response overrides #nil? to mean "body is nil or
+    # empty". That override is deprecated: it prints a [DEPRECATION] line on
+    # every single registry lookup, and once HTTParty drops it the same call
+    # would silently narrow to a plain object check, letting an empty body reach
+    # JSON.parse and abort the scan with a JSON::ParserError. Asking both
+    # questions explicitly preserves today's behaviour past that removal.
+    #
+    # Note the `unless response` rather than `response.nil?` -- calling #nil? on
+    # the Response is itself the deprecated call, so it cannot appear here.
+    def empty_response?(response)
+      return true unless response
+
+      body = response.body
+      body.nil? || body.empty?
     end
 
     # Convenience wrapper for the three npm consumers (NPM, Yarn, Importmap),

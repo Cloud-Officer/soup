@@ -36,6 +36,7 @@ RSpec.describe(SOUP::BaseParser) do
                :npm_registry_license,
                :sibling_file,
                :registry_response,
+               :empty_response?,
                :http_error_message
       end
     end
@@ -194,6 +195,39 @@ RSpec.describe(SOUP::BaseParser) do
         packages = {}
         mixed_batch.call(packages)
         expect(packages.keys).to(contain_exactly('pkg-good', 'pkg-good2'))
+      end
+    end
+
+    # Every parser guards its registry lookup with this. It used to be spelled
+    # `response.nil?`, which only covered the empty-body case because
+    # HTTParty::Response overrides #nil? to mean "body is nil or empty" -- an
+    # override HTTParty has deprecated, so a scan printed one [DEPRECATION]
+    # block per package and the guard would have silently narrowed to a plain
+    # object check on removal, letting empty bodies reach JSON.parse.
+    describe '#empty_response?' do
+      let(:url) { 'https://registry.example.com/pkg' }
+
+      def response_for(body)
+        stub_request(:get, url).to_return(status: 200, body: body)
+        parser.registry_response(url, label: 'pkg')
+      end
+
+      it 'is true when the network fault left no response at all' do
+        expect(parser.empty_response?(nil)).to(be(true))
+      end
+
+      it 'is true for an empty body, which JSON.parse would only reject' do
+        expect(parser.empty_response?(response_for(''))).to(be(true))
+      end
+
+      it 'is false for a response that actually has a payload to parse' do
+        expect(parser.empty_response?(response_for('{}'))).to(be(false))
+      end
+
+      it 'does not trip HTTParty\'s response#nil? deprecation warning' do
+        response = response_for('{}')
+        expect { parser.empty_response?(response) }
+          .not_to(output(/DEPRECATION/).to_stderr)
       end
     end
 

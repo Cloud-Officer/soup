@@ -30,12 +30,12 @@ module SOUP
       # remaining fallbacks would time out too -- record the gem as unresolved
       # rather than walking the rest of the chain. CONS-002.
       response = registry_response(version_url, label: label)
-      return unresolved_package(name: spec.name, file: file, language: 'Ruby', version: version, dependency: dependency) if response.nil?
+      return unresolved_package(name: spec.name, file: file, language: 'Ruby', version: version, dependency: dependency) if empty_response?(response)
 
       if response.code != 200
         latest_url = "https://api.rubygems.org/api/v1/versions/#{spec.name}/latest.json"
         response = registry_response(latest_url, label: label)
-        return unresolved_package(name: spec.name, file: file, language: 'Ruby', version: version, dependency: dependency) if response.nil?
+        return unresolved_package(name: spec.name, file: file, language: 'Ruby', version: version, dependency: dependency) if empty_response?(response)
 
         if response.code != 200
           warn(http_error_message(response, url: latest_url, package: label))
@@ -45,7 +45,7 @@ module SOUP
         latest_version = JSON.parse(response.body)['version']
         fallback_url = "https://api.rubygems.org/api/v2/rubygems/#{spec.name}/versions/#{latest_version}.json"
         response = registry_response(fallback_url, label: "#{spec.name} #{latest_version}")
-        return unresolved_package(name: spec.name, file: file, language: 'Ruby', version: version, dependency: dependency) if response.nil?
+        return unresolved_package(name: spec.name, file: file, language: 'Ruby', version: version, dependency: dependency) if empty_response?(response)
 
         if response.code != 200
           warn(http_error_message(response, url: fallback_url, package: "#{spec.name} #{latest_version}"))

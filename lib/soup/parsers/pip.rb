@@ -79,7 +79,7 @@ module SOUP
       url = "https://pypi.org/pypi/#{pip_package.sub(/\[[^\]]+\]/, '')}/json"
       dependency = !direct_deps.include?(normalize_pip_name(pip_package.sub(/\[[^\]]+\]/, '')))
       response = registry_response(url, label: "#{pip_package}==#{version}")
-      return unresolved_package(name: pip_package, file: file, language: 'Python', version: version, dependency: dependency) if response.nil?
+      return unresolved_package(name: pip_package, file: file, language: 'Python', version: version, dependency: dependency) if empty_response?(response)
 
       if response.code != 200
         warn(http_error_message(response, url: url, package: "#{pip_package}==#{version}"))
