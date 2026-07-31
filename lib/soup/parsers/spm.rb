@@ -103,7 +103,7 @@ module SOUP
 
       # The pin identity is all we know when the lookup fails, so it stands in
       # for the repository name the GitHub payload would otherwise supply.
-      return unresolved_package(name: pin_id, file: file, language: 'Swift', version: version, dependency: !manifest_mentions?(main_file, pin_id)) if response.nil?
+      return unresolved_package(name: pin_id, file: file, language: 'Swift', version: version, dependency: !manifest_mentions?(main_file, pin_id)) if empty_response?(response)
 
       unless response.code == 200
         # Rate limiting and bad credentials are global conditions -- every

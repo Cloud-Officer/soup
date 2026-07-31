@@ -46,7 +46,7 @@ module SOUP
       dependency = !direct_deps.include?(name)
 
       response = npm_registry_response(name: name, label: label)
-      return unresolved_package(name: name, file: file, language: 'JS', version: version, dependency: dependency) if response.nil?
+      return unresolved_package(name: name, file: file, language: 'JS', version: version, dependency: dependency) if empty_response?(response)
 
       if response.code != 200
         warn(http_error_message(response, url: npm_registry_url(name), package: label))
