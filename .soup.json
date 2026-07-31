@@ -98,7 +98,7 @@
   "json": {
     "language": "Ruby",
     "package": "json",
-    "version": "2.21.1",
+    "version": "2.21.2",
     "license": "Ruby",
     "description": "A JSON implementation as a JRuby extension.",
     "website": "https://github.com/ruby/json",

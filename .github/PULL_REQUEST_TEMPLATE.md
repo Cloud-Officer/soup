@@ -1,3 +1,5 @@
+<!-- Distributed by repos.sh from Cloud-Officer/aws:github/PULL_REQUEST_TEMPLATE-generic.md - edit it there, local changes are overwritten. -->
+
 # Summary
 
 Describe the summary/big picture of your changes here to communicate to the maintainers why we should accept this pull request.

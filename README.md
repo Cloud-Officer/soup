@@ -119,7 +119,7 @@ options
 |-------------------------|----------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `GITHUB_TOKEN`          | Optional | GitHub personal access token for SPM dependency lookups. Required when processing many Swift packages to avoid GitHub API rate limiting. [Create one here](https://github.com/settings/tokens). |
 | `SOUP_HTTP_TIMEOUT`     | Optional | Per-request HTTP timeout in seconds (integer). Defaults to `5`. Raise this on slow corporate proxies or rate-limited mirrors.                                                                   |
-| `SOUP_HTTP_MAX_RETRIES` | Optional | Number of retries on transient timeouts (integer). Defaults to `3`. Each retry uses the same timeout.                                                                                           |
+| `SOUP_HTTP_MAX_RETRIES` | Optional | Number of retries on transient network faults (timeouts, resets, unreachable hosts, DNS/TLS failures, truncated responses). Defaults to `3`. HTTP 4xx/5xx are not retried.                      |
 | `DEBUG`                 | Optional | When set to any value, print the full backtrace on an unhandled error instead of the first few frames.                                                                                          |
 
 The tool works without `GITHUB_TOKEN` for non-SPM projects. When processing SPM dependencies, unauthenticated GitHub

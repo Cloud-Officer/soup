@@ -112,12 +112,15 @@
 - `DEPENDENCY_TEXT`: Private module-level constant (`module SOUP`) holding the value written into `requirements` and `verification_reasoning` for transitive dependencies
 - `initialize(argv)`: Configures options and initializes state
 - `execute`: Main entry point that runs the detection, checking, and output workflow. On success it calls `save_files` and marks the run complete; if it raises, the `ensure` block routes to `save_partial_state` instead, so a failed run can never take the full-overwrite path
-- `validate_config!`: Validates that configuration files exist and contain valid JSON
+- `validate_config!`: Validates that `--licenses_file` and `--exceptions_file` exist and contain valid JSON (via `validate_json!`), then delegates to `validate_cache_file!`
+- `validate_cache_file!`: Validates the cache file's JSON before any state exists, and only when `--soup` will actually read it (the cache is legitimately absent on a first run). Deliberately runs here rather than in `read_cached_packages`: a parse error raised there would escape through the `ensure` block save, rewriting `.soup.json` with metadata-less entries and blanking `docs/soup.md`. Failing this early lets `save_files`' empty-state guard leave both files untouched
 - `detect_packages`: Scans for lock files and invokes appropriate parsers, then runs `parse_manual_entries` and `enforce_vendored_coverage`
 - `parse_manual_entries`: Invokes `ManualParser` on the manual entries file (default `config/soup-manual.json`) when it exists; parsed after auto-detected packages so a project can override an auto-detected entry by package name
 - `enforce_vendored_coverage`: Fails the run (sets the error exit code) when a committed file matched by `--vendored_globs` has no SOUP entry, matched on the entry's `file` path or basename
 - `read_cached_packages`: Loads previously entered user choices from cache
 - `build_license_pattern`: Compiles `--licenses_file` into the allowlist matcher, anchoring every entry on word boundaries so a license that merely contains an allowlisted entry (e.g. npm's proprietary `UNLICENSED` containing `Unlicense`) no longer passes the compliance gate; an empty allowlist matches nothing rather than everything
+- `apply_cached_metadata(name, package)`: Copies the four verification fields from the cache onto the package, and for a package whose registry lookup failed this run first calls `restore_unresolved_metadata`
+- `restore_unresolved_metadata(package, cached)`: Restores `license`, `description`, and `website` from the cached entry when the package is marked `unresolved`, so a transient registry outage never downgrades an already-verified entry to `NOASSERTION`. Applied only when the cached entry records the *same* version, since licenses change between releases and carrying an older version's license onto a newly pinned one would assert something never verified
 - `check_packages`: Validates licenses, then for each package applies cached metadata, applies the transitive-dependency defaults (`apply_dependency_defaults` writes the lowest risk level and `DEPENDENCY_TEXT`), prompts for anything still missing, stamps `last_verified_at`, and appends the markdown row
 - `save_files`: The success path. Writes cache and markdown documentation files, replacing both wholesale — which is what lets a removed dependency drop out of the register. Only reached when every package completed `check_packages`
 - `save_partial_state`: The failure path. Persists only the packages that finished the whole `check_packages` iteration (`Package#verified?`), merged over the cache read at startup, so an interrupted run keeps the verification work it did complete without blanking the metadata of packages it never reached. Deliberately does not write the markdown register, because `@markdown` holds only the rows appended before the failure and a stale-but-complete table beats a truncated one
@@ -163,9 +166,11 @@
 **Key Components:**
 
 - `self.sanitize_description(text, first_sentence:, strip_markdown:)`: Class method that sanitizes package descriptions by returning nil for nil/empty input, extracting the first sentence, wrapping URLs, and stripping markdown characters
-- Attributes: `file`, `language`, `package`, `version`, `license`, `description`, `website`, `last_verified_at`, `risk_level`, `requirements`, `verification_reasoning`, `dependency`
+- Parser-produced attributes, set once during `BaseParser#build_package` and treated as read-only afterwards: `file`, `language`, `package`, `version`, `license`, `description`, `website`, `dependency`
+- Verification attributes, filled in by `Application#check_packages` from the cache, the dependency defaults, or the prompts: `last_verified_at`, `risk_level`, `requirements`, `verification_reasoning`
+- `unresolved`: True when this run's registry lookup failed (network fault, 404 for a package absent from the registry, 403 for a private one) so license/description/website could not be fetched. Drives `Application#restore_unresolved_metadata`. Deliberately not serialized by `as_json` — it describes the run, not the package
 - `verified?`: Returns true when all four verification fields (`last_verified_at`, `risk_level`, `requirements`, `verification_reasoning`) are non-empty
-- `as_json`: Serializes package to JSON format
+- `as_json`: Serializes the package to JSON format — the ten register columns only; `file`, `dependency`, and `unresolved` are run/parse state and are excluded
 - `to_json`: JSON string representation
 
 ### SOUP::Status
@@ -191,7 +196,7 @@
 - `ConfigurationError`: Missing, unreadable, or malformed configuration file
 - `InvalidLockfileError`: Structurally malformed or unsupported lock file
 - `UnsupportedFormatError`: Recognized lock file with an unsupported format version (subclass of `InvalidLockfileError`)
-- `RegistryError`: Unrecoverable package metadata lookup failure
+- `RegistryError`: Unrecoverable package metadata lookup failure. Never raised directly — it is the common parent that lets a caller rescue both registry-level aborts below at once
 - `AuthenticationError`: Registry authentication failure (subclass of `RegistryError`)
 - `RateLimitError`: Registry rate-limit response (subclass of `RegistryError`)
 - `MissingMetadataError`: Required IEC 62304 metadata missing in `--no_prompt` mode or after prompting
@@ -241,14 +246,19 @@
 - `parallel_each(work_items, packages, &)`: Fetches metadata for the work items concurrently via `Parallel.map(..., in_threads: HttpClient::THREAD_COUNT)` and collects the results
 - `collect_packages(results, packages)`: Compacts the fetched results and keys them by package name into the packages hash
 - `build_package(...)`: Constructs a `SOUP::Package` with normalized fields
+- `unresolved_package(name:, file:, language:, version:, dependency:)`: Records a package whose registry lookup failed, carrying everything the lock file already supplied (name, version, direct/transitive) with the license set to `NOASSERTION` and `Package#unresolved` set. A failed lookup is a metadata gap, not evidence the dependency is absent, so the entry stays in the register rather than being dropped (which would understate it) or aborting the run (which would discard every package resolved so far)
+- `registry_response(url, label:, outcome:, **)`: The single GET entry point for every parser that talks to a registry. Absorbs the `HttpClient::TRANSIENT_ERRORS` fault `HttpClient.get` re-raises once its retries are exhausted, warning and returning nil — because `Parallel.map` propagates the first exception and aborts every other in-flight lookup, so one unreachable registry must not kill the whole scan. `label` names what is being skipped (the package for single-source parsers, the URL for Gradle's mirror loop) and `outcome` states what happens next, since most parsers record the package without registry metadata while Gradle only advances to the next repository
 - `normalize_license(license)`: Maps URL-style license values (a link to a licence file names no licence) to `NOASSERTION`; every named identifier, `Unlicense` included, passes through so the `config/licenses.json` allowlist can match it
 - `sibling_file(file, suffix)`: Resolves a sibling manifest path next to a lock file
 - `manifest_mentions?(main_file, token)`: Token-boundary test for whether a dependency is declared directly in a source-code manifest; matches only when `token` is not flanked by identifier characters so a name that is a substring of another coordinate (e.g. `androidx.core:core` vs `androidx.core:core-ktx`) is not misclassified. Used by the Gradle and SPM parsers
 - `lookup_npm_registry_version(payload, name:, version:)`: Extracts a specific version hash from an npm-style registry payload; shared by the NPM, Yarn, and Importmap parsers
+- `npm_registry_url(name)` / `npm_registry_response(name:, label:)`: Build the packument URL for an npm package name and fetch it through `registry_response`; shared by the three npm consumers (NPM, Yarn, Importmap). NPM and Yarn know the version up front and pass a `name@version` label; Importmap resolves the version from that very response and so can only name the package
+- `build_npm_registry_package(file:, name:, version:, package_details:, dependency:)`: Builds a `SOUP::Package` from an npm-registry per-version payload, sharing the `JS` language tag and the license/description/website extraction across the three npm consumers, which differ only in how the version became known and whether the package is direct
 - `npm_registry_license(raw_license)`: Coerces the npm registry `license` field to a plain string, so the legacy object form (`{"type": "MIT", "url": ...}`) returned for older package versions does not reach `validate_license` as a Hash; shared by the NPM and Yarn parsers
 - `empty_response?(response)`: The guard every parser applies to a `registry_response` result before parsing it — true when the lookup returned no response at all (a transient fault was swallowed) or returned an empty body, both of which are recorded via `unresolved_package`. It replaces the former `response.nil?` guard, which only covered the empty-body case because `HTTParty::Response` overrides `#nil?` to mean "body is nil or empty"; that override is deprecated, so the guard emitted a deprecation warning per lookup and would have silently narrowed to a plain object check on removal, letting empty bodies reach `JSON.parse`. It deliberately tests `unless response` rather than `response.nil?`, since calling `#nil?` on the response is itself the deprecated call
 - `http_error_message(response, url:, package:)`: Builds an actionable error message (status code, URL, package, truncated body) for non-2xx responses
 - `NOASSERTION_LICENSE`: Public constant for the `NOASSERTION` license value
+- `NPM_REGISTRY_ROOT`: Private constant for the npm registry base URL consumed by `npm_registry_url`
 
 **External Dependencies:**
 
@@ -263,7 +273,7 @@
 **Key Components:**
 
 - `parse(file, packages)`: Parses lock file via `Bundler::LockfileParser` and fetches package details from RubyGems, fetching metadata for all specs in parallel via the inherited `parallel_each` helper (`BaseParser`). Direct dependencies are the lock file's `DEPENDENCIES` section, which lists exactly the gems declared in the `Gemfile`
-- `fetch_package(...)`: Queries the versioned RubyGems endpoint first; when that version is not published (e.g. a platform-specific or yanked release) it resolves the gem's latest version and re-queries, raising `RegistryError` only when both lookups fail
+- `fetch_package(...)`: Queries the versioned RubyGems endpoint first; when that version is not published (e.g. a platform-specific or yanked release) it resolves the gem's latest version and re-queries that version's endpoint. A swallowed network fault at any step short-circuits the chain — the registry is unreachable after every retry, so the remaining fallbacks would fail identically — and every dead end warns and records the gem via `unresolved_package` rather than aborting the scan
 
 **External Dependencies:**
 
@@ -278,7 +288,7 @@
 
 **Key Components:**
 
-- `parse(file, packages)`: Parses `packages` and `packages-dev` from the lock file and extracts metadata entirely from the lock file itself; the only parser that makes no registry call, so it does not use `parallel_each`. Direct dependencies are the exact `require`/`require-dev` keys of the sibling `composer.json`
+- `parse(file, packages)`: Parses `packages` and `packages-dev` from the lock file and extracts metadata entirely from the lock file itself; one of the two parsers (with `ManualParser`) that makes no registry call, so it does not use `parallel_each`. Direct dependencies are the exact `require`/`require-dev` keys of the sibling `composer.json`
 - `extract_composer_license(raw)`: Normalizes the Composer `license` field, which the schema permits as either a single string or an array of SPDX strings
 
 ### SOUP::GradleParser
@@ -343,7 +353,7 @@
 
 **Key Components:**
 
-- `parse(file, packages)`: Parses resolved file (both the v1 `object` wrapper and the flat v2+ shape) and fetches package details from GitHub API in parallel via the inherited `parallel_each` helper (`BaseParser`); private repositories are skipped
+- `parse(file, packages)`: Parses resolved file (both the v1 `object` wrapper and the flat v2+ shape) and fetches package details from GitHub API in parallel via the inherited `parallel_each` helper (`BaseParser`). A pin that resolves to a private repository is warned about but still recorded with the metadata GitHub returned — the lookup succeeded, and a private component belongs in the register like any other
 - `pin_version(pin)`: Resolves the pinned identifier, taking the state's `version`, `branch`, or `revision` so branch- and revision-based pins are recorded rather than left empty
 - `github_repo_path(location)`: Extracts `owner/repo` from the HTTPS, HTTPS-with-`.git`, or SSH form of a pin location
 - `github_error_message(response)`: Reads GitHub's actionable error text from the JSON body's `message` field (where the rate-limit and bad-credentials strings live) rather than the HTTP reason phrase
@@ -383,8 +393,7 @@
 - `parse(file, packages)`: Reads `pin` directives, keeps only pins that resolve to an http(s) CDN URL (esm.sh, jspm.io, jsdelivr), derives the npm package name and version from the URL, and fetches metadata in parallel via the inherited `parallel_each` helper (`BaseParser`). Local/vendored pins (e.g. `application`, `@hotwired/*`, `*.js` under `vendor/`) are skipped. Unpinned "latest" pins resolve to the registry's latest dist-tag
 - `name_and_version_from_url(url)`: Strips the protocol/host and CDN routing prefix, then reads the scoped or plain npm package name and the optional `@version` that follows it
 - `PIN_REGEX`: Private constant matching `pin "name", to: "url"` directives
-- `REGISTRY_ROOT`: Private constant for the npm registry base URL
-- Reuses `lookup_npm_registry_version` (`BaseParser`) for registry payload extraction. Every importmap pin is recorded as a direct dependency (`dependency: false`)
+- Reuses the npm helpers in `BaseParser` — `npm_registry_response`, `lookup_npm_registry_version`, and `build_npm_registry_package` — rather than holding its own registry URL. Every importmap pin is recorded as a direct dependency (`dependency: false`)
 
 ### SOUP::ManualParser
 
@@ -452,7 +461,7 @@ Validation criteria for SOUP entries: Accuracy (Requirements match actual usage)
 2. Uses glob pattern to find matching files recursively
 3. Excludes `node_modules/` and `vendor/` directories
 4. Excludes user-specified ignored folders
-5. Skips files whose package manager is disabled by a skip flag, or whose registry entry maps to no parser — both guards run before the "Reading file" announcement so a dropped file is never announced
+5. Skips files whose package manager is disabled by a skip flag — the guard runs before the "Reading file" announcement so a dropped file is never announced
 6. Delegates to the appropriate parser through `SOUP::GenericParser`, which type-checks the parser, file path, and packages hash
 7. Runs `parse_manual_entries` and then `enforce_vendored_coverage` once every lock file has been parsed
 
@@ -563,18 +572,20 @@ Recoverable failures raise a subclass of `SOUP::Error` (`lib/soup/errors.rb`); t
 | Failure Mode | Handling | Location |
 | :--- | :--- | :--- |
 | Invalid command-line options | Catches `OptionParser::ParseError`, displays error, exits with error code | `lib/soup/application.rb` in `configure_options` method |
-| Missing or malformed config file | Raises `ConfigurationError` when a configuration file is absent or contains invalid JSON | `lib/soup/application.rb` in `validate_config!` method |
+| Missing or malformed config file | Raises `ConfigurationError` when a configuration file is absent or contains invalid JSON | `lib/soup/application.rb` in `validate_config!` / `validate_json!` methods |
+| Malformed cache file | Raises `ConfigurationError` before any state exists, so the `ensure`-block save cannot rewrite `.soup.json` with metadata-less entries or blank `docs/soup.md` | `lib/soup/application.rb` in `validate_cache_file!` method |
 | API rate limiting | Raises `RateLimitError` (and `AuthenticationError` for bad credentials), suggesting `GITHUB_TOKEN` | `lib/soup/parsers/spm.rb` in `fetch_package` / `github_error_message` methods |
 | Network timeouts | Retry up to 3 times via `SOUP::HttpClient`, then re-raise | `lib/soup/http_client.rb` in `get` method |
 | Transient network fault after retries | Any `HttpClient::TRANSIENT_ERRORS` fault (timeout, connection reset/refusal, DNS failure, TLS interruption, truncated reply) is retried, then the single package is warned about and recorded as unresolved rather than aborting the scan | `lib/soup/parsers/base.rb` in `registry_response`, used by every parser |
 | Empty registry response body | A response carrying no body has nothing for `JSON.parse` to read, so it is treated exactly like a swallowed network fault and the package is recorded as unresolved | `lib/soup/parsers/base.rb` in `empty_response?`, used by the Bundler, Importmap, NPM, PIP, SPM, and Yarn parsers |
-| Non-2xx registry response | Raises `RegistryError` carrying the status, URL, package, and truncated body built by `http_error_message` | `lib/soup/parsers/bundler.rb`, `pip.rb`, `yarn.rb` in `fetch_package` methods |
+| Non-2xx registry response | Warns with the status, URL, package, and truncated body built by `http_error_message`, then records the single package via `unresolved_package` so the scan continues; the run is not aborted. The only exceptions are SPM's rate-limit and bad-credentials responses (see the API rate limiting row), which are global conditions that would fail every remaining lookup identically | `lib/soup/parsers/bundler.rb`, `importmap.rb`, `npm.rb`, `pip.rb`, `spm.rb`, `yarn.rb` in `fetch_package` methods |
 | Unsupported lock file format | Raises `UnsupportedFormatError` for a `package-lock.json` below `lockfileVersion` 2 and for a `yarn.lock` that is not Yarn v1 | `lib/soup/parsers/npm.rb`, `yarn.rb` in `parse` methods |
 | Malformed manual entries file | Raises `InvalidLockfileError` when the file is not a JSON array or an entry lacks a non-empty `package` | `lib/soup/parsers/manual.rb` in `parse` method |
 | Missing Gradle build script | Raises `InvalidLockfileError` when neither `build.gradle` nor `build.gradle.kts` sits alongside the lock file | `lib/soup/parsers/gradle.rb` in `read_main_gradle_file` method |
 | Missing Swift manifest | Raises `InvalidLockfileError` when no `Package.swift`, Tuist `Dependencies.swift`, or enclosing `project.pbxproj` can be resolved for a `Package.resolved` | `lib/soup/parsers/spm.rb` in `parse` / `read_main_swift_file` methods |
 | Maven source unreachable | An unreachable `search.maven.org` query or POM mirror is skipped (warned) and the lookup falls through to the next source; the scan is not aborted | `lib/soup/parsers/gradle.rb` in `fetch_package`, via `BaseParser#registry_response` |
 | Missing package metadata | Logs warning and continues processing other packages | NPM, Gradle, SPM, Importmap parsers; `lookup_npm_registry_version` in `lib/soup/parsers/base.rb` |
+| Registry outage for an already-recorded package | The unresolved entry keeps the license, description, and website a previous run recorded, restored from `.soup.json` and only when the cached entry pins the same version, so an outage cannot silently downgrade a verified component to `NOASSERTION` | `lib/soup/application.rb` in `apply_cached_metadata` / `restore_unresolved_metadata` methods |
 | Missing required IEC 62304 fields | Raises `MissingMetadataError` in `--no_prompt` mode, prompts user otherwise | `lib/soup/application.rb` in `prompt_missing_field` / `ensure_metadata_complete!` methods |
 | Partial execution failure | Persists only fully verified packages via the `ensure` block, merged over the existing cache, so progress is not lost and previously recorded IEC 62304 evidence is never blanked; the published markdown register is left untouched rather than truncated | `lib/soup/application.rb` in `execute` / `save_partial_state` methods |
 | Unhandled exceptions | Displays error message and the top frames of the backtrace; full backtrace shown only when `ENV['DEBUG']` is set | `bin/soup.rb` top-level rescue |
