@@ -198,9 +198,7 @@ jobs:
         bundle config unset deployment
         bundle install
       env:
-        GITHUB_TOKEN: "${{secrets.GH_PAT}}"
+        GITHUB_TOKEN: "${{secrets.GITHUB_TOKEN}}"
     - name: RSpec
       shell: bash
       run: bundle exec rspec --format documentation
-      env:
-        GITHUB_TOKEN: "${{secrets.GH_PAT}}"
