@@ -495,6 +495,22 @@ RSpec.describe(SOUP::Application) do
         # "MIT+" must be a literal, not "MIT" with a one-or-more quantifier.
         expect(license_accepted?('MITT', allowlist: '["MIT+"]')).to(be(false))
       end
+
+      # BUG-005: word boundaries treat a leading digit as a word character, so
+      # the "BSD" family entry stops covering "0BSD" -- a real, OSI-approved,
+      # permissive SPDX id (BSD-2-Clause minus the attribution requirement).
+      # Every consumer of the AWS SDK for JavaScript v3 pulls in tslib, which
+      # is 0BSD, so the whole compliance gate failed on a licence the project
+      # accepts. The fix is an explicit allowlist entry, NOT a looser
+      # lookbehind: these two examples pin the mechanism so a future reader
+      # sees why a prefixed identifier cannot ride on its family entry.
+      it 'does not let a family entry reach across a leading digit' do
+        expect(license_accepted?('0BSD', allowlist: '["BSD"]')).to(be(false))
+      end
+
+      it 'accepts a digit-prefixed identifier that is allowlisted in its own right' do
+        expect(license_accepted?('0BSD', allowlist: '["0BSD"]')).to(be(true))
+      end
     end
 
     # The shipped config/licenses.json is itself part of the fix: word-boundary
@@ -520,10 +536,19 @@ RSpec.describe(SOUP::Application) do
       # source-available licence whose real SPDX id is BUSL-1.1. Replacing the
       # bare "BSL" entry has to keep every Boost spelling passing while
       # rejecting every Business Source one, so both sides are pinned here.
+      #
+      # The 0BSD rows guard BUG-005 from the other direction: the shipped file
+      # must carry the identifier itself, because the "BSD" family entry cannot
+      # match across the leading digit. Both the SPDX id and the prose spelling
+      # some registries emit are pinned, and the negatives below confirm adding
+      # them did not loosen the gate.
       [
         ['MIT', true],
         ['Apache-2.0', true],
         ['BSD-3-Clause', true],
+        ['0BSD', true],
+        ['(MIT OR 0BSD)', true],
+        ['BSD Zero Clause License', true],
         ['BSL-1.0', true],
         ['BSL 1.0', true],
         ['Boost Software License 1.0', true],
@@ -536,7 +561,8 @@ RSpec.describe(SOUP::Application) do
         ['Copyright (c) Vendor, all rights reserved', false],
         ['UNLICENSED', false],
         ['GPL-3.0', false],
-        ['SSPL-1.0', false]
+        ['SSPL-1.0', false],
+        ['0BSDish Public License', false]
       ].each do |license, allowed|
         it "#{allowed ? 'accepts' : 'rejects'} #{license.inspect}" do
           expect(license.downcase.match?(pattern)).to(be(allowed))
