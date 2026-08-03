@@ -386,7 +386,7 @@
   "rubocop-graphql": {
     "language": "Ruby",
     "package": "rubocop-graphql",
-    "version": "1.6.0",
+    "version": "1.7.0",
     "license": "MIT",
     "description": "A collection of RuboCop cops to improve GraphQL-related code",
     "website": "https://github.com/DmitryTsepelev/rubocop-graphql",
