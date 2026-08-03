@@ -72,7 +72,7 @@ GEM
     rubocop-capybara (3.0.0)
       lint_roller (~> 1.1)
       rubocop (~> 1.81)
-    rubocop-graphql (1.6.0)
+    rubocop-graphql (1.7.0)
       lint_roller (~> 1.1)
       rubocop (>= 1.72.1, < 2)
     rubocop-minitest (0.40.0)
