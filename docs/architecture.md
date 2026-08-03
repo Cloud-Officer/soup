@@ -278,7 +278,7 @@
 **External Dependencies:**
 
 - `bundler`
-- `parallel`
+- `json`
 
 ### SOUP::ComposerParser
 
@@ -290,6 +290,10 @@
 
 - `parse(file, packages)`: Parses `packages` and `packages-dev` from the lock file and extracts metadata entirely from the lock file itself; one of the two parsers (with `ManualParser`) that makes no registry call, so it does not use `parallel_each`. Direct dependencies are the exact `require`/`require-dev` keys of the sibling `composer.json`
 - `extract_composer_license(raw)`: Normalizes the Composer `license` field, which the schema permits as either a single string or an array of SPDX strings
+
+**External Dependencies:**
+
+- `json`
 
 ### SOUP::GradleParser
 
@@ -309,8 +313,8 @@
 
 **External Dependencies:**
 
+- `net/http`
 - `nokogiri`
-- `parallel`
 
 ### SOUP::NPMParser
 
@@ -324,7 +328,7 @@
 
 **External Dependencies:**
 
-- `parallel`
+- None; the registry fetching and parallelization are inherited from `SOUP::BaseParser`
 
 ### SOUP::PIPParser
 
@@ -343,7 +347,7 @@
 
 **External Dependencies:**
 
-- `parallel`
+- `json`
 
 ### SOUP::SPMParser
 
@@ -363,7 +367,7 @@
 
 **External Dependencies:**
 
-- `parallel`
+- `json`
 
 ### SOUP::YarnParser
 
@@ -379,7 +383,7 @@
 
 **External Dependencies:**
 
-- `parallel`
+- `json`
 - `yarn_lock_parser`
 
 ### SOUP::ImportmapParser
