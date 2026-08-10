@@ -6,7 +6,7 @@ RSpec.describe(SOUP::NPMParser) do
   let(:lock_file) do
     {
       packages: {
-        '': { version: '1.0.0' }, # rubocop:disable Naming/VariableNumber
+        '': { version: '1.0.0' },
         'node_modules/lodash': { version: '4.17.21' },
         'node_modules/dev-only': { version: '1.0.0', dev: true }
       }
@@ -181,7 +181,7 @@ RSpec.describe(SOUP::NPMParser) do
     let(:lock_file) do
       {
         packages: {
-          '': { version: '1.0.0' }, # rubocop:disable Naming/VariableNumber
+          '': { version: '1.0.0' },
           'node_modules/transitive-only': { version: '1.0.0' }
         }
       }.to_json
@@ -227,7 +227,7 @@ RSpec.describe(SOUP::NPMParser) do
   context 'with 100 packages (Parallel.map fan-out)' do
     let(:lock_file) do
       packages_hash =
-        (1..100).each_with_object({ '': { version: '1.0.0' } }) do |i, acc| # rubocop:disable Naming/VariableNumber
+        (1..100).each_with_object({ '': { version: '1.0.0' } }) do |i, acc|
           acc["node_modules/pkg-#{i}"] = { version: '1.0.0' }
         end
       { packages: packages_hash }.to_json
@@ -275,7 +275,7 @@ RSpec.describe(SOUP::NPMParser) do
       {
         lockfileVersion: 3,
         packages: {
-          '': { version: '1.0.0' }, # rubocop:disable Naming/VariableNumber
+          '': { version: '1.0.0' },
           'node_modules/lodash': { version: '4.17.21' }
         }
       }.to_json
