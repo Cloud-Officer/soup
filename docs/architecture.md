@@ -234,6 +234,10 @@
 
 - `parse(parser, file, packages)`: Validates arguments and delegates to specific parser
 
+**External Dependencies:**
+
+- None; the class only validates its arguments and delegates
+
 ### SOUP::BaseParser
 
 **Purpose:** Abstract base class providing the shared logic inherited by every language-specific parser: parallel metadata fetching, package construction, license normalization, and sibling-file resolution.
@@ -399,6 +403,10 @@
 - `PIN_REGEX`: Private constant matching `pin "name", to: "url"` directives
 - Reuses the npm helpers in `BaseParser` — `npm_registry_response`, `lookup_npm_registry_version`, and `build_npm_registry_package` — rather than holding its own registry URL. Every importmap pin is recorded as a direct dependency (`dependency: false`)
 
+**External Dependencies:**
+
+- None; the registry fetching and parallelization are inherited from `SOUP::BaseParser`
+
 ### SOUP::ManualParser
 
 **Purpose:** Reads manually-declared SOUP entries from a JSON file (default `config/soup-manual.json`) for vendored files and proprietary/commercial components that no package manager or registry can resolve.
@@ -411,6 +419,10 @@
 - Each entry supports `package` (required), plus optional `language`, `version`, `license`, `description`, `website`, and `file`; the `file` path lets the vendored-file coverage check (`Application#enforce_vendored_coverage`) match a committed file to its entry
 - Entries may pre-declare verification fields (`risk_level`, `requirements`, `verification_reasoning`); otherwise they fall back to the cache or prompt like any other package
 - `REQUIRED_KEY`: Private constant for the required `package` field
+
+**External Dependencies:**
+
+- None declared; `JSON` reaches this parser through the `SOUP::BaseParser` require chain, and the entries are read locally with no registry call
 
 ## Software of Unknown Provenance
 

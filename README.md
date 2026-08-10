@@ -51,7 +51,7 @@ JSON array of objects with at least a `package` key (plus optional `language`, `
 `website`, `file`, and the verification fields). When `--vendored_globs` is set, the run fails if any file matching those
 globs has no manual entry, so dropping a new vendored library into the repo cannot silently bypass the register.
 
-The soup file is generated in `./docs/soup.md` and a cache file `.soup.json` is used to preserved previously entered
+The soup file is generated in `./docs/soup.md` and a cache file `.soup.json` is used to preserve previously entered
 choices.
 
 ## Installation
