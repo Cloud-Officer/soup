@@ -521,6 +521,13 @@ $RECYCLE.BIN/
 # Claude Code
 .claude/
 
+# Claude Code skill review artifacts
+docs/code-review.md
+docs/copy-review.md
+docs/migration/
+docs/prompt-review.md
+docs/seo-audit.md
+
 # Cursor
 .cursor/
 
@@ -534,4 +541,3 @@ $RECYCLE.BIN/
 
 # RSpec
 .rspec_status
-docs/code-review.md

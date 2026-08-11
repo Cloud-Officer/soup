@@ -90,6 +90,22 @@
 
 ## Software units
 
+### CLI Entry Point
+
+**Purpose:** Executable entry point that runs the application and converts any escaped exception into a reported error and a non-zero exit status.
+
+**Location:** `bin/soup.rb`
+
+**Key Components:**
+
+- Forces UTF-8 for `Encoding.default_external` / `Encoding.default_internal` so registry metadata in any language renders correctly
+- `TOP_FRAMES_TO_SHOW`: Number of backtrace frames (5) printed for an unhandled error; the full backtrace is printed only when `DEBUG` is set
+- Top-level `rescue StandardError`: Warns with the message, prints the truncated backtrace, and exits with the error code — the single place every `SOUP::Error` subclass surfaces to the user
+
+**Internal Dependencies:**
+
+- `SOUP::Application`
+
 ### SOUP Module
 
 **Purpose:** Root module defining the IEC 62304 risk level constants used throughout the application.
@@ -602,7 +618,7 @@ Recoverable failures raise a subclass of `SOUP::Error` (`lib/soup/errors.rb`); t
 | Missing Gradle build script | Raises `InvalidLockfileError` when neither `build.gradle` nor `build.gradle.kts` sits alongside the lock file | `lib/soup/parsers/gradle.rb` in `read_main_gradle_file` method |
 | Missing Swift manifest | Raises `InvalidLockfileError` when no `Package.swift`, Tuist `Dependencies.swift`, or enclosing `project.pbxproj` can be resolved for a `Package.resolved` | `lib/soup/parsers/spm.rb` in `parse` / `read_main_swift_file` methods |
 | Maven source unreachable | An unreachable `search.maven.org` query or POM mirror is skipped (warned) and the lookup falls through to the next source; the scan is not aborted | `lib/soup/parsers/gradle.rb` in `fetch_package`, via `BaseParser#registry_response` |
-| Missing package metadata | Logs warning and continues processing other packages | NPM, Gradle, SPM, Importmap parsers; `lookup_npm_registry_version` in `lib/soup/parsers/base.rb` |
+| Missing package metadata | Warns and records the single package via `unresolved_package`, so the scan continues with the remaining packages | Gradle and SPM parsers; `lookup_npm_registry_version` in `lib/soup/parsers/base.rb`, used by the Importmap, NPM, and Yarn parsers |
 | Registry outage for an already-recorded package | The unresolved entry keeps the license, description, and website a previous run recorded, restored from `.soup.json` and only when the cached entry pins the same version, so an outage cannot silently downgrade a verified component to `NOASSERTION` | `lib/soup/application.rb` in `apply_cached_metadata` / `restore_unresolved_metadata` methods |
 | Missing required IEC 62304 fields | Raises `MissingMetadataError` in `--no_prompt` mode, prompts user otherwise | `lib/soup/application.rb` in `prompt_missing_field` / `ensure_metadata_complete!` methods |
 | Partial execution failure | Persists only fully verified packages via the `ensure` block, merged over the existing cache, so progress is not lost and previously recorded IEC 62304 evidence is never blanked; the published markdown register is left untouched rather than truncated | `lib/soup/application.rb` in `execute` / `save_partial_state` methods |
@@ -627,6 +643,7 @@ Recoverable failures raise a subclass of `SOUP::Error` (`lib/soup/errors.rb`); t
 | CI/CD mode | `--no_prompt` flag for non-interactive execution |
 | Unattended defaults | `--auto_reply` fills missing metadata with the lowest risk level and `Dependency` instead of prompting |
 | Debug diagnostics | `DEBUG` environment variable prints the full backtrace on an unhandled error |
+| HTTP tuning | `SOUP_HTTP_TIMEOUT` and `SOUP_HTTP_MAX_RETRIES` override the request timeout and retry count for slow proxies or rate-limited mirrors |
 | Selective parsing | Skip flags allow excluding specific package managers |
 | Folder exclusion | `--ignored_folders` allows excluding directories from scanning |
 | Vendored coverage gate | `--vendored_globs` fails the run when a committed vendored file has no SOUP entry |
