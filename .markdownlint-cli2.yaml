@@ -13,7 +13,15 @@ globs:
   - "!**/dist/**"
   - "!**/build/**"
   - "!**/target/**"
+  # Claude Code skill review artifacts: rewritten wholesale on every run and gitignored,
+  # so a lint failure there can only be "fixed" by regenerating the file. Living docs the
+  # same skills maintain (README.md, docs/architecture.md, docs/user-guide.md, docs/db.md,
+  # docs/ownership-map.md, docs/threat-model.md) stay linted.
   - "!docs/code-review.md"
+  - "!docs/copy-review.md"
+  - "!docs/migration/**"
+  - "!docs/prompt-review.md"
+  - "!docs/seo-audit.md"
 config:
   default: true
   first-line-heading: false
