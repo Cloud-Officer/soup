@@ -164,7 +164,7 @@
 
 **Key Components:**
 
-- `parse`: Parses command-line arguments and returns configured options object
+- `parse`: Parses command-line arguments and returns the configured options object. When neither `--licenses` nor `--soup` is given it enables both, so a bare `soup` invocation runs the full license check and register generation
 - Configuration attributes: `cache_file`, `markdown_file`, `licenses_file`, `exceptions_file`, `manual_file`, `ignored_folders`, `vendored_globs`
 - Skip flags: `skip_bundler`, `skip_composer`, `skip_gradle`, `skip_importmap`, `skip_npm`, `skip_pip`, `skip_spm`, `skip_yarn`
 - Mode flags: `licenses_check`, `soup_check`, `no_prompt`, `auto_reply`
@@ -274,7 +274,7 @@
 - `lookup_npm_registry_version(payload, name:, version:)`: Extracts a specific version hash from an npm-style registry payload; shared by the NPM, Yarn, and Importmap parsers
 - `npm_registry_url(name)` / `npm_registry_response(name:, label:)`: Build the packument URL for an npm package name and fetch it through `registry_response`; shared by the three npm consumers (NPM, Yarn, Importmap). NPM and Yarn know the version up front and pass a `name@version` label; Importmap resolves the version from that very response and so can only name the package
 - `build_npm_registry_package(file:, name:, version:, package_details:, dependency:)`: Builds a `SOUP::Package` from an npm-registry per-version payload, sharing the `JS` language tag and the license/description/website extraction across the three npm consumers, which differ only in how the version became known and whether the package is direct
-- `npm_registry_license(raw_license)`: Coerces the npm registry `license` field to a plain string, so the legacy object form (`{"type": "MIT", "url": ...}`) returned for older package versions does not reach `validate_license` as a Hash; shared by the NPM and Yarn parsers
+- `npm_registry_license(raw_license)`: Coerces the npm registry `license` field to a plain string, so the legacy object form (`{"type": "MIT", "url": ...}`) returned for older package versions does not reach `validate_license` as a Hash; reached through `build_npm_registry_package`, so it is shared by all three npm consumers (NPM, Yarn, Importmap)
 - `empty_response?(response)`: The guard every parser applies to a `registry_response` result before parsing it — true when the lookup returned no response at all (a transient fault was swallowed) or returned an empty body, both of which are recorded via `unresolved_package`. It replaces the former `response.nil?` guard, which only covered the empty-body case because `HTTParty::Response` overrides `#nil?` to mean "body is nil or empty"; that override is deprecated, so the guard emitted a deprecation warning per lookup and would have silently narrowed to a plain object check on removal, letting empty bodies reach `JSON.parse`. It deliberately tests `unless response` rather than `response.nil?`, since calling `#nil?` on the response is itself the deprecated call
 - `http_error_message(response, url:, package:)`: Builds an actionable error message (status code, URL, package, truncated body) for non-2xx responses
 - `NOASSERTION_LICENSE`: Public constant for the `NOASSERTION` license value
