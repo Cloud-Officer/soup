@@ -10,9 +10,8 @@ RSpec.describe(SOUP::BundlerParser) do
   # DEPENDENCIES section of the lockfile = the directly declared gems. test-gem
   # is present here, so it is classified as a direct dependency by default.
   let(:lock_file) do
-    # rubocop:disable Style/StringHashKeys -- DEPENDENCIES keys are gem-name strings.
+    # rubocop:disable-next Style/StringHashKeys -- DEPENDENCIES keys are gem-name strings.
     instance_double(Bundler::LockfileParser, specs: [spec], dependencies: { 'test-gem' => nil })
-    # rubocop:enable Style/StringHashKeys
   end
 
   let(:v2_response_body) do
@@ -187,9 +186,8 @@ RSpec.describe(SOUP::BundlerParser) do
   context 'when gem is not a direct dependency' do
     # test-gem resolved in specs but absent from the DEPENDENCIES section.
     let(:lock_file) do
-      # rubocop:disable Style/StringHashKeys -- DEPENDENCIES keys are gem-name strings.
+      # rubocop:disable-next Style/StringHashKeys -- DEPENDENCIES keys are gem-name strings.
       instance_double(Bundler::LockfileParser, specs: [spec], dependencies: { 'other-gem' => nil })
-      # rubocop:enable Style/StringHashKeys
     end
 
     before do
@@ -209,9 +207,8 @@ RSpec.describe(SOUP::BundlerParser) do
   # direct. The previous String#include? scan of the Gemfile classified it wrong.
   context 'when a transitive gem name is a substring of a direct dependency' do
     let(:lock_file) do
-      # rubocop:disable Style/StringHashKeys -- DEPENDENCIES keys are gem-name strings.
+      # rubocop:disable-next Style/StringHashKeys -- DEPENDENCIES keys are gem-name strings.
       instance_double(Bundler::LockfileParser, specs: [spec], dependencies: { 'test-gem-extras' => nil })
-      # rubocop:enable Style/StringHashKeys
     end
 
     before do
