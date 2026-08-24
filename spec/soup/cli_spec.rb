@@ -78,7 +78,7 @@ RSpec.describe('bin/soup.rb CLI wrapper') do
     # which bubbles through GenericParser#parse and Application#detect_packages
     # to produce a backtrace longer than TOP_FRAMES_TO_SHOW. No network calls.
     let(:run) do
-      # rubocop:disable Style/StringHashKeys -- keys are filenames passed to File.join.
+      # rubocop:disable-next Style/StringHashKeys -- keys are filenames passed to File.join.
       run_soup(
         [],
         fixtures: {
@@ -86,7 +86,6 @@ RSpec.describe('bin/soup.rb CLI wrapper') do
           'Package.resolved' => "{ this is not valid json\n"
         }
       )
-      # rubocop:enable Style/StringHashKeys
     end
     let(:stderr) { run[1] }
 
