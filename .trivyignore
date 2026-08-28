@@ -1,3 +1,32 @@
 # Trivy ignore rules
-# Add CVE IDs or vulnerability IDs to ignore, one per line
-# Example: CVE-2023-12345
+# One ID per line: CVE, secret and misconfiguration check IDs are all accepted.
+# Only IDs that are wrong or unfixable for every repository belong here; each one
+# suppresses its check repo-wide. Repo-specific exclusions go in that repo's
+# trivy.yaml, below the ghb:excluded-dirs block.
+
+# RDS cluster StorageEncrypted is set via Fn::If; Trivy cannot resolve the condition.
+AWS-0079
+# DocumentDB StorageEncrypted is set via Fn::If; Trivy cannot resolve the condition.
+AWS-0021
+# Amazon MQ audit logging is ActiveMQ-only; every broker we generate is RABBITMQ.
+AWS-0070
+# Lambda@Edge does not support X-Ray; every non-edge function has tracing enabled.
+AWS-0066
+# Unrestricted egress is intentional; workloads need outbound access and ingress is restricted per security group.
+AWS-0104
+# The API and gRPC load balancers are deliberately internet-facing; they are the public entry point.
+AWS-0053
+# CloudTrail logs use AWS-managed encryption; a CMK is not required by our baseline.
+AWS-0015
+# CloudWatch log groups use AWS-managed encryption; a CMK is not required by our baseline.
+AWS-0017
+# DocumentDB uses the AWS-managed key; a CMK is not required by our baseline.
+AWS-0022
+# RDS Performance Insights uses the AWS-managed RDS key; a CMK is not required by our baseline.
+AWS-0078
+# Secrets Manager uses the AWS-managed key; a CMK is not required by our baseline.
+AWS-0098
+# Buckets use SSE-S3 or the AWS-managed key; ELB access-log delivery constrains the key type.
+AWS-0132
+# Central log-destination buckets cannot log to themselves; all other buckets have access logging enabled.
+AWS-0089
