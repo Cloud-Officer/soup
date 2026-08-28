@@ -414,7 +414,7 @@
 
 **Key Components:**
 
-- `parse(file, packages)`: Reads `pin` directives, keeps only pins that resolve to an http(s) CDN URL (esm.sh, jspm.io, jsdelivr), derives the npm package name and version from the URL, and fetches metadata in parallel via the inherited `parallel_each` helper (`BaseParser`). Local/vendored pins (e.g. `application`, `@hotwired/*`, `*.js` under `vendor/`) are skipped. Unpinned "latest" pins resolve to the registry's latest dist-tag
+- `parse(file, packages)`: Reads `pin` directives and keeps only those whose `to:` target starts with `http` — the test is the protocol, not a CDN allowlist, so any CDN a project pins against (esm.sh, jspm.io, jsdelivr, and any other) is covered without a code change. It then derives the npm package name and version from the URL and fetches metadata in parallel via the inherited `parallel_each` helper (`BaseParser`). Pins whose target is a local asset path rather than a URL (e.g. `pin "application"`, or a `*.js` file served out of `vendor/`) are therefore skipped. Unpinned "latest" pins resolve to the registry's latest dist-tag
 - `name_and_version_from_url(url)`: Strips the protocol/host and CDN routing prefix, then reads the scoped or plain npm package name and the optional `@version` that follows it
 - `PIN_REGEX`: Private constant matching `pin "name", to: "url"` directives
 - Reuses the npm helpers in `BaseParser` — `npm_registry_response`, `lookup_npm_registry_version`, and `build_npm_registry_package` — rather than holding its own registry URL. Every importmap pin is recorded as a direct dependency (`dependency: false`)
