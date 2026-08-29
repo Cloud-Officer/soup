@@ -554,7 +554,7 @@
   "webmock": {
     "language": "Ruby",
     "package": "webmock",
-    "version": "3.26.3",
+    "version": "3.26.4",
     "license": "MIT",
     "description": "WebMock allows stubbing HTTP requests and setting expectations on HTTP requests.",
     "website": "https://github.com/bblimke/webmock",
