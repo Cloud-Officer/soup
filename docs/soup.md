@@ -48,6 +48,6 @@
 | Ruby | tty-screen | 0.8.2 | MIT | Terminal screen size detection that works on Linux, macOS and Windows systems and supports Ruby MRI, JRuby, TruffleRuby and Rubinius interpreters. | <https://ttytoolkit.org> | 2026-05-22 | Low | Dependency | Dependency |
 | Ruby | unicode-display_width | 3.2.0 | MIT | [Unicode 17.0.0] Determines the monospace display width of a string using EastAsianWidth.txt, Unicode general category, Emoji specification, and other data. | <https://github.com/janlelis/unicode-display_width> | 2026-05-22 | Low | Dependency | Dependency |
 | Ruby | unicode-emoji | 4.2.0 | MIT | [Emoji 17.0] Provides Unicode Emoji data and regexes, incorporating the latest Unicode and Emoji standards | <https://github.com/janlelis/unicode-emoji> | 2026-05-22 | Low | Dependency | Dependency |
-| Ruby | webmock | 3.26.3 | MIT | WebMock allows stubbing HTTP requests and setting expectations on HTTP requests. | <https://github.com/bblimke/webmock> | 2026-05-22 | Low | Dependency | Dependency |
+| Ruby | webmock | 3.26.4 | MIT | WebMock allows stubbing HTTP requests and setting expectations on HTTP requests. | <https://github.com/bblimke/webmock> | 2026-05-22 | Low | Dependency | Dependency |
 | Ruby | wisper | 2.0.1 | MIT | A micro library providing objects with Publish-Subscribe capabilities. | <https://github.com/krisleech/wisper> | 2026-05-22 | Low | Dependency | Dependency |
 | Ruby | yarn_lock_parser | 0.1.0 | MIT | Parser for yarn.lock files. | <https://rubygems.org/yarn_lock_parser> | 2026-05-22 | Low | Read yarn lock file | Popular gem |

@@ -30,3 +30,5 @@ AWS-0098
 AWS-0132
 # Central log-destination buckets cannot log to themselves; all other buckets have access logging enabled.
 AWS-0089
+# Multi-Factor authentication is not enforced for group; it is, but Trivy wants an inline policy and we use a customer managed one
+AWS-0123
