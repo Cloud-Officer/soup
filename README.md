@@ -4,6 +4,10 @@
 
 * [Introduction](#introduction)
 * [Installation](#installation)
+  * [Prerequisites](#prerequisites)
+  * [Install from Source](#install-from-source)
+  * [Install with Homebrew](#install-with-homebrew)
+  * [Install with Docker](#install-with-docker)
 * [Usage](#usage)
   * [Environment Variables](#environment-variables)
   * [Examples](#examples)
@@ -56,9 +60,16 @@ choices.
 
 ## Installation
 
-Prerequisites are Ruby >= 4.0 and Bundler.
+### Prerequisites
 
-You can clone the repository, install the dependencies and run the executable directly:
+* Ruby >= 4.0
+* Bundler
+
+These apply to a source install only; the Homebrew formula and the Docker image bring their own Ruby.
+
+### Install from Source
+
+Clone the repository, install the dependencies and run the executable directly:
 
 ```bash
 git clone https://github.com/Cloud-Officer/soup.git
@@ -73,9 +84,29 @@ To make it available as `soup` from anywhere, symlink the executable into your p
 ln -s "$(pwd)/bin/soup.rb" /usr/local/bin/soup
 ```
 
-You can install via [Homebrew](https://github.com/Cloud-Officer/homebrew-ci).
+### Install with Homebrew
 
-You can use the [Docker images](https://hub.docker.com/r/ydesgagne/ci-tools).
+The [Cloud-Officer/homebrew-ci](https://github.com/Cloud-Officer/homebrew-ci) tap ships a `soup` formula:
+
+```bash
+brew install cloud-officer/ci/soup
+```
+
+Verify the installation with `soup --help`.
+
+### Install with Docker
+
+The [ydesgagne/soup](https://hub.docker.com/r/ydesgagne/soup) image is built from this repository and published on every tag. It has `soup` on its `PATH`:
+
+```bash
+docker pull ydesgagne/soup
+```
+
+Mount the project you want to scan into the container and run `soup` against it:
+
+```bash
+docker run --rm -v "$PWD:/src" -w /src ydesgagne/soup soup --licenses
+```
 
 ## Usage
 
