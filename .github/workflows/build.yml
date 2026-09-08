@@ -17,7 +17,7 @@ name: Build
     - "**"
 permissions:
   contents: read
-  pull-requests: read
+  pull-requests: write
 env:
   RUBY-BUNDLER-CACHE: true
 concurrency:
@@ -47,7 +47,7 @@ jobs:
     steps:
     - name: Prepare variables
       id: variables
-      uses: cloud-officer/ci-actions/variables@v2
+      uses: cloud-officer/ci-actions/variables@v3
       with:
         ssh-key: "${{secrets.SSH_KEY}}"
         github-token: "${{secrets.GH_PAT}}"
@@ -61,11 +61,12 @@ jobs:
     steps:
     - name: Actionlint
       id: actionlint
-      uses: cloud-officer/ci-actions/linters/actionlint@v2
+      uses: cloud-officer/ci-actions/linters/actionlint@v3
       with:
         linters: "${{needs.variables.outputs.LINTERS}}"
         ssh-key: "${{secrets.SSH_KEY}}"
         github-token: "${{secrets.GH_PAT}}"
+        reviewdog-token: "${{secrets.GITHUB_TOKEN}}"
   hadolint:
     name: Docker Linter
     runs-on: ubuntu-latest
@@ -75,11 +76,12 @@ jobs:
     timeout-minutes: 30
     steps:
     - name: Hadolint
-      uses: cloud-officer/ci-actions/linters/hadolint@v2
+      uses: cloud-officer/ci-actions/linters/hadolint@v3
       with:
         linters: "${{needs.variables.outputs.LINTERS}}"
         ssh-key: "${{secrets.SSH_KEY}}"
         github-token: "${{secrets.GH_PAT}}"
+        reviewdog-token: "${{secrets.GITHUB_TOKEN}}"
   markdownlint:
     name: Markdown Linter
     runs-on: ubuntu-latest
@@ -90,11 +92,12 @@ jobs:
     steps:
     - name: Markdownlint
       id: markdownlint
-      uses: cloud-officer/ci-actions/linters/markdownlint@v2
+      uses: cloud-officer/ci-actions/linters/markdownlint@v3
       with:
         linters: "${{needs.variables.outputs.LINTERS}}"
         ssh-key: "${{secrets.SSH_KEY}}"
         github-token: "${{secrets.GH_PAT}}"
+        reviewdog-token: "${{secrets.GITHUB_TOKEN}}"
   rubocop:
     name: Ruby Linter
     runs-on: ubuntu-latest
@@ -105,11 +108,12 @@ jobs:
     steps:
     - name: Rubocop
       id: rubocop
-      uses: cloud-officer/ci-actions/linters/rubocop@v2
+      uses: cloud-officer/ci-actions/linters/rubocop@v3
       with:
         linters: "${{needs.variables.outputs.LINTERS}}"
         ssh-key: "${{secrets.SSH_KEY}}"
         github-token: "${{secrets.GH_PAT}}"
+        reviewdog-token: "${{secrets.GITHUB_TOKEN}}"
   semgrep:
     name: Semgrep Security Scanner
     permissions:
@@ -123,7 +127,7 @@ jobs:
     timeout-minutes: 30
     steps:
     - name: Semgrep
-      uses: cloud-officer/ci-actions/linters/semgrep@v2
+      uses: cloud-officer/ci-actions/linters/semgrep@v3
       with:
         linters: "${{needs.variables.outputs.LINTERS}}"
         ssh-key: "${{secrets.SSH_KEY}}"
@@ -137,7 +141,7 @@ jobs:
     timeout-minutes: 30
     steps:
     - name: Trivy
-      uses: cloud-officer/ci-actions/linters/trivy@v2
+      uses: cloud-officer/ci-actions/linters/trivy@v3
       with:
         linters: "${{needs.variables.outputs.LINTERS}}"
         ssh-key: "${{secrets.SSH_KEY}}"
@@ -152,11 +156,12 @@ jobs:
     steps:
     - name: Yamllint
       id: yamllint
-      uses: cloud-officer/ci-actions/linters/yamllint@v2
+      uses: cloud-officer/ci-actions/linters/yamllint@v3
       with:
         linters: "${{needs.variables.outputs.LINTERS}}"
         ssh-key: "${{secrets.SSH_KEY}}"
         github-token: "${{secrets.GH_PAT}}"
+        reviewdog-token: "${{secrets.GITHUB_TOKEN}}"
   licenses:
     name: Licenses Check
     runs-on: ubuntu-latest
@@ -166,7 +171,7 @@ jobs:
     timeout-minutes: 30
     steps:
     - name: Licenses
-      uses: cloud-officer/ci-actions/soup@v2
+      uses: cloud-officer/ci-actions/soup@v3
       with:
         ssh-key: "${{secrets.SSH_KEY}}"
         github-token: "${{secrets.GH_PAT}}"
@@ -181,12 +186,12 @@ jobs:
     strategy:
       matrix:
         os:
-        - macos-26
+        - macos-latest
         - ubuntu-latest
     steps:
     - name: Setup
       id: setup
-      uses: cloud-officer/ci-actions/setup@v2
+      uses: cloud-officer/ci-actions/setup@v3
       if: "${{needs.variables.outputs.SKIP_LICENSES != '1' || needs.variables.outputs.SKIP_TESTS != '1'}}"
       with:
         ruby-bundler-cache: "${{env.RUBY-BUNDLER-CACHE}}"

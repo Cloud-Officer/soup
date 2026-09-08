@@ -1,22 +1,37 @@
 globs:
   - "**/*.md"
   - "!.*"
-  - "!**/vendor/**"
-  - "!**/node_modules/**"
-  - "!**/Libraries/**"
-  - "!**/Pods/**"
+  # ghb:excluded-dirs:start - managed by github-build from config/languages.yaml; do not edit by hand
   - "!**/.build/**"
-  - "!**/Carthage/**"
-  - "!**/DerivedData/**"
-  - "!**/venv/**"
+  - "!**/.bundle/**"
+  - "!**/.git/**"
+  - "!**/.gradle/**"
+  - "!**/.hg/**"
+  - "!**/.m2/**"
+  - "!**/.npm/**"
+  - "!**/.pnpm/**"
+  - "!**/.pytest_cache/**"
+  - "!**/.svn/**"
   - "!**/.venv/**"
-  - "!**/dist/**"
+  - "!**/.yarn/**"
+  - "!**/__pycache__/**"
   - "!**/build/**"
+  - "!**/Carthage/**"
+  - "!**/coverage/**"
+  - "!**/DerivedData/**"
+  - "!**/dist/**"
+  - "!**/env/**"
+  - "!**/Libraries/**"
+  - "!**/node_modules/**"
+  - "!**/Pods/**"
   - "!**/target/**"
+  - "!**/vendor/**"
+  - "!**/venv/**"
+  # ghb:excluded-dirs:end
   # Claude Code skill review artifacts: rewritten wholesale on every run and gitignored,
   # so a lint failure there can only be "fixed" by regenerating the file. Living docs the
-  # same skills maintain (README.md, docs/architecture.md, docs/user-guide.md, docs/db.md,
-  # docs/ownership-map.md, docs/threat-model.md) stay linted.
+  # same skills maintain (README.md, docs/architecture.md, docs/user-guide.md, docs/db.md)
+  # stay linted.
   - "!docs/code-review.md"
   - "!docs/copy-review.md"
   - "!docs/migration/**"

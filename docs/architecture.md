@@ -432,7 +432,8 @@
 **Key Components:**
 
 - `parse(file, packages)`: Parses a JSON array of entry objects, raising `InvalidLockfileError` if the file is not an array or an entry lacks a non-empty `package`; each entry becomes a `SOUP::Package`
-- Each entry supports `package` (required), plus optional `language`, `version`, `license`, `description`, `website`, and `file`; the `file` path lets the vendored-file coverage check (`Application#enforce_vendored_coverage`) match a committed file to its entry
+- Each entry supports `package` (required), plus optional `language`, `version`, `license`, `description`, `website`, and `file`; the `file` path lets the vendored-file coverage check (`Application#enforce_vendored_coverage`) match a committed file to its entry. An omitted `language` defaults to `JS` (the vendored-asset case the parser exists for) and an omitted `file` falls back to the manual entries file itself, so an entry with no `file` satisfies no vendored glob
+- `build_entry(file, entry)`: Builds the `SOUP::Package` for one entry, applying those defaults and copying the pre-declared verification fields onto it
 - Entries may pre-declare verification fields (`risk_level`, `requirements`, `verification_reasoning`); otherwise they fall back to the cache or prompt like any other package
 - `REQUIRED_KEY`: Private constant for the required `package` field
 
@@ -596,7 +597,7 @@ Word-boundary anchoring cannot rescue an entry that is genuinely a substring of 
 | :--- | :--- | :--- |
 | Parser argument validation | Type checking for parser, file path, and packages hash | `lib/soup/parsers/generic.rb` in `parse` method |
 | Package name validation | Raises error if package name is nil | `lib/soup/package.rb` in `initialize` method |
-| File path validation | Checks file existence before reading | Throughout parsers |
+| File path validation | Configuration, cache, manual-entry, and sibling-manifest paths are checked for existence (or the read is rescued) before being read; lock file paths need no check because `Dir.glob` only yields files that exist | `lib/soup/application.rb` in `validate_config!` / `validate_cache_file!` / `parse_manual_entries` / `read_cached_packages`; `lib/soup/parsers/pip.rb` in `read_direct_dependencies`; `lib/soup/parsers/spm.rb` in `read_main_swift_file`; `lib/soup/parsers/gradle.rb` in `read_main_gradle_file` |
 | Command-line option validation | Uses OptionParser with defined option types | `lib/soup/options.rb` |
 
 ### Error Handling
@@ -631,7 +632,7 @@ Recoverable failures raise a subclass of `SOUP::Error` (`lib/soup/errors.rb`); t
 | ReDoS prevention | Uses non-backtracking regex pattern for markdown sanitization | `lib/soup/application.rb` in `markdown_cell` method |
 | HTML entity sanitization | Uses Nokogiri to decode HTML entities in descriptions | `lib/soup/application.rb` in `sanitize_markdown_description` method |
 | License compliance | Validates all dependencies against approved license list | `lib/soup/application.rb` in `validate_license` method |
-| Directory traversal prevention | Excludes `node_modules/` and `vendor/` from scanning | `lib/soup/application.rb` in `detect_packages` method |
+| Scan scope restriction | Excludes `node_modules/` and `vendor/` from the lock file glob, so third-party trees are never traversed as if they were the project | `lib/soup/application.rb` in `detect_packages` method |
 | API token handling | Uses environment variable for GitHub token, never logged | `lib/soup/parsers/spm.rb` in `parse` method |
 
 ### Operational Controls
