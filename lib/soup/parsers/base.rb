@@ -235,13 +235,27 @@ module SOUP
       )
     end
 
+    # The HTTP reason phrase ("Not Found", "Service Unavailable").
+    #
+    # Deliberately NOT `response.message`: HTTParty::Response does not define
+    # #message, so that call falls through method_missing, which first forces
+    # #parsed_response -- handing the body to HTTParty's own JSON parser. That
+    # parser still passes `quirks_mode:`, a keyword json 3.0 removed, so on
+    # Ruby 4 / json 3.x every 4xx or 5xx from a registry aborted the whole scan
+    # with "unknown keyword: quirks_mode" instead of warning about one package.
+    # Reaching through to the underlying Net::HTTPResponse keeps the error path
+    # off parsed_response entirely, which is the point of a diagnostic message.
+    def reason_phrase(response)
+      response.response.message.to_s
+    end
+
     # Build an actionable error message for a non-2xx response.
     #
     # Includes status code, reason phrase, URL, the package being processed (when
     # known), and a truncated body snippet so registry-side failures can be
     # diagnosed without rerunning under DEBUG.
     def http_error_message(response, url:, package: nil)
-      parts = ["HTTP #{response.code} #{response.message}"]
+      parts = ["HTTP #{response.code} #{reason_phrase(response)}"]
       parts << "package=#{package}" if package
       parts << "url=#{url}"
       body = response.body.to_s.strip
