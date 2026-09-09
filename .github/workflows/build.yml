@@ -174,7 +174,7 @@ jobs:
       uses: cloud-officer/ci-actions/soup@v3
       with:
         ssh-key: "${{secrets.SSH_KEY}}"
-        github-token: "${{secrets.GH_PAT}}"
+        github-token: "${{github.token}}"
         parameters: "--no_prompt"
   ruby_unit_tests:
     name: Ruby Unit Tests
