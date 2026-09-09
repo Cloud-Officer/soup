@@ -71,7 +71,7 @@ jobs:
         echo "is_owner=${is_owner}" >> "$GITHUB_OUTPUT"
         echo "PR author ${AUTHOR} is_owner=${is_owner}"
       env:
-        GH_TOKEN: "${{secrets.GH_PAT}}"
+        GH_TOKEN: "${{secrets.GH_BOT_PAT}}"
         AUTHOR: "${{github.event.pull_request.user.login}}"
     - name: Approve PR
       shell: bash
