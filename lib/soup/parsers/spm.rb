@@ -172,7 +172,7 @@ module SOUP
           ''
         end
 
-      [body_message, response.message.to_s].reject(&:empty?).join(' ')
+      [body_message, reason_phrase(response)].reject(&:empty?).join(' ')
     end
   end
 end

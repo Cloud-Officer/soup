@@ -6,11 +6,29 @@
 # regressions in shared behavior (especially Parallel.map's partial-failure
 # semantics) undetected.
 
-# A minimal stand-in for HTTParty::Response. HTTParty::Response delegates
-# code/message/body to Net::HTTPResponse via SimpleDelegator/method_missing,
-# so RSpec's verifying-doubles refuse those method names. This Struct
-# satisfies the helper's actual contract (responds to code, message, body).
-FakeHTTPResponse = Struct.new(:code, :message, :body)
+# A minimal stand-in for HTTParty::Response, whose method names RSpec's
+# verifying doubles refuse because they arrive through method_missing.
+#
+# The shape matters: HTTParty::Response exposes #code and #body directly but
+# NOT #message -- that one is method_missing'd onto the *parsed* body, which is
+# how a plain `response.message` used to detonate the whole scan on json 3.x.
+# So this fake deliberately does not answer #message either, and exposes the
+# reason phrase only where the real class does: on the wrapped
+# Net::HTTPResponse behind #response.
+FakeNetHTTPResponse = Struct.new(:message)
+
+class FakeHTTPResponse
+  attr_reader :code
+  attr_accessor :body
+
+  def initialize(code:, message:, body:)
+    @code = code
+    @body = body
+    @net = FakeNetHTTPResponse.new(message)
+  end
+
+  def response = @net
+end
 
 RSpec.describe(SOUP::BaseParser) do
   describe '#parse (abstract base method)' do
@@ -232,6 +250,15 @@ RSpec.describe(SOUP::BaseParser) do
     end
 
     describe '#http_error_message' do
+      let(:missing_package_url) { 'https://registry.example.com/@scope/private-pkg' }
+      # A genuine HTTParty::Response carrying a JSON content type and a body
+      # HTTParty's own parser would reject -- the exact shape npm returns for a
+      # private or paid package that is absent from the public registry.
+      let(:real_404_response) do
+        stub_request(:get, missing_package_url)
+          .to_return(status: [404, 'Not Found'], body: 'nope', headers: { 'Content-Type': 'application/json' })
+        parser.registry_response(missing_package_url, label: 'pkg')
+      end
       let(:response) do
         FakeHTTPResponse.new(code: 503, message: 'Service Unavailable', body: 'upstream timeout')
       end
@@ -258,6 +285,19 @@ RSpec.describe(SOUP::BaseParser) do
         message = parser.http_error_message(response, url: 'https://x/y')
         body_part = message[/body=A+/]
         expect(body_part.length).to(eq('body='.length + 200))
+      end
+
+      # Regression test for BUG-07: formatted a *real* HTTParty::Response, not
+      # the fake. The reason phrase used to be read as `response.message`, which
+      # HTTParty::Response answers only by parsing the body with its own JSON
+      # parser -- and that parser passes `quirks_mode:`, removed in json 3.0.
+      # So on Ruby 4 the first 404 from a registry raised "unknown keyword:
+      # quirks_mode" and aborted the entire scan instead of warning about the
+      # one package. Any body that HTTParty would choke on proves the fix.
+      it 'formats a real HTTParty response without parsing its body', :aggregate_failures do
+        message = parser.http_error_message(real_404_response, url: missing_package_url)
+        expect(message).to(include('HTTP 404 Not Found'))
+        expect(message).to(include('body=nope'))
       end
     end
 
