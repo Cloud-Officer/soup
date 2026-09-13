@@ -150,6 +150,14 @@ RSpec.describe(SOUP::Application) do
     allow(Dir).to(receive(:glob).with("#{Dir.pwd}/**/composer.lock").and_return([lockfile_path]))
   end
 
+  def stub_single_valid_pkg
+    single_lock = {
+      packages: [{ name: 'valid/pkg', version: '1.0.0', license: ['MIT'], description: 'Test', homepage: 'https://example.com' }],
+      'packages-dev': []
+    }.to_json
+    stub_composer_files(single_lock, '{"require":{"valid/pkg":"^1.0"}}')
+  end
+
   def default_composer_lock
     {
       packages: [
@@ -458,6 +466,47 @@ RSpec.describe(SOUP::Application) do
         args = ['--licenses', '--licenses_file', bad_file.path, '--exceptions_file', exceptions_file.path] + skip_all_parsers
         expect { described_class.new(args).execute }
           .to(raise_error(SOUP::ConfigurationError, /Invalid JSON/))
+      end
+    end
+
+    context 'when a configuration file has the wrong JSON shape' do
+      def valid_cache = '{"PHP:valid/pkg":{"version":"0.9.0"}}'
+
+      def existing_markdown = "# Existing SOUP\n"
+
+      def expect_shape_rejected(file, cache: valid_cache)
+        write_existing_soup_files(cache, existing_markdown)
+        expect { described_class.new(soup_args(skip: skip_parsers_except_composer)).execute }
+          .to(raise_error(SOUP::ConfigurationError, /#{Regexp.escape(file)} must contain/))
+        expect(File.read(cache_file.path)).to(eq(cache))
+        expect(File.read(markdown_file)).to(eq(existing_markdown))
+      end
+
+      before do
+        stub_composer_files(default_composer_lock, default_composer_json)
+      end
+
+      it 'rejects a cache file that is a JSON array', :aggregate_failures do
+        expect_shape_rejected(cache_file.path, cache: '[{"version":"1.0.0"}]')
+      end
+
+      it 'rejects a cache file whose entry is not an object', :aggregate_failures do
+        expect_shape_rejected(cache_file.path, cache: '{"PHP:valid/pkg":"1.0.0"}')
+      end
+
+      it 'rejects a licenses file that is a JSON object', :aggregate_failures do
+        File.write(licenses_file.path, '{"MIT": true}')
+        expect_shape_rejected(licenses_file.path)
+      end
+
+      it 'rejects a licenses file containing a non-string entry', :aggregate_failures do
+        File.write(licenses_file.path, '["MIT", 42]')
+        expect_shape_rejected(licenses_file.path)
+      end
+
+      it 'rejects an exceptions file that is not an array', :aggregate_failures do
+        File.write(exceptions_file.path, '{"excepted-pkg": true}')
+        expect_shape_rejected(exceptions_file.path)
       end
     end
 
@@ -861,19 +910,7 @@ RSpec.describe(SOUP::Application) do
       end
 
       before do
-        single_lock = {
-          packages: [
-            {
-              name: 'valid/pkg',
-              version: '1.0.0',
-              license: ['MIT'],
-              description: 'Test',
-              homepage: 'https://example.com'
-            }
-          ],
-          'packages-dev': []
-        }.to_json
-        stub_composer_files(single_lock, '{"require":{"valid/pkg":"^1.0"}}')
+        stub_single_valid_pkg
       end
 
       it 'uses cached package data' do
@@ -911,6 +948,52 @@ RSpec.describe(SOUP::Application) do
         File.write(cache_file.path, JSON.generate({ 'PHP:valid/pkg': { last_verified_at: '2025-01-01', risk_level: 'High' } }))
         described_class.new(soup_args(skip: skip_parsers_except_composer)).execute
         expect(JSON.parse(File.read(cache_file.path)).dig('PHP:valid/pkg', 'last_verified_at')).not_to(eq('2025-01-01'))
+      end
+    end
+
+    context 'with a same-version cache entry lacking verification fields' do
+      def write_incomplete_cached_valid_pkg(**fields)
+        File.write(cache_file.path, JSON.generate({ 'PHP:valid/pkg': { version: '1.0.0', **fields } }))
+      end
+
+      def today = Time.now.strftime('%Y-%m-%d')
+
+      before do
+        stub_single_valid_pkg
+      end
+
+      it 'stamps last_verified_at and defaults risk_level under --auto_reply', :aggregate_failures do
+        write_incomplete_cached_valid_pkg(requirements: 'Required for HTTP', verification_reasoning: 'Well known')
+        expect(described_class.new(soup_args(skip: skip_parsers_except_composer)).execute).to(eq(SOUP::Status::SUCCESS_EXIT_CODE))
+        entry = JSON.parse(File.read(cache_file.path))['PHP:valid/pkg']
+        expect(entry['last_verified_at']).to(eq(today))
+        expect(entry['risk_level']).to(eq('Low'))
+      end
+
+      it 'stamps a missing last_verified_at under --no_prompt when the other fields are cached' do
+        write_incomplete_cached_valid_pkg(risk_level: 'High', requirements: 'Required for HTTP', verification_reasoning: 'Well known')
+        described_class.new(soup_no_prompt_args(skip: skip_parsers_except_composer)).execute
+        expect(JSON.parse(File.read(cache_file.path)).dig('PHP:valid/pkg', 'last_verified_at')).to(eq(today))
+      end
+
+      it 'raises MissingMetadataError under --no_prompt when risk_level is also missing' do
+        write_incomplete_cached_valid_pkg(requirements: 'Required for HTTP', verification_reasoning: 'Well known')
+        expect { described_class.new(soup_no_prompt_args(skip: skip_parsers_except_composer)).execute }
+          .to(raise_error(SOUP::MissingMetadataError, %r{No risk level found for valid/pkg}))
+      end
+    end
+
+    context 'when a metadata prompt is answered with blank input' do
+      before do
+        stub_composer_files(default_composer_lock, default_composer_json)
+      end
+
+      [nil, '   '].each do |answer|
+        it "raises MissingMetadataError when the answer is #{answer.inspect}" do
+          allow(TTY::Prompt).to(receive(:new).and_return(instance_double(TTY::Prompt, select: 'Low', ask: answer)))
+          expect { described_class.new(soup_args(skip: skip_parsers_except_composer) - ['--auto_reply']).execute }
+            .to(raise_error(SOUP::MissingMetadataError, %r{Missing information for valid/pkg!}))
+        end
       end
     end
 
