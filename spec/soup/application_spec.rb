@@ -269,6 +269,41 @@ RSpec.describe(SOUP::Application) do
       expect(exit_code).to(eq(SOUP::Status::SUCCESS_EXIT_CODE))
     end
 
+    context 'when --soup detects no packages' do
+      def existing_cache = cached_requests_entry(version: '2.31.0')
+
+      def existing_markdown = "# Software of Unknown Provenance\n\n| Python | requests | 2.31.0 |\n"
+
+      def execute_quietly
+        original = $stderr
+        $stderr = StringIO.new
+        described_class.new(soup_args).execute
+      ensure
+        $stderr = original
+      end
+
+      it 'leaves the existing cache and markdown untouched', :aggregate_failures do
+        write_existing_soup_files(existing_cache, existing_markdown)
+        execute_quietly
+        expect(File.read(cache_file.path)).to(eq(existing_cache))
+        expect(File.read(markdown_file)).to(eq(existing_markdown))
+      end
+
+      it 'does not create a markdown file that did not exist' do
+        execute_quietly
+        expect(File.exist?(markdown_file)).to(be(false))
+      end
+
+      it 'warns on stderr that nothing was written' do
+        expect { described_class.new(soup_args).execute }
+          .to(output(/No packages detected/).to_stderr)
+      end
+
+      it 'still exits successfully' do
+        expect(execute_quietly).to(eq(SOUP::Status::SUCCESS_EXIT_CODE))
+      end
+    end
+
     context 'when CLI args trigger an OptionParser::ParseError subclass other than InvalidOption' do
       # Regression test for BUG-017: the configure_options rescue used to be
       # OptionParser::InvalidOption only, which let MissingArgument (and other
