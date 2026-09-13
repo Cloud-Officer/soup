@@ -69,7 +69,10 @@ module SOUP
       [@options.licenses_file, @options.exceptions_file].each do |file|
         raise(ConfigurationError, "Configuration file not found: #{file}") unless File.exist?(file)
 
-        validate_json!(file)
+        entries = validate_json!(file)
+        next if entries.is_a?(Array) && entries.all?(String)
+
+        raise(ConfigurationError, "Configuration file #{file} must contain a JSON array of strings")
       end
 
       validate_cache_file!
@@ -90,7 +93,10 @@ module SOUP
       return unless @options.soup_check
       return unless File.exist?(@options.cache_file)
 
-      validate_json!(@options.cache_file, label: 'cache file')
+      cache = validate_json!(@options.cache_file, label: 'cache file')
+      return if cache.is_a?(Hash) && cache.values.all?(Hash)
+
+      raise(ConfigurationError, "Cache file #{@options.cache_file} must contain a JSON object of package entries")
     end
 
     def validate_json!(file, label: 'configuration file')
@@ -207,7 +213,7 @@ module SOUP
         prompt_for_metadata(package, prompt)
         ensure_metadata_complete!(package)
 
-        package.last_verified_at = Time.now.strftime('%Y-%m-%d').to_s if package.last_verified_at.empty?
+        package.last_verified_at = Time.now.strftime('%Y-%m-%d').to_s if package.last_verified_at.to_s.empty?
 
         append_markdown_row(package)
       end
@@ -273,10 +279,10 @@ module SOUP
 
       same_version = cached['version'].to_s == package.version.to_s
       restore_unresolved_metadata(package, cached) if package.unresolved && same_version
-      package.last_verified_at = cached['last_verified_at'] if same_version
-      package.risk_level = cached['risk_level']
-      package.requirements = cached['requirements']
-      package.verification_reasoning = cached['verification_reasoning']
+      package.last_verified_at = cached['last_verified_at'].to_s if same_version
+      package.risk_level = cached['risk_level'].to_s
+      package.requirements = cached['requirements'].to_s
+      package.verification_reasoning = cached['verification_reasoning'].to_s
     end
 
     # When this run could not reach the registry, keep whatever a previous run
@@ -333,11 +339,11 @@ module SOUP
 
       raise(MissingMetadataError, "No #{label} found for #{package.package}!") if @options.no_prompt
 
-      package.public_send(:"#{field}=", yield(prompt, package))
+      package.public_send(:"#{field}=", yield(prompt, package).to_s.strip)
     end
 
     def ensure_metadata_complete!(package)
-      return unless package.risk_level.empty? || package.requirements.empty? || package.verification_reasoning.empty?
+      return unless [package.risk_level, package.requirements, package.verification_reasoning].any? { |value| value.to_s.strip.empty? }
 
       raise(MissingMetadataError, "Missing information for #{package.package}!")
     end

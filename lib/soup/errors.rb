@@ -6,8 +6,8 @@ module SOUP
   # an explicit class) still catches every soup-internal error.
   class Error < StandardError; end
 
-  # Raised when a soup configuration file (--licenses_file, --exceptions_file)
-  # is missing, unreadable, or contains malformed JSON.
+  # Raised when a soup configuration file (--licenses_file, --exceptions_file,
+  # --cache_file) is missing, unreadable, or contains malformed or misshapen JSON.
   class ConfigurationError < Error; end
 
   # Raised when an input lockfile is structurally malformed, unsupported, or
