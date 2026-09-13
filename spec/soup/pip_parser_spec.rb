@@ -314,6 +314,44 @@ RSpec.describe(SOUP::PIPParser) do
     end
   end
 
+  context 'when whitespace surrounds the `==` operator' do
+    let(:requirements_content) { "requests == 2.31.0\nflask==3.0.0 \\\n" }
+
+    before do
+      stub_request(:get, 'https://pypi.org/pypi/requests/json')
+        .to_return(status: 200, body: requests_response)
+      stub_request(:get, 'https://pypi.org/pypi/flask/json')
+        .to_return(status: 200, body: flask_response)
+    end
+
+    it 'strips the package name and version before looking them up', :aggregate_failures do
+      packages = {}
+      parser.parse(requirements_path, packages)
+      expect(packages.keys).to(contain_exactly('requests', 'flask'))
+      expect(packages['requests'].version).to(eq('2.31.0'))
+      expect(a_request(:get, 'https://pypi.org/pypi/requests/json')).to(have_been_made)
+    end
+
+    it 'drops a trailing line continuation from the version' do
+      packages = {}
+      parser.parse(requirements_path, packages)
+      expect(packages['flask'].version).to(eq('3.0.0'))
+    end
+  end
+
+  context 'when a package name is not URI-safe' do
+    let(:requirements_content) { "bad name==1.0.0\n" }
+    let(:packages) { {} }
+
+    before { stub_request(:get, 'https://pypi.org/pypi/bad+name/json').to_return(status: 404, body: 'Not Found') }
+
+    it 'encodes the name and records the package as unresolved instead of aborting the scan', :aggregate_failures do
+      expect { parser.parse(requirements_path, packages) }
+        .to(output(/HTTP 404/).to_stderr)
+      expect(packages['bad name'].unresolved).to(be(true))
+    end
+  end
+
   context 'when license is empty and no classifiers exist' do
     let(:requirements_content) { "pkg==1.0.0\n" }
 
