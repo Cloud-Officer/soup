@@ -67,7 +67,7 @@ RSpec.describe(SOUP::Application) do
   # save_files wrote back to .soup.json.
   def scan_and_read_cached_requests
     described_class.new(soup_args(skip: skip_parsers_except_pip)).execute
-    JSON.parse(File.read(cache_file.path))['requests']
+    JSON.parse(File.read(cache_file.path))['Python:requests']
   end
 
   def licenses_args(extra: [], skip: skip_all_parsers)
@@ -256,6 +256,77 @@ RSpec.describe(SOUP::Application) do
     end
   end
 
+  describe 'packages sharing a name across ecosystems' do
+    def gemfile_lock_with_json
+      <<~LOCK
+        GEM
+          remote: https://rubygems.org/
+          specs:
+            json (2.7.0)
+        PLATFORMS
+          ruby
+        DEPENDENCIES
+          json
+        BUNDLED WITH
+           2.5.0
+      LOCK
+    end
+
+    def npm_lock_with_json
+      { lockfileVersion: 3, packages: { '': { version: '1.0.0' }, 'node_modules/json': { version: '11.0.0' } } }.to_json
+    end
+
+    def legacy_json_entry(requirements)
+      { language: 'JS', package: 'json', version: '11.0.0', license: 'MIT', last_verified_at: '2025-01-01', risk_level: 'High', requirements: requirements, verification_reasoning: 'Reviewed' }
+    end
+
+    def scan_json_packages
+      described_class.new(soup_args(skip: %w[--skip_composer --skip_gradle --skip_pip --skip_spm --skip_yarn])).execute
+      JSON.parse(File.read(cache_file.path))
+    end
+
+    before do
+      write_fixture('Gemfile', "gem 'json'")
+      gemfile_lock = write_fixture('Gemfile.lock', gemfile_lock_with_json)
+      write_fixture('package.json', '{"dependencies":{"json":"^11.0.0"}}')
+      package_lock = write_fixture('package-lock.json', npm_lock_with_json)
+      allow(Dir).to(receive(:glob).and_return([]))
+      allow(Dir).to(receive(:glob).with("#{Dir.pwd}/**/Gemfile.lock").and_return([gemfile_lock]))
+      allow(Dir).to(receive(:glob).with("#{Dir.pwd}/**/package-lock.json").and_return([package_lock]))
+      stub_request(:get, 'https://api.rubygems.org/api/v2/rubygems/json/versions/2.7.0.json')
+        .to_return(status: 200, body: { licenses: ['Apache-2.0'], info: 'JSON gem', homepage_uri: 'https://rubygems.org/gems/json' }.to_json)
+      stub_request(:get, 'https://registry.npmjs.org/json')
+        .to_return(status: 200, body: { versions: { '11.0.0': { license: 'MIT', description: 'JSON CLI', homepage: 'https://github.com/trentm/json' } } }.to_json)
+    end
+
+    it 'keeps both packages in the cache with their own version and licence', :aggregate_failures do
+      cache = scan_json_packages
+      expect(cache.keys).to(contain_exactly('Ruby:json', 'JS:json'))
+      expect(cache['Ruby:json'].values_at('language', 'version', 'license')).to(eq(%w[Ruby 2.7.0 Apache-2.0]))
+      expect(cache['JS:json'].values_at('language', 'version', 'license')).to(eq(%w[JS 11.0.0 MIT]))
+    end
+
+    it 'renders a register row for each package', :aggregate_failures do
+      scan_json_packages
+      content = File.read(markdown_file)
+      expect(content).to(include('| Ruby | json | 2.7.0 | Apache-2.0 |'))
+      expect(content).to(include('| JS | json | 11.0.0 | MIT |'))
+    end
+
+    it 'applies a legacy bare-name cache entry only to the ecosystem it recorded', :aggregate_failures do
+      File.write(cache_file.path, JSON.generate({ json: legacy_json_entry('Parses JSON in the browser') }))
+      cache = scan_json_packages
+      expect(cache).not_to(have_key('json'))
+      expect(cache['JS:json'].values_at('requirements', 'risk_level')).to(eq(['Parses JSON in the browser', 'High']))
+      expect(cache['Ruby:json']['requirements']).not_to(eq('Parses JSON in the browser'))
+    end
+
+    it 'prefers an existing qualified cache entry over a legacy bare-name one' do
+      File.write(cache_file.path, JSON.generate({ json: legacy_json_entry('Legacy'), 'JS:json': legacy_json_entry('Current') }))
+      expect(scan_json_packages.dig('JS:json', 'requirements')).to(eq('Current'))
+    end
+  end
+
   describe '#execute' do
     it 'runs successfully with --licenses only and no detected packages' do
       app = described_class.new(licenses_args)
@@ -381,7 +452,7 @@ RSpec.describe(SOUP::Application) do
         # instead of the parser-supplied description.
         described_class.new(soup_args(skip: skip_parsers_except_composer)).execute
         cached = JSON.parse(File.read(cache_file.path))
-        expect(cached['valid/pkg']['description']).to(eq('A valid package'))
+        expect(cached['PHP:valid/pkg']['description']).to(eq('A valid package'))
       end
 
       it 'raises with no_prompt when risk_level is missing' do
@@ -597,7 +668,7 @@ RSpec.describe(SOUP::Application) do
       it 'records the license as Unlicense rather than NOASSERTION' do
         app = described_class.new(soup_args(skip: skip_parsers_except_composer))
         app.execute
-        expect(JSON.parse(File.read(cache_file.path))['unlicense/pkg']['license']).to(eq('Unlicense'))
+        expect(JSON.parse(File.read(cache_file.path))['PHP:unlicense/pkg']['license']).to(eq('Unlicense'))
       end
     end
 
@@ -673,19 +744,19 @@ RSpec.describe(SOUP::Application) do
 
       it 'still persists the packages this run finished verifying', :aggregate_failures do
         cache_content = run_expecting_failure
-        expect(cache_content).to(have_key('aaa/transitive'))
-        expect(cache_content.dig('aaa/transitive', 'risk_level')).not_to(be_empty)
+        expect(cache_content).to(have_key('PHP:aaa/transitive'))
+        expect(cache_content.dig('PHP:aaa/transitive', 'risk_level')).not_to(be_empty)
       end
 
       it 'does not blank a verified package that the run never reached', :aggregate_failures do
         cache_content = run_expecting_failure
-        expect(cache_content.dig('zzz/cached', 'risk_level')).to(eq('High'))
-        expect(cache_content.dig('zzz/cached', 'requirements')).to(eq('Critical subsystem'))
-        expect(cache_content.dig('zzz/cached', 'verification_reasoning')).to(eq('Audited in 2025'))
+        expect(cache_content.dig('PHP:zzz/cached', 'risk_level')).to(eq('High'))
+        expect(cache_content.dig('PHP:zzz/cached', 'requirements')).to(eq('Critical subsystem'))
+        expect(cache_content.dig('PHP:zzz/cached', 'verification_reasoning')).to(eq('Audited in 2025'))
       end
 
       it 'does not add the package that raised to the cache as a blank entry' do
-        expect(run_expecting_failure).not_to(have_key('mmm/raises'))
+        expect(run_expecting_failure).not_to(have_key('PHP:mmm/raises'))
       end
 
       # The published register must not be truncated to the header-only table

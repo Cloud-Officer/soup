@@ -48,17 +48,17 @@ RSpec.describe(SOUP::NPMParser) do
     end
 
     it 'parses packages and skips empty root key and dev dependencies', :aggregate_failures do
-      expect(packages).to(have_key('lodash'))
-      expect(packages).not_to(have_key('dev-only'))
-      expect(packages).not_to(have_key(''))
+      expect(packages).to(have_key('JS:lodash'))
+      expect(packages).not_to(have_key('JS:dev-only'))
+      expect(packages).not_to(have_key('JS:'))
     end
 
     it 'sets language to JS and extracts package details', :aggregate_failures do
-      expect(packages['lodash'].language).to(eq('JS'))
-      expect(packages['lodash'].version).to(eq('4.17.21'))
-      expect(packages['lodash'].license).to(eq('MIT'))
-      expect(packages['lodash'].description).to(eq('Lodash library'))
-      expect(packages['lodash'].website).to(eq('https://lodash.com/'))
+      expect(packages['JS:lodash'].language).to(eq('JS'))
+      expect(packages['JS:lodash'].version).to(eq('4.17.21'))
+      expect(packages['JS:lodash'].license).to(eq('MIT'))
+      expect(packages['JS:lodash'].description).to(eq('Lodash library'))
+      expect(packages['JS:lodash'].website).to(eq('https://lodash.com/'))
     end
   end
 
@@ -71,8 +71,8 @@ RSpec.describe(SOUP::NPMParser) do
     it 'records the package as unresolved rather than dropping it', :aggregate_failures do
       packages = {}
       parser.parse(lockfile_path, packages)
-      expect(packages['lodash']).to(have_attributes(version: '4.17.21', language: 'JS', license: 'NOASSERTION'))
-      expect(packages['lodash'].unresolved).to(be(true))
+      expect(packages['JS:lodash']).to(have_attributes(version: '4.17.21', language: 'JS', license: 'NOASSERTION'))
+      expect(packages['JS:lodash'].unresolved).to(be(true))
     end
   end
 
@@ -92,7 +92,7 @@ RSpec.describe(SOUP::NPMParser) do
 
     it 'retries max_retries+1 times before recording the package as unresolved', :aggregate_failures do
       parser.parse(lockfile_path, packages)
-      expect(packages['lodash']).to(have_attributes(version: '4.17.21', license: 'NOASSERTION'))
+      expect(packages['JS:lodash']).to(have_attributes(version: '4.17.21', license: 'NOASSERTION'))
       expect(a_request(:get, url)).to(have_been_made.times(SOUP::HttpClient.max_retries + 1))
     end
 
@@ -129,7 +129,7 @@ RSpec.describe(SOUP::NPMParser) do
     it 'records Unlicense verbatim' do
       packages = {}
       parser.parse(lockfile_path, packages)
-      expect(packages['lodash'].license).to(eq('Unlicense'))
+      expect(packages['JS:lodash'].license).to(eq('Unlicense'))
     end
   end
 
@@ -142,8 +142,8 @@ RSpec.describe(SOUP::NPMParser) do
     it 'records the package as unresolved when its version is absent', :aggregate_failures do
       packages = {}
       parser.parse(lockfile_path, packages)
-      expect(packages['lodash']).to(have_attributes(version: '4.17.21', license: 'NOASSERTION'))
-      expect(packages['lodash'].unresolved).to(be(true))
+      expect(packages['JS:lodash']).to(have_attributes(version: '4.17.21', license: 'NOASSERTION'))
+      expect(packages['JS:lodash'].unresolved).to(be(true))
     end
   end
 
@@ -157,8 +157,8 @@ RSpec.describe(SOUP::NPMParser) do
       packages = {}
       expect { parser.parse(lockfile_path, packages) }
         .not_to(raise_error)
-      expect(packages['lodash']).to(have_attributes(license: 'NOASSERTION'))
-      expect(packages['lodash'].unresolved).to(be(true))
+      expect(packages['JS:lodash']).to(have_attributes(license: 'NOASSERTION'))
+      expect(packages['JS:lodash'].unresolved).to(be(true))
     end
   end
 
@@ -173,7 +173,7 @@ RSpec.describe(SOUP::NPMParser) do
     it 'classifies overrides-only packages as transitive (not direct)' do
       packages = {}
       parser.parse(lockfile_path, packages)
-      expect(packages['lodash'].dependency).to(be(false))
+      expect(packages['JS:lodash'].dependency).to(be(false))
     end
   end
 
@@ -201,7 +201,7 @@ RSpec.describe(SOUP::NPMParser) do
     it 'is treated as transitive even though it appears in overrides' do
       packages = {}
       parser.parse(lockfile_path, packages)
-      expect(packages['transitive-only'].dependency).to(be(true))
+      expect(packages['JS:transitive-only'].dependency).to(be(true))
     end
   end
 
@@ -249,8 +249,8 @@ RSpec.describe(SOUP::NPMParser) do
       packages = {}
       parser.parse(lockfile_path, packages)
       expect(packages.size).to(eq(100))
-      expect(packages['pkg-1']).to(have_attributes(license: 'MIT', version: '1.0.0'))
-      expect(packages['pkg-100']).to(have_attributes(license: 'MIT', version: '1.0.0'))
+      expect(packages['JS:pkg-1']).to(have_attributes(license: 'MIT', version: '1.0.0'))
+      expect(packages['JS:pkg-100']).to(have_attributes(license: 'MIT', version: '1.0.0'))
     end
   end
 
@@ -289,7 +289,7 @@ RSpec.describe(SOUP::NPMParser) do
     it 'reads both files from disk without File stubs' do
       packages = {}
       parser.parse(lockfile_path, packages)
-      expect(packages['lodash']).to(have_attributes(language: 'JS', version: '4.17.21', license: 'MIT'))
+      expect(packages['JS:lodash']).to(have_attributes(language: 'JS', version: '4.17.21', license: 'MIT'))
     end
   end
 end

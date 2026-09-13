@@ -148,7 +148,7 @@ module SOUP
 
     # Manually-declared SOUP entries cover vendored/proprietary components that
     # no package manager resolves. Parsed after the auto-detected packages so a
-    # project can override an auto-detected entry by package name if needed.
+    # project can override an auto-detected entry by language and package name.
     def parse_manual_entries
       return if @options.manual_file.to_s.empty?
       return unless File.exist?(@options.manual_file)
@@ -183,7 +183,7 @@ module SOUP
 
       @cached_packages =
         if File.exist?(@options.cache_file)
-          JSON.parse(File.read(@options.cache_file))
+          migrate_legacy_cache_keys(JSON.parse(File.read(@options.cache_file)))
         else
           {}
         end
@@ -196,12 +196,12 @@ module SOUP
       exceptions = JSON.parse(File.read(@options.exceptions_file))
       prompt = TTY::Prompt.new
 
-      @detected_packages.each do |name, package|
+      @detected_packages.each do |key, package|
         validate_license(package, license_pattern, exceptions)
 
         next unless @options.soup_check
 
-        apply_cached_metadata(name, package)
+        apply_cached_metadata(key, package)
         apply_dependency_defaults(package)
         prompt_for_metadata(package, prompt)
         ensure_metadata_complete!(package)
@@ -250,8 +250,19 @@ module SOUP
       @exit_code = Status::ERROR_EXIT_CODE if package.license != 'NOASSERTION'
     end
 
-    def apply_cached_metadata(name, package)
-      cached = @cached_packages[name]
+    # Bare-name keys from older caches move to "<language>:<package>" using the language they recorded.
+    def migrate_legacy_cache_keys(cache)
+      legacy, current = cache.partition { |key, entry| legacy_cache_entry?(key, entry) }
+      migrated = legacy.to_h { |key, entry| [Package.key_for(entry['language'], entry['package'] || key), entry] }
+      migrated.merge(current.to_h)
+    end
+
+    def legacy_cache_entry?(key, entry)
+      entry.is_a?(Hash) && !entry['language'].to_s.empty? && key != Package.key_for(entry['language'], entry['package'] || key)
+    end
+
+    def apply_cached_metadata(key, package)
+      cached = @cached_packages[key] || @cached_packages[package.package]
       return unless cached
 
       restore_unresolved_metadata(package, cached) if package.unresolved

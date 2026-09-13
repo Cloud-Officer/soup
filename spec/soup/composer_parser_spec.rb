@@ -43,31 +43,31 @@ RSpec.describe(SOUP::ComposerParser) do
   end
 
   it 'parses packages and packages-dev', :aggregate_failures do
-    expect(packages).to(have_key('vendor/main-pkg'))
-    expect(packages).to(have_key('vendor/dev-pkg'))
+    expect(packages).to(have_key('PHP:vendor/main-pkg'))
+    expect(packages).to(have_key('PHP:vendor/dev-pkg'))
   end
 
   it 'sets language to PHP' do
-    expect(packages['vendor/main-pkg'].language).to(eq('PHP'))
+    expect(packages['PHP:vendor/main-pkg'].language).to(eq('PHP'))
   end
 
   it 'extracts version', :aggregate_failures do
-    expect(packages['vendor/main-pkg'].version).to(eq('v1.2.3'))
-    expect(packages['vendor/dev-pkg'].version).to(eq('2.0.0'))
+    expect(packages['PHP:vendor/main-pkg'].version).to(eq('v1.2.3'))
+    expect(packages['PHP:vendor/dev-pkg'].version).to(eq('2.0.0'))
   end
 
   it 'extracts license', :aggregate_failures do
-    expect(packages['vendor/main-pkg'].license).to(eq('MIT'))
-    expect(packages['vendor/dev-pkg'].license).to(eq('Apache-2.0'))
+    expect(packages['PHP:vendor/main-pkg'].license).to(eq('MIT'))
+    expect(packages['PHP:vendor/dev-pkg'].license).to(eq('Apache-2.0'))
   end
 
   it 'extracts first sentence of description' do
-    expect(packages['vendor/main-pkg'].description).to(eq('A main package'))
+    expect(packages['PHP:vendor/main-pkg'].description).to(eq('A main package'))
   end
 
   it 'marks non-main-file packages as dependencies', :aggregate_failures do
-    expect(packages['vendor/main-pkg'].dependency).to(be(false))
-    expect(packages['vendor/dev-pkg'].dependency).to(be(true))
+    expect(packages['PHP:vendor/main-pkg'].dependency).to(be(false))
+    expect(packages['PHP:vendor/dev-pkg'].dependency).to(be(true))
   end
 
   # BUG-003 regression: a transitive package whose name is a substring of a
@@ -84,7 +84,7 @@ RSpec.describe(SOUP::ComposerParser) do
     end
 
     it 'classifies the substring package as transitive' do
-      expect(packages['vendor/main'].dependency).to(be(true))
+      expect(packages['PHP:vendor/main'].dependency).to(be(true))
     end
   end
 
@@ -105,7 +105,7 @@ RSpec.describe(SOUP::ComposerParser) do
     end
 
     it 'strips parentheses and takes first license' do
-      expect(packages['vendor/paren-pkg'].license).to(eq('MIT'))
+      expect(packages['PHP:vendor/paren-pkg'].license).to(eq('MIT'))
     end
   end
 
@@ -125,7 +125,7 @@ RSpec.describe(SOUP::ComposerParser) do
       }.to_json
     end
 
-    let(:pkg) { packages['vendor/nil-pkg'] }
+    let(:pkg) { packages['PHP:vendor/nil-pkg'] }
 
     it 'handles nil version, license, description, and homepage', :aggregate_failures do
       expect(pkg.version).to(be_nil)
@@ -156,7 +156,7 @@ RSpec.describe(SOUP::ComposerParser) do
     it 'treats missing packages-dev as empty and parses the prod packages', :aggregate_failures do
       expect { packages }
         .not_to(raise_error)
-      expect(packages).to(have_key('vendor/prod-only'))
+      expect(packages).to(have_key('PHP:vendor/prod-only'))
     end
   end
 
@@ -176,7 +176,7 @@ RSpec.describe(SOUP::ComposerParser) do
     end
 
     it 'treats missing packages as empty and still parses dev packages' do
-      expect(packages).to(have_key('vendor/dev-only'))
+      expect(packages).to(have_key('PHP:vendor/dev-only'))
     end
   end
 
@@ -202,7 +202,7 @@ RSpec.describe(SOUP::ComposerParser) do
     end
 
     it 'reads composer.json from the same directory without corrupting the path' do
-      expect(packages).to(have_key('vendor/x'))
+      expect(packages).to(have_key('PHP:vendor/x'))
     end
   end
 
@@ -227,7 +227,7 @@ RSpec.describe(SOUP::ComposerParser) do
     end
 
     it 'treats the string as a one-element array and keeps the full SPDX id' do
-      expect(packages['vendor/str-license'].license).to(eq('MIT'))
+      expect(packages['PHP:vendor/str-license'].license).to(eq('MIT'))
     end
   end
 
@@ -267,7 +267,7 @@ RSpec.describe(SOUP::ComposerParser) do
     end
 
     it 'converts URL license to NOASSERTION' do
-      expect(packages['vendor/url-pkg'].license).to(eq('NOASSERTION'))
+      expect(packages['PHP:vendor/url-pkg'].license).to(eq('NOASSERTION'))
     end
   end
 
@@ -334,7 +334,7 @@ RSpec.describe(SOUP::ComposerParser) do
     end
 
     it 'reads the lockfile + composer.json from disk without File stubs' do
-      expect(packages['vendor/main-pkg']).to(have_attributes(language: 'PHP', version: '1.0.0', license: 'MIT'))
+      expect(packages['PHP:vendor/main-pkg']).to(have_attributes(language: 'PHP', version: '1.0.0', license: 'MIT'))
     end
   end
 end
