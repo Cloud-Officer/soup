@@ -326,11 +326,14 @@
 **Key Components:**
 
 - `parse(file, packages)`: Parses lock file and fetches package details, in parallel via the inherited `parallel_each` helper (`BaseParser`). Selects `classpath` entries for `buildscript-gradle.lockfile` and non-test, non-debug `RuntimeClasspath` entries for `gradle.lockfile`
-- `fetch_package(...)`: Queries the `search.maven.org` solrsearch endpoint first; when it returns no single match, or times out (the endpoint is chronically flaky), the lookup degrades to the per-repository POM mirrors in `REPOSITORY_URLS` rather than aborting the run. A coordinate that no source resolves is warned about and still recorded via `unresolved_package`, so the coordinate stays in the register and the scan continues
-- Mirror failures are absorbed by the inherited `BaseParser#registry_response`, which swallows any `HttpClient::TRANSIENT_ERRORS` fault on one mirror (warned, returns nil) so the caller falls through to the next source, instead of `Parallel.map` propagating the exception and aborting every other in-flight lookup. It is passed an explicit `outcome` (`trying the per-repository POM fallbacks`, then `trying the next repository`) so the warning does not claim the package was recorded
+- `fetch_package(...)`: Fetches the coordinate's POM from the repositories in `REPOSITORY_URLS` (Maven Central first) and reads the description and website from `/project/description` and `/project/url`, and the license through `pom_license`. The `search.maven.org` search API is not used: it returns no license, description, or website fields. A coordinate that no repository resolves is warned about and still recorded via `unresolved_package`, so the coordinate stays in the register and the scan continues
+- `fetch_pom(group_id, artifact_id, version, repositories)`: Tries each repository in order and returns the first POM served with HTTP 200, together with the repository that served it; otherwise returns the last response and URL for the skip warning
+- `pom_license(document, repository)`: Joins the POM's `<licenses>/<license>/<name>` values. When the POM declares none it follows `<parent>` (via `parent_pom`, looked up in the same repository then Maven Central), because many artifacts inherit their licenses from a parent POM (for example `guava` from `guava-parent`). Returns `NOASSERTION` when no POM within `MAX_POM_DEPTH` names a license, so the gap is reported rather than recorded as an empty license
+- Repository failures are absorbed by the inherited `BaseParser#registry_response`, which swallows any `HttpClient::TRANSIENT_ERRORS` fault on one repository (warned, returns nil) so the caller falls through to the next source, instead of `Parallel.map` propagating the exception and aborting every other in-flight lookup. It is passed an explicit `outcome` (`trying the next repository`) so the warning does not claim the package was recorded
 - `read_main_gradle_file(file)`: Resolves the build script next to the lock file, trying the Groovy DSL `build.gradle` then the Kotlin DSL `build.gradle.kts` (the Gradle 8.x+ default for new Android/Kotlin projects); raises `InvalidLockfileError` when neither exists. The contents are passed to `manifest_mentions?` for direct/transitive classification
 - `unresolved_message(response, url:, package:)`: Builds the skip warning, falling back to an "all Maven lookups timed out" message when every source timed out and there is no HTTP status to report
-- `REPOSITORY_URLS`: Private constant listing the Maven POM mirror URLs (`maven.google.com`, `plugins.gradle.org/m2`, `jitpack.io`, the Sonatype snapshots repo) tried in order when the primary endpoint has no match
+- `REPOSITORY_URLS`: Private constant listing the Maven repository URLs tried in order (`repo1.maven.org/maven2`, `maven.google.com`, `plugins.gradle.org/m2`, `jitpack.io`, the Sonatype snapshots repo)
+- `MAX_POM_DEPTH`: Private constant bounding how many POMs (the artifact's own plus its `<parent>` ancestors) `pom_license` inspects
 - `MAIN_FILE_NAMES`: Private constant listing the build script names tried by `read_main_gradle_file`
 
 **External Dependencies:**
@@ -512,9 +515,10 @@ Validation criteria for SOUP entries: Accuracy (Requirements match actual usage)
 
 1. `build_license_pattern` loads the authorized licenses and compiles them into a single matcher, anchoring each entry on word boundaries (`(?<!\w)entry(?!\w)`, with `Regexp.escape` applied so operator-supplied entries cannot inject regex metacharacters)
 2. Loads package-specific exceptions from configuration file
-3. For each detected package with a license:
+3. For each detected package:
+   - Skips it if the package is in the exceptions list
+   - Warns when the license is empty or missing, without failing the run (the same treatment as `NOASSERTION`), so a package that was never checked is visible in the output
    - Checks if the license matches any authorized entry on a word boundary (case-insensitive)
-   - Checks if package is in exceptions list
    - Reports error if license is not approved and not `NOASSERTION`
 
 **Why word boundaries rather than substring or exact match:** allowlist entries are license *families* as often as exact identifiers — `Apache` is meant to cover `Apache-2.0`, `BSD` to cover `BSD-3-Clause` — so an exact-match test would reject nearly every real-world SPDX identifier. A plain substring test (the BUG-004 defect) went too far the other way: any license string that merely *contained* an entry passed the compliance gate, so npm's `UNLICENSED` (proprietary, no rights granted) passed on the strength of containing `Unlicense`. Word boundaries keep `apache` matching `apache-2.0` while stopping `unlicense` from matching `unlicensed`, because `-` and `.` are boundaries but a trailing letter is not.
@@ -620,7 +624,7 @@ Recoverable failures raise a subclass of `SOUP::Error` (`lib/soup/errors.rb`); t
 | Malformed manual entries file | Raises `InvalidLockfileError` when the file is not a JSON array or an entry lacks a non-empty `package` | `lib/soup/parsers/manual.rb` in `parse` method |
 | Missing Gradle build script | Raises `InvalidLockfileError` when neither `build.gradle` nor `build.gradle.kts` sits alongside the lock file | `lib/soup/parsers/gradle.rb` in `read_main_gradle_file` method |
 | Missing Swift manifest | Raises `InvalidLockfileError` when no `Package.swift`, Tuist `Dependencies.swift`, or enclosing `project.pbxproj` can be resolved for a `Package.resolved` | `lib/soup/parsers/spm.rb` in `parse` / `read_main_swift_file` methods |
-| Maven source unreachable | An unreachable `search.maven.org` query or POM mirror is skipped (warned) and the lookup falls through to the next source; the scan is not aborted | `lib/soup/parsers/gradle.rb` in `fetch_package`, via `BaseParser#registry_response` |
+| Maven source unreachable | An unreachable Maven repository is skipped (warned) and the lookup falls through to the next repository; the scan is not aborted | `lib/soup/parsers/gradle.rb` in `fetch_package`, via `BaseParser#registry_response` |
 | Missing package metadata | Warns and records the single package via `unresolved_package`, so the scan continues with the remaining packages | Gradle and SPM parsers; `lookup_npm_registry_version` in `lib/soup/parsers/base.rb`, used by the Importmap, NPM, and Yarn parsers |
 | Registry outage for an already-recorded package | The unresolved entry keeps the license, description, and website a previous run recorded, restored from `.soup.json` and only when the cached entry pins the same version, so an outage cannot silently downgrade a verified component to `NOASSERTION` | `lib/soup/application.rb` in `apply_cached_metadata` / `restore_unresolved_metadata` methods |
 | Missing required IEC 62304 fields | Raises `MissingMetadataError` in `--no_prompt` mode, prompts user otherwise | `lib/soup/application.rb` in `prompt_missing_field` / `ensure_metadata_complete!` methods |

@@ -533,6 +533,40 @@ RSpec.describe(SOUP::Application) do
       end
     end
 
+    context 'with an empty or missing license' do
+      def composer_lock_with_license(license, name: 'nolicense/pkg')
+        { packages: [{ name: name, version: '1.0.0', license: license, description: 'Test', homepage: '' }], 'packages-dev': [] }.to_json
+      end
+
+      def run_licenses(extra: [], skip: skip_parsers_except_composer)
+        described_class.new(licenses_args(extra: extra, skip: skip)).execute
+      end
+
+      [[], ['']].each do |license|
+        it "warns without failing when composer reports license #{license.inspect}", :aggregate_failures do
+          stub_composer_files(composer_lock_with_license(license), '{"require":{"nolicense/pkg":"^1.0"}}')
+          exit_code = nil
+          expect { exit_code = run_licenses }
+            .to(output(%r{No license found in .* in package nolicense/pkg!}).to_stderr)
+          expect(exit_code).to(eq(SOUP::Status::SUCCESS_EXIT_CODE))
+        end
+      end
+
+      it 'warns without failing for a manual entry that omits the license key', :aggregate_failures do
+        manual_file = write_fixture('soup-manual.json', [{ package: 'vendored-lib', version: '1.0.0' }].to_json)
+        exit_code = nil
+        expect { exit_code = run_licenses(extra: ['--manual_file', manual_file], skip: skip_all_parsers) }
+          .to(output(/No license found in .* in package vendored-lib!/).to_stderr)
+        expect(exit_code).to(eq(SOUP::Status::SUCCESS_EXIT_CODE))
+      end
+
+      it 'does not warn for a package listed in the exceptions file' do
+        stub_composer_files(composer_lock_with_license([], name: 'excepted-pkg'), '{"require":{"excepted-pkg":"^1.0"}}')
+        expect { run_licenses }
+          .not_to(output(/No license found/).to_stderr)
+      end
+    end
+
     # BUG-006: config/licenses.json allowlists "Unlicense", but every parser
     # routed it through normalize_license, which rewrote it to NOASSERTION
     # before validate_license ran. The allowlist entry was therefore dead and

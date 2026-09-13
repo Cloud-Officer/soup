@@ -8,7 +8,7 @@ require 'openssl'
 module SOUP
   module HttpClient
     # Defaults are tuned for healthy public package registries (rubygems,
-    # registry.npmjs, pypi, search.maven, api.github). Override at runtime
+    # registry.npmjs, pypi, repo1.maven, api.github). Override at runtime
     # via SOUP_HTTP_TIMEOUT (seconds, integer) and SOUP_HTTP_MAX_RETRIES
     # (integer) for slow corporate proxies, rate-limited mirrors, or
     # air-gapped environments.
