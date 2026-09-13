@@ -62,6 +62,44 @@ RSpec.describe(SOUP::NPMParser) do
     end
   end
 
+  context 'with workspace, linked and file: entries' do
+    let(:lock_file) do
+      {
+        lockfileVersion: 3,
+        packages: {
+          '': { version: '1.0.0', workspaces: ['packages/*'] },
+          'packages/app': { version: '0.1.0', dependencies: { lodash: '^4.17.0' } },
+          'node_modules/app': { resolved: 'packages/app', link: true },
+          'node_modules/local-lib': { version: '1.0.0', resolved: 'file:../local-lib' },
+          'node_modules/lodash': { version: '4.17.21' },
+          'packages/app/node_modules/lodash': { version: '4.17.21' }
+        }
+      }.to_json
+    end
+
+    let(:packages) do
+      result = {}
+      parser.parse(lockfile_path, result)
+      result
+    end
+
+    before do
+      stub_request(:get, 'https://registry.npmjs.org/lodash')
+        .to_return(status: 200, body: registry_response)
+    end
+
+    it 'records only the registry-installed packages', :aggregate_failures do
+      expect(packages.keys).to(contain_exactly('JS:lodash'))
+      expect(packages['JS:lodash']).to(have_attributes(version: '4.17.21', license: 'MIT'))
+    end
+
+    it 'never looks up workspace, linked or file: entries on the registry', :aggregate_failures do
+      packages
+      expect(a_request(:get, %r{registry\.npmjs\.org/(packages|app|local-lib)})).not_to(have_been_made)
+      expect(a_request(:get, 'https://registry.npmjs.org/lodash')).to(have_been_made.at_least_once)
+    end
+  end
+
   context 'with non-200 response' do
     before do
       stub_request(:get, 'https://registry.npmjs.org/lodash')

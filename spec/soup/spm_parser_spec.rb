@@ -60,13 +60,52 @@ RSpec.describe(SOUP::SPMParser) do
     it 'records the pin as unresolved instead of aborting the scan', :aggregate_failures do
       expect { parser.parse(lockfile_path, packages) }
         .not_to(raise_error)
-      expect(packages['Swift:alamofire']).to(have_attributes(version: '5.9.0', language: 'Swift', license: 'NOASSERTION'))
-      expect(packages['Swift:alamofire'].unresolved).to(be(true))
+      expect(packages['Swift:Alamofire']).to(have_attributes(version: '5.9.0', language: 'Swift', license: 'NOASSERTION'))
+      expect(packages['Swift:Alamofire'].unresolved).to(be(true))
     end
 
     it 'names the pin in the skip warning' do
       expect { parser.parse(lockfile_path, packages) }
-        .to(output(/Skipping alamofire: network error after retries/).to_stderr)
+        .to(output(/Skipping Alamofire: network error after retries/).to_stderr)
+    end
+  end
+
+  describe 'package naming across successful and failed lookups' do
+    let(:packages) { {} }
+
+    def parse_with(**response)
+      stub_request(:get, 'https://api.github.com/repos/Alamofire/Alamofire').to_return(**response)
+      parser.parse(lockfile_path, packages)
+      packages
+    end
+
+    it 'records a 404 under the same key and name as a successful lookup', :aggregate_failures do
+      resolved_key = parse_with(status: 200, body: github_response).keys
+      packages.clear
+      expect(parse_with(status: [404, 'Not Found'], body: '{}').keys).to(eq(resolved_key))
+      expect(packages['Swift:Alamofire']).to(have_attributes(package: 'Alamofire', version: '5.9.0', dependency: false, unresolved: true))
+    end
+
+    it 'records an empty response under the repository name', :aggregate_failures do
+      parse_with(status: 200, body: '')
+      expect(packages.keys).to(contain_exactly('Swift:Alamofire'))
+      expect(packages['Swift:Alamofire']).to(have_attributes(package: 'Alamofire', dependency: false, unresolved: true))
+    end
+
+    context 'when the location is not a GitHub URL' do
+      let(:resolved_file) do
+        { pins: [{ identity: 'swift-log', location: 'https://gitlab.com/apple/swift-log.git', state: { version: '1.5.0' } }] }.to_json
+      end
+
+      let(:main_file_content) { '.package(url: "https://gitlab.com/apple/swift-log.git", from: "1.0.0")' }
+
+      it 'falls back to the pin identity', :aggregate_failures do
+        stub_request(:get, %r{api\.github\.com/repos/}).to_return(status: [404, 'Not Found'], body: '{}')
+        expect { parser.parse(lockfile_path, packages) }
+          .to(output(/package=swift-log/).to_stderr)
+        expect(packages.keys).to(contain_exactly('Swift:swift-log'))
+        expect(packages['Swift:swift-log']).to(have_attributes(dependency: false, unresolved: true))
+      end
     end
   end
 
@@ -214,8 +253,8 @@ RSpec.describe(SOUP::SPMParser) do
     it 'records the pin as unresolved on a non-200 response', :aggregate_failures do
       packages = {}
       parser.parse(lockfile_path, packages)
-      expect(packages['Swift:alamofire']).to(have_attributes(language: 'Swift', license: 'NOASSERTION'))
-      expect(packages['Swift:alamofire'].unresolved).to(be(true))
+      expect(packages['Swift:Alamofire']).to(have_attributes(language: 'Swift', license: 'NOASSERTION'))
+      expect(packages['Swift:Alamofire'].unresolved).to(be(true))
     end
   end
 
@@ -380,9 +419,9 @@ RSpec.describe(SOUP::SPMParser) do
     it 'warns with status + url + package context and records the pin', :aggregate_failures do
       packages = {}
       expect { parser.parse(lockfile_path, packages) }
-        .to(output(%r{HTTP 502 .*package=alamofire.*url=https://api\.github\.com/repos/Alamofire/Alamofire.*body=<html>upstream timeout</html>}m).to_stderr)
-      expect(packages['Swift:alamofire']).to(have_attributes(license: 'NOASSERTION'))
-      expect(packages['Swift:alamofire'].unresolved).to(be(true))
+        .to(output(%r{HTTP 502 .*package=Alamofire.*url=https://api\.github\.com/repos/Alamofire/Alamofire.*body=<html>upstream timeout</html>}m).to_stderr)
+      expect(packages['Swift:Alamofire']).to(have_attributes(license: 'NOASSERTION'))
+      expect(packages['Swift:Alamofire'].unresolved).to(be(true))
     end
   end
 

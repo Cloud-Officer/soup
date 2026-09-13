@@ -90,20 +90,19 @@ module SOUP
     end
 
     def fetch_package(file, main_file, token, pin)
-      pin_id = pin['identity'] || pin['package']
+      repo_path = github_repo_path(pin['location'] || pin['repositoryURL'])
+      name = pin_repo_name(repo_path, pin['identity'] || pin['package'])
       version = pin_version(pin)
-      url = "https://api.github.com/repos/#{github_repo_path(pin['location'] || pin['repositoryURL'])}"
+      url = "https://api.github.com/repos/#{repo_path}"
 
       response =
         if token.empty?
-          registry_response(url, label: pin_id)
+          registry_response(url, label: name)
         else
-          registry_response(url, label: pin_id, headers: { Authorization: "token #{token}" })
+          registry_response(url, label: name, headers: { Authorization: "token #{token}" })
         end
 
-      # The pin identity is all we know when the lookup fails, so it stands in
-      # for the repository name the GitHub payload would otherwise supply.
-      return unresolved_package(name: pin_id, file: file, language: 'Swift', version: version, dependency: !manifest_mentions?(main_file, pin_id)) if empty_response?(response)
+      return unresolved_package(name: name, file: file, language: 'Swift', version: version, dependency: !manifest_mentions?(main_file, name)) if empty_response?(response)
 
       unless response.code == 200
         # Rate limiting and bad credentials are global conditions -- every
@@ -114,15 +113,15 @@ module SOUP
         raise(RateLimitError, 'GitHub API: rate limit exceeded. Please set GITHUB_TOKEN to raise the rate limit.') if combined.include?('rate limit')
         raise(AuthenticationError, 'GitHub API: Bad credentials. Please verify GITHUB_TOKEN.') if combined.downcase.include?('bad credentials')
 
-        warn(http_error_message(response, url: url, package: pin_id))
-        return unresolved_package(name: pin_id, file: file, language: 'Swift', version: version, dependency: !manifest_mentions?(main_file, pin_id))
+        warn(http_error_message(response, url: url, package: name))
+        return unresolved_package(name: name, file: file, language: 'Swift', version: version, dependency: !manifest_mentions?(main_file, name))
       end
 
       package_details = JSON.parse(response.body)
 
       # A private repository is still a SOUP component, so it is recorded rather
       # than dropped. The lookup succeeded, so its real metadata is used.
-      warn("#{pin_id} resolves to a private repository; recording it with the metadata GitHub returned") if package_details['private']
+      warn("#{name} resolves to a private repository; recording it with the metadata GitHub returned") if package_details['private']
 
       build_package(
         name: package_details['name'],
@@ -147,6 +146,11 @@ module SOUP
 
     def github_repo_path(location)
       location.to_s.gsub(GITHUB_URL_NOISE, '')
+    end
+
+    # The repository name matches the name a successful lookup records, so both paths share one cache key.
+    def pin_repo_name(repo_path, pin_id)
+      repo_path[%r{\A[^/:\s]+/([^/:\s]+)\z}, 1] || pin_id
     end
 
     # Resolve the pinned identifier for a Swift Package.resolved entry.
