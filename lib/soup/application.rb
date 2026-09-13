@@ -83,8 +83,9 @@ module SOUP
     # error raised there escapes through the ensure-block save, which then
     # rewrites .soup.json with metadata-less entries and blanks docs/soup.md --
     # silently discarding previously entered IEC 62304 risk, requirements and
-    # verification reasoning. Failing before any state exists lets save_files'
-    # empty-state guard keep both files untouched.
+    # verification reasoning. Failing before any state exists leaves
+    # save_partial_state with nothing verified to write, so both files stay
+    # untouched.
     def validate_cache_file!
       return unless @options.soup_check
       return unless File.exist?(@options.cache_file)
@@ -366,7 +367,11 @@ module SOUP
     # goes through save_partial_state instead.
     def save_files
       return unless @options.soup_check
-      return if @detected_packages.empty? && @markdown.empty?
+
+      if @detected_packages.empty?
+        warn("No packages detected; leaving #{@options.cache_file} and #{@options.markdown_file} untouched.")
+        return
+      end
 
       File.write(@options.cache_file, JSON.pretty_generate(@detected_packages))
       FileUtils.mkdir_p(File.dirname(@options.markdown_file))
