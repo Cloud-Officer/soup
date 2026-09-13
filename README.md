@@ -58,6 +58,11 @@ globs has no manual entry, so dropping a new vendored library into the repo cann
 The soup file is generated in `./docs/soup.md` and a cache file `.soup.json` is used to preserve previously entered
 choices.
 
+Entries in `.soup.json` are keyed by `<language>:<package>` (for example `Ruby:json` and `JS:json`), so packages that
+share a name across ecosystems are all kept in the register. Older caches keyed by the bare package name are still read:
+each entry is matched to its package using the `language` it recorded, and the file is rewritten with the new keys on
+the next successful `--soup` run.
+
 ## Installation
 
 ### Prerequisites

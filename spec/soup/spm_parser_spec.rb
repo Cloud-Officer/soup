@@ -60,8 +60,8 @@ RSpec.describe(SOUP::SPMParser) do
     it 'records the pin as unresolved instead of aborting the scan', :aggregate_failures do
       expect { parser.parse(lockfile_path, packages) }
         .not_to(raise_error)
-      expect(packages['alamofire']).to(have_attributes(version: '5.9.0', language: 'Swift', license: 'NOASSERTION'))
-      expect(packages['alamofire'].unresolved).to(be(true))
+      expect(packages['Swift:alamofire']).to(have_attributes(version: '5.9.0', language: 'Swift', license: 'NOASSERTION'))
+      expect(packages['Swift:alamofire'].unresolved).to(be(true))
     end
 
     it 'names the pin in the skip warning' do
@@ -83,11 +83,11 @@ RSpec.describe(SOUP::SPMParser) do
     end
 
     it 'parses Package.resolved and calls GitHub API', :aggregate_failures do
-      expect(packages).to(have_key('Alamofire'))
-      expect(packages['Alamofire'].language).to(eq('Swift'))
-      expect(packages['Alamofire'].version).to(eq('5.9.0'))
-      expect(packages['Alamofire'].license).to(eq('MIT'))
-      expect(packages['Alamofire'].description).to(eq('Elegant HTTP Networking'))
+      expect(packages).to(have_key('Swift:Alamofire'))
+      expect(packages['Swift:Alamofire'].language).to(eq('Swift'))
+      expect(packages['Swift:Alamofire'].version).to(eq('5.9.0'))
+      expect(packages['Swift:Alamofire'].license).to(eq('MIT'))
+      expect(packages['Swift:Alamofire'].description).to(eq('Elegant HTTP Networking'))
     end
   end
 
@@ -102,7 +102,7 @@ RSpec.describe(SOUP::SPMParser) do
     it 'sends GitHub token header when GITHUB_TOKEN is set' do
       packages = {}
       parser.parse(lockfile_path, packages)
-      expect(packages).to(have_key('Alamofire'))
+      expect(packages).to(have_key('Swift:Alamofire'))
     end
   end
 
@@ -121,8 +121,8 @@ RSpec.describe(SOUP::SPMParser) do
     it 'classifies the substring package as transitive', :aggregate_failures do
       packages = {}
       parser.parse(lockfile_path, packages)
-      expect(packages).to(have_key('Alamofire'))
-      expect(packages['Alamofire'].dependency).to(be(true))
+      expect(packages).to(have_key('Swift:Alamofire'))
+      expect(packages['Swift:Alamofire'].dependency).to(be(true))
     end
   end
 
@@ -145,8 +145,8 @@ RSpec.describe(SOUP::SPMParser) do
     it 'handles repositories with no license', :aggregate_failures do
       packages = {}
       parser.parse(lockfile_path, packages)
-      expect(packages).to(have_key('Alamofire'))
-      expect(packages['Alamofire'].license).to(be_nil)
+      expect(packages).to(have_key('Swift:Alamofire'))
+      expect(packages['Swift:Alamofire'].license).to(be_nil)
     end
   end
 
@@ -201,7 +201,7 @@ RSpec.describe(SOUP::SPMParser) do
     it 'supports old format' do
       packages = {}
       parser.parse(lockfile_path, packages)
-      expect(packages).to(have_key('Alamofire'))
+      expect(packages).to(have_key('Swift:Alamofire'))
     end
   end
 
@@ -214,8 +214,8 @@ RSpec.describe(SOUP::SPMParser) do
     it 'records the pin as unresolved on a non-200 response', :aggregate_failures do
       packages = {}
       parser.parse(lockfile_path, packages)
-      expect(packages['alamofire']).to(have_attributes(language: 'Swift', license: 'NOASSERTION'))
-      expect(packages['alamofire'].unresolved).to(be(true))
+      expect(packages['Swift:alamofire']).to(have_attributes(language: 'Swift', license: 'NOASSERTION'))
+      expect(packages['Swift:alamofire'].unresolved).to(be(true))
     end
   end
 
@@ -231,7 +231,7 @@ RSpec.describe(SOUP::SPMParser) do
     it 'uses Tuist Dependencies.swift as main file' do
       packages = {}
       parser.parse(lockfile_path, packages)
-      expect(packages).to(have_key('Alamofire'))
+      expect(packages).to(have_key('Swift:Alamofire'))
     end
   end
 
@@ -246,7 +246,7 @@ RSpec.describe(SOUP::SPMParser) do
     it 'uses xcodeproj as main file' do
       packages = {}
       parser.parse(lockfile_path, packages)
-      expect(packages).to(have_key('Alamofire'))
+      expect(packages).to(have_key('Swift:Alamofire'))
     end
   end
 
@@ -270,9 +270,9 @@ RSpec.describe(SOUP::SPMParser) do
     it 'reads the enclosing project.pbxproj as the main file', :aggregate_failures do
       packages = {}
       parser.parse(lockfile_path, packages)
-      expect(packages).to(have_key('Alamofire'))
+      expect(packages).to(have_key('Swift:Alamofire'))
       # Named in the pbxproj => treated as a direct dependency, not transitive.
-      expect(packages['Alamofire'].dependency).to(be(false))
+      expect(packages['Swift:Alamofire'].dependency).to(be(false))
     end
   end
 
@@ -294,7 +294,7 @@ RSpec.describe(SOUP::SPMParser) do
       packages = {}
       expect { parser.parse(lockfile_path, packages) }
         .not_to(raise_error)
-      expect(packages).to(have_key('Alamofire'))
+      expect(packages).to(have_key('Swift:Alamofire'))
     end
   end
 
@@ -330,7 +330,7 @@ RSpec.describe(SOUP::SPMParser) do
     it 'handles git@ repository URLs' do
       packages = {}
       parser.parse(lockfile_path, packages)
-      expect(packages).to(have_key('Alamofire'))
+      expect(packages).to(have_key('Swift:Alamofire'))
     end
   end
 
@@ -381,8 +381,8 @@ RSpec.describe(SOUP::SPMParser) do
       packages = {}
       expect { parser.parse(lockfile_path, packages) }
         .to(output(%r{HTTP 502 .*package=alamofire.*url=https://api\.github\.com/repos/Alamofire/Alamofire.*body=<html>upstream timeout</html>}m).to_stderr)
-      expect(packages['alamofire']).to(have_attributes(license: 'NOASSERTION'))
-      expect(packages['alamofire'].unresolved).to(be(true))
+      expect(packages['Swift:alamofire']).to(have_attributes(license: 'NOASSERTION'))
+      expect(packages['Swift:alamofire'].unresolved).to(be(true))
     end
   end
 
@@ -407,7 +407,7 @@ RSpec.describe(SOUP::SPMParser) do
     it 'records the branch as the pin identifier so the SOUP entry is not blank' do
       packages = {}
       parser.parse(lockfile_path, packages)
-      expect(packages['Alamofire'].version).to(eq('main'))
+      expect(packages['Swift:Alamofire'].version).to(eq('main'))
     end
   end
 
@@ -432,7 +432,7 @@ RSpec.describe(SOUP::SPMParser) do
     it 'falls back to the revision when neither version nor branch is set' do
       packages = {}
       parser.parse(lockfile_path, packages)
-      expect(packages['Alamofire'].version).to(eq('deadbeef'))
+      expect(packages['Swift:Alamofire'].version).to(eq('deadbeef'))
     end
   end
 
@@ -522,7 +522,7 @@ RSpec.describe(SOUP::SPMParser) do
 
       it 'reads Package.resolved + sibling Package.swift from disk without File stubs' do
         parser.parse(lockfile_path, packages)
-        expect(packages['Alamofire']).to(have_attributes(language: 'Swift', version: '5.9.0', license: 'MIT'))
+        expect(packages['Swift:Alamofire']).to(have_attributes(language: 'Swift', version: '5.9.0', license: 'MIT'))
       end
     end
   end
@@ -565,8 +565,8 @@ RSpec.describe(SOUP::SPMParser) do
       packages = {}
       parser.parse(lockfile_path, packages)
       expect(packages.size).to(eq(100))
-      expect(packages['pkg-1']).to(have_attributes(language: 'Swift', version: '1.0.0', license: 'MIT'))
-      expect(packages['pkg-100']).to(have_attributes(language: 'Swift', version: '1.0.0', license: 'MIT'))
+      expect(packages['Swift:pkg-1']).to(have_attributes(language: 'Swift', version: '1.0.0', license: 'MIT'))
+      expect(packages['Swift:pkg-100']).to(have_attributes(language: 'Swift', version: '1.0.0', license: 'MIT'))
     end
   end
 

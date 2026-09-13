@@ -53,16 +53,16 @@ RSpec.describe(SOUP::GradleParser) do
     end
 
     it 'parses lockfile and only processes classpath entries', :aggregate_failures do
-      expect(packages).to(have_key('com.example:library'))
-      expect(packages).not_to(have_key('com.example:other'))
+      expect(packages).to(have_key('Kotlin:com.example:library'))
+      expect(packages).not_to(have_key('Kotlin:com.example:other'))
     end
 
     it 'sets language to Kotlin' do
-      expect(packages['com.example:library'].language).to(eq('Kotlin'))
+      expect(packages['Kotlin:com.example:library'].language).to(eq('Kotlin'))
     end
 
     it 'extracts details from Maven Central search API', :aggregate_failures do
-      pkg = packages['com.example:library']
+      pkg = packages['Kotlin:com.example:library']
       expect(pkg.version).to(eq('1.0.0'))
       expect(pkg.license).to(eq('Apache-2.0'))
       expect(pkg.description).to(eq('A library for example'))
@@ -100,7 +100,7 @@ RSpec.describe(SOUP::GradleParser) do
     it 'falls back to POM XML instead of crashing' do
       packages = {}
       parser.parse(lockfile_path, packages)
-      expect(packages['com.example:library'].license).to(eq('MIT License'))
+      expect(packages['Kotlin:com.example:library'].license).to(eq('MIT License'))
     end
   end
 
@@ -138,7 +138,7 @@ RSpec.describe(SOUP::GradleParser) do
       it 'falls back to POM XML from repository URLs', :aggregate_failures do
         packages = {}
         parser.parse(lockfile_path, packages)
-        pkg = packages['com.example:library']
+        pkg = packages['Kotlin:com.example:library']
         expect(pkg.license).to(eq('MIT License'))
         expect(pkg.description).to(eq('Fallback description'))
       end
@@ -160,7 +160,7 @@ RSpec.describe(SOUP::GradleParser) do
       it 'tries multiple repository URLs until one succeeds' do
         packages = {}
         parser.parse(lockfile_path, packages)
-        expect(packages).to(have_key('com.example:library'))
+        expect(packages).to(have_key('Kotlin:com.example:library'))
       end
     end
 
@@ -180,8 +180,8 @@ RSpec.describe(SOUP::GradleParser) do
         packages = {}
         expect { parser.parse(lockfile_path, packages) }
           .to(output(/HTTP 503.*com\.example:library 1\.0\.0.*\.pom.*offline/m).to_stderr)
-        expect(packages['com.example:library']).to(have_attributes(version: '1.0.0', language: 'Kotlin', license: 'NOASSERTION'))
-        expect(packages['com.example:library'].unresolved).to(be(true))
+        expect(packages['Kotlin:com.example:library']).to(have_attributes(version: '1.0.0', language: 'Kotlin', license: 'NOASSERTION'))
+        expect(packages['Kotlin:com.example:library'].unresolved).to(be(true))
       end
     end
   end
@@ -217,7 +217,7 @@ RSpec.describe(SOUP::GradleParser) do
         packages = {}
         expect { parser.parse(lockfile_path, packages) }
           .not_to(raise_error)
-        expect(packages['com.example:library'].license).to(eq('MIT License'))
+        expect(packages['Kotlin:com.example:library'].license).to(eq('MIT License'))
       end
     end
 
@@ -234,8 +234,8 @@ RSpec.describe(SOUP::GradleParser) do
         packages = {}
         expect { parser.parse(lockfile_path, packages) }
           .to(output(/all Maven lookups timed out/).to_stderr)
-        expect(packages['com.example:library']).to(have_attributes(version: '1.0.0', license: 'NOASSERTION'))
-        expect(packages['com.example:library'].unresolved).to(be(true))
+        expect(packages['Kotlin:com.example:library']).to(have_attributes(version: '1.0.0', license: 'NOASSERTION'))
+        expect(packages['Kotlin:com.example:library'].unresolved).to(be(true))
       end
     end
   end
@@ -251,7 +251,7 @@ RSpec.describe(SOUP::GradleParser) do
     it 'marks dependency based on main file content' do
       packages = {}
       parser.parse(lockfile_path, packages)
-      expect(packages['com.example:library'].dependency).to(be(true))
+      expect(packages['Kotlin:com.example:library'].dependency).to(be(true))
     end
   end
 
@@ -271,7 +271,7 @@ RSpec.describe(SOUP::GradleParser) do
     it 'classifies the substring coordinate as transitive' do
       packages = {}
       parser.parse(lockfile_path, packages)
-      expect(packages['com.example:lib'].dependency).to(be(true))
+      expect(packages['Kotlin:com.example:lib'].dependency).to(be(true))
     end
   end
 
@@ -289,7 +289,7 @@ RSpec.describe(SOUP::GradleParser) do
       packages = {}
       expect { parser.parse(lockfile_path, packages) }
         .not_to(raise_error)
-      expect(packages).to(have_key('com.example:library'))
+      expect(packages).to(have_key('Kotlin:com.example:library'))
     end
   end
 
@@ -338,23 +338,23 @@ RSpec.describe(SOUP::GradleParser) do
     it 'includes production runtime classpath entries', :aggregate_failures do
       packages = {}
       parser.parse(lockfile_path, packages)
-      expect(packages).to(have_key('androidx.activity:activity-compose'))
-      expect(packages).to(have_key('com.example:runtime-lib'))
+      expect(packages).to(have_key('Kotlin:androidx.activity:activity-compose'))
+      expect(packages).to(have_key('Kotlin:com.example:runtime-lib'))
     end
 
     it 'excludes test, debug-only, and compile-only configurations', :aggregate_failures do
       packages = {}
       parser.parse(lockfile_path, packages)
-      expect(packages).not_to(have_key('androidx.test:runner'))
-      expect(packages).not_to(have_key('com.example:debug-only'))
-      expect(packages).not_to(have_key('com.example:compile-only'))
+      expect(packages).not_to(have_key('Kotlin:androidx.test:runner'))
+      expect(packages).not_to(have_key('Kotlin:com.example:debug-only'))
+      expect(packages).not_to(have_key('Kotlin:com.example:compile-only'))
     end
 
     it 'flags transitive dependencies not declared in build.gradle', :aggregate_failures do
       packages = {}
       parser.parse(lockfile_path, packages)
-      expect(packages['com.example:runtime-lib'].dependency).to(be(true))
-      expect(packages['androidx.activity:activity-compose'].dependency).to(be(false))
+      expect(packages['Kotlin:com.example:runtime-lib'].dependency).to(be(true))
+      expect(packages['Kotlin:androidx.activity:activity-compose'].dependency).to(be(false))
     end
   end
 
@@ -428,7 +428,7 @@ RSpec.describe(SOUP::GradleParser) do
       it 'reads the lockfile + sibling build.gradle from disk without File stubs' do
         packages = {}
         parser.parse(lockfile_path, packages)
-        expect(packages['com.example:library']).to(have_attributes(language: 'Kotlin', version: '1.0.0', license: 'Apache-2.0'))
+        expect(packages['Kotlin:com.example:library']).to(have_attributes(language: 'Kotlin', version: '1.0.0', license: 'Apache-2.0'))
       end
     end
   end
@@ -470,8 +470,8 @@ RSpec.describe(SOUP::GradleParser) do
       packages = {}
       parser.parse(lockfile_path, packages)
       expect(packages.size).to(eq(100))
-      expect(packages['com.example:lib-1']).to(have_attributes(language: 'Kotlin', version: '1.0.0', license: 'Apache-2.0'))
-      expect(packages['com.example:lib-100']).to(have_attributes(language: 'Kotlin', version: '1.0.0', license: 'Apache-2.0'))
+      expect(packages['Kotlin:com.example:lib-1']).to(have_attributes(language: 'Kotlin', version: '1.0.0', license: 'Apache-2.0'))
+      expect(packages['Kotlin:com.example:lib-100']).to(have_attributes(language: 'Kotlin', version: '1.0.0', license: 'Apache-2.0'))
     end
   end
 end

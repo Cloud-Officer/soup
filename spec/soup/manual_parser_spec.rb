@@ -35,19 +35,19 @@ RSpec.describe(SOUP::ManualParser) do
   end
 
   it 'builds packages for each declared entry', :aggregate_failures do
-    expect(packages.keys).to(contain_exactly('tiptap-pro', 'prismjs'))
-    expect(packages['tiptap-pro'].license).to(eq('Commercial'))
-    expect(packages['tiptap-pro'].file).to(eq('vendor/javascript/tiptap-pro.js'))
-    expect(packages['tiptap-pro'].dependency).to(be(false))
+    expect(packages.keys).to(contain_exactly('JS:tiptap-pro', 'JS:prismjs'))
+    expect(packages['JS:tiptap-pro'].license).to(eq('Commercial'))
+    expect(packages['JS:tiptap-pro'].file).to(eq('vendor/javascript/tiptap-pro.js'))
+    expect(packages['JS:tiptap-pro'].dependency).to(be(false))
   end
 
   it 'carries pre-declared verification fields through', :aggregate_failures do
-    expect(packages['tiptap-pro'].risk_level).to(eq('Low'))
-    expect(packages['tiptap-pro'].verification_reasoning).to(eq('Commercial subscription'))
+    expect(packages['JS:tiptap-pro'].risk_level).to(eq('Low'))
+    expect(packages['JS:tiptap-pro'].verification_reasoning).to(eq('Commercial subscription'))
   end
 
   it 'defaults language to JS when unspecified' do
-    expect(packages['prismjs'].language).to(eq('JS'))
+    expect(packages['JS:prismjs'].language).to(eq('JS'))
   end
 
   context 'when the file is not a JSON array' do

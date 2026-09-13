@@ -26,7 +26,7 @@ module SOUP
     end
 
     def collect_packages(results, packages)
-      results.compact.each { |package| packages[package.package] = package }
+      results.compact.each { |package| packages[package.key] = package }
     end
 
     def build_package(name:, file:, language:, version:, license:, description:, website:, dependency:)

@@ -27,7 +27,7 @@ module SOUP
         raise(InvalidLockfileError, "Each entry in #{file} must be an object with a non-empty \"package\"") unless valid_entry
 
         package = build_entry(file, entry)
-        packages[package.package] = package
+        packages[package.key] = package
       end
     end
 

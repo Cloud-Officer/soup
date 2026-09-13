@@ -136,6 +136,22 @@ RSpec.describe(SOUP::Package) do
     end
   end
 
+  describe '#key' do
+    def package_in(language)
+      package = described_class.new('json')
+      package.language = language
+      package
+    end
+
+    it 'qualifies the package name with its language' do
+      expect(package_in('Ruby').key).to(eq('Ruby:json'))
+    end
+
+    it 'differs for same-named packages from different ecosystems' do
+      expect(package_in('Ruby').key).not_to(eq(package_in('JS').key))
+    end
+  end
+
   describe '#verified?' do
     subject(:package) { described_class.new('test-package') }
 
