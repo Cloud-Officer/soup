@@ -254,8 +254,9 @@ module SOUP
       cached = @cached_packages[name]
       return unless cached
 
-      restore_unresolved_metadata(package, cached) if package.unresolved
-      package.last_verified_at = cached['last_verified_at']
+      same_version = cached['version'].to_s == package.version.to_s
+      restore_unresolved_metadata(package, cached) if package.unresolved && same_version
+      package.last_verified_at = cached['last_verified_at'] if same_version
       package.risk_level = cached['risk_level']
       package.requirements = cached['requirements']
       package.verification_reasoning = cached['verification_reasoning']
@@ -264,13 +265,8 @@ module SOUP
     # When this run could not reach the registry, keep whatever a previous run
     # resolved instead of downgrading the entry to NOASSERTION -- a transient
     # outage must not blank out metadata already recorded in the register.
-    #
-    # Only restored when the cached entry is for the SAME version: licenses do
-    # change between releases, so carrying an older version's license onto a
-    # newly pinned one would assert something we never verified.
+    # Only restored for the same version: licenses change between releases.
     def restore_unresolved_metadata(package, cached)
-      return unless cached['version'].to_s == package.version.to_s
-
       package.license = cached['license'] unless cached['license'].to_s.empty?
       package.description = cached['description'] unless cached['description'].to_s.empty?
       package.website = cached['website'] unless cached['website'].to_s.empty?

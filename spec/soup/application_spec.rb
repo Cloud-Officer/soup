@@ -707,16 +707,20 @@ RSpec.describe(SOUP::Application) do
     end
 
     context 'with cached package data' do
-      before do
+      def write_cached_valid_pkg(version:)
         cached = {
           'valid/pkg': {
+            version: version,
             last_verified_at: '2025-01-01',
-            risk_level: 'Low',
+            risk_level: 'High',
             requirements: 'Required for HTTP',
             verification_reasoning: 'Well known'
           }
         }
         File.write(cache_file.path, JSON.generate(cached))
+      end
+
+      before do
         single_lock = {
           packages: [
             {
@@ -733,10 +737,40 @@ RSpec.describe(SOUP::Application) do
       end
 
       it 'uses cached package data' do
+        write_cached_valid_pkg(version: '1.0.0')
         app = described_class.new(soup_args(skip: skip_parsers_except_composer))
         app.execute
         content = File.read(markdown_file)
         expect(content).to(include('2025-01-01'))
+      end
+
+      def scan_with_cached_version(version)
+        write_cached_valid_pkg(version: version)
+        described_class.new(soup_args(skip: skip_parsers_except_composer)).execute
+        JSON.parse(File.read(cache_file.path))['valid/pkg']
+      end
+
+      it 're-stamps last_verified_at when the cached entry is for a different version' do
+        expect(scan_with_cached_version('0.9.0')['last_verified_at']).to(eq(Time.now.strftime('%Y-%m-%d')))
+      end
+
+      it 'keeps risk, requirements and reasoning cached against a different version', :aggregate_failures do
+        entry = scan_with_cached_version('0.9.0')
+        expect(entry['risk_level']).to(eq('High'))
+        expect(entry['requirements']).to(eq('Required for HTTP'))
+        expect(entry['verification_reasoning']).to(eq('Well known'))
+      end
+
+      it 'does not prompt under --no_prompt when only the cached version differs' do
+        write_cached_valid_pkg(version: '0.9.0')
+        expect { described_class.new(soup_no_prompt_args(skip: skip_parsers_except_composer)).execute }
+          .not_to(raise_error)
+      end
+
+      it 'does not carry verification metadata from a cache entry with no version' do
+        File.write(cache_file.path, JSON.generate({ 'valid/pkg': { last_verified_at: '2025-01-01', risk_level: 'High' } }))
+        described_class.new(soup_args(skip: skip_parsers_except_composer)).execute
+        expect(JSON.parse(File.read(cache_file.path)).dig('valid/pkg', 'last_verified_at')).not_to(eq('2025-01-01'))
       end
     end
 
