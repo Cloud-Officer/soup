@@ -243,9 +243,14 @@ module SOUP
 
     def validate_license(package, license_pattern, exceptions)
       return unless @options.licenses_check
-      return if package.license.nil? || package.license.empty?
-      return if package.license.downcase.match?(license_pattern)
       return if exceptions.include?(package.package)
+
+      if package.license.to_s.empty?
+        warn("No license found in #{package.file} in package #{package.package}!")
+        return
+      end
+
+      return if package.license.downcase.match?(license_pattern)
 
       warn("Invalid license #{package.license} found in #{package.file} in package #{package.package}!")
       @exit_code = Status::ERROR_EXIT_CODE if package.license != 'NOASSERTION'

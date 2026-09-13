@@ -13,21 +13,6 @@ RSpec.describe(SOUP::GradleParser) do
 
   let(:main_file) { 'classpath "com.example:library:1.0.0"' }
 
-  let(:maven_response) do
-    {
-      response: {
-        numFound: 1,
-        docs: [
-          {
-            l: 'Apache-2.0',
-            p: 'A library for example',
-            home_page: 'https://example.com'
-          }
-        ]
-      }
-    }.to_json
-  end
-
   def lockfile_path
     write_fixture(main_file_name, main_file) unless main_file.nil?
     write_fixture(lockfile_name, Array(lock_content).join)
@@ -42,15 +27,53 @@ RSpec.describe(SOUP::GradleParser) do
 
   def main_file_name = 'build.gradle'
 
-  context 'when Maven Central search succeeds' do
-    let(:packages) { {} }
+  def maven_central = 'https://repo1.maven.org/maven2'
 
-    before do
-      stub_request(:get, %r{search\.maven\.org/solrsearch/select})
-        .to_return(status: 200, body: maven_response)
+  def maven_google = 'https://maven.google.com'
 
-      parser.parse(lockfile_path, packages)
-    end
+  def any_repository = /repo1\.maven\.org|maven\.google\.com|plugins\.gradle\.org|jitpack\.io|oss\.sonatype\.org/
+
+  def pom_url(repository, coordinate)
+    group_id, artifact_id, version = coordinate.split(':')
+    "#{repository}/#{group_id.tr('.', '/')}/#{artifact_id}/#{version}/#{artifact_id}-#{version}.pom"
+  end
+
+  def stub_pom(coordinate, body: '', status: 200, repository: maven_central)
+    stub_request(:get, pom_url(repository, coordinate)).to_return(status: status, body: body)
+  end
+
+  def real_pom(name) = File.read(File.expand_path("../fixtures/gradle/#{name}.pom", __dir__))
+
+  def pom_xml(licenses: ['MIT License'], parent: nil, description: 'A library for example')
+    parent_xml =
+      if parent
+        group_id, artifact_id, version = parent.split(':')
+        "<parent><groupId>#{group_id}</groupId><artifactId>#{artifact_id}</artifactId><version>#{version}</version></parent>"
+      end
+
+    licenses_xml = licenses.map { |name| "<license><name>#{name}</name></license>" }
+
+    <<~XML
+      <?xml version="1.0" encoding="UTF-8"?>
+      <project xmlns="http://maven.apache.org/POM/4.0.0">
+        #{parent_xml}
+        <licenses>#{licenses_xml.join}</licenses>
+        <description>#{description}</description>
+        <url>https://example.com</url>
+      </project>
+    XML
+  end
+
+  def parse_packages
+    packages = {}
+    parser.parse(lockfile_path, packages)
+    packages
+  end
+
+  context 'when Maven Central serves the POM' do
+    let(:packages) { parse_packages }
+
+    before { stub_pom('com.example:library:1.0.0', body: pom_xml) }
 
     it 'parses lockfile and only processes classpath entries', :aggregate_failures do
       expect(packages).to(have_key('Kotlin:com.example:library'))
@@ -61,159 +84,149 @@ RSpec.describe(SOUP::GradleParser) do
       expect(packages['Kotlin:com.example:library'].language).to(eq('Kotlin'))
     end
 
-    it 'extracts details from Maven Central search API', :aggregate_failures do
-      pkg = packages['Kotlin:com.example:library']
-      expect(pkg.version).to(eq('1.0.0'))
-      expect(pkg.license).to(eq('Apache-2.0'))
-      expect(pkg.description).to(eq('A library for example'))
+    it 'extracts license, description and website from the POM', :aggregate_failures do
+      expect(packages['Kotlin:com.example:library'])
+        .to(have_attributes(version: '1.0.0', license: 'MIT License', description: 'A library for example', website: 'https://example.com'))
+      expect(packages['Kotlin:com.example:library'].unresolved).to(be_falsey)
+    end
+
+    it 'does not query the search.maven.org search API' do
+      packages
+      expect(a_request(:get, /search\.maven\.org/)).not_to(have_been_made)
     end
   end
 
-  context 'when Maven Central returns numFound 1 but empty docs' do
-    let(:inconsistent_maven_response) do
-      { response: { numFound: 1, docs: [] } }.to_json
+  context 'with real published POMs' do
+    let(:main_file) { 'implementation "com.google.guava:guava:33.0.0-jre"' }
+
+    context 'when the license is only declared in the parent POM (guava)' do
+      let(:lock_content) { ["com.google.guava:guava:33.0.0-jre=classpath\n"] }
+
+      before do
+        stub_pom('com.google.guava:guava:33.0.0-jre', body: real_pom('guava-33.0.0-jre'))
+        stub_pom('com.google.guava:guava-parent:33.0.0-jre', body: real_pom('guava-parent-33.0.0-jre'))
+      end
+
+      it 'inherits the license from guava-parent and keeps its own description and website', :aggregate_failures do
+        pkg = parse_packages['Kotlin:com.google.guava:guava']
+        expect(pkg.license).to(eq('Apache License, Version 2.0'))
+        expect(pkg.description).to(start_with('Guava is a suite of core and expanded libraries'))
+        expect(pkg.website).to(eq('https://github.com/google/guava'))
+      end
     end
 
-    let(:pom_xml) do
-      <<~XML
-        <?xml version="1.0" encoding="UTF-8"?>
-        <project>
-          <licenses>
-            <license>
-              <name>MIT License</name>
-            </license>
-          </licenses>
-          <description>Fallback description</description>
-          <url>https://fallback.example.com</url>
-        </project>
-      XML
+    context 'when the POM declares its own license (okhttp)' do
+      let(:lock_content) { ["com.squareup.okhttp3:okhttp:4.12.0=classpath\n"] }
+
+      before { stub_pom('com.squareup.okhttp3:okhttp:4.12.0', body: real_pom('okhttp-4.12.0')) }
+
+      it 'records the license without looking for a parent' do
+        expect(parse_packages['Kotlin:com.squareup.okhttp3:okhttp'].license).to(eq('The Apache Software License, Version 2.0'))
+      end
     end
 
+    context 'when the artifact is only on Google Maven (androidx core)' do
+      let(:lock_content) { ["androidx.core:core:1.12.0=classpath\n"] }
+
+      before do
+        stub_pom('androidx.core:core:1.12.0', status: 404)
+        stub_pom('androidx.core:core:1.12.0', body: real_pom('core-1.12.0'), repository: maven_google)
+      end
+
+      it 'falls through to maven.google.com and reads the license' do
+        expect(parse_packages['Kotlin:androidx.core:core'].license).to(eq('The Apache Software License, Version 2.0'))
+      end
+    end
+  end
+
+  context 'when the POM lists several licenses' do
+    before { stub_pom('com.example:library:1.0.0', body: pom_xml(licenses: ['Apache-2.0', 'MIT'])) }
+
+    it 'joins every license name' do
+      expect(parse_packages['Kotlin:com.example:library'].license).to(eq('Apache-2.0, MIT'))
+    end
+  end
+
+  context 'when no POM names a license' do
+    before { stub_request(:get, any_repository).to_return(status: 404) }
+
+    it 'records NOASSERTION when the POM has no licenses and no parent' do
+      stub_pom('com.example:library:1.0.0', body: pom_xml(licenses: []))
+      expect(parse_packages['Kotlin:com.example:library'].license).to(eq('NOASSERTION'))
+    end
+
+    it 'records NOASSERTION when the parent POM cannot be found' do
+      stub_pom('com.example:library:1.0.0', body: pom_xml(licenses: [], parent: 'com.example:parent:1.0.0'))
+      expect(parse_packages['Kotlin:com.example:library'].license).to(eq('NOASSERTION'))
+    end
+
+    it 'records NOASSERTION when the parent reference is incomplete' do
+      stub_pom('com.example:library:1.0.0', body: pom_xml(licenses: [], parent: 'com.example:parent'))
+      expect(parse_packages['Kotlin:com.example:library'].license).to(eq('NOASSERTION'))
+    end
+  end
+
+  context 'when the parent chain is deeper than the POM depth limit' do
     before do
-      stub_request(:get, %r{search\.maven\.org/solrsearch/select})
-        .to_return(status: 200, body: inconsistent_maven_response)
-
-      stub_request(:get, 'https://maven.google.com/com/example/library/1.0.0/library-1.0.0.pom')
-        .to_return(status: 200, body: pom_xml)
+      stub_pom('com.example:library:1.0.0', body: pom_xml(licenses: [], parent: 'com.example:chain-1:1.0.0'))
+      (1..4).each { |i| stub_pom("com.example:chain-#{i}:1.0.0", body: pom_xml(licenses: [], parent: "com.example:chain-#{i + 1}:1.0.0")) }
+      stub_pom('com.example:chain-5:1.0.0', body: pom_xml(licenses: ['MIT License']))
     end
 
-    it 'falls back to POM XML instead of crashing' do
+    it 'stops after five POMs without fetching further ancestors', :aggregate_failures do
+      expect(parse_packages['Kotlin:com.example:library'].license).to(eq('NOASSERTION'))
+      expect(a_request(:get, /chain-5/)).not_to(have_been_made)
+    end
+  end
+
+  context 'when the parent POM is only on Maven Central' do
+    before do
+      stub_request(:get, any_repository).to_return(status: 404)
+      stub_pom('com.example:library:1.0.0', body: pom_xml(licenses: [], parent: 'com.example:parent:1.0.0'), repository: maven_google)
+      stub_pom('com.example:parent:1.0.0', body: pom_xml(licenses: ['BSD-3-Clause']))
+    end
+
+    it 'looks the parent up on Maven Central after the serving repository' do
+      expect(parse_packages['Kotlin:com.example:library'].license).to(eq('BSD-3-Clause'))
+    end
+  end
+
+  context 'when the first repositories do not have the POM' do
+    before do
+      stub_request(:get, any_repository).to_return(status: 404)
+      stub_request(:get, %r{plugins\.gradle\.org/m2/com/example/library/1\.0\.0/library-1\.0\.0\.pom}).to_return(status: 200, body: pom_xml)
+    end
+
+    it 'tries multiple repository URLs until one succeeds' do
+      expect(parse_packages['Kotlin:com.example:library'].license).to(eq('MIT License'))
+    end
+  end
+
+  context 'when every repository returns a non-200' do
+    # Regression test for BUG-07: the warn used to be a one-liner that
+    # dropped the URL, HTTP status, and response body, making maven-side
+    # failures opaque. It now uses BaseParser#http_error_message so the
+    # operator sees status + url + truncated body.
+    before { stub_request(:get, any_repository).to_return(status: 503, body: 'repository offline') }
+
+    it 'warns with http_error_message and records the coordinate', :aggregate_failures do
       packages = {}
-      parser.parse(lockfile_path, packages)
-      expect(packages['Kotlin:com.example:library'].license).to(eq('MIT License'))
+      expect { parser.parse(lockfile_path, packages) }
+        .to(output(/HTTP 503.*com\.example:library 1\.0\.0.*\.pom.*offline/m).to_stderr)
+      expect(packages['Kotlin:com.example:library']).to(have_attributes(version: '1.0.0', language: 'Kotlin', license: 'NOASSERTION'))
+      expect(packages['Kotlin:com.example:library'].unresolved).to(be(true))
     end
   end
 
-  context 'when Maven Central returns 0 results' do
-    let(:empty_maven_response) do
-      { response: { numFound: 0, docs: [] } }.to_json
-    end
-
-    let(:pom_xml) do
-      <<~XML
-        <?xml version="1.0" encoding="UTF-8"?>
-        <project>
-          <licenses>
-            <license>
-              <name>MIT License</name>
-            </license>
-          </licenses>
-          <description>Fallback description</description>
-          <url>https://fallback.example.com</url>
-        </project>
-      XML
-    end
-
-    before do
-      stub_request(:get, %r{search\.maven\.org/solrsearch/select})
-        .to_return(status: 200, body: empty_maven_response)
-    end
-
-    context 'when first repository URL succeeds' do
+  # A Net::ReadTimeout on one repository must fall through to the next, not abort the run.
+  context 'when a repository times out' do
+    context 'with a later repository that resolves the package' do
       before do
-        stub_request(:get, 'https://maven.google.com/com/example/library/1.0.0/library-1.0.0.pom')
-          .to_return(status: 200, body: pom_xml)
+        stub_request(:get, /repo1\.maven\.org/).to_timeout
+        stub_pom('com.example:library:1.0.0', body: pom_xml, repository: maven_google)
       end
 
-      it 'falls back to POM XML from repository URLs', :aggregate_failures do
-        packages = {}
-        parser.parse(lockfile_path, packages)
-        pkg = packages['Kotlin:com.example:library']
-        expect(pkg.license).to(eq('MIT License'))
-        expect(pkg.description).to(eq('Fallback description'))
-      end
-    end
-
-    context 'when first repository URL fails' do
-      before do
-        stub_request(:get, 'https://maven.google.com/com/example/library/1.0.0/library-1.0.0.pom')
-          .to_return(status: 404)
-
-        stub_request(:get, %r{plugins\.gradle\.org/m2/.*com/example/library/1\.0\.0/library-1\.0\.0\.pom})
-          .to_return(status: 200, body: pom_xml)
-
-        # Stub remaining repos in case they get hit
-        stub_request(:get, /jitpack\.io/).to_return(status: 404)
-        stub_request(:get, /oss\.sonatype\.org/).to_return(status: 404)
-      end
-
-      it 'tries multiple repository URLs until one succeeds' do
-        packages = {}
-        parser.parse(lockfile_path, packages)
-        expect(packages).to(have_key('Kotlin:com.example:library'))
-      end
-    end
-
-    context 'when every fallback repository returns a non-200' do
-      # Regression test for BUG-07: the warn used to be a one-liner that
-      # dropped the URL, HTTP status, and response body, making maven-side
-      # failures opaque. It now uses BaseParser#http_error_message so the
-      # operator sees status + url + truncated body.
-      before do
-        stub_request(:get, /maven\.google\.com/).to_return(status: 503, body: 'maven.google: gateway timeout')
-        stub_request(:get, /plugins\.gradle\.org/).to_return(status: 503, body: 'plugins offline')
-        stub_request(:get, /jitpack\.io/).to_return(status: 503, body: 'jitpack offline')
-        stub_request(:get, /oss\.sonatype\.org/).to_return(status: 503, body: 'sonatype offline')
-      end
-
-      it 'warns with http_error_message and records the coordinate', :aggregate_failures do
-        packages = {}
-        expect { parser.parse(lockfile_path, packages) }
-          .to(output(/HTTP 503.*com\.example:library 1\.0\.0.*\.pom.*offline/m).to_stderr)
-        expect(packages['Kotlin:com.example:library']).to(have_attributes(version: '1.0.0', language: 'Kotlin', license: 'NOASSERTION'))
-        expect(packages['Kotlin:com.example:library'].unresolved).to(be(true))
-      end
-    end
-  end
-
-  # Regression: search.maven.org's solrsearch endpoint chronically stops
-  # responding (Net::ReadTimeout). HttpClient re-raises after its retries, and
-  # that exception used to propagate through Parallel.map and abort the entire
-  # SOUP run. It must instead fall through to the per-repository POM mirrors.
-  context 'when Maven Central search times out' do
-    let(:pom_xml) do
-      <<~XML
-        <?xml version="1.0" encoding="UTF-8"?>
-        <project>
-          <licenses>
-            <license>
-              <name>MIT License</name>
-            </license>
-          </licenses>
-          <description>Fallback description</description>
-          <url>https://fallback.example.com</url>
-        </project>
-      XML
-    end
-
-    context 'with a fallback repository that resolves the package' do
-      before do
-        stub_request(:get, %r{search\.maven\.org/solrsearch/select}).to_timeout
-        stub_request(:get, 'https://maven.google.com/com/example/library/1.0.0/library-1.0.0.pom')
-          .to_return(status: 200, body: pom_xml)
-      end
-
-      it 'falls through to the POM mirror instead of aborting', :aggregate_failures do
+      it 'falls through to the next repository instead of aborting', :aggregate_failures do
         packages = {}
         expect { parser.parse(lockfile_path, packages) }
           .not_to(raise_error)
@@ -221,14 +234,8 @@ RSpec.describe(SOUP::GradleParser) do
       end
     end
 
-    context 'when every source also times out' do
-      before do
-        stub_request(:get, /search\.maven\.org/).to_timeout
-        stub_request(:get, /maven\.google\.com/).to_timeout
-        stub_request(:get, /plugins\.gradle\.org/).to_timeout
-        stub_request(:get, /jitpack\.io/).to_timeout
-        stub_request(:get, /oss\.sonatype\.org/).to_timeout
-      end
+    context 'when every repository times out' do
+      before { stub_request(:get, any_repository).to_timeout }
 
       it 'warns and records the coordinate without raising', :aggregate_failures do
         packages = {}
@@ -240,56 +247,106 @@ RSpec.describe(SOUP::GradleParser) do
     end
   end
 
-  context 'when package is not in main file' do
-    let(:main_file) { 'no match here' }
+  context 'with a POM for every coordinate on Maven Central' do
+    before { stub_request(:get, %r{repo1\.maven\.org/maven2/.+\.pom}).to_return(status: 200, body: pom_xml) }
 
-    before do
-      stub_request(:get, %r{search\.maven\.org/solrsearch/select})
-        .to_return(status: 200, body: maven_response)
+    context 'when package is not in main file' do
+      let(:main_file) { 'no match here' }
+
+      it 'marks dependency based on main file content' do
+        expect(parse_packages['Kotlin:com.example:library'].dependency).to(be(true))
+      end
     end
 
-    it 'marks dependency based on main file content' do
-      packages = {}
-      parser.parse(lockfile_path, packages)
-      expect(packages['Kotlin:com.example:library'].dependency).to(be(true))
-    end
-  end
+    # BUG-003 regression: a transitive coordinate whose name is a substring of a
+    # declared dependency (com.example:lib within com.example:library) must NOT be
+    # flagged direct. The old String#include? scan of build.gradle mis-classified
+    # it; manifest_mentions? anchors on a non-identifier boundary.
+    context 'when a transitive coordinate is a substring of a declared dependency' do
+      let(:lock_content) { ["com.example:lib:1.0.0=classpath\n"]   }
+      let(:main_file)    { 'classpath "com.example:library:1.0.0"' }
 
-  # BUG-003 regression: a transitive coordinate whose name is a substring of a
-  # declared dependency (com.example:lib within com.example:library) must NOT be
-  # flagged direct. The old String#include? scan of build.gradle mis-classified
-  # it; manifest_mentions? anchors on a non-identifier boundary.
-  context 'when a transitive coordinate is a substring of a declared dependency' do
-    let(:lock_content) { ["com.example:lib:1.0.0=classpath\n"]   }
-    let(:main_file)    { 'classpath "com.example:library:1.0.0"' }
-
-    before do
-      stub_request(:get, %r{search\.maven\.org/solrsearch/select})
-        .to_return(status: 200, body: maven_response)
+      it 'classifies the substring coordinate as transitive' do
+        expect(parse_packages['Kotlin:com.example:lib'].dependency).to(be(true))
+      end
     end
 
-    it 'classifies the substring coordinate as transitive' do
-      packages = {}
-      parser.parse(lockfile_path, packages)
-      expect(packages['Kotlin:com.example:lib'].dependency).to(be(true))
-    end
-  end
+    context 'when only build.gradle.kts (Kotlin DSL) exists' do
+      # Only the Kotlin DSL file is written, so the parser's real ENOENT rescue
+      # on build.gradle drives the fallback.
+      let(:main_file_name) { 'build.gradle.kts' }
 
-  context 'when only build.gradle.kts (Kotlin DSL) exists' do
-    # Only the Kotlin DSL file is written, so the parser's real ENOENT rescue
-    # on build.gradle drives the fallback.
-    let(:main_file_name) { 'build.gradle.kts' }
-
-    before do
-      stub_request(:get, %r{search\.maven\.org/solrsearch/select})
-        .to_return(status: 200, body: maven_response)
+      it 'falls back to build.gradle.kts instead of crashing', :aggregate_failures do
+        packages = {}
+        expect { parser.parse(lockfile_path, packages) }
+          .not_to(raise_error)
+        expect(packages).to(have_key('Kotlin:com.example:library'))
+      end
     end
 
-    it 'falls back to build.gradle.kts instead of crashing', :aggregate_failures do
-      packages = {}
-      expect { parser.parse(lockfile_path, packages) }
-        .not_to(raise_error)
-      expect(packages).to(have_key('Kotlin:com.example:library'))
+    context 'when parsing an application gradle.lockfile (runtime classpath)' do
+      def lockfile_name = 'app/gradle.lockfile'
+
+      def main_file_name = 'app/build.gradle'
+
+      let(:lock_content) do
+        [
+          "# Gradle dependency lock file\n",
+          "androidx.activity:activity-compose:1.10.1=googleProdDebugRuntimeClasspath,googleProdReleaseRuntimeClasspath\n",
+          "androidx.test:runner:1.5.2=googleProdReleaseUnitTestRuntimeClasspath\n",
+          "com.example:debug-only:1.0.0=googleProdDebugRuntimeClasspath\n",
+          "com.example:compile-only:1.0.0=googleProdReleaseCompileClasspath\n",
+          "com.example:runtime-lib:2.0.0=runtimeClasspath\n",
+          "empty:no-config:0=\n"
+        ]
+      end
+
+      let(:main_file) { 'implementation "androidx.activity:activity-compose:1.10.1"' }
+
+      it 'derives the build.gradle path from the lockfile location' do
+        expect { parse_packages }
+          .not_to(raise_error)
+      end
+
+      it 'includes production runtime classpath entries', :aggregate_failures do
+        packages = parse_packages
+        expect(packages).to(have_key('Kotlin:androidx.activity:activity-compose'))
+        expect(packages).to(have_key('Kotlin:com.example:runtime-lib'))
+      end
+
+      it 'excludes test, debug-only, and compile-only configurations', :aggregate_failures do
+        packages = parse_packages
+        expect(packages).not_to(have_key('Kotlin:androidx.test:runner'))
+        expect(packages).not_to(have_key('Kotlin:com.example:debug-only'))
+        expect(packages).not_to(have_key('Kotlin:com.example:compile-only'))
+      end
+
+      it 'flags transitive dependencies not declared in build.gradle', :aggregate_failures do
+        packages = parse_packages
+        expect(packages['Kotlin:com.example:runtime-lib'].dependency).to(be(true))
+        expect(packages['Kotlin:androidx.activity:activity-compose'].dependency).to(be(false))
+      end
+    end
+
+    # TEST-303: exercise parallel_each at a meaningful fan-out width so a
+    # parser-local concurrency or ordering regression in Gradle is caught
+    # by the spec suite, not just by NPM's existing scale guard.
+    context 'with 100 packages (Parallel.map fan-out)' do
+      let(:lock_content) do
+        (1..100).map { |i| "com.example:lib-#{i}:1.0.0=classpath\n" }
+      end
+
+      let(:main_file) do
+        (1..100).map { |i| %(classpath "com.example:lib-#{i}:1.0.0") }
+                .join("\n")
+      end
+
+      it 'parses all 100 classpath entries without raising and adds them to the hash', :aggregate_failures do
+        packages = parse_packages
+        expect(packages.size).to(eq(100))
+        expect(packages['Kotlin:com.example:lib-1']).to(have_attributes(language: 'Kotlin', version: '1.0.0', license: 'MIT License'))
+        expect(packages['Kotlin:com.example:lib-100']).to(have_attributes(language: 'Kotlin', version: '1.0.0', license: 'MIT License'))
+      end
     end
   end
 
@@ -301,60 +358,6 @@ RSpec.describe(SOUP::GradleParser) do
       packages = {}
       expect { parser.parse(lockfile_path, packages) }
         .to(raise_error(SOUP::InvalidLockfileError, /No build\.gradle or build\.gradle\.kts found/))
-    end
-  end
-
-  context 'when parsing an application gradle.lockfile (runtime classpath)' do
-    def lockfile_name = 'app/gradle.lockfile'
-
-    def main_file_name = 'app/build.gradle'
-
-    let(:lock_content) do
-      [
-        "# Gradle dependency lock file\n",
-        "androidx.activity:activity-compose:1.10.1=googleProdDebugRuntimeClasspath,googleProdReleaseRuntimeClasspath\n",
-        "androidx.test:runner:1.5.2=googleProdReleaseUnitTestRuntimeClasspath\n",
-        "com.example:debug-only:1.0.0=googleProdDebugRuntimeClasspath\n",
-        "com.example:compile-only:1.0.0=googleProdReleaseCompileClasspath\n",
-        "com.example:runtime-lib:2.0.0=runtimeClasspath\n",
-        "empty:no-config:0=\n"
-      ]
-    end
-
-    let(:main_file) { 'implementation "androidx.activity:activity-compose:1.10.1"' }
-
-    before do
-      stub_request(:get, %r{search\.maven\.org/solrsearch/select})
-        .to_return(status: 200, body: maven_response)
-    end
-
-    it 'derives the build.gradle path from the lockfile location' do
-      packages = {}
-      expect do
-        parser.parse(lockfile_path, packages)
-      end.not_to(raise_error)
-    end
-
-    it 'includes production runtime classpath entries', :aggregate_failures do
-      packages = {}
-      parser.parse(lockfile_path, packages)
-      expect(packages).to(have_key('Kotlin:androidx.activity:activity-compose'))
-      expect(packages).to(have_key('Kotlin:com.example:runtime-lib'))
-    end
-
-    it 'excludes test, debug-only, and compile-only configurations', :aggregate_failures do
-      packages = {}
-      parser.parse(lockfile_path, packages)
-      expect(packages).not_to(have_key('Kotlin:androidx.test:runner'))
-      expect(packages).not_to(have_key('Kotlin:com.example:debug-only'))
-      expect(packages).not_to(have_key('Kotlin:com.example:compile-only'))
-    end
-
-    it 'flags transitive dependencies not declared in build.gradle', :aggregate_failures do
-      packages = {}
-      parser.parse(lockfile_path, packages)
-      expect(packages['Kotlin:com.example:runtime-lib'].dependency).to(be(true))
-      expect(packages['Kotlin:androidx.activity:activity-compose'].dependency).to(be(false))
     end
   end
 
@@ -420,58 +423,12 @@ RSpec.describe(SOUP::GradleParser) do
 
       let(:main_file) { 'classpath "com.example:library:1.0.0"' }
 
-      before do
-        stub_request(:get, %r{search\.maven\.org/solrsearch/select})
-          .to_return(status: 200, body: maven_response)
-      end
+      before { stub_pom('com.example:library:1.0.0', body: pom_xml) }
 
       it 'reads the lockfile + sibling build.gradle from disk without File stubs' do
-        packages = {}
         parser.parse(lockfile_path, packages)
-        expect(packages['Kotlin:com.example:library']).to(have_attributes(language: 'Kotlin', version: '1.0.0', license: 'Apache-2.0'))
+        expect(packages['Kotlin:com.example:library']).to(have_attributes(language: 'Kotlin', version: '1.0.0', license: 'MIT License'))
       end
-    end
-  end
-
-  # TEST-303: exercise parallel_each at a meaningful fan-out width so a
-  # parser-local concurrency or ordering regression in Gradle is caught
-  # by the spec suite, not just by NPM's existing scale guard.
-  context 'with 100 packages (Parallel.map fan-out)' do
-    let(:lock_content) do
-      (1..100).map { |i| "com.example:lib-#{i}:1.0.0=classpath\n" }
-    end
-
-    let(:main_file) do
-      (1..100).map { |i| %(classpath "com.example:lib-#{i}:1.0.0") }
-              .join("\n")
-    end
-
-    let(:maven_response_for) do
-      lambda do |i|
-        {
-          response: {
-            numFound: 1,
-            docs: [
-              { l: 'Apache-2.0', p: "lib-#{i} description", home_page: 'https://example.com' }
-            ]
-          }
-        }.to_json
-      end
-    end
-
-    before do
-      (1..100).each do |i|
-        stub_request(:get, %r{search\.maven\.org/solrsearch/select.*a:%22lib-#{i}%22})
-          .to_return(status: 200, body: maven_response_for.call(i))
-      end
-    end
-
-    it 'parses all 100 classpath entries without raising and adds them to the hash', :aggregate_failures do
-      packages = {}
-      parser.parse(lockfile_path, packages)
-      expect(packages.size).to(eq(100))
-      expect(packages['Kotlin:com.example:lib-1']).to(have_attributes(language: 'Kotlin', version: '1.0.0', license: 'Apache-2.0'))
-      expect(packages['Kotlin:com.example:lib-100']).to(have_attributes(language: 'Kotlin', version: '1.0.0', license: 'Apache-2.0'))
     end
   end
 end

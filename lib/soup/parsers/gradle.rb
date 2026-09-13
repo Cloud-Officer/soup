@@ -7,16 +7,19 @@ require_relative 'base'
 
 module SOUP
   class GradleParser < BaseParser
-    # Maven mirrors tried (in order) when search.maven.org has no matching docs.
-    # jcenter.bintray.com (sunset 2022) and the third-party maven.pkg.github.com/skgmn
-    # vendor repo were dropped from the list. Neither served a generic SOUP scan.
+    # Maven repositories tried (in order) for each coordinate's POM.
     REPOSITORY_URLS = %w[
+      https://repo1.maven.org/maven2
       https://maven.google.com
-      https://plugins.gradle.org/m2/
+      https://plugins.gradle.org/m2
       https://jitpack.io
-      https://oss.sonatype.org/content/repositories/snapshots/
+      https://oss.sonatype.org/content/repositories/snapshots
     ].freeze
     private_constant :REPOSITORY_URLS
+
+    # POMs inspected for <licenses>: the artifact's own plus up to four <parent> ancestors.
+    MAX_POM_DEPTH = 5
+    private_constant :MAX_POM_DEPTH
 
     MAIN_FILE_NAMES = %w[build.gradle build.gradle.kts].freeze
     private_constant :MAIN_FILE_NAMES
@@ -66,58 +69,68 @@ module SOUP
     end
 
     def fetch_package(file, main_file, group_id, artifact_id, version)
-      last_url = "https://search.maven.org/solrsearch/select?q=g:%22#{group_id}%22+AND+a:%22#{artifact_id}%22+AND+v:%22#{version}%22&rows=1&wt=json"
-      # search.maven.org's solrsearch endpoint is chronically flaky and regularly
-      # stops responding entirely (Net::ReadTimeout). When that happens we must
-      # still try the per-repository POM fallbacks below (maven.google.com et al.
-      # serve the Android/AndroidX artifacts that dominate a Gradle scan), so a
-      # dead primary is treated as "no match" rather than aborting the whole run.
-      response = registry_response(last_url, label: last_url, outcome: 'trying the per-repository POM fallbacks')
-
-      parsed = JSON.parse(response.body) if response&.code == 200
-      docs = parsed&.dig('response', 'docs')
-
-      resolved = false
-
-      if response&.code == 200 && docs&.length == 1
-        license = docs[0]['l']
-        description = docs[0]['p']
-        website = docs[0]['home_page']
-        resolved = true
-      else
-        REPOSITORY_URLS.each do |url|
-          last_url = "#{url}/#{group_id.tr('.', '/')}/#{artifact_id}/#{version}/#{artifact_id}-#{version}.pom"
-          response = registry_response(last_url, label: last_url, outcome: 'trying the next repository')
-
-          next unless response&.code == 200
-
-          xml_doc = Nokogiri::XML(response.body)
-          xml_doc.remove_namespaces!
-          license = xml_doc.xpath('//licenses/license/name').text
-          description = xml_doc.xpath('//description').text
-          website = xml_doc.xpath('/project/url').text
-          resolved = true
-          break
-        end
-      end
-
       coordinate = "#{group_id}:#{artifact_id}"
+      dependency = !manifest_mentions?(main_file, coordinate)
+      pom = fetch_pom(group_id, artifact_id, version, REPOSITORY_URLS)
 
-      unless resolved
-        warn(unresolved_message(response, url: last_url, package: "#{coordinate} #{version}"))
-        return unresolved_package(name: coordinate, file: file, language: 'Kotlin', version: version, dependency: !manifest_mentions?(main_file, coordinate))
+      unless pom[:document]
+        warn(unresolved_message(pom[:response], url: pom[:url], package: "#{coordinate} #{version}"))
+        return unresolved_package(name: coordinate, file: file, language: 'Kotlin', version: version, dependency: dependency)
       end
+
+      document = pom[:document]
 
       build_package(
-        name: "#{group_id}:#{artifact_id}",
+        name: coordinate,
         file: file,
         language: 'Kotlin',
         version: version,
-        license: license,
-        description: Package.sanitize_description(description),
-        website: website,
-        dependency: !manifest_mentions?(main_file, "#{group_id}:#{artifact_id}")
+        license: pom_license(document, pom[:repository]),
+        description: Package.sanitize_description(document.xpath('/project/description').text.strip),
+        website: document.xpath('/project/url').text.strip,
+        dependency: dependency
       )
+    end
+
+    def fetch_pom(group_id, artifact_id, version, repositories)
+      result = {}
+
+      repositories.each do |repository|
+        url = "#{repository}/#{group_id.tr('.', '/')}/#{artifact_id}/#{version}/#{artifact_id}-#{version}.pom"
+        response = registry_response(url, label: url, outcome: 'trying the next repository')
+        result = { url: url, response: response }
+
+        next unless response&.code == 200
+
+        document = Nokogiri::XML(response.body)
+        document.remove_namespaces!
+        return result.merge(repository: repository, document: document)
+      end
+
+      result
+    end
+
+    def pom_license(document, repository, depth = 1)
+      names =
+        document.xpath('/project/licenses/license/name').filter_map do |node|
+          name = node.text.strip
+          name unless name.empty?
+        end
+      return names.join(', ') unless names.empty?
+      return NOASSERTION_LICENSE if depth >= MAX_POM_DEPTH
+
+      parent = parent_pom(document, repository)
+      parent ? pom_license(parent, repository, depth + 1) : NOASSERTION_LICENSE
+    end
+
+    def parent_pom(document, repository)
+      parent = document.at_xpath('/project/parent')
+      return unless parent
+
+      group_id, artifact_id, version = %w[groupId artifactId version].map { |field| parent.at_xpath(field)&.text.to_s.strip }
+      return if [group_id, artifact_id, version].any?(&:empty?)
+
+      fetch_pom(group_id, artifact_id, version, [repository, REPOSITORY_URLS.first].uniq)[:document]
     end
 
     # Build the "could not resolve this coordinate" warning. With a final
