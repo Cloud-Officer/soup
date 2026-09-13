@@ -14,12 +14,24 @@ module SOUP
       # is an exact name match, unlike a String#include? scan of the Gemfile.
       direct_deps = lock_file.dependencies.keys
 
-      parallel_each(lock_file.specs, packages) do |spec|
+      parallel_each(lock_file.specs + declared_bundler(lock_file, direct_deps), packages) do |spec|
         fetch_package(file, direct_deps, spec)
       end
     end
 
     private
+
+    LockedGem = Data.define(:name, :version)
+    private_constant :LockedGem
+
+    # Bundler never lists itself under specs, so its BUNDLED WITH version stands in when the Gemfile declares it.
+    def declared_bundler(lock_file, direct_deps)
+      return [] unless direct_deps.include?('bundler')
+      return [] if lock_file.specs.any? { |spec| spec.name == 'bundler' }
+
+      bundler_version = lock_file.bundler_version
+      bundler_version ? [LockedGem.new(name: 'bundler', version: bundler_version)] : []
+    end
 
     def fetch_package(file, direct_deps, spec)
       label = "#{spec.name} #{spec.version}"

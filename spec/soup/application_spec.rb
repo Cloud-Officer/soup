@@ -264,6 +264,42 @@ RSpec.describe(SOUP::Application) do
     end
   end
 
+  describe 'an unresolved Swift pin with a cached entry' do
+    def cached_alamofire_entry
+      {
+        'Swift:Alamofire': {
+          language: 'Swift',
+          package: 'Alamofire',
+          version: '5.9.0',
+          license: 'MIT',
+          description: 'Elegant HTTP Networking',
+          website: 'https://github.com/Alamofire/Alamofire',
+          last_verified_at: '2026-01-01',
+          risk_level: 'Low',
+          requirements: 'Cached requirements',
+          verification_reasoning: 'Cached reasoning'
+        }
+      }.to_json
+    end
+
+    before do
+      write_fixture('Package.swift', '.package(url: "https://github.com/Alamofire/Alamofire.git", from: "5.0.0")')
+      resolved = write_fixture('Package.resolved', { pins: [{ identity: 'alamofire', location: 'https://github.com/Alamofire/Alamofire.git', state: { version: '5.9.0' } }] }.to_json)
+      allow(Dir).to(receive(:glob).and_return([]))
+      allow(Dir).to(receive(:glob).with("#{Dir.pwd}/**/Package.resolved").and_return([resolved]))
+      stub_request(:get, 'https://api.github.com/repos/Alamofire/Alamofire').to_return(status: [404, 'Not Found'], body: '{}')
+      File.write(cache_file.path, cached_alamofire_entry)
+    end
+
+    it 'restores the cached metadata under the same key a successful lookup uses', :aggregate_failures do
+      described_class.new(soup_args(skip: %w[--skip_bundler --skip_composer --skip_gradle --skip_npm --skip_pip --skip_yarn])).execute
+      cache = JSON.parse(File.read(cache_file.path))
+      expect(cache.keys).to(contain_exactly('Swift:Alamofire'))
+      expect(cache['Swift:Alamofire'].values_at('license', 'description', 'website')).to(eq(['MIT', 'Elegant HTTP Networking', 'https://github.com/Alamofire/Alamofire']))
+      expect(cache['Swift:Alamofire'].values_at('risk_level', 'requirements', 'last_verified_at')).to(eq(['Low', 'Cached requirements', '2026-01-01']))
+    end
+  end
+
   describe 'packages sharing a name across ecosystems' do
     def gemfile_lock_with_json
       <<~LOCK

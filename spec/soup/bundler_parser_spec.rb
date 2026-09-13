@@ -310,6 +310,59 @@ RSpec.describe(SOUP::BundlerParser) do
     end
   end
 
+  describe 'bundler declared in the Gemfile' do
+    let(:packages) { {} }
+
+    let(:bundler_response_body) do
+      { licenses: ['MIT'], info: 'Bundler manages an application dependencies. Through its entire life.', homepage_uri: 'https://bundler.io' }.to_json
+    end
+
+    def lockfile_bytes(dependencies:, bundled_with: nil)
+      lock = +"GEM\n  remote: https://rubygems.org/\n  specs:\n    test-gem (1.0.0)\n\nPLATFORMS\n  ruby\n\nDEPENDENCIES\n"
+      dependencies.each { |dependency| lock << "  #{dependency}\n" }
+      lock << "\nBUNDLED WITH\n   #{bundled_with}\n" if bundled_with
+      lock
+    end
+
+    def parse_lockfile(**)
+      allow(Bundler::LockfileParser).to(receive(:new).and_call_original)
+      allow(Bundler).to(receive(:read_file).and_call_original)
+      parser.parse(write_fixture('Gemfile.lock', lockfile_bytes(**)), packages)
+    end
+
+    before do
+      stub_request(:get, 'https://api.rubygems.org/api/v2/rubygems/test-gem/versions/1.0.0.json')
+        .to_return(status: 200, body: v2_response_body)
+      stub_request(:get, 'https://api.rubygems.org/api/v2/rubygems/bundler/versions/4.0.10.json')
+        .to_return(status: 200, body: bundler_response_body)
+    end
+
+    it 'records bundler at its BUNDLED WITH version with the rubygems metadata', :aggregate_failures do
+      parse_lockfile(dependencies: ['bundler (>= 2.3.0)', 'test-gem'], bundled_with: '4.0.10')
+      expect(packages['Ruby:bundler']).to(have_attributes(language: 'Ruby', version: '4.0.10', license: 'MIT', description: 'Bundler manages an application dependencies', website: 'https://bundler.io', dependency: false))
+      expect(packages['Ruby:bundler'].unresolved).to(be(false))
+      expect(packages).to(have_key('Ruby:test-gem'))
+    end
+
+    it 'does not add bundler when the lockfile has no BUNDLED WITH section', :aggregate_failures do
+      parse_lockfile(dependencies: ['bundler (>= 2.3.0)', 'test-gem'])
+      expect(packages.keys).to(contain_exactly('Ruby:test-gem'))
+      expect(a_request(:get, %r{api\.rubygems\.org/.*bundler})).not_to(have_been_made)
+    end
+
+    it 'does not add bundler when the Gemfile does not declare it', :aggregate_failures do
+      parse_lockfile(dependencies: ['test-gem'], bundled_with: '4.0.10')
+      expect(packages.keys).to(contain_exactly('Ruby:test-gem'))
+      expect(a_request(:get, %r{api\.rubygems\.org/.*bundler})).not_to(have_been_made)
+    end
+
+    it 'skips other declared gems that have no locked spec without looking them up', :aggregate_failures do
+      parse_lockfile(dependencies: %w[test-gem wdm], bundled_with: '4.0.10')
+      expect(packages.keys).to(contain_exactly('Ruby:test-gem'))
+      expect(a_request(:get, %r{api\.rubygems\.org/.*wdm})).not_to(have_been_made)
+    end
+  end
+
   # TEST-303: exercise parallel_each at a meaningful fan-out width so a
   # parser-local concurrency or ordering regression in Bundler is caught
   # by the spec suite, not just by NPM's existing scale guard.
