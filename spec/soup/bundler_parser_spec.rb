@@ -40,8 +40,8 @@ RSpec.describe(SOUP::BundlerParser) do
     it 'records the gem as unresolved instead of aborting the scan', :aggregate_failures do
       expect { parser.parse('Gemfile.lock', packages) }
         .not_to(raise_error)
-      expect(packages['test-gem']).to(have_attributes(version: '1.0.0', language: 'Ruby', license: 'NOASSERTION'))
-      expect(packages['test-gem'].unresolved).to(be(true))
+      expect(packages['Ruby:test-gem']).to(have_attributes(version: '1.0.0', language: 'Ruby', license: 'NOASSERTION'))
+      expect(packages['Ruby:test-gem'].unresolved).to(be(true))
     end
 
     it 'names the gem in the skip warning' do
@@ -61,11 +61,11 @@ RSpec.describe(SOUP::BundlerParser) do
     end
 
     it 'parses lock file and calls RubyGems v2 API', :aggregate_failures do
-      expect(packages['test-gem'].language).to(eq('Ruby'))
-      expect(packages['test-gem'].version).to(eq('1.0.0'))
-      expect(packages['test-gem'].license).to(eq('MIT'))
-      expect(packages['test-gem'].description).to(eq('A test gem'))
-      expect(packages['test-gem'].website).to(eq('https://example.com'))
+      expect(packages['Ruby:test-gem'].language).to(eq('Ruby'))
+      expect(packages['Ruby:test-gem'].version).to(eq('1.0.0'))
+      expect(packages['Ruby:test-gem'].license).to(eq('MIT'))
+      expect(packages['Ruby:test-gem'].description).to(eq('A test gem'))
+      expect(packages['Ruby:test-gem'].website).to(eq('https://example.com'))
     end
   end
 
@@ -87,7 +87,7 @@ RSpec.describe(SOUP::BundlerParser) do
       it 'falls back to latest version when v2 returns 404' do
         packages = {}
         parser.parse('Gemfile.lock', packages)
-        expect(packages).to(have_key('test-gem'))
+        expect(packages).to(have_key('Ruby:test-gem'))
       end
     end
 
@@ -109,8 +109,8 @@ RSpec.describe(SOUP::BundlerParser) do
       it 'warns and records the gem as unresolved', :aggregate_failures do
         expect { parser.parse('Gemfile.lock', packages) }
           .to(output(/HTTP 404.*test-gem 2\.0\.0/m).to_stderr)
-        expect(packages['test-gem']).to(have_attributes(version: '1.0.0', license: 'NOASSERTION'))
-        expect(packages['test-gem'].unresolved).to(be(true))
+        expect(packages['Ruby:test-gem']).to(have_attributes(version: '1.0.0', license: 'NOASSERTION'))
+        expect(packages['Ruby:test-gem'].unresolved).to(be(true))
       end
     end
 
@@ -122,7 +122,7 @@ RSpec.describe(SOUP::BundlerParser) do
       it 'records the gem without attempting the remaining fallback', :aggregate_failures do
         expect { parser.parse('Gemfile.lock', packages) }
           .not_to(raise_error)
-        expect(packages['test-gem']).to(have_attributes(version: '1.0.0', license: 'NOASSERTION'))
+        expect(packages['Ruby:test-gem']).to(have_attributes(version: '1.0.0', license: 'NOASSERTION'))
         expect(a_request(:get, %r{api/v2/rubygems/test-gem/versions/2\.0\.0\.json})).not_to(have_been_made)
       end
     end
@@ -139,7 +139,7 @@ RSpec.describe(SOUP::BundlerParser) do
       it 'records the gem and names the resolved version in the warning', :aggregate_failures do
         expect { parser.parse('Gemfile.lock', packages) }
           .to(output(/Skipping test-gem 2\.0\.0: network error after retries/).to_stderr)
-        expect(packages['test-gem']).to(have_attributes(version: '1.0.0', license: 'NOASSERTION'))
+        expect(packages['Ruby:test-gem']).to(have_attributes(version: '1.0.0', license: 'NOASSERTION'))
       end
     end
 
@@ -155,8 +155,8 @@ RSpec.describe(SOUP::BundlerParser) do
         packages = {}
         expect { parser.parse('Gemfile.lock', packages) }
           .to(output(/HTTP 500.*test-gem.*api\.rubygems\.org/m).to_stderr)
-        expect(packages['test-gem']).to(have_attributes(version: '1.0.0', license: 'NOASSERTION'))
-        expect(packages['test-gem'].unresolved).to(be(true))
+        expect(packages['Ruby:test-gem']).to(have_attributes(version: '1.0.0', license: 'NOASSERTION'))
+        expect(packages['Ruby:test-gem'].unresolved).to(be(true))
       end
     end
   end
@@ -178,8 +178,8 @@ RSpec.describe(SOUP::BundlerParser) do
     end
 
     it 'handles nil fields from API response', :aggregate_failures do
-      expect(packages['test-gem'].license).to(be_nil)
-      expect(packages['test-gem'].website).to(be_nil)
+      expect(packages['Ruby:test-gem'].license).to(be_nil)
+      expect(packages['Ruby:test-gem'].website).to(be_nil)
     end
   end
 
@@ -198,7 +198,7 @@ RSpec.describe(SOUP::BundlerParser) do
     it 'marks transitive dependencies' do
       packages = {}
       parser.parse('Gemfile.lock', packages)
-      expect(packages['test-gem'].dependency).to(be(true))
+      expect(packages['Ruby:test-gem'].dependency).to(be(true))
     end
   end
 
@@ -219,7 +219,7 @@ RSpec.describe(SOUP::BundlerParser) do
     it 'classifies the substring gem as transitive' do
       packages = {}
       parser.parse('Gemfile.lock', packages)
-      expect(packages['test-gem'].dependency).to(be(true))
+      expect(packages['Ruby:test-gem'].dependency).to(be(true))
     end
   end
 
@@ -305,7 +305,7 @@ RSpec.describe(SOUP::BundlerParser) do
         write_fixture('Gemfile', "gem 'test-gem'")
         lockfile_path = write_fixture('Gemfile.lock', gemfile_lock_bytes)
         parser.parse(lockfile_path, packages)
-        expect(packages['test-gem']).to(have_attributes(language: 'Ruby', version: '1.0.0', license: 'MIT'))
+        expect(packages['Ruby:test-gem']).to(have_attributes(language: 'Ruby', version: '1.0.0', license: 'MIT'))
       end
     end
   end
@@ -332,8 +332,8 @@ RSpec.describe(SOUP::BundlerParser) do
       packages = {}
       parser.parse('Gemfile.lock', packages)
       expect(packages.size).to(eq(100))
-      expect(packages['gem-1']).to(have_attributes(license: 'MIT', version: '1.0.0'))
-      expect(packages['gem-100']).to(have_attributes(license: 'MIT', version: '1.0.0'))
+      expect(packages['Ruby:gem-1']).to(have_attributes(license: 'MIT', version: '1.0.0'))
+      expect(packages['Ruby:gem-100']).to(have_attributes(license: 'MIT', version: '1.0.0'))
     end
   end
 end

@@ -212,7 +212,7 @@ RSpec.describe(SOUP::BaseParser) do
         stub_request(:get, "#{url}/good").to_return(status: 200, body: 'ok')
         packages = {}
         mixed_batch.call(packages)
-        expect(packages.keys).to(contain_exactly('pkg-good', 'pkg-good2'))
+        expect(packages.keys).to(contain_exactly('X:pkg-good', 'X:pkg-good2'))
       end
     end
 
@@ -302,10 +302,10 @@ RSpec.describe(SOUP::BaseParser) do
     end
 
     describe '#parallel_each' do
-      it 'maps the work items, compacts nils, and indexes the survivors by package name' do
+      it 'maps the work items, compacts nils, and indexes the survivors by language-qualified key' do
         packages = {}
         parser.parallel_each(%w[a skip b], packages) { |i| build_block.call("pkg-#{i}") unless i == 'skip' }
-        expect(packages.keys).to(contain_exactly('pkg-a', 'pkg-b'))
+        expect(packages.keys).to(contain_exactly('X:pkg-a', 'X:pkg-b'))
       end
 
       # TEST-08: partial-failure contract for Parallel.map. The current
@@ -322,12 +322,12 @@ RSpec.describe(SOUP::BaseParser) do
     end
 
     describe '#collect_packages' do
-      it 'indexes by Package#package and ignores nils', :aggregate_failures do
+      it 'indexes by Package#key and ignores nils', :aggregate_failures do
         good = build_block.call('pkg-x')
         packages = {}
         parser.collect_packages([good, nil], packages)
         expect(packages.size).to(eq(1))
-        expect(packages[good.package]).to(equal(good))
+        expect(packages['X:pkg-x']).to(equal(good))
       end
     end
   end

@@ -74,14 +74,14 @@ RSpec.describe(SOUP::PIPParser) do
     end
 
     it 'parses requirements line by line, skips comments and empty lines', :aggregate_failures do
-      expect(packages).to(have_key('requests'))
-      expect(packages).to(have_key('flask'))
-      expect(packages).to(have_key('boto3[crt]'))
+      expect(packages).to(have_key('Python:requests'))
+      expect(packages).to(have_key('Python:flask'))
+      expect(packages).to(have_key('Python:boto3[crt]'))
       expect(packages.size).to(eq(3))
     end
 
     it 'strips environment markers from line' do
-      expect(packages['flask'].version).to(eq('3.0.0'))
+      expect(packages['Python:flask'].version).to(eq('3.0.0'))
     end
 
     it 'strips extras brackets from package name in URL' do
@@ -90,15 +90,15 @@ RSpec.describe(SOUP::PIPParser) do
     end
 
     it 'extracts license from classifiers first' do
-      expect(packages['requests'].license).to(eq('Apache Software License'))
+      expect(packages['Python:requests'].license).to(eq('Apache Software License'))
     end
 
     it 'falls back to license field when classifiers are empty' do
-      expect(packages['flask'].license).to(eq('BSD-3-Clause'))
+      expect(packages['Python:flask'].license).to(eq('BSD-3-Clause'))
     end
 
     it 'sets language to Python' do
-      expect(packages['requests'].language).to(eq('Python'))
+      expect(packages['Python:requests'].language).to(eq('Python'))
     end
   end
 
@@ -116,8 +116,8 @@ RSpec.describe(SOUP::PIPParser) do
     it 'uses .in file for dependency detection if it exists', :aggregate_failures do
       packages = {}
       parser.parse(requirements_path, packages)
-      expect(packages['requests'].dependency).to(be(false))
-      expect(packages['flask'].dependency).to(be(true))
+      expect(packages['Python:requests'].dependency).to(be(false))
+      expect(packages['Python:flask'].dependency).to(be(true))
     end
   end
 
@@ -132,8 +132,8 @@ RSpec.describe(SOUP::PIPParser) do
     it 'warns and records the package as unresolved', :aggregate_failures do
       expect { parser.parse(requirements_path, packages) }
         .to(output(/HTTP 404.*requests==2\.31\.0/m).to_stderr)
-      expect(packages['requests']).to(have_attributes(version: '2.31.0', language: 'Python', license: 'NOASSERTION'))
-      expect(packages['requests'].unresolved).to(be(true))
+      expect(packages['Python:requests']).to(have_attributes(version: '2.31.0', language: 'Python', license: 'NOASSERTION'))
+      expect(packages['Python:requests'].unresolved).to(be(true))
     end
   end
 
@@ -150,8 +150,8 @@ RSpec.describe(SOUP::PIPParser) do
     it 'records the package as unresolved instead of aborting the scan', :aggregate_failures do
       expect { parser.parse(requirements_path, packages) }
         .not_to(raise_error)
-      expect(packages['requests']).to(have_attributes(version: '2.31.0', language: 'Python', license: 'NOASSERTION'))
-      expect(packages['requests'].unresolved).to(be(true))
+      expect(packages['Python:requests']).to(have_attributes(version: '2.31.0', language: 'Python', license: 'NOASSERTION'))
+      expect(packages['Python:requests'].unresolved).to(be(true))
     end
 
     it 'names the package as name==version in the skip warning' do
@@ -186,8 +186,8 @@ RSpec.describe(SOUP::PIPParser) do
     it 'still resolves the sibling requirements.in without corrupting the path', :aggregate_failures do
       packages = {}
       parser.parse(requirements_path, packages)
-      expect(packages['requests'].dependency).to(be(false))
-      expect(packages['flask'].dependency).to(be(true))
+      expect(packages['Python:requests'].dependency).to(be(false))
+      expect(packages['Python:flask'].dependency).to(be(true))
     end
   end
 
@@ -206,7 +206,7 @@ RSpec.describe(SOUP::PIPParser) do
     it 'classifies the substring package as transitive' do
       packages = {}
       parser.parse(requirements_path, packages)
-      expect(packages['requests'].dependency).to(be(true))
+      expect(packages['Python:requests'].dependency).to(be(true))
     end
   end
 
@@ -224,7 +224,7 @@ RSpec.describe(SOUP::PIPParser) do
     it 'classifies the normalized match as a direct dependency' do
       packages = {}
       parser.parse(requirements_path, packages)
-      expect(packages['flask-login'].dependency).to(be(false))
+      expect(packages['Python:flask-login'].dependency).to(be(false))
     end
   end
 
@@ -250,7 +250,7 @@ RSpec.describe(SOUP::PIPParser) do
     it 'handles nil home_page' do
       packages = {}
       parser.parse(requirements_path, packages)
-      expect(packages['simple'].website).to(be_nil)
+      expect(packages['Python:simple'].website).to(be_nil)
     end
   end
 
@@ -308,8 +308,8 @@ RSpec.describe(SOUP::PIPParser) do
     it 'strips the inline comment and parses the package', :aggregate_failures do
       packages = {}
       parser.parse(requirements_path, packages)
-      expect(packages['requests'].version).to(eq('2.31.0'))
-      expect(packages['flask'].version).to(eq('3.0.0'))
+      expect(packages['Python:requests'].version).to(eq('2.31.0'))
+      expect(packages['Python:flask'].version).to(eq('3.0.0'))
       expect(packages.size).to(eq(2))
     end
   end
@@ -374,7 +374,7 @@ RSpec.describe(SOUP::PIPParser) do
     it 'handles empty license and no classifiers' do
       packages = {}
       parser.parse(requirements_path, packages)
-      expect(packages['pkg'].license).to(be_nil)
+      expect(packages['Python:pkg'].license).to(be_nil)
     end
   end
 
@@ -436,7 +436,7 @@ RSpec.describe(SOUP::PIPParser) do
 
       it 'reads pinned requirements from disk and skips comments/blanks' do
         parser.parse(requirements_path, packages)
-        expect(packages['requests']).to(have_attributes(language: 'Python', version: '2.31.0'))
+        expect(packages['Python:requests']).to(have_attributes(language: 'Python', version: '2.31.0'))
       end
     end
   end
@@ -468,8 +468,8 @@ RSpec.describe(SOUP::PIPParser) do
       packages = {}
       parser.parse(requirements_path, packages)
       expect(packages.size).to(eq(100))
-      expect(packages['pkg-1']).to(have_attributes(language: 'Python', version: '1.0.0'))
-      expect(packages['pkg-100']).to(have_attributes(language: 'Python', version: '1.0.0'))
+      expect(packages['Python:pkg-1']).to(have_attributes(language: 'Python', version: '1.0.0'))
+      expect(packages['Python:pkg-100']).to(have_attributes(language: 'Python', version: '1.0.0'))
     end
   end
 end

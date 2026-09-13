@@ -13,6 +13,10 @@ module SOUP
       text
     end
 
+    def self.key_for(language, name)
+      "#{language}:#{name}"
+    end
+
     def initialize(package)
       raise('No package specified!') if package.nil?
 
@@ -48,6 +52,11 @@ module SOUP
     # restores those three fields from .soup.json when a previous run resolved
     # them. Deliberately not serialized: it describes this run, not the package.
     attr_accessor :unresolved
+
+    # Names collide across ecosystems (a `json` gem and a `json` npm package).
+    def key
+      Package.key_for(language, package)
+    end
 
     # True when all four verification fields are non-empty (i.e. the package is
     # ready to be rendered into the SOUP markdown). Use this instead of

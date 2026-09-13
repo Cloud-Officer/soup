@@ -49,9 +49,9 @@ RSpec.describe(SOUP::YarnParser) do
     it 'parses via YarnLockParser and calls NPM registry', :aggregate_failures do
       packages = {}
       parser.parse(lockfile_path, packages)
-      expect(packages['lodash'].language).to(eq('JS'))
-      expect(packages['lodash'].version).to(eq('4.17.21'))
-      expect(packages['lodash'].license).to(eq('MIT'))
+      expect(packages['JS:lodash'].language).to(eq('JS'))
+      expect(packages['JS:lodash'].version).to(eq('4.17.21'))
+      expect(packages['JS:lodash'].license).to(eq('MIT'))
     end
   end
 
@@ -70,7 +70,7 @@ RSpec.describe(SOUP::YarnParser) do
     it 'classifies the substring package as transitive' do
       packages = {}
       parser.parse(lockfile_path, packages)
-      expect(packages['lodash'].dependency).to(be(true))
+      expect(packages['JS:lodash'].dependency).to(be(true))
     end
   end
 
@@ -96,8 +96,8 @@ RSpec.describe(SOUP::YarnParser) do
     it 'records the package as unresolved instead of aborting the scan', :aggregate_failures do
       expect { parser.parse(lockfile_path, packages) }
         .to(output(/HTTP 500.*lodash.*registry\.npmjs\.org/m).to_stderr)
-      expect(packages['lodash']).to(have_attributes(version: '4.17.21', language: 'JS', license: 'NOASSERTION'))
-      expect(packages['lodash'].unresolved).to(be(true))
+      expect(packages['JS:lodash']).to(have_attributes(version: '4.17.21', language: 'JS', license: 'NOASSERTION'))
+      expect(packages['JS:lodash'].unresolved).to(be(true))
     end
   end
 
@@ -117,7 +117,7 @@ RSpec.describe(SOUP::YarnParser) do
 
     it 'retries max_retries+1 times before recording the package as unresolved', :aggregate_failures do
       parser.parse(lockfile_path, packages)
-      expect(packages['lodash']).to(have_attributes(version: '4.17.21', license: 'NOASSERTION'))
+      expect(packages['JS:lodash']).to(have_attributes(version: '4.17.21', license: 'NOASSERTION'))
       expect(a_request(:get, url)).to(have_been_made.times(SOUP::HttpClient.max_retries + 1))
     end
 
@@ -148,8 +148,8 @@ RSpec.describe(SOUP::YarnParser) do
       packages = {}
       expect { parser.parse(lockfile_path, packages) }
         .not_to(raise_error)
-      expect(packages['lodash']).to(have_attributes(version: '4.17.21', license: 'NOASSERTION'))
-      expect(packages['lodash'].unresolved).to(be(true))
+      expect(packages['JS:lodash']).to(have_attributes(version: '4.17.21', license: 'NOASSERTION'))
+      expect(packages['JS:lodash'].unresolved).to(be(true))
     end
   end
 
@@ -163,8 +163,8 @@ RSpec.describe(SOUP::YarnParser) do
       packages = {}
       expect { parser.parse(lockfile_path, packages) }
         .not_to(raise_error)
-      expect(packages['lodash']).to(have_attributes(license: 'NOASSERTION'))
-      expect(packages['lodash'].unresolved).to(be(true))
+      expect(packages['JS:lodash']).to(have_attributes(license: 'NOASSERTION'))
+      expect(packages['JS:lodash'].unresolved).to(be(true))
     end
   end
 
@@ -208,7 +208,7 @@ RSpec.describe(SOUP::YarnParser) do
     it 'records Unlicense verbatim' do
       packages = {}
       parser.parse(lockfile_path, packages)
-      expect(packages['lodash'].license).to(eq('Unlicense'))
+      expect(packages['JS:lodash'].license).to(eq('Unlicense'))
     end
   end
 
@@ -239,7 +239,7 @@ RSpec.describe(SOUP::YarnParser) do
       packages = {}
       expect { parser.parse(lockfile_path, packages) }
         .not_to(raise_error)
-      expect(packages['lodash'].license).to(eq('MIT'))
+      expect(packages['JS:lodash'].license).to(eq('MIT'))
     end
   end
 
@@ -283,7 +283,7 @@ RSpec.describe(SOUP::YarnParser) do
     it 'reads the lockfile and writes a Package entry without File stubs' do
       packages = {}
       parser.parse(lockfile_path, packages)
-      expect(packages['lodash']).to(have_attributes(language: 'JS', version: '4.17.21', license: 'MIT'))
+      expect(packages['JS:lodash']).to(have_attributes(language: 'JS', version: '4.17.21', license: 'MIT'))
     end
   end
 
@@ -329,8 +329,8 @@ RSpec.describe(SOUP::YarnParser) do
       packages = {}
       parser.parse(lockfile_path, packages)
       expect(packages.size).to(eq(100))
-      expect(packages['pkg-1']).to(have_attributes(language: 'JS', version: '1.0.0', license: 'MIT'))
-      expect(packages['pkg-100']).to(have_attributes(language: 'JS', version: '1.0.0', license: 'MIT'))
+      expect(packages['JS:pkg-1']).to(have_attributes(language: 'JS', version: '1.0.0', license: 'MIT'))
+      expect(packages['JS:pkg-100']).to(have_attributes(language: 'JS', version: '1.0.0', license: 'MIT'))
     end
   end
 end

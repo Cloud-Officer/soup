@@ -47,12 +47,12 @@ RSpec.describe(SOUP::ImportmapParser) do
   end
 
   it 'skips local and non-http pins', :aggregate_failures do
-    expect(packages).not_to(have_key('application'))
-    expect(packages).not_to(have_key('turbo_confirm'))
+    expect(packages).not_to(have_key('JS:application'))
+    expect(packages).not_to(have_key('JS:turbo_confirm'))
   end
 
   it 'derives scoped name and version from an esm.sh url', :aggregate_failures do
-    pkg = packages['@tiptap/starter-kit']
+    pkg = packages['JS:@tiptap/starter-kit']
     expect(pkg.version).to(eq('3.1.0'))
     expect(pkg.language).to(eq('JS'))
     expect(pkg.license).to(eq('MIT'))
@@ -60,18 +60,18 @@ RSpec.describe(SOUP::ImportmapParser) do
   end
 
   it 'maps a scoped subpath pin to its base package', :aggregate_failures do
-    expect(packages).to(have_key('@tiptap/pm'))
-    expect(packages['@tiptap/pm'].version).to(eq('3.1.0'))
+    expect(packages).to(have_key('JS:@tiptap/pm'))
+    expect(packages['JS:@tiptap/pm'].version).to(eq('3.1.0'))
   end
 
   it 'derives name and version from jspm npm: and jsdelivr npm/ urls', :aggregate_failures do
-    expect(packages['highlight.js'].version).to(eq('11.9.0'))
-    expect(packages['tributejs'].version).to(eq('5.1.3'))
-    expect(packages['@rails/ujs'].version).to(eq('7.0.4'))
+    expect(packages['JS:highlight.js'].version).to(eq('11.9.0'))
+    expect(packages['JS:tributejs'].version).to(eq('5.1.3'))
+    expect(packages['JS:@rails/ujs'].version).to(eq('7.0.4'))
   end
 
   it 'resolves an unpinned pin to the registry latest dist-tag' do
-    expect(packages['yjs'].version).to(eq('13.6.0'))
+    expect(packages['JS:yjs'].version).to(eq('13.6.0'))
   end
 
   context 'with a non-200 response' do
@@ -80,8 +80,8 @@ RSpec.describe(SOUP::ImportmapParser) do
     before { stub_request(:get, 'https://registry.npmjs.org/marked').to_return(status: 404, body: 'Not Found') }
 
     it 'records the package as unresolved rather than dropping it', :aggregate_failures do
-      expect(packages['marked']).to(have_attributes(version: '12.0.0', language: 'JS', license: 'NOASSERTION'))
-      expect(packages['marked'].unresolved).to(be(true))
+      expect(packages['JS:marked']).to(have_attributes(version: '12.0.0', language: 'JS', license: 'NOASSERTION'))
+      expect(packages['JS:marked'].unresolved).to(be(true))
     end
   end
 
@@ -108,8 +108,8 @@ RSpec.describe(SOUP::ImportmapParser) do
     end
 
     it 'coerces the object to its type string rather than leaving a Hash', :aggregate_failures do
-      expect(packages['marked'].license).to(eq('MIT'))
-      expect(packages['marked'].license).to(be_a(String))
+      expect(packages['JS:marked'].license).to(eq('MIT'))
+      expect(packages['JS:marked'].license).to(be_a(String))
     end
 
     context 'when the registry omits the license entirely' do
@@ -118,7 +118,7 @@ RSpec.describe(SOUP::ImportmapParser) do
       end
 
       it 'yields an empty string rather than a nil that breaks downstream matching' do
-        expect(packages['marked'].license).to(eq(''))
+        expect(packages['JS:marked'].license).to(eq(''))
       end
     end
   end
@@ -137,8 +137,8 @@ RSpec.describe(SOUP::ImportmapParser) do
     it 'records the package and names it without a version in the warning', :aggregate_failures do
       expect { packages }
         .to(output(/Skipping marked: network error after retries/).to_stderr)
-      expect(packages['marked']).to(have_attributes(version: '12.0.0', license: 'NOASSERTION'))
-      expect(packages['marked'].unresolved).to(be(true))
+      expect(packages['JS:marked']).to(have_attributes(version: '12.0.0', license: 'NOASSERTION'))
+      expect(packages['JS:marked'].unresolved).to(be(true))
     end
   end
 
@@ -150,8 +150,8 @@ RSpec.describe(SOUP::ImportmapParser) do
     it 'warns and records the package as unresolved', :aggregate_failures do
       expect { packages }
         .to(output(/version not present/).to_stderr)
-      expect(packages['marked']).to(have_attributes(version: '99.0.0', license: 'NOASSERTION'))
-      expect(packages['marked'].unresolved).to(be(true))
+      expect(packages['JS:marked']).to(have_attributes(version: '99.0.0', license: 'NOASSERTION'))
+      expect(packages['JS:marked'].unresolved).to(be(true))
     end
   end
 end
