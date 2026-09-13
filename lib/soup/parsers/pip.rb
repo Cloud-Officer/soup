@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'json'
+require 'uri'
 
 require_relative 'base'
 
@@ -26,7 +27,7 @@ module SOUP
         next if line.strip.empty?
 
         line = line.slice(0, line.index(';')) if line.include?(';')
-        pip_package, version = line.strip.split('==', 2)
+        pip_package, version = line.strip.delete_suffix('\\').split('==', 2).map(&:strip)
 
         next if pip_package&.strip&.empty?
 
@@ -76,7 +77,7 @@ module SOUP
     end
 
     def fetch_package(file, direct_deps, pip_package, version)
-      url = "https://pypi.org/pypi/#{pip_package.sub(/\[[^\]]+\]/, '')}/json"
+      url = "https://pypi.org/pypi/#{URI.encode_www_form_component(pip_package.sub(/\[[^\]]+\]/, ''))}/json"
       dependency = !direct_deps.include?(normalize_pip_name(pip_package.sub(/\[[^\]]+\]/, '')))
       response = registry_response(url, label: "#{pip_package}==#{version}")
       return unresolved_package(name: pip_package, file: file, language: 'Python', version: version, dependency: dependency) if empty_response?(response)
