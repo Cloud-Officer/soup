@@ -25,16 +25,26 @@ RSpec.describe(SOUP::Application) do
     FileUtils.rm_rf(File.dirname(markdown_file))
   end
 
+  def parser_registry
+    SOUP.module_eval('PARSER_REGISTRY', __FILE__, __LINE__)
+  end
+
+  def skip_parsers_except(*kept)
+    flags = parser_registry.values.map { |config| "--#{config[:skip]}" }
+    flags.uniq!
+    flags - kept.map { |skip| "--#{skip}" }
+  end
+
   def skip_all_parsers
-    %w[--skip_bundler --skip_composer --skip_gradle --skip_npm --skip_pip --skip_spm --skip_yarn]
+    skip_parsers_except
   end
 
   def skip_parsers_except_composer
-    %w[--skip_bundler --skip_gradle --skip_npm --skip_pip --skip_spm --skip_yarn]
+    skip_parsers_except(:skip_composer)
   end
 
   def skip_parsers_except_pip
-    %w[--skip_bundler --skip_composer --skip_gradle --skip_npm --skip_spm --skip_yarn]
+    skip_parsers_except(:skip_pip)
   end
 
   # Point detect_packages at a real requirements.txt whose registry lookup 404s,
@@ -224,7 +234,12 @@ RSpec.describe(SOUP::Application) do
   # so reintroducing a nil entry fails here instead of at runtime. The registry
   # is private_constant, hence the module_eval reach-in.
   describe 'PARSER_REGISTRY' do
-    subject(:registry) { SOUP.module_eval('PARSER_REGISTRY', __FILE__, __LINE__) }
+    subject(:registry) { parser_registry }
+
+    it 'is fully covered by the skip_all_parsers spec helper', :aggregate_failures do
+      expect(skip_all_parsers).to(include(*registry.values.map { |config| "--#{config[:skip]}" }))
+      expect(skip_all_parsers).to(include('--skip_importmap'))
+    end
 
     it 'maps every package file to a concrete parser class, never nil' do
       expect(registry.reject { |_file, config| config[:parser].is_a?(Class) }).to(be_empty)
@@ -264,6 +279,34 @@ RSpec.describe(SOUP::Application) do
     end
   end
 
+  describe 'lockfile discovery on disk' do
+    def write_requirements(relative_dir, package)
+      write_fixture(File.join(relative_dir, 'requirements.txt'), "#{package}==1.0.0\n")
+    end
+
+    def scan_fixture_tree(extra: [])
+      Dir.chdir(fixture_dir) { described_class.new(soup_args(extra: extra, skip: skip_parsers_except_pip)).execute } # rubocop:disable ThreadSafety/DirChdir
+      JSON.parse(File.read(cache_file.path)).keys
+    end
+
+    before do
+      write_requirements('.', 'kept')
+      write_requirements('node_modules/x', 'from-node-modules')
+      write_requirements('vendor/y', 'from-vendor')
+      write_requirements('ignored/z', 'from-ignored')
+      stub_request(:get, %r{\Ahttps://pypi\.org/pypi/[^/]+/json\z})
+        .to_return(status: 200, body: { info: { classifiers: ['License :: OSI Approved :: MIT License'], summary: 'Fixture' } }.to_json)
+    end
+
+    it 'skips lockfiles under node_modules and vendor but reads other folders' do
+      expect(scan_fixture_tree).to(contain_exactly('Python:kept', 'Python:from-ignored'))
+    end
+
+    it 'also skips lockfiles under --ignored_folders' do
+      expect(scan_fixture_tree(extra: %w[--ignored_folders ignored])).to(contain_exactly('Python:kept'))
+    end
+  end
+
   describe 'an unresolved Swift pin with a cached entry' do
     def cached_alamofire_entry
       {
@@ -292,7 +335,7 @@ RSpec.describe(SOUP::Application) do
     end
 
     it 'restores the cached metadata under the same key a successful lookup uses', :aggregate_failures do
-      described_class.new(soup_args(skip: %w[--skip_bundler --skip_composer --skip_gradle --skip_npm --skip_pip --skip_yarn])).execute
+      described_class.new(soup_args(skip: skip_parsers_except(:skip_spm))).execute
       cache = JSON.parse(File.read(cache_file.path))
       expect(cache.keys).to(contain_exactly('Swift:Alamofire'))
       expect(cache['Swift:Alamofire'].values_at('license', 'description', 'website')).to(eq(['MIT', 'Elegant HTTP Networking', 'https://github.com/Alamofire/Alamofire']))
@@ -325,7 +368,7 @@ RSpec.describe(SOUP::Application) do
     end
 
     def scan_json_packages
-      described_class.new(soup_args(skip: %w[--skip_composer --skip_gradle --skip_pip --skip_spm --skip_yarn])).execute
+      described_class.new(soup_args(skip: skip_parsers_except(:skip_bundler, :skip_npm))).execute
       JSON.parse(File.read(cache_file.path))
     end
 
