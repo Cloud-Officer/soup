@@ -135,9 +135,8 @@ RSpec.describe(SOUP::NPMParser) do
     end
 
     # QUAL-001: the warning is emitted by the shared
-    # BaseParser#npm_registry_response, which names the package from the `label`
-    # this parser passes. NPM knows the version up front, so it must stay
-    # "name@version" -- Importmap, which cannot, deliberately omits it.
+    # BaseParser#resolve_npm_package. NPM knows the version up front, so it must
+    # stay "name@version" -- Importmap, which cannot, deliberately omits it.
     it 'names the package as name@version in the skip warning' do
       expect { parser.parse(lockfile_path, packages) }
         .to(output(/Skipping lodash@4\.17\.21: network error after retries/).to_stderr)

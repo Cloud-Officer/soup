@@ -34,36 +34,10 @@ module SOUP
     end
 
     def fetch_package(file, direct_deps, spec)
-      label = "#{spec.name} #{spec.version}"
       version = spec.version&.to_s&.strip
       dependency = !direct_deps.include?(spec.name)
-      version_url = "https://api.rubygems.org/api/v2/rubygems/#{spec.name}/versions/#{spec.version}.json"
-      # A timeout means rubygems.org is unreachable after every retry, so the
-      # remaining fallbacks would time out too -- record the gem as unresolved
-      # rather than walking the rest of the chain. CONS-002.
-      response = registry_response(version_url, label: label)
-      return unresolved_package(name: spec.name, file: file, language: 'Ruby', version: version, dependency: dependency) if empty_response?(response)
-
-      if response.code != 200
-        latest_url = "https://api.rubygems.org/api/v1/versions/#{spec.name}/latest.json"
-        response = registry_response(latest_url, label: label)
-        return unresolved_package(name: spec.name, file: file, language: 'Ruby', version: version, dependency: dependency) if empty_response?(response)
-
-        if response.code != 200
-          warn(http_error_message(response, url: latest_url, package: label))
-          return unresolved_package(name: spec.name, file: file, language: 'Ruby', version: version, dependency: dependency)
-        end
-
-        latest_version = JSON.parse(response.body)['version']
-        fallback_url = "https://api.rubygems.org/api/v2/rubygems/#{spec.name}/versions/#{latest_version}.json"
-        response = registry_response(fallback_url, label: "#{spec.name} #{latest_version}")
-        return unresolved_package(name: spec.name, file: file, language: 'Ruby', version: version, dependency: dependency) if empty_response?(response)
-
-        if response.code != 200
-          warn(http_error_message(response, url: fallback_url, package: "#{spec.name} #{latest_version}"))
-          return unresolved_package(name: spec.name, file: file, language: 'Ruby', version: version, dependency: dependency)
-        end
-      end
+      response = rubygems_response(spec)
+      return unresolved_package(name: spec.name, file: file, language: 'Ruby', version: version, dependency: dependency) unless response
 
       package_details = JSON.parse(response.body)
 
@@ -77,6 +51,38 @@ module SOUP
         website: package_details['homepage_uri']&.strip,
         dependency: dependency
       )
+    end
+
+    # The pinned version's 200 response, else the latest version's when the pinned one is not published; nil otherwise.
+    def rubygems_response(spec)
+      rubygems_candidates(spec).each do |url, label, final|
+        response = registry_response(url, label: label)
+        # An unreachable registry would fail every remaining candidate identically.
+        break if empty_response?(response)
+        return response if response.code == 200
+
+        warn(http_error_message(response, url: url, package: label)) if final
+      end
+
+      nil
+    end
+
+    # Yields [url, label, final]; the latest version is looked up only once the pinned version has failed.
+    def rubygems_candidates(spec)
+      Enumerator.new do |candidates|
+        label = "#{spec.name} #{spec.version}"
+        candidates << [rubygems_version_url(spec.name, spec.version), label, false]
+
+        latest = successful_registry_response("https://api.rubygems.org/api/v1/versions/#{spec.name}/latest.json", label: label)
+        next unless latest
+
+        latest_version = JSON.parse(latest.body)['version']
+        candidates << [rubygems_version_url(spec.name, latest_version), "#{spec.name} #{latest_version}", true]
+      end
+    end
+
+    def rubygems_version_url(name, version)
+      "https://api.rubygems.org/api/v2/rubygems/#{name}/versions/#{version}.json"
     end
   end
 end
