@@ -34,9 +34,9 @@ RUN groupadd -g 1001 soup && useradd -m -u 1001 -g 1001 -s /bin/bash soup && ech
 # Copying also makes the build hermetic and removes the stale-layer-cache risk.
 COPY --chown=soup:soup . /home/soup/soup
 
-# Install soup dependencies and create a symlink
+# Install only the runtime gems, exactly as locked, with the Bundler version recorded in Gemfile.lock
 WORKDIR /home/soup/soup
-RUN bundle install && ln -s "/home/soup/soup/bin/soup.rb" "/usr/local/bin/soup"
+RUN gem install bundler --no-document --version "$(awk '/^BUNDLED WITH/ { getline; print $1 }' Gemfile.lock)" && bundle config set --local without 'development test' && bundle config set --local frozen true && bundle install && ln -s "/home/soup/soup/bin/soup.rb" "/usr/local/bin/soup"
 
 # Health check. Spelled in JSON notation with an explicit shell (DL3025): the
 # check is a shell expression -- a redirect and an `||` -- so it needs one, and
