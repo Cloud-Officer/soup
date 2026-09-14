@@ -79,13 +79,8 @@ module SOUP
     def fetch_package(file, direct_deps, pip_package, version)
       url = "https://pypi.org/pypi/#{URI.encode_www_form_component(pip_package.sub(/\[[^\]]+\]/, ''))}/json"
       dependency = !direct_deps.include?(normalize_pip_name(pip_package.sub(/\[[^\]]+\]/, '')))
-      response = registry_response(url, label: "#{pip_package}==#{version}")
-      return unresolved_package(name: pip_package, file: file, language: 'Python', version: version, dependency: dependency) if empty_response?(response)
-
-      if response.code != 200
-        warn(http_error_message(response, url: url, package: "#{pip_package}==#{version}"))
-        return unresolved_package(name: pip_package, file: file, language: 'Python', version: version, dependency: dependency)
-      end
+      response = successful_registry_response(url, label: "#{pip_package}==#{version}")
+      return unresolved_package(name: pip_package, file: file, language: 'Python', version: version, dependency: dependency) unless response
 
       package_details = JSON.parse(response.body)
       info = package_details['info']

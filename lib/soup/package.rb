@@ -35,10 +35,10 @@ module SOUP
       @unresolved = false
     end
 
-    # Parser-produced fields. Set once during BaseParser#build_package and
-    # treated as read-only afterwards. Accessors stay mutable so existing tests
-    # can patch fixture content, but production code MUST NOT mutate these
-    # after construction.
+    # Parser-produced fields. Written by BaseParser#build_package (which
+    # ManualParser#build_entry also goes through); license, description and
+    # website are re-written by Application#restore_unresolved_metadata when
+    # this run could not reach the registry.
     attr_accessor :file, :language, :package, :version, :license, :description, :website, :dependency
 
     # Verification fields. Filled in by Application#check_packages from the

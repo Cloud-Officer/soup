@@ -41,28 +41,7 @@ module SOUP
 
     def fetch_package(file, direct_deps, js_package)
       name = js_package[:name]
-      version = js_package[:version]
-      label = "#{name}@#{version}"
-      dependency = !direct_deps.include?(name)
-
-      response = npm_registry_response(name: name, label: label)
-      return unresolved_package(name: name, file: file, language: 'JS', version: version, dependency: dependency) if empty_response?(response)
-
-      if response.code != 200
-        warn(http_error_message(response, url: npm_registry_url(name), package: label))
-        return unresolved_package(name: name, file: file, language: 'JS', version: version, dependency: dependency)
-      end
-
-      package_details = lookup_npm_registry_version(JSON.parse(response.body), name: name, version: version)
-      return unresolved_package(name: name, file: file, language: 'JS', version: version, dependency: dependency) if package_details.nil?
-
-      build_npm_registry_package(
-        file: file,
-        name: name,
-        version: version,
-        package_details: package_details,
-        dependency: dependency
-      )
+      resolve_npm_package(file: file, name: name, version: js_package[:version], dependency: !direct_deps.include?(name))
     end
   end
 end

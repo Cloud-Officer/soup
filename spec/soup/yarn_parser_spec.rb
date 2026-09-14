@@ -121,9 +121,9 @@ RSpec.describe(SOUP::YarnParser) do
       expect(a_request(:get, url)).to(have_been_made.times(SOUP::HttpClient.max_retries + 1))
     end
 
-    # QUAL-001: the warning now comes from the shared
-    # BaseParser#npm_registry_response, named from the `label` this parser
-    # passes. A timeout is skipped here even though a non-200 raises.
+    # QUAL-001: the warning comes from the shared
+    # BaseParser#resolve_npm_package, named "name@version". A timeout is skipped
+    # here even though a non-200 raises.
     it 'names the package as name@version in the skip warning' do
       expect { parser.parse(lockfile_path, packages) }
         .to(output(/Skipping lodash@4\.17\.21: network error after retries/).to_stderr)

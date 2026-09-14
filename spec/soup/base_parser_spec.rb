@@ -331,4 +331,84 @@ RSpec.describe(SOUP::BaseParser) do
       end
     end
   end
+
+  describe 'shared registry lookup helpers' do
+    subject(:parser) { lookup_parser_class.new }
+
+    let(:lookup_parser_class) do
+      Class.new(described_class) do
+        def parse(_file, _packages) = nil
+
+        public :successful_registry_response, :resolve_npm_package
+      end
+    end
+
+    let(:url) { 'https://registry.example.com/pkg' }
+
+    describe '#successful_registry_response' do
+      it 'returns a 200 response that has a body' do
+        stub_request(:get, url).to_return(status: 200, body: '{}')
+        expect(parser.successful_registry_response(url, label: 'pkg').body).to(eq('{}'))
+      end
+
+      it 'forwards extra keywords such as headers to the request' do
+        stub_request(:get, url).with(headers: { Authorization: 'token abc' }).to_return(status: 200, body: '{}')
+        expect(parser.successful_registry_response(url, label: 'pkg', headers: { Authorization: 'token abc' })).not_to(be_nil)
+      end
+
+      it 'returns nil without an HTTP warning for an empty body', :aggregate_failures do
+        stub_request(:get, url).to_return(status: 200, body: '')
+        result = :unset
+        expect { result = parser.successful_registry_response(url, label: 'pkg') }
+          .not_to(output.to_stderr)
+        expect(result).to(be_nil)
+      end
+
+      it 'returns nil when a network fault left no response', :aggregate_failures do
+        stub_request(:get, url).to_raise(SocketError)
+        result = :unset
+        expect { result = parser.successful_registry_response(url, label: 'pkg', max_retries: 0) }
+          .to(output(/Skipping pkg: network error after retries/).to_stderr)
+        expect(result).to(be_nil)
+      end
+
+      it 'returns nil and warns with the status, package, and url for a non-200', :aggregate_failures do
+        stub_request(:get, url).to_return(status: [404, 'Not Found'], body: 'missing')
+        result = :unset
+        expect { result = parser.successful_registry_response(url, label: 'pkg') }
+          .to(output(/HTTP 404 Not Found \| package=pkg \| url=#{Regexp.escape(url)} \| body=missing/).to_stderr)
+        expect(result).to(be_nil)
+      end
+    end
+
+    describe '#resolve_npm_package' do
+      let(:npm_url) { 'https://registry.npmjs.org/left-pad' }
+      let(:resolve) do
+        -> { parser.resolve_npm_package(file: 'package-lock.json', name: 'left-pad', version: '1.3.0', dependency: true) }
+      end
+
+      it 'builds the package from the pinned version in the packument' do
+        body = { versions: { '1.3.0': { license: 'WTFPL', description: 'Pad', homepage: 'https://example.com' } } }.to_json
+        stub_request(:get, npm_url).to_return(status: 200, body: body)
+        package = resolve.call
+        expect([package.key, package.version, package.license, package.dependency, package.unresolved]).to(eq(['JS:left-pad', '1.3.0', 'WTFPL', true, false]))
+      end
+
+      it 'records the package as unresolved after a non-200', :aggregate_failures do
+        stub_request(:get, npm_url).to_return(status: 503, body: 'down')
+        package = nil
+        expect { package = resolve.call }
+          .to(output(/HTTP 503.*package=left-pad@1\.3\.0/).to_stderr)
+        expect([package.key, package.license, package.unresolved]).to(eq(['JS:left-pad', 'NOASSERTION', true]))
+      end
+
+      it 'records the package as unresolved when the pinned version is not in the registry', :aggregate_failures do
+        stub_request(:get, npm_url).to_return(status: 200, body: { versions: {} }.to_json)
+        package = nil
+        expect { package = resolve.call }
+          .to(output(/left-pad@1\.3\.0: version not present in registry/).to_stderr)
+        expect([package.version, package.license, package.unresolved]).to(eq(['1.3.0', 'NOASSERTION', true]))
+      end
+    end
+  end
 end

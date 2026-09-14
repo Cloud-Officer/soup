@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'json'
 require 'parallel'
 
 require_relative '../errors'
@@ -210,12 +211,34 @@ module SOUP
       body.nil? || body.empty?
     end
 
-    # Convenience wrapper for the three npm consumers (NPM, Yarn, Importmap),
-    # which all resolve the same packument URL from a package name. NPM and Yarn
-    # know the version up front and pass "name@version"; Importmap resolves the
-    # version from this very response and so can only name the package.
-    def npm_registry_response(name:, label: name)
-      registry_response(npm_registry_url(name), label: label)
+    # The response when it is a non-empty 200; otherwise nil (warning on a non-200) so the caller records the package unresolved.
+    def successful_registry_response(url, label:, **)
+      response = registry_response(url, label: label, **)
+      return if empty_response?(response)
+
+      if response.code != 200
+        warn(http_error_message(response, url: url, package: label))
+        return
+      end
+
+      response
+    end
+
+    # Resolve a lockfile-pinned npm package (NPM and Yarn), unresolved when the lookup fails or the version is absent.
+    def resolve_npm_package(file:, name:, version:, dependency:)
+      response = successful_registry_response(npm_registry_url(name), label: "#{name}@#{version}")
+      return unresolved_package(name: name, file: file, language: 'JS', version: version, dependency: dependency) unless response
+
+      package_details = lookup_npm_registry_version(JSON.parse(response.body), name: name, version: version)
+      return unresolved_package(name: name, file: file, language: 'JS', version: version, dependency: dependency) if package_details.nil?
+
+      build_npm_registry_package(
+        file: file,
+        name: name,
+        version: version,
+        package_details: package_details,
+        dependency: dependency
+      )
     end
 
     # Build a Package from an npm-registry per-version payload. The three npm
