@@ -516,7 +516,7 @@ $RECYCLE.BIN/
 
 # End of https://www.toptal.com/developers/gitignore/api/eclipse,emacs,jetbrains,linux,macos,netbeans,nova,ruby,rubymine,sublimetext,vim,visualstudiocode,windows
 
-# BEGIN AI Assistants
+# BEGIN Managed patterns
 
 # Claude Code
 .claude/
@@ -537,7 +537,40 @@ docs/seo-audit.md
 # OpenAI Codex
 .codex/
 
-# END AI Assistants
+# Credentials
+.env
+.env.*
+!.env.example
+!.env.sample
+!.env.template
+!.env.dist
+!.env.test
+!**/fastlane/.env.*
+.envrc
+.npmrc
+.netrc
+.pypirc
+.vault_pass*
+credentials
+*service-account*.json
+id_dsa
+id_ecdsa
+id_ed25519
+id_rsa
+*.jks
+*.kdbx
+*.key
+*.keystore
+*.mobileprovision
+*.p12
+*.p8
+*.pem
+!*ca-bundle.pem
+!*global-bundle.pem
+*.pfx
+*.ppk
+
+# END Managed patterns
 
 # RSpec
 .rspec_status
