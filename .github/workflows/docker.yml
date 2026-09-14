@@ -17,6 +17,20 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
+    - name: Verify Tag Is On Default Branch
+      run: |
+        status="$(gh api "repos/${GITHUB_REPOSITORY}/compare/${DEFAULT_BRANCH}...${GITHUB_SHA}" --jq .status)"
+
+        case "${status}" in
+          identical|behind) ;;
+          *)
+            echo "::error::Tag ${GITHUB_REF_NAME} points at ${GITHUB_SHA}, which is not on ${DEFAULT_BRANCH} (compare status: ${status}); refusing to publish."
+            exit 1
+            ;;
+        esac
+      env:
+        GH_TOKEN: "${{github.token}}"
+        DEFAULT_BRANCH: "${{github.event.repository.default_branch}}"
     - name: Publish Docker image
       uses: cloud-officer/ci-actions/docker@v3
       with:

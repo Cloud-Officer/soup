@@ -1,5 +1,5 @@
 {
-  "addressable": {
+  "Ruby:addressable": {
     "language": "Ruby",
     "package": "addressable",
     "version": "2.9.0",
@@ -11,7 +11,7 @@
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
   },
-  "ast": {
+  "Ruby:ast": {
     "language": "Ruby",
     "package": "ast",
     "version": "2.4.3",
@@ -23,19 +23,19 @@
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
   },
-  "bigdecimal": {
+  "Ruby:bigdecimal": {
     "language": "Ruby",
     "package": "bigdecimal",
-    "version": "4.1.2",
+    "version": "4.1.3",
     "license": "Ruby",
     "description": "This library provides arbitrary-precision decimal floating-point number class.",
     "website": "https://github.com/ruby/bigdecimal",
-    "last_verified_at": "2026-05-22",
+    "last_verified_at": "2026-09-14",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
   },
-  "crack": {
+  "Ruby:crack": {
     "language": "Ruby",
     "package": "crack",
     "version": "1.0.1",
@@ -47,7 +47,7 @@
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
   },
-  "csv": {
+  "Ruby:csv": {
     "language": "Ruby",
     "package": "csv",
     "version": "3.3.6",
@@ -59,7 +59,7 @@
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
   },
-  "diff-lcs": {
+  "Ruby:diff-lcs": {
     "language": "Ruby",
     "package": "diff-lcs",
     "version": "1.6.2",
@@ -71,7 +71,7 @@
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
   },
-  "hashdiff": {
+  "Ruby:hashdiff": {
     "language": "Ruby",
     "package": "hashdiff",
     "version": "1.2.1",
@@ -83,7 +83,7 @@
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
   },
-  "httparty": {
+  "Ruby:httparty": {
     "language": "Ruby",
     "package": "httparty",
     "version": "0.24.2",
@@ -95,7 +95,7 @@
     "requirements": "Makes http fun! Also, makes consuming restful web services dead easy.",
     "verification_reasoning": "Very popular on rubygems.org"
   },
-  "json": {
+  "Ruby:json": {
     "language": "Ruby",
     "package": "json",
     "version": "3.0.2",
@@ -107,7 +107,7 @@
     "requirements": "Used to read package manager and cache files.",
     "verification_reasoning": "Very popular on rubygems.org"
   },
-  "language_server-protocol": {
+  "Ruby:language_server-protocol": {
     "language": "Ruby",
     "package": "language_server-protocol",
     "version": "3.17.0.6",
@@ -119,7 +119,7 @@
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
   },
-  "lint_roller": {
+  "Ruby:lint_roller": {
     "language": "Ruby",
     "package": "lint_roller",
     "version": "1.1.0",
@@ -131,7 +131,7 @@
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
   },
-  "mini_mime": {
+  "Ruby:mini_mime": {
     "language": "Ruby",
     "package": "mini_mime",
     "version": "1.1.5",
@@ -143,7 +143,7 @@
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
   },
-  "multi_xml": {
+  "Ruby:multi_xml": {
     "language": "Ruby",
     "package": "multi_xml",
     "version": "0.9.1",
@@ -155,7 +155,7 @@
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
   },
-  "nokogiri": {
+  "Ruby:nokogiri": {
     "language": "Ruby",
     "package": "nokogiri",
     "version": "1.19.4",
@@ -167,7 +167,7 @@
     "requirements": "XML parser",
     "verification_reasoning": "Most popular library"
   },
-  "optparse": {
+  "Ruby:optparse": {
     "language": "Ruby",
     "package": "optparse",
     "version": "0.8.1",
@@ -179,7 +179,7 @@
     "requirements": "Used to parse command line arguments.",
     "verification_reasoning": "Very popular on rubygems.org"
   },
-  "parallel": {
+  "Ruby:parallel": {
     "language": "Ruby",
     "package": "parallel",
     "version": "2.2.0",
@@ -191,7 +191,7 @@
     "requirements": "Used to parallelize HTTP fetches across CPU cores in each parser.",
     "verification_reasoning": "Very popular on rubygems.org"
   },
-  "parser": {
+  "Ruby:parser": {
     "language": "Ruby",
     "package": "parser",
     "version": "3.3.12.0",
@@ -203,7 +203,7 @@
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
   },
-  "pastel": {
+  "Ruby:pastel": {
     "language": "Ruby",
     "package": "pastel",
     "version": "0.8.0",
@@ -215,7 +215,7 @@
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
   },
-  "prism": {
+  "Ruby:prism": {
     "language": "Ruby",
     "package": "prism",
     "version": "1.9.0",
@@ -227,7 +227,7 @@
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
   },
-  "public_suffix": {
+  "Ruby:public_suffix": {
     "language": "Ruby",
     "package": "public_suffix",
     "version": "7.0.5",
@@ -239,7 +239,7 @@
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
   },
-  "racc": {
+  "Ruby:racc": {
     "language": "Ruby",
     "package": "racc",
     "version": "1.8.1",
@@ -251,7 +251,7 @@
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
   },
-  "rainbow": {
+  "Ruby:rainbow": {
     "language": "Ruby",
     "package": "rainbow",
     "version": "3.1.1",
@@ -263,7 +263,7 @@
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
   },
-  "regexp_parser": {
+  "Ruby:regexp_parser": {
     "language": "Ruby",
     "package": "regexp_parser",
     "version": "2.12.0",
@@ -275,7 +275,7 @@
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
   },
-  "rexml": {
+  "Ruby:rexml": {
     "language": "Ruby",
     "package": "rexml",
     "version": "3.4.4",
@@ -287,7 +287,7 @@
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
   },
-  "rspec": {
+  "Ruby:rspec": {
     "language": "Ruby",
     "package": "rspec",
     "version": "3.13.2",
@@ -299,7 +299,7 @@
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
   },
-  "rspec-core": {
+  "Ruby:rspec-core": {
     "language": "Ruby",
     "package": "rspec-core",
     "version": "3.13.6",
@@ -311,7 +311,7 @@
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
   },
-  "rspec-expectations": {
+  "Ruby:rspec-expectations": {
     "language": "Ruby",
     "package": "rspec-expectations",
     "version": "3.13.5",
@@ -323,7 +323,7 @@
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
   },
-  "rspec-mocks": {
+  "Ruby:rspec-mocks": {
     "language": "Ruby",
     "package": "rspec-mocks",
     "version": "3.13.8",
@@ -335,7 +335,7 @@
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
   },
-  "rspec-support": {
+  "Ruby:rspec-support": {
     "language": "Ruby",
     "package": "rspec-support",
     "version": "3.13.7",
@@ -347,7 +347,7 @@
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
   },
-  "rubocop": {
+  "Ruby:rubocop": {
     "language": "Ruby",
     "package": "rubocop",
     "version": "1.91.0",
@@ -359,7 +359,7 @@
     "requirements": "Ruby linter",
     "verification_reasoning": "Most popular gem on rubygems"
   },
-  "rubocop-ast": {
+  "Ruby:rubocop-ast": {
     "language": "Ruby",
     "package": "rubocop-ast",
     "version": "1.50.0",
@@ -371,7 +371,7 @@
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
   },
-  "rubocop-capybara": {
+  "Ruby:rubocop-capybara": {
     "language": "Ruby",
     "package": "rubocop-capybara",
     "version": "3.0.0",
@@ -383,7 +383,7 @@
     "requirements": "Ruby linter",
     "verification_reasoning": "Most popular gem"
   },
-  "rubocop-graphql": {
+  "Ruby:rubocop-graphql": {
     "language": "Ruby",
     "package": "rubocop-graphql",
     "version": "1.8.0",
@@ -395,7 +395,7 @@
     "requirements": "Ruby linter",
     "verification_reasoning": "Most popular gem"
   },
-  "rubocop-minitest": {
+  "Ruby:rubocop-minitest": {
     "language": "Ruby",
     "package": "rubocop-minitest",
     "version": "0.40.0",
@@ -407,7 +407,7 @@
     "requirements": "Ruby linter",
     "verification_reasoning": "Most popular gem"
   },
-  "rubocop-performance": {
+  "Ruby:rubocop-performance": {
     "language": "Ruby",
     "package": "rubocop-performance",
     "version": "1.27.0",
@@ -419,7 +419,7 @@
     "requirements": "A collection of RuboCop cops to check for performance optimizations in Ruby code",
     "verification_reasoning": "Most popular gem"
   },
-  "rubocop-rspec": {
+  "Ruby:rubocop-rspec": {
     "language": "Ruby",
     "package": "rubocop-rspec",
     "version": "3.10.2",
@@ -431,19 +431,19 @@
     "requirements": "Code style checking for RSpec files. A plugin for the RuboCop code style enforcing & linting tool",
     "verification_reasoning": "Most popular gem"
   },
-  "rubocop-thread_safety": {
+  "Ruby:rubocop-thread_safety": {
     "language": "Ruby",
     "package": "rubocop-thread_safety",
-    "version": "0.7.3",
+    "version": "0.8.0",
     "license": "MIT",
     "description": "    Thread-safety checks via static analysis.",
     "website": "https://github.com/rubocop/rubocop-thread_safety",
-    "last_verified_at": "2026-05-22",
+    "last_verified_at": "2026-09-14",
     "risk_level": "Low",
     "requirements": "Ruby linter",
     "verification_reasoning": "Most popular gem"
   },
-  "ruby-progressbar": {
+  "Ruby:ruby-progressbar": {
     "language": "Ruby",
     "package": "ruby-progressbar",
     "version": "1.13.0",
@@ -455,19 +455,19 @@
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
   },
-  "simplecov": {
+  "Ruby:simplecov": {
     "language": "Ruby",
     "package": "simplecov",
-    "version": "1.2.0",
+    "version": "1.3.0",
     "license": "MIT",
     "description": "Code coverage for Ruby with a powerful configuration library and automatic merging of coverage across test suites",
     "website": "https://github.com/simplecov-ruby/simplecov",
-    "last_verified_at": "2026-05-22",
+    "last_verified_at": "2026-09-14",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
   },
-  "tty-color": {
+  "Ruby:tty-color": {
     "language": "Ruby",
     "package": "tty-color",
     "version": "0.6.0",
@@ -479,7 +479,7 @@
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
   },
-  "tty-cursor": {
+  "Ruby:tty-cursor": {
     "language": "Ruby",
     "package": "tty-cursor",
     "version": "0.7.1",
@@ -491,7 +491,7 @@
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
   },
-  "tty-prompt": {
+  "Ruby:tty-prompt": {
     "language": "Ruby",
     "package": "tty-prompt",
     "version": "0.23.1",
@@ -503,7 +503,7 @@
     "requirements": "Prompt for TTY",
     "verification_reasoning": "Most popular on RubyGem"
   },
-  "tty-reader": {
+  "Ruby:tty-reader": {
     "language": "Ruby",
     "package": "tty-reader",
     "version": "0.9.0",
@@ -515,7 +515,7 @@
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
   },
-  "tty-screen": {
+  "Ruby:tty-screen": {
     "language": "Ruby",
     "package": "tty-screen",
     "version": "0.8.2",
@@ -527,7 +527,7 @@
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
   },
-  "unicode-display_width": {
+  "Ruby:unicode-display_width": {
     "language": "Ruby",
     "package": "unicode-display_width",
     "version": "3.2.0",
@@ -539,7 +539,7 @@
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
   },
-  "unicode-emoji": {
+  "Ruby:unicode-emoji": {
     "language": "Ruby",
     "package": "unicode-emoji",
     "version": "4.2.0",
@@ -551,7 +551,7 @@
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
   },
-  "webmock": {
+  "Ruby:webmock": {
     "language": "Ruby",
     "package": "webmock",
     "version": "3.26.4",
@@ -563,7 +563,7 @@
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
   },
-  "wisper": {
+  "Ruby:wisper": {
     "language": "Ruby",
     "package": "wisper",
     "version": "2.0.1",
@@ -575,7 +575,7 @@
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
   },
-  "yarn_lock_parser": {
+  "Ruby:yarn_lock_parser": {
     "language": "Ruby",
     "package": "yarn_lock_parser",
     "version": "0.1.0",
@@ -586,5 +586,17 @@
     "risk_level": "Low",
     "requirements": "Read yarn lock file",
     "verification_reasoning": "Popular gem"
+  },
+  "Ruby:bundler": {
+    "language": "Ruby",
+    "package": "bundler",
+    "version": "4.0.10",
+    "license": "MIT",
+    "description": "Bundler manages an application's dependencies through its entire life, across many machines, systematically and repeatably",
+    "website": "https://bundler.io/",
+    "last_verified_at": "2026-09-14",
+    "risk_level": "Low",
+    "requirements": "Used to read Gemfile.lock files and install the gems locked in them.",
+    "verification_reasoning": "Ruby's standard dependency manager, bundled with Ruby."
   }
 }
