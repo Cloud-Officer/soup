@@ -645,6 +645,28 @@ Recoverable failures raise a subclass of `SOUP::Error` (`lib/soup/errors.rb`); t
 | License compliance | Validates all dependencies against approved license list | `lib/soup/application.rb` in `validate_license` method |
 | Scan scope restriction | Excludes `node_modules/` and `vendor/` from the lock file glob, so third-party trees are never traversed as if they were the project | `lib/soup/application.rb` in `detect_packages` method |
 | API token handling | Uses environment variable for GitHub token, never logged | `lib/soup/parsers/spm.rb` in `parse` method |
+| Container image scanning | Deliberately not performed on the built image; see [Container Image Scanning](#container-image-scanning) | `.github/workflows/build.yml` (`trivy`, `hadolint`, `Docker Build` jobs) |
+
+### Container Image Scanning
+
+The Docker image published to Docker Hub is deliberately **not** vulnerability-scanned (for example with Trivy in `image`
+mode), neither on pull requests nor at publish time. This is a recorded decision, not a gap, and code reviews should not
+raise it as a finding.
+
+What the project controls is already checked on every pull request:
+
+- **Ruby dependencies:** the `trivy` job in `.github/workflows/build.yml` scans the repository, including `Gemfile.lock`.
+  The image installs exactly those locked gems (`bundle config set --local frozen true`), so an image scan would report
+  the same gem findings
+- **Dockerfile:** `hadolint` and Trivy's misconfiguration scanner check it
+- **Image build:** the required `Docker Build (amd64)` and `Docker Build (arm64)` jobs build the image without publishing
+  it, so a Dockerfile, apt or bundler regression fails the pull request instead of the release tag
+
+An image scan adds only findings in the `ubuntu:26.04` base image and the distribution packages layered on it. The
+project cannot fix those: they are resolved when Canonical publishes a rebuilt base image. When this was evaluated in
+September 2026 (soup#443), every fixable HIGH finding was in `/usr/bin/pebble`, a Go binary Canonical ships unpackaged in
+the base image and that soup never runs, and the latest 26.04.1 base still carried it. As a required check, an image scan
+would block every pull request on upstream release timing without pointing at anything the project can change.
 
 ### Operational Controls
 
