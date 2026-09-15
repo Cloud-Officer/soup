@@ -13,6 +13,10 @@ RSpec.describe(SOUP::Options) do
         expect(options.no_prompt).to(be(false))
       end
 
+      it 'leaves GitHub Actions scanning off' do
+        expect(options.gha).to(be(false))
+      end
+
       it 'sets default skip options', :aggregate_failures do
         expect(options.skip_bundler).to(be(false))
         expect(options.skip_composer).to(be(false))
@@ -50,6 +54,11 @@ RSpec.describe(SOUP::Options) do
       options = described_class.new([]).parse
       expect(options.licenses_check).to(be(true))
       expect(options.soup_check).to(be(true))
+    end
+
+    it 'parses --gha' do
+      options = described_class.new(['--gha']).parse
+      expect(options.gha).to(be(true))
     end
 
     it 'parses --skip_bundler' do

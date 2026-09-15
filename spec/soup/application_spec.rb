@@ -307,6 +307,30 @@ RSpec.describe(SOUP::Application) do
     end
   end
 
+  describe 'GitHub Actions discovery on disk' do
+    def scan_actions_tree(extra: [])
+      Dir.chdir(fixture_dir) { described_class.new(soup_args(extra: extra)).execute } # rubocop:disable ThreadSafety/DirChdir
+      JSON.parse(File.read(cache_file.path)).keys
+    end
+
+    before do
+      write_fixture('.github/workflows/build.yml', "jobs:\n  build:\n    steps:\n      - uses: actions/checkout@v7\n")
+      write_fixture('.github/actions/setup/action.yml', "runs:\n  steps:\n    - uses: actions/setup-node@v6\n")
+      write_fixture('lint/action.yaml', "runs:\n  steps:\n    - uses: reviewdog/action-setup@v1\n")
+      write_fixture('node_modules/x/action.yml', "runs:\n  steps:\n    - uses: from/node-modules@v1\n")
+      write_fixture('ignored/action.yml', "runs:\n  steps:\n    - uses: from/ignored@v1\n")
+      stub_request(:get, %r{\Ahttps://api\.github\.com/repos/}).to_return(status: 200, body: { license: { spdx_id: 'MIT' } }.to_json)
+    end
+
+    it 'records actions from workflows, .github actions and action files with --gha' do
+      expect(scan_actions_tree(extra: %w[--gha --ignored_folders ignored])).to(contain_exactly('GHA:actions/checkout', 'GHA:actions/setup-node', 'GHA:reviewdog/action-setup'))
+    end
+
+    it 'leaves GitHub Actions out without --gha' do
+      expect(scan_actions_tree).to(be_empty)
+    end
+  end
+
   describe 'an unresolved Swift pin with a cached entry' do
     def cached_alamofire_entry
       {

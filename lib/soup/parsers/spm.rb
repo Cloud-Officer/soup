@@ -13,10 +13,8 @@ module SOUP
 
       raise(InvalidLockfileError, "No Swift main file found alongside #{file}") if main_file.nil?
 
-      token = ENV.fetch('GITHUB_TOKEN', '')
-
       parallel_each(lock_file['pins'], packages) do |pin|
-        fetch_package(file, main_file, token, pin)
+        fetch_package(file, main_file, pin)
       end
     end
 
@@ -89,33 +87,13 @@ module SOUP
       "#{tuist_root}/Dependencies.swift"
     end
 
-    def fetch_package(file, main_file, token, pin)
+    def fetch_package(file, main_file, pin)
       repo_path = github_repo_path(pin['location'] || pin['repositoryURL'])
       name = pin_repo_name(repo_path, pin['identity'] || pin['package'])
       version = pin_version(pin)
-      url = "https://api.github.com/repos/#{repo_path}"
+      response = github_repository_response(repo_path, label: name)
 
-      response =
-        if token.empty?
-          registry_response(url, label: name)
-        else
-          registry_response(url, label: name, headers: { Authorization: "token #{token}" })
-        end
-
-      return unresolved_package(name: name, file: file, language: 'Swift', version: version, dependency: !manifest_mentions?(main_file, name)) if empty_response?(response)
-
-      unless response.code == 200
-        # Rate limiting and bad credentials are global conditions -- every
-        # remaining lookup would fail the same way -- so they still abort with
-        # actionable guidance rather than filling the register with unresolved
-        # entries.
-        combined = github_error_message(response)
-        raise(RateLimitError, 'GitHub API: rate limit exceeded. Please set GITHUB_TOKEN to raise the rate limit.') if combined.include?('rate limit')
-        raise(AuthenticationError, 'GitHub API: Bad credentials. Please verify GITHUB_TOKEN.') if combined.downcase.include?('bad credentials')
-
-        warn(http_error_message(response, url: url, package: name))
-        return unresolved_package(name: name, file: file, language: 'Swift', version: version, dependency: !manifest_mentions?(main_file, name))
-      end
+      return unresolved_package(name: name, file: file, language: 'Swift', version: version, dependency: !manifest_mentions?(main_file, name)) unless response
 
       package_details = JSON.parse(response.body)
 
@@ -161,22 +139,6 @@ module SOUP
       state = pin['state'] || {}
       raw = state['version'] || state['branch'] || state['revision']
       raw&.to_s&.strip
-    end
-
-    # GitHub returns its actionable error string ("API rate limit exceeded...",
-    # "Bad credentials") in the JSON response body's `message` field, NOT in
-    # the HTTP reason phrase. We still concatenate the reason phrase so any
-    # consumer that already relies on it keeps working.
-    def github_error_message(response)
-      body_message =
-        begin
-          parsed = JSON.parse(response.body.to_s)
-          parsed.is_a?(Hash) ? parsed['message'].to_s : ''
-        rescue JSON::ParserError
-          ''
-        end
-
-      [body_message, reason_phrase(response)].reject(&:empty?).join(' ')
     end
   end
 end

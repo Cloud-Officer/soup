@@ -15,6 +15,9 @@ module SOUP
     NPM_REGISTRY_ROOT = 'https://registry.npmjs.org'
     private_constant :NPM_REGISTRY_ROOT
 
+    GITHUB_API_ROOT = 'https://api.github.com'
+    private_constant :GITHUB_API_ROOT
+
     def parse(_file, _packages)
       raise(NotImplementedError, "#{self.class} must implement #parse")
     end
@@ -28,6 +31,40 @@ module SOUP
 
     def collect_packages(results, packages)
       results.compact.each { |package| packages[package.key] = package }
+    end
+
+    def github_repository_response(repo_path, label:)
+      url = "#{GITHUB_API_ROOT}/repos/#{repo_path}"
+      token = ENV.fetch('GITHUB_TOKEN', '')
+      response =
+        if token.empty?
+          registry_response(url, label: label)
+        else
+          registry_response(url, label: label, headers: { Authorization: "token #{token}" })
+        end
+
+      return if empty_response?(response)
+      return response if response.code == 200
+
+      combined = github_error_message(response)
+      raise(RateLimitError, 'GitHub API: rate limit exceeded. Please set GITHUB_TOKEN to raise the rate limit.') if combined.include?('rate limit')
+      raise(AuthenticationError, 'GitHub API: Bad credentials. Please verify GITHUB_TOKEN.') if combined.downcase.include?('bad credentials')
+
+      warn(http_error_message(response, url: url, package: label))
+      nil
+    end
+
+    # GitHub puts the rate-limit and bad-credentials text in the body's message, not the reason phrase.
+    def github_error_message(response)
+      body_message =
+        begin
+          parsed = JSON.parse(response.body.to_s)
+          parsed.is_a?(Hash) ? parsed['message'].to_s : ''
+        rescue JSON::ParserError
+          ''
+        end
+
+      [body_message, reason_phrase(response)].reject(&:empty?).join(' ')
     end
 
     def build_package(name:, file:, language:, version:, license:, description:, website:, dependency:)

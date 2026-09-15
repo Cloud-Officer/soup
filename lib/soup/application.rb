@@ -12,6 +12,7 @@ require_relative 'options'
 require_relative 'parsers/bundler'
 require_relative 'parsers/composer'
 require_relative 'parsers/generic'
+require_relative 'parsers/gha'
 require_relative 'parsers/gradle'
 require_relative 'parsers/importmap'
 require_relative 'parsers/manual'
@@ -39,6 +40,9 @@ module SOUP
   }.freeze
 
   private_constant :PARSER_REGISTRY
+
+  GITHUB_ACTIONS_GLOBS = ['**/action.{yml,yaml}', '.github/**/action.{yml,yaml}', '.github/workflows/*.{yml,yaml}'].freeze
+  private_constant :GITHUB_ACTIONS_GLOBS
 
   # Represents an instance of a soup application. This is the entry point for all invocations of soup from the command line.
   class Application
@@ -130,14 +134,7 @@ module SOUP
 
       PARSER_REGISTRY.each do |package_file, config|
         Dir.glob("#{Dir.pwd}/**/#{package_file}").each do |file|
-          next if file.include?('/node_modules/')
-
-          next if file.include?('/vendor/')
-
-          if @options.ignored_folders.any? { |folder| File.fnmatch?(File.join(File.expand_path(folder), '**'), file) }
-            puts("Skipping file #{file} because it is in an ignored folder.")
-            next
-          end
+          next if excluded_path?(file)
 
           # The skip-flag guard comes BEFORE the "Reading file" announce so the
           # user never sees "Reading file X..." for a file that is then silently
@@ -149,8 +146,29 @@ module SOUP
         end
       end
 
+      parse_github_actions
       parse_manual_entries
       enforce_vendored_coverage
+    end
+
+    def excluded_path?(file)
+      return true if file.include?('/node_modules/') || file.include?('/vendor/')
+      return false unless @options.ignored_folders.any? { |folder| File.fnmatch?(File.join(File.expand_path(folder), '**'), file) }
+
+      puts("Skipping file #{file} because it is in an ignored folder.")
+      true
+    end
+
+    def parse_github_actions
+      return unless @options.gha
+
+      files = GITHUB_ACTIONS_GLOBS.flat_map { |glob| Dir.glob(File.join(Dir.pwd, glob)) }
+      files.uniq!
+      files.reject! { |file| excluded_path?(file) }
+      return if files.empty?
+
+      files.each { |file| puts("Reading file #{file}...") }
+      GHAParser.new.parse(files, @detected_packages)
     end
 
     # Manually-declared SOUP entries cover vendored/proprietary components that

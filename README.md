@@ -55,6 +55,11 @@ JSON array of objects with at least a `package` key (plus optional `language`, `
 `website`, `file`, and the verification fields). When `--vendored_globs` is set, the run fails if any file matching those
 globs has no manual entry, so dropping a new vendored library into the repo cannot silently bypass the register.
 
+GitHub Actions are opt-in with `--gha`. Every `uses: <owner>/<repo>[/<path>]@<ref>` found in `action.yml`/`action.yaml`
+files and `.github/workflows` becomes a `GHA` entry keyed by the lowercase `<owner>/<repo>`, with every ref the repository is used at
+listed as its version and the license, description and website read from the GitHub API. Local (`./`) and `docker://`
+references are skipped. Enable it for projects whose actions ship as the product, such as a composite actions repository.
+
 The soup file is generated in `./docs/soup.md` and a cache file `.soup.json` is used to preserve previously entered
 choices.
 
@@ -127,6 +132,7 @@ Usage: soup options
 options
         --cache_file file            Path to cached file
         --exceptions_file file       Path to exception file
+        --gha                        Include GitHub Actions referenced by uses: in action.yml files and .github workflows
         --ignored_folders ignored_folders
                                      Comma separated list of folders to ignore
         --licenses                   Check for open source licenses compliance
@@ -151,15 +157,15 @@ options
 
 ### Environment Variables
 
-| Variable                | Required | Description                                                                                                                                                                                     |
-|-------------------------|----------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `GITHUB_TOKEN`          | Optional | GitHub personal access token for SPM dependency lookups. Required when processing many Swift packages to avoid GitHub API rate limiting. [Create one here](https://github.com/settings/tokens). |
-| `SOUP_HTTP_TIMEOUT`     | Optional | Per-request HTTP timeout in seconds (integer). Defaults to `5`. Raise this on slow corporate proxies or rate-limited mirrors.                                                                   |
-| `SOUP_HTTP_MAX_RETRIES` | Optional | Number of retries on transient network faults (timeouts, resets, unreachable hosts, DNS/TLS failures, truncated responses). Defaults to `3`. HTTP 4xx/5xx are not retried.                      |
-| `DEBUG`                 | Optional | When set to any value, print the full backtrace on an unhandled error instead of the first few frames.                                                                                          |
+| Variable                | Required | Description                                                                                                                                                                                               |
+|-------------------------|----------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `GITHUB_TOKEN`          | Optional | GitHub personal access token for SPM and `--gha` lookups. Required when processing many Swift packages or actions to avoid GitHub API rate limits. [Create one here](https://github.com/settings/tokens). |
+| `SOUP_HTTP_TIMEOUT`     | Optional | Per-request HTTP timeout in seconds (integer). Defaults to `5`. Raise this on slow corporate proxies or rate-limited mirrors.                                                                             |
+| `SOUP_HTTP_MAX_RETRIES` | Optional | Number of retries on transient network faults (timeouts, resets, unreachable hosts, DNS/TLS failures, truncated responses). Defaults to `3`. HTTP 4xx/5xx are not retried.                                |
+| `DEBUG`                 | Optional | When set to any value, print the full backtrace on an unhandled error instead of the first few frames.                                                                                                    |
 
-The tool works without `GITHUB_TOKEN` for non-SPM projects. When processing SPM dependencies, unauthenticated GitHub
-API requests are limited to 60 per hour. Setting `GITHUB_TOKEN` increases this to 5,000 per hour.
+The tool works without `GITHUB_TOKEN` for projects with no SPM dependencies that do not pass `--gha`. Otherwise,
+unauthenticated GitHub API requests are limited to 60 per hour. Setting `GITHUB_TOKEN` increases this to 5,000 per hour.
 
 ### Examples
 
