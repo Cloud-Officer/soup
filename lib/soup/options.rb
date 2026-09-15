@@ -11,6 +11,7 @@ module SOUP
       @auto_reply = false
       @cache_file = '.soup.json'
       @exceptions_file = "#{__dir__}/../../config/exceptions.json"
+      @gha = false
       @ignored_folders = []
       @licenses_check = false
       @licenses_file = "#{__dir__}/../../config/licenses.json"
@@ -37,6 +38,9 @@ module SOUP
 
     # File-path flags
     attr_reader :cache_file, :exceptions_file, :licenses_file, :manual_file, :markdown_file, :ignored_folders, :vendored_globs
+
+    # Opt-in scan flags
+    attr_reader :gha
 
     # Per-package-manager skip flags
     attr_reader :skip_bundler, :skip_composer, :skip_gradle, :skip_importmap, :skip_npm, :skip_pip, :skip_spm, :skip_yarn
@@ -65,6 +69,10 @@ module SOUP
 
       @parser.on('', '--exceptions_file file', 'Path to exception file') do |file|
         @exceptions_file = file
+      end
+
+      @parser.on('', '--gha', 'Include GitHub Actions referenced by uses: in action.yml files and .github workflows') do
+        @gha = true
       end
 
       @parser.on('', '--ignored_folders ignored_folders', 'Comma separated list of folders to ignore') do |folders|

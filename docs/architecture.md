@@ -45,10 +45,10 @@
 │  │  Bundler   │ │  Composer  │ │   Gradle   │ │    NPM     │ │    PIP     │ │
 │  │  (Ruby)    │ │   (PHP)    │ │  (Kotlin)  │ │   (JS)     │ │  (Python)  │ │
 │  └────────────┘ └────────────┘ └────────────┘ └────────────┘ └────────────┘ │
-│  ┌────────────┐ ┌────────────┐ ┌────────────┐ ┌────────────┐                │
-│  │    SPM     │ │    Yarn    │ │ Importmap  │ │   Manual   │                │
-│  │  (Swift)   │ │   (JS)     │ │  (Rails)   │ │ (vendored) │                │
-│  └────────────┘ └────────────┘ └────────────┘ └────────────┘                │
+│  ┌────────────┐ ┌────────────┐ ┌────────────┐ ┌────────────┐ ┌────────────┐ │
+│  │    SPM     │ │    Yarn    │ │ Importmap  │ │   Manual   │ │  Actions   │ │
+│  │  (Swift)   │ │   (JS)     │ │  (Rails)   │ │ (vendored) │ │   (GHA)    │ │
+│  └────────────┘ └────────────┘ └────────────┘ └────────────┘ └────────────┘ │
 └─────────────────────────────────────────────────────────────────────────────┘
                                       │
                                       ▼
@@ -83,7 +83,7 @@
 2. **Application** (`lib/soup/application.rb`): Orchestrates the entire workflow from detection to output generation
 3. **Options** (`lib/soup/options.rb`): Parses command-line arguments and configures application behavior
 4. **Package** (`lib/soup/package.rb`): Data structure representing a third-party dependency with all IEC 62304 required metadata
-5. **Parsers** (`lib/soup/parsers/`): Language-specific parsers that read lock files and fetch metadata from package registries; each inherits shared fetching, normalization, and parallelization logic from `SOUP::BaseParser`. The `ImportmapParser` resolves CDN-pinned dependencies from a Rails `config/importmap.rb`, and the `ManualParser` reads manually-declared entries for vendored/proprietary components that no registry can resolve
+5. **Parsers** (`lib/soup/parsers/`): Language-specific parsers that read lock files and fetch metadata from package registries; each inherits shared fetching, normalization, and parallelization logic from `SOUP::BaseParser`. The `ImportmapParser` resolves CDN-pinned dependencies from a Rails `config/importmap.rb`, the `ManualParser` reads manually-declared entries for vendored/proprietary components that no registry can resolve, and the `GHAParser` (only with `--gha`) records the GitHub Actions referenced by `uses:` in action and workflow files
 6. **HttpClient** (`lib/soup/http_client.rb`): Single HTTP entry point used by every parser; applies the shared timeout, retry, and thread-pool sizing
 7. **Status** (`lib/soup/status.rb`): Defines exit codes for the application
 8. **Errors** (`lib/soup/errors.rb`): Defines the `SOUP::Error` exception hierarchy raised throughout the application
@@ -125,12 +125,15 @@
 **Key Components:**
 
 - `PARSER_REGISTRY`: Private module-level constant (`module SOUP`) mapping lock file names to parser classes and skip flags
+- `GITHUB_ACTIONS_GLOBS`: Private module-level constant listing the files `--gha` scans: `**/action.{yml,yaml}`, `.github/**/action.{yml,yaml}` (the first glob never enters hidden directories), and `.github/workflows/*.{yml,yaml}`
 - `DEPENDENCY_TEXT`: Private module-level constant (`module SOUP`) holding the value written into `requirements` and `verification_reasoning` for transitive dependencies
 - `initialize(argv)`: Configures options and initializes state
 - `execute`: Main entry point that runs the detection, checking, and output workflow. On success it calls `save_files` and marks the run complete; if it raises, the `ensure` block routes to `save_partial_state` instead, so a failed run can never take the full-overwrite path
 - `validate_config!`: Validates that `--licenses_file` and `--exceptions_file` exist and contain a JSON array of strings (parsed by `validate_json!`, which returns the parsed value), then delegates to `validate_cache_file!`
 - `validate_cache_file!`: Validates the cache file before any state exists, and only when `--soup` will actually read it (the cache is legitimately absent on a first run): it must be valid JSON whose top level is an object and whose every value is an object (a package entry). The shape check also has to precede `migrate_legacy_cache_keys`, which would otherwise crash on a JSON array. Deliberately runs here rather than in `read_cached_packages`: a parse error raised there would escape through the `ensure` block save, rewriting `.soup.json` with metadata-less entries and blanking `docs/soup.md`. Failing this early leaves `save_partial_state` with nothing verified to write, so both files stay untouched
-- `detect_packages`: Scans for lock files and invokes appropriate parsers, then runs `parse_manual_entries` and `enforce_vendored_coverage`
+- `detect_packages`: Scans for lock files and invokes appropriate parsers, then runs `parse_github_actions`, `parse_manual_entries` and `enforce_vendored_coverage`
+- `excluded_path?(file)`: True for a file under `node_modules/`, `vendor/`, or an `--ignored_folders` entry (announcing the last); shared by lock-file detection and `parse_github_actions`
+- `parse_github_actions`: With `--gha`, collects the files matched by `GITHUB_ACTIONS_GLOBS`, drops excluded paths, and hands them to `GHAParser` in a single call; runs before `parse_manual_entries` so a manual entry can override a detected action
 - `parse_manual_entries`: Invokes `ManualParser` on the manual entries file (default `config/soup-manual.json`) when it exists; parsed after auto-detected packages so a project can override an auto-detected entry by package name
 - `enforce_vendored_coverage`: Fails the run (sets the error exit code) when a committed file matched by `--vendored_globs` has no SOUP entry, matched on the entry's `file` path or basename
 - `read_cached_packages`: Loads previously entered user choices from cache
@@ -168,6 +171,7 @@
 - `parse`: Parses command-line arguments and returns the configured options object. When neither `--licenses` nor `--soup` is given it enables both, so a bare `soup` invocation runs the full license check and register generation
 - Configuration attributes: `cache_file`, `markdown_file`, `licenses_file`, `exceptions_file`, `manual_file`, `ignored_folders`, `vendored_globs`
 - Skip flags: `skip_bundler`, `skip_composer`, `skip_gradle`, `skip_importmap`, `skip_npm`, `skip_pip`, `skip_spm`, `skip_yarn`
+- Opt-in scan flag: `gha` (`--gha`), off by default so CI tooling is registered only by projects that ship it
 - Mode flags: `licenses_check`, `soup_check`, `no_prompt`, `auto_reply`
 
 **External Dependencies:**
@@ -273,16 +277,19 @@
 - `sibling_file(file, suffix)`: Resolves a sibling manifest path next to a lock file
 - `manifest_mentions?(main_file, token)`: Token-boundary test for whether a dependency is declared directly in a source-code manifest; matches only when `token` is not flanked by identifier characters so a name that is a substring of another coordinate (e.g. `androidx.core:core` vs `androidx.core:core-ktx`) is not misclassified. Used by the Gradle and SPM parsers
 - `lookup_npm_registry_version(payload, name:, version:)`: Extracts a specific version hash from an npm-style registry payload; shared by the NPM, Yarn, and Importmap parsers
-- `successful_registry_response(url, label:, **)`: The shared lookup sequence every single-source parser runs — GET through `registry_response`, then return the response only when it is a usable 200. An `empty_response?` result returns nil, and a non-200 returns nil after warning with `http_error_message` naming `label`, so the caller records the package via `unresolved_package`. Extra keywords (e.g. `headers:`) reach `registry_response`. Used by the Bundler (latest-version lookup), Importmap, and PIP parsers and by `resolve_npm_package`; SPM keeps its own sequence because its rate-limit and bad-credentials responses must abort before any warning
+- `successful_registry_response(url, label:, **)`: The shared lookup sequence every single-source parser runs — GET through `registry_response`, then return the response only when it is a usable 200. An `empty_response?` result returns nil, and a non-200 returns nil after warning with `http_error_message` naming `label`, so the caller records the package via `unresolved_package`. Extra keywords (e.g. `headers:`) reach `registry_response`. Used by the Bundler (latest-version lookup), Importmap, and PIP parsers and by `resolve_npm_package`; the SPM and GHA parsers use `github_repository_response` instead, because GitHub's rate-limit and bad-credentials responses must abort before any warning
 - `npm_registry_url(name)`: Builds the packument URL for an npm package name; shared by the three npm consumers (NPM, Yarn, Importmap)
 - `resolve_npm_package(file:, name:, version:, dependency:)`: The whole `fetch_package` of the NPM and Yarn parsers, which know the version up front — looks the packument up via `successful_registry_response` with a `name@version` label, extracts the pinned version with `lookup_npm_registry_version`, and builds it with `build_npm_registry_package`, recording the package via `unresolved_package` when the lookup fails or the version is absent. Importmap resolves the version from that very response and so calls the lower-level helpers itself, naming only the package
 - `build_npm_registry_package(file:, name:, version:, package_details:, dependency:)`: Builds a `SOUP::Package` from an npm-registry per-version payload, sharing the `JS` language tag and the license/description/website extraction across the three npm consumers, which differ only in how the version became known and whether the package is direct
 - `npm_registry_license(raw_license)`: Coerces the npm registry `license` field to a plain string, so the legacy object form (`{"type": "MIT", "url": ...}`) returned for older package versions does not reach `validate_license` as a Hash; reached through `build_npm_registry_package`, so it is shared by all three npm consumers (NPM, Yarn, Importmap)
 - `empty_response?(response)`: The guard every parser applies to a `registry_response` result before parsing it — true when the lookup returned no response at all (a transient fault was swallowed) or returned an empty body, both of which are recorded via `unresolved_package`. It replaces the former `response.nil?` guard, which only covered the empty-body case because `HTTParty::Response` overrides `#nil?` to mean "body is nil or empty"; that override is deprecated, so the guard emitted a deprecation warning per lookup and would have silently narrowed to a plain object check on removal, letting empty bodies reach `JSON.parse`. It deliberately tests `unless response` rather than `response.nil?`, since calling `#nil?` on the response is itself the deprecated call
-- `reason_phrase(response)`: Reads the HTTP reason phrase ("Not Found", "Service Unavailable") by reaching through to the underlying `Net::HTTPResponse` rather than calling `response.message`. `HTTParty::Response` does not define `#message`, so that call falls through `method_missing`, which first forces `parsed_response` and hands the body to HTTParty's own JSON parser — and that parser still passes `quirks_mode:`, a keyword `json` 3.0 removed. On Ruby 4 / `json` 3.x every 4xx or 5xx from a registry therefore aborted the whole scan with "unknown keyword: quirks_mode" instead of warning about the one package. Keeping the error path off `parsed_response` is the point of a diagnostic message; used by `http_error_message` and by SPM's `github_error_message`
+- `reason_phrase(response)`: Reads the HTTP reason phrase ("Not Found", "Service Unavailable") by reaching through to the underlying `Net::HTTPResponse` rather than calling `response.message`. `HTTParty::Response` does not define `#message`, so that call falls through `method_missing`, which first forces `parsed_response` and hands the body to HTTParty's own JSON parser — and that parser still passes `quirks_mode:`, a keyword `json` 3.0 removed. On Ruby 4 / `json` 3.x every 4xx or 5xx from a registry therefore aborted the whole scan with "unknown keyword: quirks_mode" instead of warning about the one package. Keeping the error path off `parsed_response` is the point of a diagnostic message; used by `http_error_message` and `github_error_message`
 - `http_error_message(response, url:, package:)`: Builds an actionable error message (status code, reason phrase via `reason_phrase`, URL, package, truncated body) for non-2xx responses
+- `github_repository_response(repo_path, label:)`: GETs `https://api.github.com/repos/<owner>/<repo>` through `registry_response`, sending `Authorization: token $GITHUB_TOKEN` when the variable is set, and returns the response only when it is a non-empty 200. A rate-limit or bad-credentials response raises `RateLimitError` / `AuthenticationError`, since every remaining lookup would fail the same way; any other non-200 warns and returns nil so the caller records the package via `unresolved_package`. Shared by the SPM and GHA parsers
+- `github_error_message(response)`: Reads GitHub's actionable error text from the JSON body's `message` field — where the rate-limit and bad-credentials strings live, not in the HTTP reason phrase — joined ahead of `reason_phrase`
 - `NOASSERTION_LICENSE`: Public constant for the `NOASSERTION` license value
 - `NPM_REGISTRY_ROOT`: Private constant for the npm registry base URL consumed by `npm_registry_url`
+- `GITHUB_API_ROOT`: Private constant for the GitHub API base URL consumed by `github_repository_response`
 
 **External Dependencies:**
 
@@ -390,10 +397,9 @@
 - `pin_version(pin)`: Resolves the pinned identifier, taking the state's `version`, `branch`, or `revision` so branch- and revision-based pins are recorded rather than left empty
 - `github_repo_path(location)`: Extracts `owner/repo` from the HTTPS, HTTPS-with-`.git`, or SSH form of a pin location
 - `pin_repo_name(repo_path, pin_id)`: Names a pin whose GitHub lookup failed (non-200, network error, or empty body) after the repository segment of `github_repo_path` — the same name a successful lookup records from GitHub's `name` field — rather than the lowercased SwiftPM `identity`, so both paths share one `Swift:<name>` key and a cached `.soup.json` entry is still restored during an outage. Falls back to the pin identity only when the location is not a GitHub URL. The same name drives the `manifest_mentions?` check and the warning labels
-- `github_error_message(response)`: Reads GitHub's actionable error text from the JSON body's `message` field — where the rate-limit and bad-credentials strings live, not in the HTTP reason phrase — and joins it ahead of the inherited `BaseParser#reason_phrase`, so a consumer that already relies on the reason phrase keeps working
 - `read_main_swift_file(file)`: Resolves the direct-dependency manifest for `Package.resolved` files that are nested inside an Xcode project bundle by trying, in order, a sibling `Package.swift` (or matching `<Name>.swift`), an enclosing `Tuist/Dependencies.swift` when the resolved file lives under a Tuist directory, a sibling `<Name>.xcodeproj/project.pbxproj`, and finally the `project.pbxproj` of an enclosing `*.xcodeproj` higher up the tree (`enclosing_xcodeproj_pbxproj`, `tuist_dependencies_path`, `path_join` are its helpers). `parse` raises `InvalidLockfileError` when none of them resolves; otherwise the manifest is passed to `manifest_mentions?` to classify direct vs transitive dependencies
 - `GITHUB_URL_NOISE`: Private constant stripping the GitHub host prefix and `.git` suffix consumed by `github_repo_path`
-- Supports `GITHUB_TOKEN` environment variable for rate limit handling
+- Looks each pin up through the inherited `BaseParser#github_repository_response`, which sends `GITHUB_TOKEN` when set and aborts on rate-limit and bad-credentials responses
 
 **External Dependencies:**
 
@@ -433,6 +439,26 @@
 
 - None; the registry fetching and parallelization are inherited from `SOUP::BaseParser`
 
+### SOUP::GHAParser
+
+**Purpose:** Records the GitHub Actions a project references through `uses:` as SOUP entries when `--gha` is given.
+
+**Location:** `lib/soup/parsers/gha.rb`
+
+**Key Components:**
+
+- `parse(files, packages)`: Takes every action and workflow file `Application#parse_github_actions` found — an array, unlike the lock-file parsers, so each repository is looked up once however many files use it — groups the references by repository, and fetches each repository's metadata in parallel via the inherited `parallel_each` helper
+- `collect_references(files)`: Keeps every `uses:` value as an `<owner>/<repo>` reference with its ref, grouped case-insensitively. Sub-path actions (`github/codeql-action/init`) and reusable workflows (`org/repo/.github/workflows/ci.yml`) fold into their repository; local (`./`) and `docker://` references are skipped, and any other value that is not `<owner>/<repo>[/<path>]@<ref>` is warned about and skipped
+- `load_workflow(file)`: `YAML.safe_load_file` with `Date`/`Time` permitted and aliases enabled; a file that is not valid YAML raises `InvalidLockfileError`
+- `uses_values(node)`: Walks the parsed document for every `uses` key with a string value, covering job steps, composite action steps, and reusable-workflow jobs. Because the YAML is parsed rather than grepped, commented-out lines and `uses:` text inside `run:` scripts are never recorded
+- `fetch_package(occurrences)`: Names the entry `<owner>/<repo>` in lowercase — GitHub resolves names case-insensitively, and a stable key keeps the cached verification fields when a file changes the spelling — joins the distinct refs, sorted, into the version (`v6, v7`), records the first referencing file, and looks the repository up via `BaseParser#github_repository_response`. The license is GitHub's `spdx_id`, the description the first sentence of the repository description, and the website its `html_url`. Every entry is direct (`dependency: false`), so its verification fields come from the cache or the prompt, never the transitive defaults
+- `LANGUAGE`, `LOCAL_REFERENCE_PREFIXES`, `USES_REFERENCE`: Private constants for the `GHA` language tag, the skipped reference prefixes, and the reference pattern
+
+**External Dependencies:**
+
+- `date`
+- `yaml`
+
 ### SOUP::ManualParser
 
 **Purpose:** Reads manually-declared SOUP entries from a JSON file (default `config/soup-manual.json`) for vendored files and proprietary/commercial components that no package manager or registry can resolve.
@@ -453,7 +479,7 @@
 
 ## Software of Unknown Provenance
 
-See [soup.md](soup.md) for the complete list of third-party dependencies. The `soup.md` file is auto-generated by the `soup` tool itself; never edit it directly. All metadata is sourced from `.soup.json` (cache) and the lock files at the project root.
+See [soup.md](soup.md) for the complete list of third-party dependencies. The `soup.md` file is auto-generated by the `soup` tool itself; never edit it directly. All metadata is sourced from `.soup.json` (cache) and the lock files at the project root, plus action and workflow files when `--gha` is given.
 
 ### Risk Level Classification (per IEC 62304)
 
@@ -506,7 +532,7 @@ Validation criteria for SOUP entries: Accuracy (Requirements match actual usage)
 4. Excludes user-specified ignored folders
 5. Skips files whose package manager is disabled by a skip flag — the guard runs before the "Reading file" announcement so a dropped file is never announced
 6. Delegates to the appropriate parser through `SOUP::GenericParser`, which type-checks the parser, file path, and packages hash
-7. Runs `parse_manual_entries` and then `enforce_vendored_coverage` once every lock file has been parsed
+7. Runs `parse_github_actions` (only with `--gha`), `parse_manual_entries`, and then `enforce_vendored_coverage` once every lock file has been parsed
 
 **Complexity:** O(n) where n is the number of files in the project
 
@@ -644,7 +670,7 @@ Recoverable failures raise a subclass of `SOUP::Error` (`lib/soup/errors.rb`); t
 | HTML entity sanitization | Uses Nokogiri to decode HTML entities in descriptions | `lib/soup/application.rb` in `sanitize_markdown_description` method |
 | License compliance | Validates all dependencies against approved license list | `lib/soup/application.rb` in `validate_license` method |
 | Scan scope restriction | Excludes `node_modules/` and `vendor/` from the lock file glob, so third-party trees are never traversed as if they were the project | `lib/soup/application.rb` in `detect_packages` method |
-| API token handling | Uses environment variable for GitHub token, never logged | `lib/soup/parsers/spm.rb` in `parse` method |
+| API token handling | Uses environment variable for GitHub token, never logged | `lib/soup/parsers/base.rb` in `github_repository_response` method |
 | Container image scanning | Deliberately not performed on the built image; see [Container Image Scanning](#container-image-scanning) | `.github/workflows/build.yml` (`trivy`, `hadolint`, `Docker Build` jobs) |
 
 ### Container Image Scanning
