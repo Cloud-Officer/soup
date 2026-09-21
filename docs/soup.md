@@ -24,7 +24,7 @@
 | Ruby | public_suffix | 7.0.5 | MIT | PublicSuffix can parse and decompose a domain name into top level domain, domain and subdomains. | <https://simonecarletti.com/code/publicsuffix-ruby> | 2026-05-22 | Low | Dependency | Dependency |
 | Ruby | racc | 1.8.1 | Ruby | Racc is an LALR(1) parser generator. | <https://github.com/ruby/racc> | 2026-05-22 | Low | Dependency | Dependency |
 | Ruby | rainbow | 3.1.1 | MIT | Colorize printed text on ANSI terminals | <https://github.com/sickill/rainbow> | 2026-05-22 | Low | Dependency | Dependency |
-| Ruby | regexp_parser | 2.12.0 | MIT | A library for tokenizing, lexing, and parsing Ruby regular expressions. | <https://github.com/ammar/regexp_parser> | 2026-05-22 | Low | Dependency | Dependency |
+| Ruby | regexp_parser | 2.13.0 | MIT | A library for tokenizing, lexing, and parsing Ruby regular expressions. | <https://github.com/ammar/regexp_parser> | 2026-09-21 | Low | Dependency | Dependency |
 | Ruby | rexml | 3.4.4 | BSD-2-Clause | An XML toolkit for Ruby | <https://github.com/ruby/rexml> | 2026-05-22 | Low | Dependency | Dependency |
 | Ruby | rspec | 3.13.2 | MIT | BDD for Ruby | <https://rspec.info> | 2026-05-22 | Low | Dependency | Dependency |
 | Ruby | rspec-core | 3.13.6 | MIT | BDD for Ruby | <https://rspec.info> | 2026-05-22 | Low | Dependency | Dependency |

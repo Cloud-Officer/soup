@@ -266,11 +266,11 @@
   "Ruby:regexp_parser": {
     "language": "Ruby",
     "package": "regexp_parser",
-    "version": "2.12.0",
+    "version": "2.13.0",
     "license": "MIT",
     "description": "A library for tokenizing, lexing, and parsing Ruby regular expressions.",
     "website": "https://github.com/ammar/regexp_parser",
-    "last_verified_at": "2026-05-22",
+    "last_verified_at": "2026-09-21",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
