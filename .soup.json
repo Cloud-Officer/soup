@@ -530,11 +530,11 @@
   "Ruby:unicode-display_width": {
     "language": "Ruby",
     "package": "unicode-display_width",
-    "version": "3.2.0",
+    "version": "3.3.0",
     "license": "MIT",
-    "description": "[Unicode 17.0.0] Determines the monospace display width of a string using EastAsianWidth.txt, Unicode general category, Emoji specification, and other data.",
+    "description": "[Unicode 18.0.0] Determines the monospace display width of a string using EastAsianWidth.txt, Unicode general category, Emoji specification, and other data.",
     "website": "https://github.com/janlelis/unicode-display_width",
-    "last_verified_at": "2026-05-22",
+    "last_verified_at": "2026-09-21",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -542,11 +542,11 @@
   "Ruby:unicode-emoji": {
     "language": "Ruby",
     "package": "unicode-emoji",
-    "version": "4.2.0",
+    "version": "4.3.0",
     "license": "MIT",
-    "description": "[Emoji 17.0] Provides Unicode Emoji data and regexes, incorporating the latest Unicode and Emoji standards",
+    "description": "[Emoji 18.0] Provides Unicode Emoji data and regexes, incorporating the latest Unicode and Emoji standards",
     "website": "https://github.com/janlelis/unicode-emoji",
-    "last_verified_at": "2026-05-22",
+    "last_verified_at": "2026-09-21",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -590,11 +590,11 @@
   "Ruby:bundler": {
     "language": "Ruby",
     "package": "bundler",
-    "version": "4.0.10",
+    "version": "4.0.20",
     "license": "MIT",
     "description": "Bundler manages an application's dependencies through its entire life, across many machines, systematically and repeatably",
     "website": "https://bundler.io/",
-    "last_verified_at": "2026-09-14",
+    "last_verified_at": "2026-09-21",
     "risk_level": "Low",
     "requirements": "Used to read Gemfile.lock files and install the gems locked in them.",
     "verification_reasoning": "Ruby's standard dependency manager, bundled with Ruby."
