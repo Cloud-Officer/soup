@@ -79,7 +79,7 @@ jobs:
       run: |
         set -euo pipefail
 
-        SUBJECT=$(gh api "repos/${REPO}/commits/${HEAD_SHA}" --jq .commit.message)
+        SUBJECT=$(GH_TOKEN="$GITHUB_TOKEN" gh api "repos/${REPO}/commits/${HEAD_SHA}" --jq .commit.message)
         SUBJECT="${SUBJECT%%$'\n'*}"
         for trigger in '#skip-all' '#skip-licenses' '#skip-linters' '#skip-tests'; do
           if grep -iqF -- "$trigger" <<< "$SUBJECT"; then
@@ -97,6 +97,7 @@ jobs:
         gh pr review --approve "$PR"
       env:
         GH_TOKEN: "${{secrets.GH_BOT_PAT}}"
+        GITHUB_TOKEN: "${{github.token}}"
         AUTHOR: "${{github.event.pull_request.user.login}}"
         PR: "${{github.event.pull_request.number}}"
         REPO: "${{github.repository}}"
