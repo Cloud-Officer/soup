@@ -134,7 +134,7 @@
 - `detect_packages`: Scans for lock files and invokes appropriate parsers, then runs `parse_github_actions`, `parse_manual_entries` and `enforce_vendored_coverage`
 - `excluded_path?(file)`: True for a file under `node_modules/`, `vendor/`, or an `--ignored_folders` entry (announcing the last); shared by lock-file detection and `parse_github_actions`
 - `parse_github_actions`: With `--gha`, collects the files matched by `GITHUB_ACTIONS_GLOBS`, drops excluded paths, and hands them to `GHAParser` in a single call; runs before `parse_manual_entries` so a manual entry can override a detected action
-- `parse_manual_entries`: Invokes `ManualParser` on the manual entries file (default `config/soup-manual.json`) when it exists; parsed after auto-detected packages so a project can override an auto-detected entry by package name
+- `parse_manual_entries`: Invokes `ManualParser` on the manual entries file (default `config/soup-manual.json`) when it exists; parsed after auto-detected packages so a project can override an auto-detected entry by language and package name (entries are keyed `<language>:<package>`, so a manual entry that omits `language` overrides only the `JS` entry of that name)
 - `enforce_vendored_coverage`: Fails the run (sets the error exit code) when a committed file matched by `--vendored_globs` has no SOUP entry, matched on the entry's `file` path or basename
 - `read_cached_packages`: Loads previously entered user choices from cache
 - `build_license_pattern`: Compiles `--licenses_file` into the allowlist matcher, anchoring every entry on word boundaries so a license that merely contains an allowlisted entry (e.g. npm's proprietary `UNLICENSED` containing `Unlicense`) no longer passes the compliance gate; an empty allowlist matches nothing rather than everything
@@ -190,6 +190,7 @@
 - Parser-produced attributes, written by `BaseParser#build_package` (which `ManualParser#build_entry` also goes through): `file`, `language`, `package`, `version`, `license`, `description`, `website`, `dependency`. `license`, `description`, and `website` are re-written by `Application#restore_unresolved_metadata` when this run could not reach the registry
 - Verification attributes, filled in by `Application#check_packages` from the cache, the dependency defaults, or the prompts: `last_verified_at`, `risk_level`, `requirements`, `verification_reasoning`
 - `unresolved`: True when this run's registry lookup failed (network fault, 404 for a package absent from the registry, 403 for a private one) so license/description/website could not be fetched. Drives `Application#restore_unresolved_metadata`. Deliberately not serialized by `as_json` — it describes the run, not the package
+- `self.key_for(language, name)` / `key`: Build the `<language>:<package>` key every package is stored under, so a name that exists in two ecosystems (a `json` gem and a `json` npm package) does not overwrite itself in the packages hash or the cache
 - `verified?`: Returns true when all four verification fields (`last_verified_at`, `risk_level`, `requirements`, `verification_reasoning`) are non-empty
 - `as_json`: Serializes the package to JSON format — the ten register columns only; `file`, `dependency`, and `unresolved` are run/parse state and are excluded
 - `to_json`: JSON string representation
@@ -293,6 +294,7 @@
 
 **External Dependencies:**
 
+- `json`
 - `parallel`
 
 ### SOUP::BundlerParser
@@ -377,6 +379,7 @@
 - `parse(file, packages)`: Parses requirements file and fetches package details from PyPI in parallel via the inherited `parallel_each` helper (`BaseParser`). Only exact `==` pins are supported; comments and PEP 508 environment markers are stripped, and a line carrying a loose constraint (`>=`, `~=`, `!=`, `<`, `>`) is warned about and skipped
 - `read_direct_dependencies(file)`: Reads the sibling `requirements.in` (the compiled-from source) for the direct dependency names; with no `.in` file every package stays transitive
 - `normalize_pip_name(name)`: PEP 503 name normalization (lowercase, runs of `-`, `_`, `.` collapsed to `-`) so direct/transitive matching is case- and separator-insensitive
+- `fetch_package(...)`: Builds the PyPI URL with `URI.encode_www_form_component` so a name needing escaping cannot alter the request path, dropping any PEP 508 extras (`package[extra]`) first — extras select optional features of the same distribution, so they are not part of the name PyPI is queried for, nor of the name matched against the direct dependencies
 - `extract_pip_license(info)`: Prefers the PyPI trove `License ::` classifiers and falls back to the raw `license` field
 - `LOOSE_CONSTRAINT_PATTERN`: Private constant matching the `<`, `>`, `!`, `~` characters that mark an unsupported non-exact pin
 - `REQUIREMENT_NAME_PATTERN`: Private constant matching the leading PEP 508 distribution name of a `requirements.in` line, before any extras, constraint, or environment marker
@@ -384,6 +387,7 @@
 **External Dependencies:**
 
 - `json`
+- `uri` (for `URI.encode_www_form_component` in `fetch_package`)
 
 ### SOUP::SPMParser
 
@@ -457,6 +461,7 @@
 **External Dependencies:**
 
 - `date`
+- `json`
 - `yaml`
 
 ### SOUP::ManualParser
@@ -646,11 +651,11 @@ Recoverable failures raise a subclass of `SOUP::Error` (`lib/soup/errors.rb`); t
 | Invalid command-line options | Catches `OptionParser::ParseError`, displays error, exits with error code | `lib/soup/application.rb` in `configure_options` method |
 | Missing or malformed config file | Raises `ConfigurationError`, naming the file, when a configuration file is absent, contains invalid JSON, or is not a JSON array of strings | `lib/soup/application.rb` in `validate_config!` / `validate_json!` methods |
 | Malformed cache file | Raises `ConfigurationError`, naming the file, when the cache is invalid JSON or is not a JSON object of package-entry objects. Raised before any state exists, so the `ensure`-block save cannot rewrite `.soup.json` with metadata-less entries or blank `docs/soup.md` | `lib/soup/application.rb` in `validate_cache_file!` method |
-| API rate limiting | Raises `RateLimitError` (and `AuthenticationError` for bad credentials), suggesting `GITHUB_TOKEN` | `lib/soup/parsers/spm.rb` in `fetch_package` / `github_error_message` methods |
+| API rate limiting | Raises `RateLimitError` (and `AuthenticationError` for bad credentials), suggesting `GITHUB_TOKEN`; both are global conditions that would fail every remaining GitHub lookup identically, so they abort rather than skip one package | `lib/soup/parsers/base.rb` in `github_repository_response` / `github_error_message` methods, reached from the SPM and GHA parsers' `fetch_package` |
 | Network timeouts | Retry up to 3 times via `SOUP::HttpClient`, then re-raise | `lib/soup/http_client.rb` in `get` method |
 | Transient network fault after retries | Any `HttpClient::TRANSIENT_ERRORS` fault (timeout, connection reset/refusal, DNS failure, TLS interruption, truncated reply) is retried, then the single package is warned about and recorded as unresolved rather than aborting the scan | `lib/soup/parsers/base.rb` in `registry_response`, used by every parser |
 | Empty registry response body | A response carrying no body has nothing for `JSON.parse` to read, so it is treated exactly like a swallowed network fault and the package is recorded as unresolved | `lib/soup/parsers/base.rb` in `empty_response?`, used by the Bundler, Importmap, NPM, PIP, SPM, and Yarn parsers |
-| Non-2xx registry response | Warns with the status, URL, package, and truncated body built by `http_error_message`, then records the single package via `unresolved_package` so the scan continues; the run is not aborted. The only exceptions are SPM's rate-limit and bad-credentials responses (see the API rate limiting row), which are global conditions that would fail every remaining lookup identically | `lib/soup/parsers/base.rb` in `successful_registry_response` (used by the Bundler, Importmap, NPM, PIP, and Yarn parsers), and `lib/soup/parsers/bundler.rb` in `rubygems_response` and `spm.rb` in `fetch_package` |
+| Non-2xx registry response | Warns with the status, URL, package, and truncated body built by `http_error_message`, then records the single package via `unresolved_package` so the scan continues; the run is not aborted. The only exceptions are SPM's rate-limit and bad-credentials responses (see the API rate limiting row), which are global conditions that would fail every remaining lookup identically | `lib/soup/parsers/base.rb` in `successful_registry_response` (used by the Bundler, Importmap, NPM, PIP, and Yarn parsers) and in `github_repository_response` (used by the SPM and GHA parsers), and `lib/soup/parsers/bundler.rb` in `rubygems_response` |
 | Unsupported lock file format | Raises `UnsupportedFormatError` for a `package-lock.json` below `lockfileVersion` 2 and for a `yarn.lock` that is not Yarn v1 | `lib/soup/parsers/npm.rb`, `yarn.rb` in `parse` methods |
 | Malformed manual entries file | Raises `InvalidLockfileError` when the file is not a JSON array or an entry lacks a non-empty `package` | `lib/soup/parsers/manual.rb` in `parse` method |
 | Missing Gradle build script | Raises `InvalidLockfileError` when neither `build.gradle` nor `build.gradle.kts` sits alongside the lock file | `lib/soup/parsers/gradle.rb` in `read_main_gradle_file` method |
@@ -669,7 +674,7 @@ Recoverable failures raise a subclass of `SOUP::Error` (`lib/soup/errors.rb`); t
 | ReDoS prevention | Uses non-backtracking regex pattern for markdown sanitization | `lib/soup/application.rb` in `markdown_cell` method |
 | HTML entity sanitization | Uses Nokogiri to decode HTML entities in descriptions | `lib/soup/application.rb` in `sanitize_markdown_description` method |
 | License compliance | Validates all dependencies against approved license list | `lib/soup/application.rb` in `validate_license` method |
-| Scan scope restriction | Excludes `node_modules/` and `vendor/` from the lock file glob, so third-party trees are never traversed as if they were the project | `lib/soup/application.rb` in `detect_packages` method |
+| Scan scope restriction | Excludes `node_modules/` and `vendor/` from the lock file glob, so third-party trees are never traversed as if they were the project; the same test also gates the `--gha` file list | `lib/soup/application.rb` in `excluded_path?`, called from `detect_packages` and `parse_github_actions` |
 | API token handling | Uses environment variable for GitHub token, never logged | `lib/soup/parsers/base.rb` in `github_repository_response` method |
 | Container image scanning | Deliberately not performed on the built image; see [Container Image Scanning](#container-image-scanning) | `.github/workflows/build.yml` (`trivy`, `hadolint`, `Docker Build` jobs) |
 
