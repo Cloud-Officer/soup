@@ -380,7 +380,8 @@
 - `read_direct_dependencies(file)`: Reads the sibling `requirements.in` (the compiled-from source) for the direct dependency names; with no `.in` file every package stays transitive
 - `normalize_pip_name(name)`: PEP 503 name normalization (lowercase, runs of `-`, `_`, `.` collapsed to `-`) so direct/transitive matching is case- and separator-insensitive
 - `fetch_package(...)`: Builds the PyPI URL with `URI.encode_www_form_component` so a name needing escaping cannot alter the request path, dropping any PEP 508 extras (`package[extra]`) first — extras select optional features of the same distribution, so they are not part of the name PyPI is queried for, nor of the name matched against the direct dependencies
-- `extract_pip_license(info)`: Prefers the PyPI trove `License ::` classifiers and falls back to the raw `license` field
+- `extract_pip_license(info)`: Prefers the SPDX `license_expression` field (PEP 639), then the PyPI trove `License ::` classifiers, then the raw `license` field
+- `extract_pip_website(info)`: Uses `home_page` when set, otherwise the `project_urls` entry labelled Homepage, Source, Source Code, Code, Repository or GitHub (labels compared case- and punctuation-insensitively), otherwise the first project URL
 - `LOOSE_CONSTRAINT_PATTERN`: Private constant matching the `<`, `>`, `!`, `~` characters that mark an unsupported non-exact pin
 - `REQUIREMENT_NAME_PATTERN`: Private constant matching the leading PEP 508 distribution name of a `requirements.in` line, before any extras, constraint, or environment marker
 
