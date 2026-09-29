@@ -15,6 +15,9 @@ module SOUP
     REQUIREMENT_NAME_PATTERN = /\A[A-Za-z0-9._-]+/
     private_constant :REQUIREMENT_NAME_PATTERN
 
+    WEBSITE_URL_LABELS = %w[homepage source sourcecode code repository github].freeze
+    private_constant :WEBSITE_URL_LABELS
+
     def parse(file, packages)
       direct_deps = read_direct_dependencies(file)
 
@@ -92,12 +95,15 @@ module SOUP
         version: version,
         license: extract_pip_license(info),
         description: Package.sanitize_description(info['summary'], first_sentence: true),
-        website: info['home_page']&.strip,
+        website: extract_pip_website(info),
         dependency: dependency
       )
     end
 
     def extract_pip_license(info)
+      expression = info['license_expression'].to_s.strip
+      return expression unless expression.empty?
+
       license = ''
 
       Array(info['classifiers']).each do |classifier|
@@ -113,6 +119,19 @@ module SOUP
       return raw if raw.nil?
 
       raw.strip.split("\n").first
+    end
+
+    def extract_pip_website(info)
+      home_page = info['home_page']&.strip
+      return home_page unless home_page.to_s.empty?
+
+      urls = {}
+      (info['project_urls'] || {}).each do |label, url|
+        urls[label.to_s.downcase.gsub(/[^a-z]/, '')] = url.to_s.strip unless url.to_s.strip.empty?
+      end
+      return home_page if urls.empty?
+
+      urls[WEBSITE_URL_LABELS.find { |label| urls.key?(label) } || urls.keys.first]
     end
   end
 end

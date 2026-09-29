@@ -352,6 +352,83 @@ RSpec.describe(SOUP::PIPParser) do
     end
   end
 
+  context 'when the package publishes PEP 639 metadata' do
+    let(:requirements_content) { "attrs==26.1.0\n" }
+    let(:packages) { {}.tap { |result| parser.parse(requirements_path, result) } }
+
+    before do
+      body =
+        {
+          info: {
+            summary: 'Classes Without Boilerplate',
+            home_page: nil,
+            classifiers: ['Programming Language :: Python :: 3'],
+            license: nil,
+            license_expression: 'MIT',
+            project_urls: {
+              Changelog: 'https://www.attrs.org/en/stable/changelog.html',
+              GitHub: 'https://github.com/python-attrs/attrs',
+              Homepage: 'https://www.attrs.org/ '
+            }
+          }
+        }.to_json
+      stub_request(:get, 'https://pypi.org/pypi/attrs/json').to_return(status: 200, body: body)
+    end
+
+    it 'reads the license from license_expression' do
+      expect(packages['Python:attrs'].license).to(eq('MIT'))
+    end
+
+    it 'reads the website from the Homepage project URL' do
+      expect(packages['Python:attrs'].website).to(eq('https://www.attrs.org/'))
+    end
+  end
+
+  context 'when license_expression and license classifiers are both present' do
+    let(:requirements_content) { "dual==1.0.0\n" }
+
+    before do
+      body = { info: { summary: 'Dual', home_page: 'https://example.com', classifiers: ['License :: OSI Approved :: BSD License'], license: nil, license_expression: 'Apache-2.0 OR BSD-3-Clause' } }.to_json
+      stub_request(:get, 'https://pypi.org/pypi/dual/json').to_return(status: 200, body: body)
+    end
+
+    it 'prefers the SPDX license_expression' do
+      packages = {}
+      parser.parse(requirements_path, packages)
+      expect(packages['Python:dual'].license).to(eq('Apache-2.0 OR BSD-3-Clause'))
+    end
+  end
+
+  context 'when home_page is empty and project_urls has no Homepage' do
+    let(:requirements_content) { "urls==1.0.0\n" }
+
+    before do
+      body = { info: { summary: 'Urls', home_page: '', classifiers: [], license: nil, license_expression: 'MIT', project_urls: { Changelog: 'https://example.com/changes', 'Source Code': 'https://github.com/example/urls' } } }.to_json
+      stub_request(:get, 'https://pypi.org/pypi/urls/json').to_return(status: 200, body: body)
+    end
+
+    it 'falls back to the source URL' do
+      packages = {}
+      parser.parse(requirements_path, packages)
+      expect(packages['Python:urls'].website).to(eq('https://github.com/example/urls'))
+    end
+  end
+
+  context 'when project_urls only has unrecognised labels' do
+    let(:requirements_content) { "other==1.0.0\n" }
+
+    before do
+      body = { info: { summary: 'Other', home_page: nil, classifiers: [], license: nil, license_expression: 'MIT', project_urls: { Changelog: 'https://example.com/changes', Tracker: 'https://example.com/issues' } } }.to_json
+      stub_request(:get, 'https://pypi.org/pypi/other/json').to_return(status: 200, body: body)
+    end
+
+    it 'uses the first project URL' do
+      packages = {}
+      parser.parse(requirements_path, packages)
+      expect(packages['Python:other'].website).to(eq('https://example.com/changes'))
+    end
+  end
+
   context 'when license is empty and no classifiers exist' do
     let(:requirements_content) { "pkg==1.0.0\n" }
 
