@@ -13,6 +13,7 @@ scan:
     # ghb:excluded-dirs:start - managed by github-build from config/languages.yaml; do not edit by hand
     - "**/.build"
     - "**/.bundle"
+    - "**/.claude/worktrees"
     - "**/.git"
     - "**/.gradle"
     - "**/.hg"
