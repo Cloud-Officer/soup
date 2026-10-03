@@ -182,11 +182,11 @@
   "Ruby:parallel": {
     "language": "Ruby",
     "package": "parallel",
-    "version": "2.2.0",
+    "version": "2.3.0",
     "license": "MIT",
     "description": "Run any kind of code in parallel processes",
     "website": "https://github.com/grosser/parallel",
-    "last_verified_at": "2026-05-22",
+    "last_verified_at": "2026-10-03",
     "risk_level": "Low",
     "requirements": "Used to parallelize HTTP fetches across CPU cores in each parser.",
     "verification_reasoning": "Very popular on rubygems.org"
@@ -398,11 +398,11 @@
   "Ruby:rubocop-minitest": {
     "language": "Ruby",
     "package": "rubocop-minitest",
-    "version": "0.40.0",
+    "version": "0.41.0",
     "license": "MIT",
     "description": "Automatic Minitest code style checking tool.",
     "website": "https://docs.rubocop.org/rubocop-minitest/",
-    "last_verified_at": "2026-05-22",
+    "last_verified_at": "2026-10-03",
     "risk_level": "Low",
     "requirements": "Ruby linter",
     "verification_reasoning": "Most popular gem"
