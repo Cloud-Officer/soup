@@ -92,8 +92,8 @@
     "website": "https://github.com/jnunemaker/httparty",
     "last_verified_at": "2026-09-30",
     "risk_level": "Medium",
-    "requirements": "Makes http fun! Also, makes consuming restful web services dead easy.",
-    "verification_reasoning": "Very popular on rubygems.org"
+    "requirements": "HTTP client for the package registry APIs (RubyGems, npm, PyPI, Maven repositories, GitHub)",
+    "verification_reasoning": "Simple GET API with per-request timeout and headers, built on Ruby's standard Net::HTTP"
   },
   "Ruby:json": {
     "language": "Ruby",
@@ -105,7 +105,7 @@
     "last_verified_at": "2026-05-22",
     "risk_level": "Low",
     "requirements": "Used to read package manager and cache files.",
-    "verification_reasoning": "Very popular on rubygems.org"
+    "verification_reasoning": "Ruby's bundled JSON implementation (default gem)"
   },
   "Ruby:language_server-protocol": {
     "language": "Ruby",
@@ -164,8 +164,8 @@
     "website": "https://nokogiri.org",
     "last_verified_at": "2026-05-22",
     "risk_level": "Low",
-    "requirements": "XML parser",
-    "verification_reasoning": "Most popular library"
+    "requirements": "Parses Maven POM XML and decodes HTML entities in package descriptions",
+    "verification_reasoning": "libxml2-backed parser with XPath support, needed for POM licenses and parent lookups"
   },
   "Ruby:optparse": {
     "language": "Ruby",
@@ -177,7 +177,7 @@
     "last_verified_at": "2026-05-22",
     "risk_level": "Low",
     "requirements": "Used to parse command line arguments.",
-    "verification_reasoning": "Very popular on rubygems.org"
+    "verification_reasoning": "Ruby's standard command-line option parser (default gem)"
   },
   "Ruby:parallel": {
     "language": "Ruby",
@@ -189,7 +189,7 @@
     "last_verified_at": "2026-10-03",
     "risk_level": "Low",
     "requirements": "Used to parallelize HTTP fetches across CPU cores in each parser.",
-    "verification_reasoning": "Very popular on rubygems.org"
+    "verification_reasoning": "Thread-pool map (in_threads) without hand-rolled thread management"
   },
   "Ruby:parser": {
     "language": "Ruby",
@@ -296,8 +296,8 @@
     "website": "https://rspec.info",
     "last_verified_at": "2026-05-22",
     "risk_level": "Low",
-    "requirements": "Dependency",
-    "verification_reasoning": "Dependency"
+    "requirements": "Test framework that runs the spec suite",
+    "verification_reasoning": "Behaviour-driven Ruby test framework the spec suite and rubocop-rspec rules are written for"
   },
   "Ruby:rspec-core": {
     "language": "Ruby",
@@ -464,8 +464,8 @@
     "website": "https://github.com/simplecov-ruby/simplecov",
     "last_verified_at": "2026-09-30",
     "risk_level": "Low",
-    "requirements": "Dependency",
-    "verification_reasoning": "Dependency"
+    "requirements": "Code coverage reporting for the spec suite",
+    "verification_reasoning": "Coverage reporter built on Ruby's standard Coverage module, started from spec/spec_helper.rb"
   },
   "Ruby:tty-color": {
     "language": "Ruby",
@@ -500,8 +500,8 @@
     "website": "https://ttytoolkit.org",
     "last_verified_at": "2026-05-22",
     "risk_level": "Low",
-    "requirements": "Prompt for TTY",
-    "verification_reasoning": "Most popular on RubyGem"
+    "requirements": "Interactive prompts for missing risk level, requirements and verification reasoning",
+    "verification_reasoning": "Provides both select menus and free-text questions in one API"
   },
   "Ruby:tty-reader": {
     "language": "Ruby",
@@ -560,8 +560,8 @@
     "website": "https://github.com/bblimke/webmock",
     "last_verified_at": "2026-05-22",
     "risk_level": "Low",
-    "requirements": "Dependency",
-    "verification_reasoning": "Dependency"
+    "requirements": "Stubs HTTP requests so the parser specs run without network access",
+    "verification_reasoning": "Intercepts HTTParty/Net::HTTP requests, letting the specs simulate registry errors and timeouts"
   },
   "Ruby:wisper": {
     "language": "Ruby",
@@ -584,8 +584,8 @@
     "website": "https://rubygems.org/yarn_lock_parser",
     "last_verified_at": "2026-05-22",
     "risk_level": "Low",
-    "requirements": "Read yarn lock file",
-    "verification_reasoning": "Popular gem"
+    "requirements": "Parses Yarn v1 yarn.lock files",
+    "verification_reasoning": "Turns yarn.lock into name/version records, avoiding a hand-written Yarn v1 parser"
   },
   "Ruby:bundler": {
     "language": "Ruby",

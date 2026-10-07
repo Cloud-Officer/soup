@@ -384,6 +384,7 @@
 - `extract_pip_website(info)`: Uses `home_page` when set, otherwise the `project_urls` entry labelled Homepage, Source, Source Code, Code, Repository or GitHub (labels compared case- and punctuation-insensitively), otherwise the first project URL
 - `LOOSE_CONSTRAINT_PATTERN`: Private constant matching the `<`, `>`, `!`, `~` characters that mark an unsupported non-exact pin
 - `REQUIREMENT_NAME_PATTERN`: Private constant matching the leading PEP 508 distribution name of a `requirements.in` line, before any extras, constraint, or environment marker
+- `WEBSITE_URL_LABELS`: Private constant listing, in preference order, the normalized `project_urls` labels `extract_pip_website` accepts as the website
 
 **External Dependencies:**
 
@@ -476,7 +477,7 @@
 - `parse(file, packages)`: Parses a JSON array of entry objects, raising `InvalidLockfileError` if the file is not an array or an entry lacks a non-empty `package`; each entry becomes a `SOUP::Package`
 - Each entry supports `package` (required), plus optional `language`, `version`, `license`, `description`, `website`, and `file`; the `file` path lets the vendored-file coverage check (`Application#enforce_vendored_coverage`) match a committed file to its entry. An omitted `language` defaults to `JS` (the vendored-asset case the parser exists for) and an omitted `file` falls back to the manual entries file itself, so an entry with no `file` satisfies no vendored glob
 - `build_entry(file, entry)`: Builds the `SOUP::Package` for one entry, applying those defaults and copying the pre-declared verification fields onto it
-- Entries may pre-declare verification fields (`risk_level`, `requirements`, `verification_reasoning`); otherwise they fall back to the cache or prompt like any other package
+- Entries may pre-declare verification fields (`risk_level`, `requirements`, `verification_reasoning`); a cached `.soup.json` entry for the same key overrides them in `Application#apply_cached_metadata`, and any field still missing is prompted for like any other package
 - `REQUIRED_KEY`: Private constant for the required `package` field
 
 **External Dependencies:**
@@ -623,7 +624,7 @@ Word-boundary anchoring cannot rescue an entry that is genuinely a substring of 
 
 **Purpose:** Speeds up registry lookups by fetching package metadata concurrently instead of serially.
 
-**Location:** `parallel_each` in `lib/soup/parsers/base.rb` (`SOUP::BaseParser`), invoked from the `parse` method of the Bundler, Gradle, Importmap, NPM, PIP, SPM, and Yarn parsers. The Composer and Manual parsers resolve everything locally and so do not use it
+**Location:** `parallel_each` in `lib/soup/parsers/base.rb` (`SOUP::BaseParser`), invoked from the `parse` method of the Bundler, GHA, Gradle, Importmap, NPM, PIP, SPM, and Yarn parsers. The Composer and Manual parsers resolve everything locally and so do not use it
 
 **Implementation:**
 
@@ -655,14 +656,15 @@ Recoverable failures raise a subclass of `SOUP::Error` (`lib/soup/errors.rb`); t
 | API rate limiting | Raises `RateLimitError` (and `AuthenticationError` for bad credentials), suggesting `GITHUB_TOKEN`; both are global conditions that would fail every remaining GitHub lookup identically, so they abort rather than skip one package | `lib/soup/parsers/base.rb` in `github_repository_response` / `github_error_message` methods, reached from the SPM and GHA parsers' `fetch_package` |
 | Network timeouts | Retry up to 3 times via `SOUP::HttpClient`, then re-raise | `lib/soup/http_client.rb` in `get` method |
 | Transient network fault after retries | Any `HttpClient::TRANSIENT_ERRORS` fault (timeout, connection reset/refusal, DNS failure, TLS interruption, truncated reply) is retried, then the single package is warned about and recorded as unresolved rather than aborting the scan | `lib/soup/parsers/base.rb` in `registry_response`, used by every parser |
-| Empty registry response body | A response carrying no body has nothing for `JSON.parse` to read, so it is treated exactly like a swallowed network fault and the package is recorded as unresolved | `lib/soup/parsers/base.rb` in `empty_response?`, used by the Bundler, Importmap, NPM, PIP, SPM, and Yarn parsers |
-| Non-2xx registry response | Warns with the status, URL, package, and truncated body built by `http_error_message`, then records the single package via `unresolved_package` so the scan continues; the run is not aborted. The only exceptions are SPM's rate-limit and bad-credentials responses (see the API rate limiting row), which are global conditions that would fail every remaining lookup identically | `lib/soup/parsers/base.rb` in `successful_registry_response` (used by the Bundler, Importmap, NPM, PIP, and Yarn parsers) and in `github_repository_response` (used by the SPM and GHA parsers), and `lib/soup/parsers/bundler.rb` in `rubygems_response` |
+| Empty registry response body | A response carrying no body has nothing for `JSON.parse` to read, so it is treated exactly like a swallowed network fault and the package is recorded as unresolved | `lib/soup/parsers/base.rb` in `empty_response?`, used by the Bundler, GHA, Importmap, NPM, PIP, SPM, and Yarn parsers |
+| Non-2xx registry response | Warns with the status, URL, package, and truncated body built by `http_error_message`, then records the single package via `unresolved_package` so the scan continues; the run is not aborted. The only exceptions are the SPM and GHA parsers' rate-limit and bad-credentials responses (see the API rate limiting row), which are global conditions that would fail every remaining lookup identically | `lib/soup/parsers/base.rb` in `successful_registry_response` (used by the Bundler, Importmap, NPM, PIP, and Yarn parsers) and in `github_repository_response` (used by the SPM and GHA parsers), and `lib/soup/parsers/bundler.rb` in `rubygems_response` |
 | Unsupported lock file format | Raises `UnsupportedFormatError` for a `package-lock.json` below `lockfileVersion` 2 and for a `yarn.lock` that is not Yarn v1 | `lib/soup/parsers/npm.rb`, `yarn.rb` in `parse` methods |
 | Malformed manual entries file | Raises `InvalidLockfileError` when the file is not a JSON array or an entry lacks a non-empty `package` | `lib/soup/parsers/manual.rb` in `parse` method |
+| Malformed action or workflow file | Raises `InvalidLockfileError`, naming the file, when a file scanned by `--gha` is not valid YAML | `lib/soup/parsers/gha.rb` in `load_workflow` method |
 | Missing Gradle build script | Raises `InvalidLockfileError` when neither `build.gradle` nor `build.gradle.kts` sits alongside the lock file | `lib/soup/parsers/gradle.rb` in `read_main_gradle_file` method |
 | Missing Swift manifest | Raises `InvalidLockfileError` when no `Package.swift`, Tuist `Dependencies.swift`, or enclosing `project.pbxproj` can be resolved for a `Package.resolved` | `lib/soup/parsers/spm.rb` in `parse` / `read_main_swift_file` methods |
 | Maven source unreachable | An unreachable Maven repository is skipped (warned) and the lookup falls through to the next repository; the scan is not aborted | `lib/soup/parsers/gradle.rb` in `fetch_package`, via `BaseParser#registry_response` |
-| Missing package metadata | Warns and records the single package via `unresolved_package`, so the scan continues with the remaining packages | Gradle and SPM parsers; `lookup_npm_registry_version` in `lib/soup/parsers/base.rb`, used by the Importmap, NPM, and Yarn parsers |
+| Missing package metadata | Warns and records the single package via `unresolved_package`, so the scan continues with the remaining packages | Gradle, SPM, and GHA parsers; `lookup_npm_registry_version` in `lib/soup/parsers/base.rb`, used by the Importmap, NPM, and Yarn parsers |
 | Registry outage for an already-recorded package | The unresolved entry keeps the license, description, and website a previous run recorded, restored from `.soup.json` and only when the cached entry pins the same version, so an outage cannot silently downgrade a verified component to `NOASSERTION` | `lib/soup/application.rb` in `apply_cached_metadata` / `restore_unresolved_metadata` methods |
 | Missing required IEC 62304 fields | Raises `MissingMetadataError` in `--no_prompt` mode, prompts user otherwise; a cache entry lacking a field and a blank or whitespace-only prompt answer are both treated as missing, so they raise `MissingMetadataError` rather than `NoMethodError` | `lib/soup/application.rb` in `prompt_missing_field` / `ensure_metadata_complete!` methods |
 | Partial execution failure | Persists only fully verified packages via the `ensure` block, merged over the existing cache, so progress is not lost and previously recorded IEC 62304 evidence is never blanked; the published markdown register is left untouched rather than truncated | `lib/soup/application.rb` in `execute` / `save_partial_state` methods |
