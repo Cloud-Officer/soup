@@ -350,11 +350,11 @@
   "Ruby:rubocop": {
     "language": "Ruby",
     "package": "rubocop",
-    "version": "1.91.0",
+    "version": "1.92.0",
     "license": "MIT",
     "description": "RuboCop is a Ruby code style checking and code formatting tool.",
     "website": "https://rubocop.org/",
-    "last_verified_at": "2026-05-22",
+    "last_verified_at": "2026-10-12",
     "risk_level": "Low",
     "requirements": "Ruby linter",
     "verification_reasoning": "Most popular gem on rubygems"
@@ -554,11 +554,11 @@
   "Ruby:webmock": {
     "language": "Ruby",
     "package": "webmock",
-    "version": "3.26.4",
+    "version": "3.30.0",
     "license": "MIT",
     "description": "WebMock allows stubbing HTTP requests and setting expectations on HTTP requests.",
     "website": "https://github.com/bblimke/webmock",
-    "last_verified_at": "2026-05-22",
+    "last_verified_at": "2026-10-12",
     "risk_level": "Low",
     "requirements": "Stubs HTTP requests so the parser specs run without network access",
     "verification_reasoning": "Intercepts HTTParty/Net::HTTP requests, letting the specs simulate registry errors and timeouts"
