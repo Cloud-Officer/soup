@@ -51,10 +51,6 @@ RSpec.describe(SOUP::PIPParser) do
     write_fixture('requirements.txt', requirements_content)
   end
 
-  # TEST-12: requirements.txt (and the sibling requirements.in, when the case
-  # needs one) are written to a per-example tmpdir. Whether the .in file exists
-  # is expressed by writing it or not, so the parser's real File.exist? check
-  # runs instead of a stubbed one.
   def requirements_in_content = nil
 
   context 'when parsing all three packages' do
@@ -121,8 +117,6 @@ RSpec.describe(SOUP::PIPParser) do
     end
   end
 
-  # CONS-001: a 404 usually means the package is private or simply absent from
-  # PyPI. It is still a dependency, so it is recorded rather than dropped.
   context 'when the registry returns a non-200' do
     let(:requirements_content) { "requests==2.31.0\n" }
     let(:packages) { {} }
@@ -137,10 +131,6 @@ RSpec.describe(SOUP::PIPParser) do
     end
   end
 
-  # CONS-002: HttpClient re-raises Net::ReadTimeout once its retries are
-  # exhausted. Before the fix that escaped fetch_package, propagated through
-  # Parallel.map, and killed the whole scan with an untyped backtrace. It must
-  # warn and omit just this package instead.
   context 'when the registry times out' do
     let(:requirements_content) { "requests==2.31.0\n" }
     let(:packages) { {} }
@@ -160,13 +150,6 @@ RSpec.describe(SOUP::PIPParser) do
     end
   end
 
-  # CONS-003 regression: the sibling .in path used to be derived with an
-  # unanchored `file.gsub('.txt', '.in')`, which rewrote every ".txt" in the
-  # whole path -- so /builds/my.txt.d/requirements.txt looked for
-  # /builds/my.in.d/requirements.in. That file never exists, so
-  # read_direct_dependencies silently returned [] and every Python package was
-  # misclassified as transitive with no warning. A real directory named
-  # "my.txt.d" is written here so the path genuinely contains the substring.
   context 'when the lockfile lives in a directory whose name contains ".txt"' do
     let(:requirements_in_content) { "requests\n"                       }
     let(:requirements_content)    { "requests==2.31.0\nflask==3.0.0\n" }
@@ -191,9 +174,6 @@ RSpec.describe(SOUP::PIPParser) do
     end
   end
 
-  # BUG-003 regression: a transitive package whose name is a substring of a
-  # declared requirement (requests within requests-oauthlib) must NOT be flagged
-  # direct. The old String#include? scan of requirements.in mis-classified it.
   context 'when a transitive package name is a substring of a declared requirement' do
     let(:requirements_in_content) { "requests-oauthlib\n" }
     let(:requirements_content) { "requests==2.31.0\n" }
@@ -254,11 +234,7 @@ RSpec.describe(SOUP::PIPParser) do
     end
   end
 
-  # QUAL-003 regression: pypi.python.org was retired in April 2018 and only
-  # answers through a permanent 301 to pypi.org, costing an extra round-trip per
-  # package against the HTTP timeout. Both domains are stubbed here so the
-  # expectation fails on a revert instead of merely erroring on an unregistered
-  # request.
+  # pypi.python.org is stubbed too, so hitting it fails the expectation rather than WebMock.
   context 'when resolving the PyPI registry host' do
     let(:requirements_content) { "requests==2.31.0\n" }
 
@@ -289,10 +265,6 @@ RSpec.describe(SOUP::PIPParser) do
     end
   end
 
-  # BUG-001 regression: a pinned package carrying a trailing inline comment
-  # (PEP 508 / `pip-compile --annotation-style=line`) must be parsed, not
-  # silently dropped. Before the fix, `next if line.include?('#')` skipped the
-  # whole line; full-line comments must still be skipped via the blank guard.
   context 'when a requirement line has a trailing inline comment' do
     let(:requirements_content) do
       "# full-line comment\nrequests==2.31.0  # security pin\nflask==3.0.0  # pinned for CVE\n"
@@ -455,9 +427,6 @@ RSpec.describe(SOUP::PIPParser) do
     end
   end
 
-  # TEST-04: malformed-input coverage. requirements.txt is a plain text format;
-  # the parser skips blank/comment lines and raises on lines with loose
-  # constraints (covered in the existing "loose constraints" context).
   describe '#parse with malformed input' do
     let(:packages) { {} }
 
@@ -481,8 +450,6 @@ RSpec.describe(SOUP::PIPParser) do
       end
     end
 
-    # TEST-05: race where Dir.glob found the lockfile but it was deleted /
-    # unreadable before File.foreach ran.
     context 'when requirements.txt cannot be read' do
       # A path inside the fixture dir that was never written, so the real
       # File.foreach raises ENOENT instead of a stub simulating it.
@@ -494,7 +461,6 @@ RSpec.describe(SOUP::PIPParser) do
       end
     end
 
-    # TEST-12: a requirements.txt mixing pins, comments and blank lines.
     context 'with pins mixed among comments and blank lines' do
       before do
         body = {
@@ -518,9 +484,6 @@ RSpec.describe(SOUP::PIPParser) do
     end
   end
 
-  # TEST-303: exercise parallel_each at a meaningful fan-out width so a
-  # parser-local concurrency or ordering regression in PIP is caught
-  # by the spec suite, not just by NPM's existing scale guard.
   context 'with 100 packages (Parallel.map fan-out)' do
     let(:requirements_content) do
       (1..100).map { |i| "pkg-#{i}==1.0.0\n" }

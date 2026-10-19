@@ -27,10 +27,6 @@ RSpec.describe(SOUP::BundlerParser) do
     allow(Bundler).to(receive(:read_file).with('Gemfile.lock').and_return(''))
   end
 
-  # CONS-002: HttpClient re-raises Net::ReadTimeout once its retries are
-  # exhausted. Before the fix that escaped fetch_package, propagated through
-  # Parallel.map, and killed the whole scan with an untyped backtrace. It must
-  # warn and omit just this gem instead.
   context 'when the registry times out' do
     let(:url)      { 'https://api.rubygems.org/api/v2/rubygems/test-gem/versions/1.0.0.json' }
     let(:packages) { {}                                                                      }
@@ -91,11 +87,6 @@ RSpec.describe(SOUP::BundlerParser) do
       end
     end
 
-    # CONS-002: the fallback chain makes three sequential requests, so each has
-    # its own timeout guard. A timeout means rubygems.org is unreachable after
-    # every retry, so the remaining fallbacks would time out too -- the gem is
-    # skipped rather than walking the rest of the chain.
-    # CONS-001: the final fallback returning a non-200 used to raise and abort.
     context 'when the resolved-version fallback returns a non-200' do
       let(:packages) { {} }
 
@@ -149,8 +140,6 @@ RSpec.describe(SOUP::BundlerParser) do
           .to_return(status: 500, body: 'Internal Server Error', headers: { Status: 'Internal Server Error' })
       end
 
-      # CONS-001: this used to raise RegistryError and abort the whole scan.
-      # Every parser now records the gem with what the lockfile already knows.
       it 'warns with status + url + package context and records the gem', :aggregate_failures do
         packages = {}
         expect { parser.parse('Gemfile.lock', packages) }
@@ -202,9 +191,6 @@ RSpec.describe(SOUP::BundlerParser) do
     end
   end
 
-  # BUG-003 regression: a transitive gem whose name is a substring of a direct
-  # dependency (test-gem within test-gem-extras) must NOT be mis-flagged as
-  # direct. The previous String#include? scan of the Gemfile classified it wrong.
   context 'when a transitive gem name is a substring of a direct dependency' do
     let(:lock_file) do
       # rubocop:disable-next Style/StringHashKeys -- DEPENDENCIES keys are gem-name strings.
@@ -223,8 +209,6 @@ RSpec.describe(SOUP::BundlerParser) do
     end
   end
 
-  # TEST-04: malformed-lockfile coverage. Locks in current behavior so future
-  # error-handling improvements are deliberate, not accidental.
   describe '#parse with malformed input' do
     let(:packages) { {} }
 
@@ -258,8 +242,6 @@ RSpec.describe(SOUP::BundlerParser) do
       end
     end
 
-    # TEST-05: race where Dir.glob found the lockfile but it was deleted /
-    # unreadable before Bundler.read_file ran.
     context 'when Gemfile.lock cannot be read' do
       before do
         allow(Bundler).to(receive(:read_file).with('Gemfile.lock').and_raise(Errno::ENOENT.new('Gemfile.lock')))
@@ -271,10 +253,7 @@ RSpec.describe(SOUP::BundlerParser) do
       end
     end
 
-    # TEST-12 follow-up: parser exercised against real Gemfile + Gemfile.lock
-    # bytes via SoupFixtureHelpers. Overrides the outer LockfileParser /
-    # Bundler.read_file stubs with and_call_original so the real Bundler
-    # parser runs against on-disk content.
+    # and_call_original overrides the outer LockfileParser / Bundler.read_file stubs.
     context 'with real Gemfile.lock + Gemfile fixtures on disk' do
       # `def` inside a context block defines an instance method on the
       # example group; it is not a memoized helper and does not count against
@@ -363,9 +342,6 @@ RSpec.describe(SOUP::BundlerParser) do
     end
   end
 
-  # TEST-303: exercise parallel_each at a meaningful fan-out width so a
-  # parser-local concurrency or ordering regression in Bundler is caught
-  # by the spec suite, not just by NPM's existing scale guard.
   context 'with 100 packages (Parallel.map fan-out)' do
     let(:specs) do
       (1..100).map do |i|

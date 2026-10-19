@@ -12,11 +12,6 @@ require 'tmpdir'
 require 'webmock/rspec'
 require_relative '../lib/soup/application'
 
-# TEST-12 helpers: write parser fixture files into a per-example tmpdir
-# instead of stubbing File.read / File.foreach / File.readlines. Returns the
-# absolute path of the written file so parser specs can pass it to
-# Parser#parse the same way detect_packages would in production. The tmpdir is
-# cleaned up by an after-each hook in RSpec.configure below.
 module SoupFixtureHelpers
   def fixture_dir
     @fixture_dir ||= Dir.mktmpdir('soup-spec-')

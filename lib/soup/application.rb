@@ -414,7 +414,7 @@ module SOUP
       File.write(@options.markdown_file, @markdown)
     end
 
-    # The failure path (BUG-001). A run that raised part-way through
+    # The failure path. A run that raised part-way through
     # check_packages leaves @detected_packages half-populated: every package
     # after the failure point never reached apply_cached_metadata, so it still
     # carries the empty verification fields Package#initialize gave it. The
