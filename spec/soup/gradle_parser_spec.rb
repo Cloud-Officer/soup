@@ -399,6 +399,37 @@ RSpec.describe(SOUP::GradleParser) do
       end
     end
 
+    context 'with the trailing empty= line of a buildscript lockfile' do
+      let(:lock_content) { ["# Gradle lockfile\n", "empty=classpath\n"] }
+
+      it 'adds no phantom package and makes no repository request', :aggregate_failures do
+        parser.parse(lockfile_path, packages)
+        expect(packages).to(be_empty)
+        expect(a_request(:get, any_repository)).not_to(have_been_made)
+      end
+    end
+
+    context 'with the trailing empty= line of an application lockfile' do
+      def lockfile_name = 'gradle.lockfile'
+
+      let(:lock_content) { ["empty=releaseRuntimeClasspath\n"] }
+
+      it 'adds no phantom package' do
+        parser.parse(lockfile_path, packages)
+        expect(packages).to(be_empty)
+      end
+    end
+
+    context 'with a coordinate that does not have exactly three parts' do
+      let(:lock_content) { ["com.example:library=classpath\n", "com.example::1.0.0=classpath\n", "a:b:c:d=classpath\n"] }
+
+      it 'skips the entry', :aggregate_failures do
+        parser.parse(lockfile_path, packages)
+        expect(packages).to(be_empty)
+        expect(a_request(:get, any_repository)).not_to(have_been_made)
+      end
+    end
+
     # TEST-05: race where Dir.glob found the lockfile but it was deleted /
     # unreadable before File.readlines ran.
     context 'when the lockfile cannot be read' do
