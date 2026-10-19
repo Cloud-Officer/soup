@@ -414,30 +414,7 @@ module SOUP
       File.write(@options.markdown_file, @markdown)
     end
 
-    # The failure path (BUG-001). A run that raised part-way through
-    # check_packages leaves @detected_packages half-populated: every package
-    # after the failure point never reached apply_cached_metadata, so it still
-    # carries the empty verification fields Package#initialize gave it. The
-    # ensure block used to hand that straight to save_files, which
-    # * overwrote .soup.json with blank last_verified_at / risk_level /
-    #   requirements / verification_reasoning, destroying IEC 62304 evidence a
-    #   human had entered on a previous run, and
-    # * overwrote docs/soup.md with a header-only table, because @markdown only
-    #   ever received rows for the packages processed before the failure.
-    # One failed --no_prompt run in CI was therefore enough to wipe the
-    # register, recoverable only from git.
-    #
-    # The ensure-save exists for a real reason -- verification work already done
-    # this session should survive an interruption -- so the fix is to make the
-    # write additive rather than to drop it. Only packages that completed the
-    # full check_packages iteration are persisted (Package#verified? is exactly
-    # that test, since last_verified_at is stamped at the end of the loop body),
-    # layered over the cache that was read at startup. An entry can gain
-    # metadata this way; it can never lose any.
-    #
-    # The markdown is deliberately NOT written here. It is the published
-    # register: a stale-but-complete table beats a truncated one, and the next
-    # successful run regenerates it in full from every package.
+    # Persist only fully verified packages over the startup cache; never write the markdown.
     def save_partial_state
       return unless @options&.soup_check
 
