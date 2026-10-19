@@ -36,9 +36,8 @@ module SOUP
     #   mid-response, leaving an unparseable reply
     #
     # Deliberately excluded: HTTP status codes. A 4xx/5xx is a *response*, not a
-    # transport failure -- callers inspect `response.code` and decide, and SPM's
-    # rate-limit and bad-credentials handling still aborts on purpose because
-    # those are global conditions that would fail every remaining lookup.
+    # transport failure -- callers inspect `response.code` and decide; GitHub
+    # rate-limit and bad-credentials responses (SPM and GHA) abort the scan.
     TRANSIENT_ERRORS = [
       Net::OpenTimeout,
       Net::ReadTimeout,

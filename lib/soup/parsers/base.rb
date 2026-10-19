@@ -225,9 +225,8 @@ module SOUP
     # either outcome for the other would be false.
     #
     # A nil return and a non-200 are handled the same way by every caller: warn,
-    # then record the package via unresolved_package. Only SPM's rate-limit and
-    # bad-credentials responses still abort, because those are global conditions
-    # that would fail every remaining lookup identically.
+    # then record the package via unresolved_package. GitHub rate-limit and
+    # bad-credentials responses (SPM and GHA) abort instead.
     #
     # The rescue list is HttpClient::TRANSIENT_ERRORS itself rather than a
     # hand-copied set, so it can never again fall behind what `.get` retries --
