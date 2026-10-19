@@ -322,12 +322,44 @@ RSpec.describe(SOUP::BaseParser) do
     end
 
     describe '#collect_packages' do
+      let(:versioned) do
+        lambda do |version, dependency: true, unresolved: false|
+          package = build_block.call('pkg-x')
+          package.version = version
+          package.dependency = dependency
+          package.unresolved = unresolved
+          package
+        end
+      end
+
       it 'indexes by Package#key and ignores nils', :aggregate_failures do
         good = build_block.call('pkg-x')
         packages = {}
         parser.collect_packages([good, nil], packages)
         expect(packages.size).to(eq(1))
         expect(packages['X:pkg-x']).to(equal(good))
+      end
+
+      it 'records every distinct version of one package, sorted, in one entry', :aggregate_failures do
+        packages = {}
+        parser.collect_packages([versioned.call('2.0'), versioned.call('1.0'), versioned.call('2.0')], packages)
+        parser.collect_packages([versioned.call('1.5')], packages)
+        expect(packages.keys).to(eq(['X:pkg-x']))
+        expect(packages['X:pkg-x'].version).to(eq('1.0, 1.5, 2.0'))
+      end
+
+      it 'treats the package as direct when any occurrence is direct' do
+        packages = {}
+        parser.collect_packages([versioned.call('1.0', dependency: false), versioned.call('2.0')], packages)
+        expect(packages['X:pkg-x'].dependency).to(be(false))
+      end
+
+      it 'keeps resolved metadata over an unresolved occurrence', :aggregate_failures do
+        resolved = versioned.call('1.0')
+        packages = {}
+        parser.collect_packages([resolved, versioned.call('2.0', unresolved: true)], packages)
+        expect(packages['X:pkg-x']).to(equal(resolved))
+        expect(packages['X:pkg-x'].version).to(eq('1.0, 2.0'))
       end
     end
   end
