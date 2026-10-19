@@ -18,11 +18,6 @@ RSpec.describe(SOUP::GradleParser) do
     write_fixture(lockfile_name, Array(lock_content).join)
   end
 
-  # TEST-12: the lockfile and its sibling build script are written to a
-  # per-example tmpdir. Which manifest exists is expressed by writing it or not
-  # -- `main_file_name` selects the Groovy or Kotlin DSL, and a nil `main_file`
-  # writes neither -- so the parser's real Errno::ENOENT fallback runs instead
-  # of a stubbed one.
   def lockfile_name = 'buildscript-gradle.lockfile'
 
   def main_file_name = 'build.gradle'
@@ -203,10 +198,6 @@ RSpec.describe(SOUP::GradleParser) do
   end
 
   context 'when every repository returns a non-200' do
-    # Regression test for BUG-07: the warn used to be a one-liner that
-    # dropped the URL, HTTP status, and response body, making maven-side
-    # failures opaque. It now uses BaseParser#http_error_message so the
-    # operator sees status + url + truncated body.
     before { stub_request(:get, any_repository).to_return(status: 503, body: 'repository offline') }
 
     it 'warns with http_error_message and records the coordinate', :aggregate_failures do
@@ -258,10 +249,6 @@ RSpec.describe(SOUP::GradleParser) do
       end
     end
 
-    # BUG-003 regression: a transitive coordinate whose name is a substring of a
-    # declared dependency (com.example:lib within com.example:library) must NOT be
-    # flagged direct. The old String#include? scan of build.gradle mis-classified
-    # it; manifest_mentions? anchors on a non-identifier boundary.
     context 'when a transitive coordinate is a substring of a declared dependency' do
       let(:lock_content) { ["com.example:lib:1.0.0=classpath\n"]   }
       let(:main_file)    { 'classpath "com.example:library:1.0.0"' }
@@ -328,9 +315,6 @@ RSpec.describe(SOUP::GradleParser) do
       end
     end
 
-    # TEST-303: exercise parallel_each at a meaningful fan-out width so a
-    # parser-local concurrency or ordering regression in Gradle is caught
-    # by the spec suite, not just by NPM's existing scale guard.
     context 'with 100 packages (Parallel.map fan-out)' do
       let(:lock_content) do
         (1..100).map { |i| "com.example:lib-#{i}:1.0.0=classpath\n" }
@@ -361,9 +345,6 @@ RSpec.describe(SOUP::GradleParser) do
     end
   end
 
-  # TEST-04: malformed-lockfile coverage. The gradle lockfile is a plain
-  # text format; the parser tolerates empty input and comment-only files,
-  # and skips lines that don't have a key=value shape.
   describe '#parse with malformed input' do
     let(:packages) { {} }
 
@@ -399,8 +380,37 @@ RSpec.describe(SOUP::GradleParser) do
       end
     end
 
-    # TEST-05: race where Dir.glob found the lockfile but it was deleted /
-    # unreadable before File.readlines ran.
+    context 'with the trailing empty= line of a buildscript lockfile' do
+      let(:lock_content) { ["# Gradle lockfile\n", "empty=classpath\n"] }
+
+      it 'adds no phantom package and makes no repository request', :aggregate_failures do
+        parser.parse(lockfile_path, packages)
+        expect(packages).to(be_empty)
+        expect(a_request(:get, any_repository)).not_to(have_been_made)
+      end
+    end
+
+    context 'with the trailing empty= line of an application lockfile' do
+      def lockfile_name = 'gradle.lockfile'
+
+      let(:lock_content) { ["empty=releaseRuntimeClasspath\n"] }
+
+      it 'adds no phantom package' do
+        parser.parse(lockfile_path, packages)
+        expect(packages).to(be_empty)
+      end
+    end
+
+    context 'with a coordinate that does not have exactly three parts' do
+      let(:lock_content) { ["com.example:library=classpath\n", "com.example::1.0.0=classpath\n", "a:b:c:d=classpath\n"] }
+
+      it 'skips the entry', :aggregate_failures do
+        parser.parse(lockfile_path, packages)
+        expect(packages).to(be_empty)
+        expect(a_request(:get, any_repository)).not_to(have_been_made)
+      end
+    end
+
     context 'when the lockfile cannot be read' do
       # A path inside the fixture dir that was never written, so the real
       # File.readlines raises ENOENT instead of a stub simulating it.
@@ -412,7 +422,6 @@ RSpec.describe(SOUP::GradleParser) do
       end
     end
 
-    # TEST-12: a well-formed lockfile plus sibling build.gradle read off disk.
     context 'with a well-formed lockfile on disk' do
       let(:lock_content) do
         <<~LOCK

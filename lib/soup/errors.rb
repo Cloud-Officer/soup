@@ -7,7 +7,8 @@ module SOUP
   class Error < StandardError; end
 
   # Raised when a soup configuration file (--licenses_file, --exceptions_file,
-  # --cache_file) is missing, unreadable, or contains malformed or misshapen JSON.
+  # --cache_file) is missing, unreadable, or contains malformed or misshapen JSON,
+  # or when a SOUP_HTTP_* environment variable is not a valid integer in range.
   class ConfigurationError < Error; end
 
   # Raised when an input lockfile is structurally malformed, unsupported, or

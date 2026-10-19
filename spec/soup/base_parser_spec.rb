@@ -1,11 +1,5 @@
 # frozen_string_literal: true
 
-# TEST-02: BaseParser has shared concurrency, license-normalization, and
-# error-formatting helpers that every subclass relies on. Previously they were
-# exercised only transitively through individual parser specs, leaving
-# regressions in shared behavior (especially Parallel.map's partial-failure
-# semantics) undetected.
-
 # A minimal stand-in for HTTParty::Response, whose method names RSpec's
 # verifying doubles refuse because they arrive through method_missing.
 #
@@ -86,10 +80,6 @@ RSpec.describe(SOUP::BaseParser) do
         expect(parser.normalize_license('')).to(eq(''))
       end
 
-      # BUG-006: Unlicense is a real SPDX identifier and config/licenses.json
-      # allowlists it, but normalize_license rewrote it to NOASSERTION before
-      # validation ever saw it -- making the allowlist entry unreachable and
-      # warning "Invalid license NOASSERTION" on every run.
       it 'passes Unlicense through so the allowlist entry stays reachable' do
         expect(parser.normalize_license('Unlicense')).to(eq('Unlicense'))
       end
@@ -107,10 +97,6 @@ RSpec.describe(SOUP::BaseParser) do
       end
     end
 
-    # BUG-002: the npm registry returns `license` as a String for modern
-    # packages but as the legacy object form {"type": "...", "url": "..."} for
-    # older versions. The Hash must be coerced to its type string so it never
-    # reaches Application#validate_license's unguarded `.downcase`.
     describe '#npm_registry_license' do
       it 'passes a plain string license through unchanged' do
         expect(parser.npm_registry_license('MIT')).to(eq('MIT'))
@@ -127,10 +113,6 @@ RSpec.describe(SOUP::BaseParser) do
       end
     end
 
-    # CONS-007: before the TEST-12 fixture migration, the bare-basename branch
-    # was covered only incidentally, by parser specs that stubbed File.read and
-    # so passed 'composer.lock' rather than a real path. Now that every fixture
-    # is a real absolute tmpdir path, the helper is asserted directly instead.
     describe '#sibling_file' do
       it 'returns the bare suffix when the file has no directory component' do
         expect(parser.sibling_file('composer.lock', 'composer.json')).to(eq('composer.json'))
@@ -146,12 +128,6 @@ RSpec.describe(SOUP::BaseParser) do
       end
     end
 
-    # ERR-001: registry_response is the single parser-level rescue every parser
-    # routes through. Its rescue list used to be a hand-copied
-    # "Net::OpenTimeout, Net::ReadTimeout", so any other transient fault escaped
-    # into Parallel.map and aborted the entire scan. It now rescues
-    # HttpClient::TRANSIENT_ERRORS itself, which cannot drift from what .get
-    # retries.
     describe '#registry_response' do
       let(:url) { 'https://registry.example.com/pkg' }
       # One healthy package, one that resets, one more healthy -- routed through
@@ -204,9 +180,6 @@ RSpec.describe(SOUP::BaseParser) do
         expect(parser.registry_response(url, label: 'pkg').code).to(eq(404))
       end
 
-      # The whole point of ERR-001: Parallel.map propagates the first exception
-      # and drops every other in-flight result, so a single reset used to cost
-      # the entire run. The surviving packages must still be collected.
       it 'lets the rest of a parallel batch survive one package\'s connection reset' do
         stub_request(:get, "#{url}/bad").to_raise(Errno::ECONNRESET)
         stub_request(:get, "#{url}/good").to_return(status: 200, body: 'ok')
@@ -287,13 +260,6 @@ RSpec.describe(SOUP::BaseParser) do
         expect(body_part.length).to(eq('body='.length + 200))
       end
 
-      # Regression test for BUG-07: formatted a *real* HTTParty::Response, not
-      # the fake. The reason phrase used to be read as `response.message`, which
-      # HTTParty::Response answers only by parsing the body with its own JSON
-      # parser -- and that parser passes `quirks_mode:`, removed in json 3.0.
-      # So on Ruby 4 the first 404 from a registry raised "unknown keyword:
-      # quirks_mode" and aborted the entire scan instead of warning about the
-      # one package. Any body that HTTParty would choke on proves the fix.
       it 'formats a real HTTParty response without parsing its body', :aggregate_failures do
         message = parser.http_error_message(real_404_response, url: missing_package_url)
         expect(message).to(include('HTTP 404 Not Found'))
@@ -308,10 +274,6 @@ RSpec.describe(SOUP::BaseParser) do
         expect(packages.keys).to(contain_exactly('X:pkg-a', 'X:pkg-b'))
       end
 
-      # TEST-08: partial-failure contract for Parallel.map. The current
-      # behavior is that the first raise aborts the batch and no results are
-      # written to the packages hash. Locking this in catches regressions
-      # against future Parallel library upgrades that might change semantics.
       it 'propagates a worker exception and writes no partial results', :aggregate_failures do
         packages = {}
         block = ->(i) { i == 'fail' ? raise('boom from worker') : build_block.call("pkg-#{i}") }
@@ -322,12 +284,44 @@ RSpec.describe(SOUP::BaseParser) do
     end
 
     describe '#collect_packages' do
+      let(:versioned) do
+        lambda do |version, dependency: true, unresolved: false|
+          package = build_block.call('pkg-x')
+          package.version = version
+          package.dependency = dependency
+          package.unresolved = unresolved
+          package
+        end
+      end
+
       it 'indexes by Package#key and ignores nils', :aggregate_failures do
         good = build_block.call('pkg-x')
         packages = {}
         parser.collect_packages([good, nil], packages)
         expect(packages.size).to(eq(1))
         expect(packages['X:pkg-x']).to(equal(good))
+      end
+
+      it 'records every distinct version of one package, sorted, in one entry', :aggregate_failures do
+        packages = {}
+        parser.collect_packages([versioned.call('2.0'), versioned.call('1.0'), versioned.call('2.0')], packages)
+        parser.collect_packages([versioned.call('1.5')], packages)
+        expect(packages.keys).to(eq(['X:pkg-x']))
+        expect(packages['X:pkg-x'].version).to(eq('1.0, 1.5, 2.0'))
+      end
+
+      it 'treats the package as direct when any occurrence is direct' do
+        packages = {}
+        parser.collect_packages([versioned.call('1.0', dependency: false), versioned.call('2.0')], packages)
+        expect(packages['X:pkg-x'].dependency).to(be(false))
+      end
+
+      it 'keeps resolved metadata over an unresolved occurrence', :aggregate_failures do
+        resolved = versioned.call('1.0')
+        packages = {}
+        parser.collect_packages([resolved, versioned.call('2.0', unresolved: true)], packages)
+        expect(packages['X:pkg-x']).to(equal(resolved))
+        expect(packages['X:pkg-x'].version).to(eq('1.0, 2.0'))
       end
     end
   end
@@ -339,7 +333,7 @@ RSpec.describe(SOUP::BaseParser) do
       Class.new(described_class) do
         def parse(_file, _packages) = nil
 
-        public :successful_registry_response, :resolve_npm_package
+        public :successful_registry_response, :resolve_npm_package, :parse_registry_json
       end
     end
 
@@ -381,6 +375,33 @@ RSpec.describe(SOUP::BaseParser) do
       end
     end
 
+    describe '#parse_registry_json' do
+      let(:parse) do
+        lambda do |body|
+          stub_request(:get, url).to_return(status: 200, body: body)
+          parser.parse_registry_json(parser.successful_registry_response(url, label: 'pkg'), label: 'pkg')
+        end
+      end
+
+      it 'returns the parsed object' do
+        expect(parse.call('{"name":"pkg"}')).to(eq(JSON.parse('{"name":"pkg"}')))
+      end
+
+      it 'returns nil and warns with the label and the start of a non-JSON body', :aggregate_failures do
+        result = :unset
+        expect { result = parse.call("<html>Captive portal#{'x' * 300}</html>") }
+          .to(output(/\ASkipping pkg: registry response is not a JSON object \(body=<html>Captive portalx{180}\); recorded without registry metadata\n\z/).to_stderr)
+        expect(result).to(be_nil)
+      end
+
+      it 'returns nil and warns for JSON that is not an object', :aggregate_failures do
+        result = :unset
+        expect { result = parse.call('["pkg"]') }
+          .to(output(/Skipping pkg: registry response is not a JSON object \(body=\["pkg"\]\)/).to_stderr)
+        expect(result).to(be_nil)
+      end
+    end
+
     describe '#resolve_npm_package' do
       let(:npm_url) { 'https://registry.npmjs.org/left-pad' }
       let(:resolve) do
@@ -400,6 +421,14 @@ RSpec.describe(SOUP::BaseParser) do
         expect { package = resolve.call }
           .to(output(/HTTP 503.*package=left-pad@1\.3\.0/).to_stderr)
         expect([package.key, package.license, package.unresolved]).to(eq(['JS:left-pad', 'NOASSERTION', true]))
+      end
+
+      it 'records the package as unresolved when the registry body is not JSON', :aggregate_failures do
+        stub_request(:get, npm_url).to_return(status: 200, body: '<html>proxy</html>')
+        package = nil
+        expect { package = resolve.call }
+          .to(output(/Skipping left-pad@1\.3\.0: registry response is not a JSON object/).to_stderr)
+        expect([package.version, package.license, package.unresolved]).to(eq(['1.3.0', 'NOASSERTION', true]))
       end
 
       it 'records the package as unresolved when the pinned version is not in the registry', :aggregate_failures do

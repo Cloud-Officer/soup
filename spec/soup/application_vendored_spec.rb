@@ -16,11 +16,11 @@ RSpec.describe(SOUP::Application) do
     File.write(path, content)
   end
 
-  def run(manual_entries)
+  def run(manual_entries, vendored: ['vendor/javascript/tiptap-pro.js'])
     write('config/licenses.json', '["MIT"]')
     write('config/exceptions.json', '[]')
     write('config/soup-manual.json', manual_entries.to_json)
-    write('vendor/javascript/tiptap-pro.js', '// vendored')
+    vendored.each { |relative| write(relative, '// vendored') }
 
     argv = [
       '--soup',
@@ -63,5 +63,26 @@ RSpec.describe(SOUP::Application) do
     exit_code = run(entries)
     expect(exit_code).to(eq(SOUP::Status::SUCCESS_EXIT_CODE))
     expect(File.read(File.join(root, 'docs/soup.md'))).to(include('tiptap-pro'))
+  end
+
+  it 'passes when the entry declares the vendored file by bare filename' do
+    entries = [{ package: 'tiptap-pro', file: 'tiptap-pro.js', license: 'MIT', version: '1.0.0' }]
+    expect(run(entries)).to(eq(SOUP::Status::SUCCESS_EXIT_CODE))
+  end
+
+  it 'fails when the entry declares a same-named file in another directory', :aggregate_failures do
+    entries = [{ package: 'tiptap-pro', file: 'app/assets/tiptap-pro.js', license: 'MIT', version: '1.0.0' }]
+    exit_code = nil
+    expect { exit_code = run(entries) }
+      .to(output(%r{vendor/javascript/tiptap-pro\.js has no SOUP entry}).to_stderr)
+    expect(exit_code).to(eq(SOUP::Status::ERROR_EXIT_CODE))
+  end
+
+  it 'fails naming the undeclared path when two vendored files share a basename', :aggregate_failures do
+    entries = [{ package: 'editor', file: 'vendor/javascript/a/editor.js', license: 'MIT', version: '1.0.0' }]
+    exit_code = nil
+    expect { exit_code = run(entries, vendored: %w[vendor/javascript/a/editor.js vendor/javascript/b/editor.js]) }
+      .to(output(%r{\AVendored file vendor/javascript/b/editor\.js has no SOUP entry[^\n]*\n\z}).to_stderr)
+    expect(exit_code).to(eq(SOUP::Status::ERROR_EXIT_CODE))
   end
 end

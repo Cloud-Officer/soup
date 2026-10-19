@@ -31,13 +31,13 @@ module SOUP
       dir = File.dirname(file)
       base = File.basename(file, '.*')
 
-      package_swift = path_join(dir, "#{base}.swift")
+      package_swift = sibling_file(file, "#{base}.swift")
       return File.read(package_swift) if File.exist?(package_swift)
 
       tuist_deps = tuist_dependencies_path(dir)
       return File.read(tuist_deps) if tuist_deps && File.exist?(tuist_deps)
 
-      xcodeproj = path_join(dir, "#{base}.xcodeproj/project.pbxproj")
+      xcodeproj = sibling_file(file, "#{base}.xcodeproj/project.pbxproj")
       return File.read(xcodeproj) if File.exist?(xcodeproj)
 
       enclosing_pbxproj = enclosing_xcodeproj_pbxproj(dir)
@@ -67,14 +67,6 @@ module SOUP
       nil
     end
 
-    # Drop the leading "./" that File.join would introduce when dir == '.' so
-    # downstream File.exist?/File.read receive the same path callers use.
-    def path_join(dir, suffix)
-      return suffix if dir.nil? || dir.empty? || dir == '.'
-
-      "#{dir}/#{suffix}"
-    end
-
     # If the resolved file lives anywhere inside a Tuist/ directory, return the
     # path to Dependencies.swift inside that same Tuist directory. Returns nil
     # otherwise so a non-Tuist project never invents a synthetic path.
@@ -92,10 +84,8 @@ module SOUP
       name = pin_repo_name(repo_path, pin['identity'] || pin['package'])
       version = pin_version(pin)
       response = github_repository_response(repo_path, label: name)
-
-      return unresolved_package(name: name, file: file, language: 'Swift', version: version, dependency: !manifest_mentions?(main_file, name)) unless response
-
-      package_details = JSON.parse(response.body)
+      package_details = response && parse_registry_json(response, label: name)
+      return unresolved_package(name: name, file: file, language: 'Swift', version: version, dependency: !manifest_mentions?(main_file, name)) unless package_details
 
       # A private repository is still a SOUP component, so it is recorded rather
       # than dropped. The lookup succeeded, so its real metadata is used.

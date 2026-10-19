@@ -22,10 +22,6 @@ RSpec.describe(SOUP::YarnParser) do
     }.to_json
   end
 
-  # TEST-12: both the lockfile and its sibling package.json are written to a
-  # per-example tmpdir, so the parser resolves package.json through the same
-  # sibling_file path handling production uses instead of a File.read stub keyed
-  # to a bare basename.
   def lockfile_path
     write_fixture('package.json', main_file)
     write_fixture('yarn.lock', yarn_lock_content)
@@ -55,9 +51,6 @@ RSpec.describe(SOUP::YarnParser) do
     end
   end
 
-  # BUG-003 regression: a transitive package whose name is a substring of a
-  # declared dependency (lodash within lodash-es) must NOT be flagged direct.
-  # The old String#include? scan of package.json mis-classified it.
   context 'when a transitive package name is a substring of a dependency' do
     let(:parsed_lock) { [{ name: 'lodash', version: '4.17.21' }] }
     let(:main_file)   { '{"dependencies":{"lodash-es":"^4.17.0"}}' }
@@ -84,10 +77,6 @@ RSpec.describe(SOUP::YarnParser) do
     end
   end
 
-  # CONS-001: a non-200 used to raise RegistryError here and abort the entire
-  # scan, while the NPM parser hitting the identical endpoint merely skipped the
-  # package. All seven parsers now record the package with what the lockfile
-  # knows, so one flaky 5xx can no longer destroy a whole yarn scan.
   context 'with a non-200 response' do
     let(:packages) { {} }
 
@@ -101,9 +90,6 @@ RSpec.describe(SOUP::YarnParser) do
     end
   end
 
-  # TEST-305: assert the full retry loop ran and the user saw the
-  # "Aborting after N retries" warning before the parser skipped the
-  # package, not just that parse did not raise.
   context 'when the registry times out' do
     let(:url)      { 'https://registry.npmjs.org/lodash' }
     let(:packages) { {}                                  }
@@ -121,9 +107,6 @@ RSpec.describe(SOUP::YarnParser) do
       expect(a_request(:get, url)).to(have_been_made.times(SOUP::HttpClient.max_retries + 1))
     end
 
-    # QUAL-001: the warning comes from the shared
-    # BaseParser#resolve_npm_package, named "name@version". A timeout is skipped
-    # here even though a non-200 raises.
     it 'names the package as name@version in the skip warning' do
       expect { parser.parse(lockfile_path, packages) }
         .to(output(/Skipping lodash@4\.17\.21: network error after retries/).to_stderr)
@@ -169,10 +152,6 @@ RSpec.describe(SOUP::YarnParser) do
   end
 
   context 'when YarnLockParser returns nil (Yarn Berry / v2+ lockfile)' do
-    # Regression test for BUG-01: yarn_lock_parser 0.1.0 returns nil from
-    # Parser.parse when compatible? is false (Yarn v2+). Without the guard
-    # in yarn.rb#parse the next line raises NoMethodError on NilClass and
-    # the whole run aborts.
     before do
       allow(YarnLockParser::Parser).to(receive(:parse).with(lockfile_path).and_return(nil))
     end
@@ -203,8 +182,6 @@ RSpec.describe(SOUP::YarnParser) do
         .to_return(status: 200, body: unlicense_response)
     end
 
-    # BUG-006: Unlicense is allowlisted in config/licenses.json, so it must
-    # survive parsing intact rather than being downgraded to NOASSERTION.
     it 'records Unlicense verbatim' do
       packages = {}
       parser.parse(lockfile_path, packages)
@@ -212,11 +189,6 @@ RSpec.describe(SOUP::YarnParser) do
     end
   end
 
-  # BUG-002 regression: the npm registry returns the legacy object-form
-  # license {"type": "MIT", "url": "..."} for older package versions. Before
-  # the fix YarnParser passed the Hash straight to build_package, and it later
-  # crashed Application#validate_license's `license.downcase` with
-  # NoMethodError, aborting the whole scan. NPMParser already guarded this.
   context 'when the registry returns the legacy object-form license' do
     let(:object_license_response) do
       {
@@ -243,8 +215,6 @@ RSpec.describe(SOUP::YarnParser) do
     end
   end
 
-  # TEST-05: race where Dir.glob found the lockfile but it was deleted /
-  # unreadable before YarnLockParser::Parser.parse ran.
   context 'when yarn.lock cannot be read' do
     before do
       allow(YarnLockParser::Parser).to(receive(:parse).with(lockfile_path).and_raise(Errno::ENOENT.new('yarn.lock')))
@@ -257,9 +227,6 @@ RSpec.describe(SOUP::YarnParser) do
     end
   end
 
-  # TEST-12: parser exercised against real lockfile bytes, with the real
-  # YarnLockParser running, exactly like Application#detect_packages would
-  # invoke it in production.
   context 'with a real yarn.lock fixture on disk' do
     let(:yarn_lock_content) do
       <<~LOCK
@@ -287,10 +254,6 @@ RSpec.describe(SOUP::YarnParser) do
     end
   end
 
-  # TEST-306: parity with bundler / composer which both cover an explicit
-  # empty-lockfile context. yarn_lock_parser 0.1.0 returns nil for empty
-  # input, so the parser surfaces the same UnsupportedFormatError as the
-  # Yarn Berry case (BUG-01) but via a real on-disk file rather than a stub.
   context 'with an empty yarn.lock fixture on disk' do
     let(:packages) { {} }
     let(:main_file)         { '{}' }
@@ -305,9 +268,6 @@ RSpec.describe(SOUP::YarnParser) do
     end
   end
 
-  # TEST-303: exercise parallel_each at a meaningful fan-out width so a
-  # parser-local concurrency or ordering regression in Yarn is caught
-  # by the spec suite, not just by NPM's existing scale guard.
   context 'with 100 packages (Parallel.map fan-out)' do
     let(:parsed_lock) do
       (1..100).map { |i| { name: "pkg-#{i}", version: '1.0.0' } }

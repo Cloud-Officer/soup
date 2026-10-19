@@ -30,7 +30,23 @@ module SOUP
     end
 
     def collect_packages(results, packages)
-      results.compact.each { |package| packages[package.key] = package }
+      results.compact.each { |package| store_package(packages, package) }
+    end
+
+    def store_package(packages, package)
+      existing = packages[package.key]
+      packages[package.key] = existing ? merge_versions(existing, package) : package
+    end
+
+    def merge_versions(existing, package)
+      kept = package.unresolved && !existing.unresolved ? existing : package
+      versions = [existing.version, package.version].flat_map { |version| version.to_s.split(', ') }
+      versions.reject!(&:empty?)
+      versions.uniq!
+      versions.sort!
+      kept.version = versions.join(', ')
+      kept.dependency = existing.dependency && package.dependency
+      kept
     end
 
     def github_repository_response(repo_path, label:)
@@ -209,9 +225,8 @@ module SOUP
     # either outcome for the other would be false.
     #
     # A nil return and a non-200 are handled the same way by every caller: warn,
-    # then record the package via unresolved_package. Only SPM's rate-limit and
-    # bad-credentials responses still abort, because those are global conditions
-    # that would fail every remaining lookup identically.
+    # then record the package via unresolved_package. GitHub rate-limit and
+    # bad-credentials responses (SPM and GHA) abort instead.
     #
     # The rescue list is HttpClient::TRANSIENT_ERRORS itself rather than a
     # hand-copied set, so it can never again fall behind what `.get` retries --
@@ -261,12 +276,25 @@ module SOUP
       response
     end
 
+    def parse_registry_json(response, label:)
+      payload =
+        begin
+          JSON.parse(response.body)
+        rescue JSON::ParserError
+          nil
+        end
+      return payload if payload.is_a?(Hash)
+
+      warn("Skipping #{label}: registry response is not a JSON object (body=#{response.body.to_s.strip[0, 200]}); recorded without registry metadata")
+      nil
+    end
+
     # Resolve a lockfile-pinned npm package (NPM and Yarn), unresolved when the lookup fails or the version is absent.
     def resolve_npm_package(file:, name:, version:, dependency:)
-      response = successful_registry_response(npm_registry_url(name), label: "#{name}@#{version}")
-      return unresolved_package(name: name, file: file, language: 'JS', version: version, dependency: dependency) unless response
-
-      package_details = lookup_npm_registry_version(JSON.parse(response.body), name: name, version: version)
+      label = "#{name}@#{version}"
+      response = successful_registry_response(npm_registry_url(name), label: label)
+      payload = response && parse_registry_json(response, label: label)
+      package_details = payload && lookup_npm_registry_version(payload, name: name, version: version)
       return unresolved_package(name: name, file: file, language: 'JS', version: version, dependency: dependency) if package_details.nil?
 
       build_npm_registry_package(

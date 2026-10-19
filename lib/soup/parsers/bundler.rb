@@ -37,9 +37,8 @@ module SOUP
       version = spec.version&.to_s&.strip
       dependency = !direct_deps.include?(spec.name)
       response = rubygems_response(spec)
-      return unresolved_package(name: spec.name, file: file, language: 'Ruby', version: version, dependency: dependency) unless response
-
-      package_details = JSON.parse(response.body)
+      package_details = response && parse_registry_json(response, label: "#{spec.name} #{version}")
+      return unresolved_package(name: spec.name, file: file, language: 'Ruby', version: version, dependency: dependency) unless package_details
 
       build_package(
         name: spec.name,
@@ -74,9 +73,10 @@ module SOUP
         candidates << [rubygems_version_url(spec.name, spec.version), label, false]
 
         latest = successful_registry_response("https://api.rubygems.org/api/v1/versions/#{spec.name}/latest.json", label: label)
-        next unless latest
+        latest_details = latest && parse_registry_json(latest, label: label)
+        next unless latest_details
 
-        latest_version = JSON.parse(latest.body)['version']
+        latest_version = latest_details['version']
         candidates << [rubygems_version_url(spec.name, latest_version), "#{spec.name} #{latest_version}", true]
       end
     end

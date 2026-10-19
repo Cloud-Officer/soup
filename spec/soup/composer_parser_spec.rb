@@ -30,9 +30,6 @@ RSpec.describe(SOUP::ComposerParser) do
 
   let(:packages) { {} }
 
-  # TEST-12: lockfile and its sibling composer.json are written to a per-example
-  # tmpdir, so the parser resolves composer.json through the real sibling_file
-  # path handling rather than File.read stubs keyed to bare basenames.
   def lockfile_path
     write_fixture('composer.json', main_file)
     write_fixture('composer.lock', lock_file)
@@ -40,6 +37,14 @@ RSpec.describe(SOUP::ComposerParser) do
 
   before do |example|
     parser.parse(lockfile_path, packages) if example.metadata.fetch(:auto_parse, true)
+  end
+
+  it 'merges the versions of a package found in several lockfiles', :aggregate_failures, auto_parse: false do
+    parser.parse(lockfile_path, packages)
+    other_lock = { packages: [{ name: 'vendor/main-pkg', version: 'v1.0.0', license: ['MIT'] }] }.to_json
+    write_fixture('other/composer.json', main_file)
+    parser.parse(write_fixture('other/composer.lock', other_lock), packages)
+    expect(packages['PHP:vendor/main-pkg'].version).to(eq('v1.0.0, v1.2.3'))
   end
 
   it 'parses packages and packages-dev', :aggregate_failures do
@@ -70,9 +75,6 @@ RSpec.describe(SOUP::ComposerParser) do
     expect(packages['PHP:vendor/dev-pkg'].dependency).to(be(true))
   end
 
-  # BUG-003 regression: a transitive package whose name is a substring of a
-  # declared require (vendor/main within vendor/main-pkg) must NOT be flagged
-  # direct. The old String#include? scan of composer.json mis-classified it.
   context 'when a transitive package name is a substring of a required package' do
     let(:lock_file) do
       {
@@ -136,9 +138,6 @@ RSpec.describe(SOUP::ComposerParser) do
   end
 
   context 'with composer.lock missing packages-dev key' do
-    # Regression test for BUG-021: production-only lockfiles (e.g. from
-    # composer install --no-dev) may omit packages-dev entirely. The parser
-    # used to raise TypeError on Array + nil.
     let(:lock_file) do
       {
         packages: [
@@ -181,9 +180,6 @@ RSpec.describe(SOUP::ComposerParser) do
   end
 
   context 'when the lockfile lives in a directory whose name contains "lock"' do
-    # Regression test for BUG-04: pre-fix the parser used file.gsub('lock',
-    # 'json'), an unanchored substring substitution that corrupted any path
-    # containing "lock" (e.g. /Users/sherlock/proj/composer.lock).
     let(:main_file) { '{"require":{"vendor/x":"^1.0"}}' }
     let(:lock_file) do
       {
@@ -207,10 +203,6 @@ RSpec.describe(SOUP::ComposerParser) do
   end
 
   context 'when license is a single String (not an Array)' do
-    # Regression test for BUG-12: Composer's schema permits `license` as a
-    # single string. Pre-fix the parser called `.first` on a String, which
-    # either raised NoMethodError (plain Ruby) or returned the first
-    # character "M" (when ActiveSupport's String#first was loaded).
     let(:lock_file) do
       {
         packages: [
@@ -231,9 +223,6 @@ RSpec.describe(SOUP::ComposerParser) do
     end
   end
 
-  # TEST-04: graceful malformed-lockfile cases. Structurally-empty and
-  # unknown-shape JSON should fall through the existing `|| []` guards
-  # without raising.
   context 'with structurally empty (but valid JSON) composer.lock' do
     let(:lock_file) { '{}' }
 
@@ -271,10 +260,6 @@ RSpec.describe(SOUP::ComposerParser) do
     end
   end
 
-  # TEST-05: a transient race where Dir.glob found the lockfile but it was
-  # deleted/unreadable before File.read surfaces as a bare Errno::ENOENT
-  # backtrace. Locking in current behavior so a future improvement (clearer
-  # message) is deliberate.
   context 'when the lockfile itself is missing at read time', auto_parse: false do
     # Points at a path inside the fixture dir that was never written, so the
     # real File.read raises ENOENT instead of a stub simulating it.
@@ -286,9 +271,7 @@ RSpec.describe(SOUP::ComposerParser) do
     end
   end
 
-  # TEST-04: malformed-JSON cases use auto_parse: false so the top-level
-  # before-hook does not invoke parser.parse before the example body has
-  # a chance to assert on the expected exception.
+  # auto_parse: false stops the top-level before-hook from parsing ahead of the raise assertion.
   context 'with malformed composer.lock JSON', auto_parse: false do
     let(:lock_file) { 'not json' }
 
@@ -316,7 +299,6 @@ RSpec.describe(SOUP::ComposerParser) do
     end
   end
 
-  # TEST-12: a minimal single-package lockfile read straight off disk.
   context 'with a single-package lockfile on disk' do
     let(:lock_file) do
       {

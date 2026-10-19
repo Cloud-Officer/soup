@@ -25,8 +25,6 @@ RSpec.describe(SOUP::Options) do
       end
 
       it 'does not respond to the historical skip_cocoapods accessor' do
-        # Regression guard for QUAL-08: the CocoaPods parser + skip_cocoapods
-        # flag were dropped because cocoapods-core is pinned to activesupport < 8.
         expect(options).not_to(respond_to(:skip_cocoapods))
       end
 

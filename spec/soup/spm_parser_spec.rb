@@ -32,26 +32,15 @@ RSpec.describe(SOUP::SPMParser) do
     write_fixture(resolved_name, resolved_file)
   end
 
-  # TEST-12: Package.resolved and whichever Swift manifest the case needs are
-  # written to a per-example tmpdir. The manifest-discovery chain (Package.swift
-  # -> Tuist/Dependencies.swift -> *.xcodeproj/project.pbxproj -> enclosing
-  # pbxproj) is then driven by which files actually exist on disk, exercising the
-  # parser's real File.exist? walk instead of a stubbed one.
   def manifest_name = 'Package.swift'
 
   def resolved_name = 'Package.resolved'
 
-  # ENV stubbing is out of scope for the TEST-12 fixture migration.
   before do
     allow(ENV).to(receive(:fetch).and_call_original)
     allow(ENV).to(receive(:fetch).with('GITHUB_TOKEN', '').and_return(''))
   end
 
-  # CONS-002: HttpClient re-raises Net::ReadTimeout once its retries are
-  # exhausted. Before the fix that escaped fetch_package, propagated through
-  # Parallel.map, and killed the whole scan with an untyped backtrace -- even
-  # though this parser already warn-and-skipped on a generic non-200, so it was
-  # inconsistent with itself.
   context 'when the GitHub API times out' do
     let(:packages) { {} }
 
@@ -145,10 +134,6 @@ RSpec.describe(SOUP::SPMParser) do
     end
   end
 
-  # BUG-003 regression: a transitive package whose repo name is a substring of a
-  # declared package (Alamofire within AlamofireImage) must NOT be flagged
-  # direct. The old String#include? scan of the manifest mis-classified it;
-  # manifest_mentions? anchors on a non-identifier boundary.
   context 'when a package name is a substring of a declared package' do
     let(:main_file_content) { '.package(url: "https://github.com/SomeOrg/AlamofireImage.git", from: "1.0.0")' }
 
@@ -205,9 +190,6 @@ RSpec.describe(SOUP::SPMParser) do
         .to_return(status: 200, body: private_response)
     end
 
-    # CONS-001: a private repository is still a SOUP component. The lookup
-    # succeeded, so it is recorded with the real metadata rather than dropped --
-    # and it is NOT marked unresolved, because nothing failed.
     it 'records private repositories with the metadata GitHub returned', :aggregate_failures do
       packages = {}
       expect { parser.parse(lockfile_path, packages) }
@@ -255,6 +237,20 @@ RSpec.describe(SOUP::SPMParser) do
       parser.parse(lockfile_path, packages)
       expect(packages['Swift:Alamofire']).to(have_attributes(language: 'Swift', license: 'NOASSERTION'))
       expect(packages['Swift:Alamofire'].unresolved).to(be(true))
+    end
+  end
+
+  context 'when the GitHub API returns a 200 that is not JSON' do
+    before do
+      stub_request(:get, 'https://api.github.com/repos/Alamofire/Alamofire')
+        .to_return(status: 200, body: '<html>proxy</html>')
+    end
+
+    it 'warns and records the pin as unresolved', :aggregate_failures do
+      packages = {}
+      expect { parser.parse(lockfile_path, packages) }
+        .to(output(/Skipping Alamofire: registry response is not a JSON object/).to_stderr)
+      expect(packages['Swift:Alamofire']).to(have_attributes(version: '5.9.0', license: 'NOASSERTION', unresolved: true))
     end
   end
 
@@ -316,11 +312,6 @@ RSpec.describe(SOUP::SPMParser) do
   end
 
   context 'when the project directory contains a dot in its name' do
-    # Regression test for BUG-011: a previous implementation used
-    # file.split('.').first to derive the xcodeproj path, which truncated
-    # any path whose parent directory contained a dot.
-    # A real directory literally named "foo.bar" on disk, so the path genuinely
-    # contains the dot that the old split('.').first truncated at.
     let(:manifest_name) { 'foo.bar/MyProject/Package.xcodeproj/project.pbxproj' }
     let(:resolved_name) { 'foo.bar/MyProject/Package.resolved'                  }
 
@@ -387,10 +378,6 @@ RSpec.describe(SOUP::SPMParser) do
   end
 
   context 'when rate limited with the real GitHub response shape' do
-    # Regression test for BUG-05: GitHub returns the actionable string in the
-    # response BODY (the `message` field), not in the HTTP reason phrase.
-    # Pre-fix the parser only inspected `response.message` (reason phrase) so
-    # this realistic 403 fell through to a silent return.
     before do
       stub_request(:get, 'https://api.github.com/repos/Alamofire/Alamofire')
         .to_return(
@@ -407,10 +394,6 @@ RSpec.describe(SOUP::SPMParser) do
   end
 
   context 'when GitHub returns a 5xx error' do
-    # Regression test for BUG-06: the parser used to silently `return unless
-    # response.code == 200` on non-200 responses, omitting the package from
-    # the SOUP report with no diagnostic. It should warn via http_error_message
-    # to match the discipline of every other parser post-PR #327.
     before do
       stub_request(:get, 'https://api.github.com/repos/Alamofire/Alamofire')
         .to_return(status: [502, 'Bad Gateway'], body: '<html>upstream timeout</html>')
@@ -489,8 +472,6 @@ RSpec.describe(SOUP::SPMParser) do
     end
   end
 
-  # TEST-04: malformed-Package.resolved coverage. Locks in current behavior
-  # so future error-handling improvements are deliberate, not accidental.
   describe '#parse with malformed input' do
     let(:packages) { {} }
 
@@ -531,8 +512,6 @@ RSpec.describe(SOUP::SPMParser) do
       end
     end
 
-    # TEST-05: race where Dir.glob found the lockfile but it was deleted /
-    # unreadable before File.read ran.
     context 'when Package.resolved cannot be read' do
       # A path inside the fixture dir that was never written, so the real
       # File.read raises ENOENT instead of a stub simulating it.
@@ -544,8 +523,6 @@ RSpec.describe(SOUP::SPMParser) do
       end
     end
 
-    # TEST-12: a well-formed Package.resolved plus sibling Package.swift, read
-    # straight off disk with the full GitHub metadata response.
     context 'with a well-formed Package.resolved on disk' do
       before do
         body = {
@@ -566,9 +543,6 @@ RSpec.describe(SOUP::SPMParser) do
     end
   end
 
-  # TEST-303: exercise parallel_each at a meaningful fan-out width so a
-  # parser-local concurrency or ordering regression in SPM is caught
-  # by the spec suite, not just by NPM's existing scale guard.
   context 'with 100 packages (Parallel.map fan-out)' do
     let(:resolved_file) do
       pins =
@@ -606,29 +580,6 @@ RSpec.describe(SOUP::SPMParser) do
       expect(packages.size).to(eq(100))
       expect(packages['Swift:pkg-1']).to(have_attributes(language: 'Swift', version: '1.0.0', license: 'MIT'))
       expect(packages['Swift:pkg-100']).to(have_attributes(language: 'Swift', version: '1.0.0', license: 'MIT'))
-    end
-  end
-
-  # CONS-007: the dir == '.' branch was previously covered only incidentally, by
-  # specs that stubbed File.read and so passed 'Package.resolved' rather than a
-  # real path. Now that every fixture is an absolute tmpdir path, the helper is
-  # asserted directly, the same way base_parser_spec exposes BaseParser's own
-  # protected helpers.
-  describe '#path_join' do
-    subject(:helper) { helper_class.new }
-
-    let(:helper_class) do
-      Class.new(described_class) do
-        public :path_join
-      end
-    end
-
-    it 'returns the bare suffix when the directory is "."' do
-      expect(helper.path_join('.', 'Package.swift')).to(eq('Package.swift'))
-    end
-
-    it 'joins the suffix onto a real directory without a leading "./"' do
-      expect(helper.path_join('/tmp/proj', 'Package.swift')).to(eq('/tmp/proj/Package.swift'))
     end
   end
 end

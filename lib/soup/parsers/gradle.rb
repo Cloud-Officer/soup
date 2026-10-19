@@ -44,7 +44,8 @@ module SOUP
             end
           end
 
-          package_name.split(':')
+          coordinate = package_name.split(':', -1)
+          coordinate if coordinate.size == 3 && coordinate.none?(&:empty?)
         end
 
       parallel_each(work_items, packages) do |group_id, artifact_id, version|
