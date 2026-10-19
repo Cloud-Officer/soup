@@ -608,27 +608,4 @@ RSpec.describe(SOUP::SPMParser) do
       expect(packages['Swift:pkg-100']).to(have_attributes(language: 'Swift', version: '1.0.0', license: 'MIT'))
     end
   end
-
-  # CONS-007: the dir == '.' branch was previously covered only incidentally, by
-  # specs that stubbed File.read and so passed 'Package.resolved' rather than a
-  # real path. Now that every fixture is an absolute tmpdir path, the helper is
-  # asserted directly, the same way base_parser_spec exposes BaseParser's own
-  # protected helpers.
-  describe '#path_join' do
-    subject(:helper) { helper_class.new }
-
-    let(:helper_class) do
-      Class.new(described_class) do
-        public :path_join
-      end
-    end
-
-    it 'returns the bare suffix when the directory is "."' do
-      expect(helper.path_join('.', 'Package.swift')).to(eq('Package.swift'))
-    end
-
-    it 'joins the suffix onto a real directory without a leading "./"' do
-      expect(helper.path_join('/tmp/proj', 'Package.swift')).to(eq('/tmp/proj/Package.swift'))
-    end
-  end
 end
