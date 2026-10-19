@@ -26,7 +26,7 @@ module SOUP
           website: php_package['homepage']&.strip,
           dependency: !direct_deps.include?(php_package['name'])
         )
-        packages[package.key] = package
+        store_package(packages, package)
       end
     end
 

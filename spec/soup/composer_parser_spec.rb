@@ -42,6 +42,14 @@ RSpec.describe(SOUP::ComposerParser) do
     parser.parse(lockfile_path, packages) if example.metadata.fetch(:auto_parse, true)
   end
 
+  it 'merges the versions of a package found in several lockfiles', :aggregate_failures, auto_parse: false do
+    parser.parse(lockfile_path, packages)
+    other_lock = { packages: [{ name: 'vendor/main-pkg', version: 'v1.0.0', license: ['MIT'] }] }.to_json
+    write_fixture('other/composer.json', main_file)
+    parser.parse(write_fixture('other/composer.lock', other_lock), packages)
+    expect(packages['PHP:vendor/main-pkg'].version).to(eq('v1.0.0, v1.2.3'))
+  end
+
   it 'parses packages and packages-dev', :aggregate_failures do
     expect(packages).to(have_key('PHP:vendor/main-pkg'))
     expect(packages).to(have_key('PHP:vendor/dev-pkg'))

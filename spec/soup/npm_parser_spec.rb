@@ -100,6 +100,33 @@ RSpec.describe(SOUP::NPMParser) do
     end
   end
 
+  context 'with the same package nested at another version' do
+    let(:lock_file) do
+      {
+        packages: {
+          'node_modules/lodash': { version: '4.17.21' },
+          'node_modules/legacy/node_modules/lodash': { version: '3.10.1' }
+        }
+      }.to_json
+    end
+
+    let(:registry_response) do
+      { versions: { '4.17.21': { license: 'MIT' }, '3.10.1': { license: 'MIT' } } }.to_json
+    end
+
+    before do
+      stub_request(:get, 'https://registry.npmjs.org/lodash')
+        .to_return(status: 200, body: registry_response)
+    end
+
+    it 'records both installed versions', :aggregate_failures do
+      packages = {}
+      parser.parse(lockfile_path, packages)
+      expect(packages.keys).to(contain_exactly('JS:lodash'))
+      expect(packages['JS:lodash']).to(have_attributes(version: '3.10.1, 4.17.21', dependency: false))
+    end
+  end
+
   context 'with non-200 response' do
     before do
       stub_request(:get, 'https://registry.npmjs.org/lodash')

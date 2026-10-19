@@ -30,7 +30,23 @@ module SOUP
     end
 
     def collect_packages(results, packages)
-      results.compact.each { |package| packages[package.key] = package }
+      results.compact.each { |package| store_package(packages, package) }
+    end
+
+    def store_package(packages, package)
+      existing = packages[package.key]
+      packages[package.key] = existing ? merge_versions(existing, package) : package
+    end
+
+    def merge_versions(existing, package)
+      kept = package.unresolved && !existing.unresolved ? existing : package
+      versions = [existing.version, package.version].flat_map { |version| version.to_s.split(', ') }
+      versions.reject!(&:empty?)
+      versions.uniq!
+      versions.sort!
+      kept.version = versions.join(', ')
+      kept.dependency = existing.dependency && package.dependency
+      kept
     end
 
     def github_repository_response(repo_path, label:)
