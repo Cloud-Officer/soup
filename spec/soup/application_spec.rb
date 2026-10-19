@@ -149,10 +149,6 @@ RSpec.describe(SOUP::Application) do
     ] + skip_all_parsers
   end
 
-  # TEST-12: the lockfile and its sibling composer.json are written to a
-  # per-example tmpdir and Dir.glob is pointed at the real path, so the parser
-  # reads actual bytes. Dir stubbing stays -- detect_packages globs Dir.pwd, and
-  # Dir is not File stubbing.
   def stub_composer_files(lock_content, json_content)
     write_fixture('composer.json', json_content)
     lockfile_path = write_fixture('composer.lock', lock_content)
@@ -208,11 +204,6 @@ RSpec.describe(SOUP::Application) do
     '{"require":{"valid/pkg":"^1.0","bad/pkg":"^2.0","excepted-pkg":"^3.0","noassert/pkg":"^4.0"}}'
   end
 
-  # CONS-006 regression: DEPENDENCY_TEXT used to be defined at the top level of
-  # application.rb, so merely requiring soup leaked ::DEPENDENCY_TEXT into the
-  # host program's Object namespace. It is now module-scoped and private, like
-  # PARSER_REGISTRY below. The value itself stays covered by the markdown-output
-  # example that asserts a transitive package renders "Dependency".
   describe 'DEPENDENCY_TEXT' do
     it 'does not leak into the global Object namespace' do
       expect(Object.const_defined?(:DEPENDENCY_TEXT)).to(be(false))
@@ -226,13 +217,6 @@ RSpec.describe(SOUP::Application) do
     end
   end
 
-  # COM-001 regression: detect_packages used to carry a `next if
-  # config[:parser].nil?` guard justified by a Podfile.lock entry that no longer
-  # exists in the registry. The guard was removed as dead code, which is only
-  # safe while every entry maps to a concrete parser: a nil placeholder would
-  # now blow up on `config[:parser].new`. These examples lock that invariant in,
-  # so reintroducing a nil entry fails here instead of at runtime. The registry
-  # is private_constant, hence the module_eval reach-in.
   describe 'PARSER_REGISTRY' do
     subject(:registry) { parser_registry }
 
@@ -251,9 +235,6 @@ RSpec.describe(SOUP::Application) do
     end
   end
 
-  # CONS-001: a package whose registry lookup fails is still recorded, so the
-  # register enumerates every component. When a previous run resolved it, that
-  # metadata is restored rather than downgraded to NOASSERTION.
   describe 'unresolved packages' do
     before { stub_unresolved_pip_package }
 
@@ -487,10 +468,6 @@ RSpec.describe(SOUP::Application) do
     end
 
     context 'when CLI args trigger an OptionParser::ParseError subclass other than InvalidOption' do
-      # Regression test for BUG-017: the configure_options rescue used to be
-      # OptionParser::InvalidOption only, which let MissingArgument (and other
-      # ParseError subclasses) escape with a stack trace instead of the
-      # friendly "Error: ..." message + ERROR_EXIT_CODE.
       it 'exits with ERROR_EXIT_CODE on --licenses_file missing its required argument', :aggregate_failures do
         expect { described_class.new(['--licenses_file']) }
           .to(raise_error(SystemExit) { |e| expect(e.status).to(eq(SOUP::Status::ERROR_EXIT_CODE)) }
@@ -509,10 +486,6 @@ RSpec.describe(SOUP::Application) do
           .to(raise_error(SOUP::ConfigurationError, /Configuration file not found/))
       end
 
-      # Regression test for BUG-08: when --soup is enabled (default) and
-      # validate_config! raises before any state is populated, the ensure
-      # block must NOT overwrite existing .soup.json / docs/soup.md with
-      # empty content.
       it 'in --soup mode, preserves the existing cache and markdown when validate_config! raises', :aggregate_failures do
         write_existing_soup_files('{"existing/pkg":{"version":"1.0.0"}}', "# Existing SOUP\n")
         expect { described_class.new(missing_soup_args).execute }
@@ -522,14 +495,6 @@ RSpec.describe(SOUP::Application) do
       end
     end
 
-    # CFG-001: the cache was the only JSON input not validated at startup.
-    # read_cached_packages parsed it AFTER detect_packages had populated
-    # @detected_packages, so a raw JSON::ParserError escaped through the
-    # ensure-block save -- rewriting .soup.json with metadata-less entries and
-    # blanking docs/soup.md, discarding previously entered IEC 62304 risk,
-    # requirements and verification reasoning. Composer is stubbed here so
-    # detection genuinely populates state; without the fix save_files' empty
-    # -state guard would not fire and both files would be clobbered.
     context 'when the cache file has invalid JSON' do
       def corrupt_cache = '{"existing/pkg": {"version": "1.0.0"'
 
@@ -648,10 +613,6 @@ RSpec.describe(SOUP::Application) do
       end
 
       it 'persists the parser-supplied description verbatim to the cache (no in-place mutation)' do
-        # Regression test for QUAL-02: append_markdown_row used to mutate
-        # package.description in place via Nokogiri.fragment.text + gsub, so
-        # the persisted .soup.json contained the sanitized markdown version
-        # instead of the parser-supplied description.
         described_class.new(soup_args(skip: skip_parsers_except_composer)).execute
         cached = JSON.parse(File.read(cache_file.path))
         expect(cached['PHP:valid/pkg']['description']).to(eq('A valid package'))
@@ -734,16 +695,6 @@ RSpec.describe(SOUP::Application) do
       end
     end
 
-    # BUG-006: config/licenses.json allowlists "Unlicense", but every parser
-    # routed it through normalize_license, which rewrote it to NOASSERTION
-    # before validate_license ran. The allowlist entry was therefore dead and
-    # every Unlicense package warned "Invalid license NOASSERTION" on each run.
-    # BUG-004: the allowlist was matched with a bare Regexp.union, i.e. an
-    # unanchored substring test, so any licence string that merely *contained*
-    # an allowlisted entry passed the compliance gate -- the tool's core
-    # function. Entries are now anchored on word boundaries, and the two
-    # allowlist entries that were themselves too broad to be rescued by
-    # anchoring ("Copyright", bare "BSL") are gone from config/licenses.json.
     describe 'license allowlist matching' do
       # Drives a real --licenses run over a composer package with the given
       # licence, against the given allowlist, and reports whether it passed.
@@ -767,9 +718,6 @@ RSpec.describe(SOUP::Application) do
         $stderr = original
       end
 
-      # A family entry must still cover the versioned identifiers it exists for
-      # -- this is why the fix anchors on word boundaries rather than switching
-      # to exact-match, which would reject every real-world SPDX id.
       [
         ['MIT', 'exact match'],
         ['Apache-2.0', 'family entry covering a versioned SPDX id'],
@@ -781,14 +729,12 @@ RSpec.describe(SOUP::Application) do
         end
       end
 
-      # The headline defect: each of these contains an allowlisted entry as a
-      # substring but is not that licence.
       [
         ['UNLICENSED', "npm's proprietary marker, the opposite of Unlicense"],
         ['MITigated Source License', 'unrelated licence whose name starts with MIT'],
         ['Apacheish Public License', 'unrelated licence embedding a family name']
       ].each do |license, why|
-        it "now rejects #{license.inspect} (#{why})" do
+        it "rejects #{license.inspect} (#{why})" do
           expect(license_accepted?(license)).to(be(false))
         end
       end
@@ -803,14 +749,6 @@ RSpec.describe(SOUP::Application) do
         expect(license_accepted?('MITT', allowlist: '["MIT+"]')).to(be(false))
       end
 
-      # BUG-005: word boundaries treat a leading digit as a word character, so
-      # the "BSD" family entry stops covering "0BSD" -- a real, OSI-approved,
-      # permissive SPDX id (BSD-2-Clause minus the attribution requirement).
-      # Every consumer of the AWS SDK for JavaScript v3 pulls in tslib, which
-      # is 0BSD, so the whole compliance gate failed on a licence the project
-      # accepts. The fix is an explicit allowlist entry, NOT a looser
-      # lookbehind: these two examples pin the mechanism so a future reader
-      # sees why a prefixed identifier cannot ride on its family entry.
       it 'does not let a family entry reach across a leading digit' do
         expect(license_accepted?('0BSD', allowlist: '["BSD"]')).to(be(false))
       end
@@ -820,35 +758,21 @@ RSpec.describe(SOUP::Application) do
       end
     end
 
-    # The shipped config/licenses.json is itself part of the fix: word-boundary
-    # anchoring cannot rescue an entry that is legitimately a substring of a
-    # non-compliant licence name, so those entries had to change.
     describe 'the shipped config/licenses.json' do
       subject(:pattern) do
         entries = JSON.parse(File.read('config/licenses.json'))
         Regexp.union(entries.map { |entry| /(?<!\w)#{Regexp.escape(entry.downcase)}(?!\w)/ })
       end
 
-      it 'no longer carries the bare "Copyright" entry that matched any proprietary notice' do
+      it 'does not carry the bare "Copyright" entry that matched any proprietary notice' do
         expect(JSON.parse(File.read('config/licenses.json'))).not_to(include('Copyright'))
       end
 
-      it 'no longer carries the bare "BSL" entry that matched Business Source License' do
+      it 'does not carry the bare "BSL" entry that matched Business Source License' do
         expect(JSON.parse(File.read('config/licenses.json'))).not_to(include('BSL'))
       end
 
-      # "BSL" is an abbreviation collision, not a version series: BSL-1.0 is the
-      # Boost Software License (permissive, and the only version Boost has ever
-      # had), while "BSL 1.1" is the Business Source License -- a different,
-      # source-available licence whose real SPDX id is BUSL-1.1. Replacing the
-      # bare "BSL" entry has to keep every Boost spelling passing while
-      # rejecting every Business Source one, so both sides are pinned here.
-      #
-      # The 0BSD rows guard BUG-005 from the other direction: the shipped file
-      # must carry the identifier itself, because the "BSD" family entry cannot
-      # match across the leading digit. Both the SPDX id and the prose spelling
-      # some registries emit are pinned, and the negatives below confirm adding
-      # them did not loosen the gate.
+      # BSL-1.0 is the Boost Software License; "BSL 1.1" / BUSL-1.1 is the Business Source License.
       [
         ['MIT', true],
         ['Apache-2.0', true],
@@ -908,21 +832,6 @@ RSpec.describe(SOUP::Application) do
       end
     end
 
-    # BUG-001: the ensure block handed the half-populated @detected_packages
-    # straight to save_files when a run raised part-way through check_packages.
-    # Every package after the failure point had never reached
-    # apply_cached_metadata, so it serialized with blank verification fields and
-    # overwrote the human-entered IEC 62304 evidence in .soup.json, while
-    # docs/soup.md was replaced by a header-only table. One failed --no_prompt
-    # run in CI destroyed the register.
-    #
-    # The ensure-save must still preserve work completed this session, so the
-    # write is now additive: only packages that finished the whole
-    # check_packages iteration are persisted, layered over the cache read at
-    # startup. The previous version of this context asserted merely that the
-    # cache was "not empty" after a failure -- which the destructive behaviour
-    # satisfied by writing blank entries, so it pinned the bug rather than the
-    # intent.
     context 'with partial state on failure' do
       # Reproduces the issue's scenario exactly, with the failure in the middle
       # so there is a package on each side of it. Hash order follows the

@@ -3,12 +3,6 @@
 require 'open3'
 require 'rbconfig'
 
-# TEST-301: exercise the top-level rescue in bin/soup.rb. The rescue formats
-# StandardError into a one-line "Error: ..." plus a backtrace shaped by ENV
-# ['DEBUG']: no DEBUG -> top TOP_FRAMES_TO_SHOW frames each prefixed with two
-# spaces, optionally followed by "  ... (set DEBUG=1 for full backtrace)" when
-# the backtrace is longer than the slice; DEBUG=1 -> the full backtrace joined
-# with newlines and no top-frames hint. Every error path exits with status 1.
 # rubocop:disable RSpec/DescribeClass -- subject under test is bin/soup.rb, not a class.
 # rubocop:disable RSpec/MultipleMemoizedHelpers -- each context destructures the
 # Open3.capture3 tuple into stdout/stderr/status via let for readability.

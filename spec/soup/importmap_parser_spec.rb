@@ -85,13 +85,6 @@ RSpec.describe(SOUP::ImportmapParser) do
     end
   end
 
-  # QUAL-002: the npm registry returns `license` as a plain String for modern
-  # packages but as the legacy object form { "type": ..., "url": ... } for older
-  # ones. Importmap consumes the same per-version payload as the NPM and Yarn
-  # parsers, so it must coerce it the same way -- an uncoerced Hash flows through
-  # to Application#validate_license, where `license.downcase` raises NoMethodError
-  # and aborts the entire run. These examples cover the importmap call site, which
-  # previously only ever exercised the String form.
   context 'when the registry returns a legacy object-form license' do
     let(:importmap) { "pin 'marked', to: 'https://esm.sh/marked@12.0.0'\n" }
 
@@ -123,11 +116,6 @@ RSpec.describe(SOUP::ImportmapParser) do
     end
   end
 
-  # QUAL-001: the GET + post-retry timeout rescue lives in
-  # BaseParser#successful_registry_response. Importmap labels the lookup with the
-  # package name alone, because the version is only resolved from the response it
-  # is still waiting on -- so its warning has no "@version" suffix (unlike the NPM
-  # and Yarn parsers). This path had no spec before the extraction.
   context 'when the registry returns a 200 that is not JSON' do
     let(:importmap) { "pin 'marked', to: 'https://esm.sh/marked@12.0.0'\n" }
 

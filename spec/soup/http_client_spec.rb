@@ -55,8 +55,6 @@ RSpec.describe(SOUP::HttpClient) do
       expect(WebMock).to(have_requested(:get, url).times(2))
     end
 
-    # TEST-06: 4xx/5xx are *responses*, not transport failures -- they are
-    # returned to the caller for inspection rather than retried or raised.
     it 'returns a 404 response unchanged so callers can decide how to handle it', :aggregate_failures do
       stub_request(:get, url).to_return(status: 404, body: 'Not Found')
       response = described_class.get(url)
@@ -71,17 +69,6 @@ RSpec.describe(SOUP::HttpClient) do
       expect(WebMock).to(have_requested(:get, url).times(1))
     end
 
-    # ERR-001: the retry set used to be Net::OpenTimeout/ReadTimeout only, so
-    # every other transient fault bypassed the retry loop on its first attempt
-    # and escaped into Parallel.map -- which propagates the first exception and
-    # aborts every other in-flight lookup, killing a whole multi-hundred-package
-    # scan over one connection reset. Two of the examples below previously
-    # asserted that bypass as if it were the intended contract.
-    #
-    # Each transient class must now be retried max_retries times and only then
-    # re-raised, so BaseParser#registry_response can turn it into a per-package
-    # skip. Driven from the constant itself so a class added to TRANSIENT_ERRORS
-    # without retry coverage fails here.
     describe 'transient network faults' do
       SOUP::HttpClient::TRANSIENT_ERRORS.each do |error_class|
         it "retries #{error_class} to exhaustion, warns, then re-raises", :aggregate_failures do
