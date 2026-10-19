@@ -5,6 +5,8 @@ require 'httparty'
 require 'net/http'
 require 'openssl'
 
+require_relative 'errors'
+
 module SOUP
   module HttpClient
     # Defaults are tuned for healthy public package registries (rubygems,
@@ -55,13 +57,36 @@ module SOUP
     private_constant :DEFAULT_MAX_RETRIES, :DEFAULT_TIMEOUT_SECONDS
     public_constant :THREAD_COUNT, :TRANSIENT_ERRORS
 
+    Settings = Struct.new(:max_retries, :timeout)
+    SETTINGS = Settings.new
+    private_constant :Settings, :SETTINGS
+
+    def self.validate_env!
+      SETTINGS.max_retries = env_integer('SOUP_HTTP_MAX_RETRIES', DEFAULT_MAX_RETRIES, minimum: 0)
+      SETTINGS.timeout = env_integer('SOUP_HTTP_TIMEOUT', DEFAULT_TIMEOUT_SECONDS, minimum: 1)
+    end
+
     def self.max_retries
-      Integer(ENV.fetch('SOUP_HTTP_MAX_RETRIES', DEFAULT_MAX_RETRIES))
+      validate_env! if SETTINGS.max_retries.nil?
+      SETTINGS.max_retries
     end
 
     def self.default_timeout
-      Integer(ENV.fetch('SOUP_HTTP_TIMEOUT', DEFAULT_TIMEOUT_SECONDS))
+      validate_env! if SETTINGS.timeout.nil?
+      SETTINGS.timeout
     end
+
+    def self.env_integer(name, default, minimum:)
+      raw = ENV.fetch(name, nil)
+      return default if raw.nil?
+
+      value = Integer(raw, exception: false)
+      return value if value && value >= minimum
+
+      raise(ConfigurationError, "#{name} must be an integer >= #{minimum}, got #{raw.inspect}")
+    end
+
+    private_class_method :env_integer
 
     def self.get(url, max_retries: nil, **options)
       max_retries ||= self.max_retries

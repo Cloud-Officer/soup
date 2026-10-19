@@ -160,8 +160,8 @@ options
 | Variable                | Required | Description                                                                                                                                                                                               |
 |-------------------------|----------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `GITHUB_TOKEN`          | Optional | GitHub personal access token for SPM and `--gha` lookups. Required when processing many Swift packages or actions to avoid GitHub API rate limits. [Create one here](https://github.com/settings/tokens). |
-| `SOUP_HTTP_TIMEOUT`     | Optional | Per-request HTTP timeout in seconds (integer). Defaults to `5`. Raise this on slow corporate proxies or rate-limited mirrors.                                                                             |
-| `SOUP_HTTP_MAX_RETRIES` | Optional | Number of retries on transient network faults (timeouts, resets, unreachable hosts, DNS/TLS failures, truncated responses). Defaults to `3`. HTTP 4xx/5xx are not retried.                                |
+| `SOUP_HTTP_TIMEOUT`     | Optional | Per-request HTTP timeout in seconds (integer >= 1). Defaults to `5`. Raise this on slow corporate proxies or rate-limited mirrors. Invalid values fail at startup.                                        |
+| `SOUP_HTTP_MAX_RETRIES` | Optional | Number of retries (integer >= 0) on transient network faults (timeouts, resets, unreachable hosts, DNS/TLS failures, truncated responses). Defaults to `3`. HTTP 4xx/5xx are not retried.                 |
 | `DEBUG`                 | Optional | When set to any value, print the full backtrace on an unhandled error instead of the first few frames.                                                                                                    |
 
 The tool works without `GITHUB_TOKEN` for projects with no SPM dependencies that do not pass `--gha`. Otherwise,
