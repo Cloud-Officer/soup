@@ -371,7 +371,7 @@ RSpec.describe(SOUP::BaseParser) do
       Class.new(described_class) do
         def parse(_file, _packages) = nil
 
-        public :successful_registry_response, :resolve_npm_package
+        public :successful_registry_response, :resolve_npm_package, :parse_registry_json
       end
     end
 
@@ -413,6 +413,33 @@ RSpec.describe(SOUP::BaseParser) do
       end
     end
 
+    describe '#parse_registry_json' do
+      let(:parse) do
+        lambda do |body|
+          stub_request(:get, url).to_return(status: 200, body: body)
+          parser.parse_registry_json(parser.successful_registry_response(url, label: 'pkg'), label: 'pkg')
+        end
+      end
+
+      it 'returns the parsed object' do
+        expect(parse.call('{"name":"pkg"}')).to(eq(JSON.parse('{"name":"pkg"}')))
+      end
+
+      it 'returns nil and warns with the label and the start of a non-JSON body', :aggregate_failures do
+        result = :unset
+        expect { result = parse.call("<html>Captive portal#{'x' * 300}</html>") }
+          .to(output(/\ASkipping pkg: registry response is not a JSON object \(body=<html>Captive portalx{180}\); recorded without registry metadata\n\z/).to_stderr)
+        expect(result).to(be_nil)
+      end
+
+      it 'returns nil and warns for JSON that is not an object', :aggregate_failures do
+        result = :unset
+        expect { result = parse.call('["pkg"]') }
+          .to(output(/Skipping pkg: registry response is not a JSON object \(body=\["pkg"\]\)/).to_stderr)
+        expect(result).to(be_nil)
+      end
+    end
+
     describe '#resolve_npm_package' do
       let(:npm_url) { 'https://registry.npmjs.org/left-pad' }
       let(:resolve) do
@@ -432,6 +459,14 @@ RSpec.describe(SOUP::BaseParser) do
         expect { package = resolve.call }
           .to(output(/HTTP 503.*package=left-pad@1\.3\.0/).to_stderr)
         expect([package.key, package.license, package.unresolved]).to(eq(['JS:left-pad', 'NOASSERTION', true]))
+      end
+
+      it 'records the package as unresolved when the registry body is not JSON', :aggregate_failures do
+        stub_request(:get, npm_url).to_return(status: 200, body: '<html>proxy</html>')
+        package = nil
+        expect { package = resolve.call }
+          .to(output(/Skipping left-pad@1\.3\.0: registry response is not a JSON object/).to_stderr)
+        expect([package.version, package.license, package.unresolved]).to(eq(['1.3.0', 'NOASSERTION', true]))
       end
 
       it 'records the package as unresolved when the pinned version is not in the registry', :aggregate_failures do

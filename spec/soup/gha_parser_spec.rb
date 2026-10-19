@@ -106,6 +106,16 @@ RSpec.describe(SOUP::GHAParser) do
     end
   end
 
+  context 'when the repository lookup returns a 200 that is not JSON' do
+    before { stub_request(:get, 'https://api.github.com/repos/octo-org/shared').to_return(status: 200, body: '<html>proxy</html>') }
+
+    it 'warns and records the package as unresolved', :aggregate_failures do
+      expect { parse_fixtures }
+        .to(output(%r{Skipping octo-org/shared: registry response is not a JSON object}).to_stderr)
+      expect(packages['GHA:octo-org/shared']).to(have_attributes(version: 'main', license: 'NOASSERTION', unresolved: true))
+    end
+  end
+
   context 'when the GitHub API times out' do
     before { stub_request(:get, 'https://api.github.com/repos/octo-org/shared').to_timeout }
 

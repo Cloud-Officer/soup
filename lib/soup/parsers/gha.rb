@@ -74,10 +74,8 @@ module SOUP
       version = refs.join(', ')
       file = occurrences.first[:file]
       response = github_repository_response(name, label: name)
-
-      return unresolved_package(name: name, file: file, language: LANGUAGE, version: version, dependency: false) unless response
-
-      package_details = JSON.parse(response.body)
+      package_details = response && parse_registry_json(response, label: name)
+      return unresolved_package(name: name, file: file, language: LANGUAGE, version: version, dependency: false) unless package_details
 
       build_package(
         name: name,

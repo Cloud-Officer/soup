@@ -82,11 +82,10 @@ module SOUP
     def fetch_package(file, direct_deps, pip_package, version)
       url = "https://pypi.org/pypi/#{URI.encode_www_form_component(pip_package.sub(/\[[^\]]+\]/, ''))}/json"
       dependency = !direct_deps.include?(normalize_pip_name(pip_package.sub(/\[[^\]]+\]/, '')))
-      response = successful_registry_response(url, label: "#{pip_package}==#{version}")
-      return unresolved_package(name: pip_package, file: file, language: 'Python', version: version, dependency: dependency) unless response
-
-      package_details = JSON.parse(response.body)
-      info = package_details['info']
+      label = "#{pip_package}==#{version}"
+      response = successful_registry_response(url, label: label)
+      info = pypi_info(response, label: label)
+      return unresolved_package(name: pip_package, file: file, language: 'Python', version: version, dependency: dependency) unless info
 
       build_package(
         name: pip_package,
@@ -98,6 +97,17 @@ module SOUP
         website: extract_pip_website(info),
         dependency: dependency
       )
+    end
+
+    def pypi_info(response, label:)
+      package_details = response && parse_registry_json(response, label: label)
+      return unless package_details
+
+      info = package_details['info']
+      return info if info.is_a?(Hash)
+
+      warn("Skipping #{label}: registry response has no info object; recorded without registry metadata")
+      nil
     end
 
     def extract_pip_license(info)
