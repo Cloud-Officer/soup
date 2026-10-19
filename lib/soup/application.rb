@@ -186,12 +186,12 @@ module SOUP
     # Fail the run if a committed vendored JS file (matched by --vendored_globs)
     # has no SOUP entry, so dropping a new third-party file into the repo cannot
     # silently bypass the register. Coverage is matched on the entry's `file`
-    # path or basename.
+    # path, or on the basename when the entry's `file` is a bare filename.
     def enforce_vendored_coverage
       return if @options.vendored_globs.empty?
 
       declared = @detected_packages.values.filter_map { |package| package.file unless package.file.to_s.empty? }
-      declared_basenames = declared.map { |path| File.basename(path) }
+      declared_basenames = declared.select { |path| File.basename(path) == path }
 
       @options.vendored_globs.each do |glob|
         Dir.glob(File.join(Dir.pwd, glob)).each do |file|

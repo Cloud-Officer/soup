@@ -135,7 +135,7 @@
 - `excluded_path?(file)`: True for a file under `node_modules/`, `vendor/`, or an `--ignored_folders` entry (announcing the last); shared by lock-file detection and `parse_github_actions`
 - `parse_github_actions`: With `--gha`, collects the files matched by `GITHUB_ACTIONS_GLOBS`, drops excluded paths, and hands them to `GHAParser` in a single call; runs before `parse_manual_entries` so a manual entry can override a detected action
 - `parse_manual_entries`: Invokes `ManualParser` on the manual entries file (default `config/soup-manual.json`) when it exists; parsed after auto-detected packages so a project can override an auto-detected entry by language and package name (entries are keyed `<language>:<package>`, so a manual entry that omits `language` overrides only the `JS` entry of that name)
-- `enforce_vendored_coverage`: Fails the run (sets the error exit code) when a committed file matched by `--vendored_globs` has no SOUP entry, matched on the entry's `file` path or basename
+- `enforce_vendored_coverage`: Fails the run (sets the error exit code) when a committed file matched by `--vendored_globs` has no SOUP entry, matched on the entry's `file` path, or on the basename when that `file` is a bare filename
 - `read_cached_packages`: Loads previously entered user choices from cache
 - `build_license_pattern`: Compiles `--licenses_file` into the allowlist matcher, anchoring every entry on word boundaries so a license that merely contains an allowlisted entry (e.g. npm's proprietary `UNLICENSED` containing `Unlicense`) no longer passes the compliance gate; an empty allowlist matches nothing rather than everything
 - `migrate_legacy_cache_keys(cache)`: Moves entries from caches written before packages were keyed by language (bare package-name keys) to their `<language>:<package>` key, using the `language` each entry recorded, so an entry is never applied to a same-named package from another ecosystem; an existing qualified key wins over a migrated one, and an entry with no recorded language keeps its bare key
@@ -589,9 +589,9 @@ Word-boundary anchoring cannot rescue an entry that is genuinely a substring of 
 **Implementation:**
 
 1. Returns early when no `--vendored_globs` are configured
-2. Collects the `file` paths (and their basenames) declared by detected/manual packages
+2. Collects the `file` paths declared by detected/manual packages, plus the bare filenames (entries whose `file` has no directory)
 3. For each glob, expands matching files under the project root
-4. Reports an error and sets the error exit code for any matched file whose relative path or basename is not declared, instructing the user to add it to the manual entries file
+4. Reports an error and sets the error exit code for any matched file whose relative path is not declared and whose basename matches no bare-filename entry, instructing the user to add it to the manual entries file
 
 ### Markdown Sanitization Algorithm
 
