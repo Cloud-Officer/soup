@@ -15,14 +15,14 @@ ENV LANGUAGE=en_US:en
 ENV LC_ALL=en_US.UTF-8
 
 # Update and install dependencies
-RUN apt-get update && apt-get install --no-install-recommends --yes autoconf autogen automake build-essential ca-certificates clang curl file gcc git git-lfs intltool libtool libtool-bin locales make pkg-config ruby ruby-all-dev ruby-build ruby-bundler ruby-dev sudo unzip wget zip && locale-gen en_US.UTF-8 && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install --no-install-recommends --yes autoconf autogen automake build-essential ca-certificates clang curl file gcc git git-lfs intltool libtool libtool-bin locales make pkg-config ruby ruby-all-dev ruby-build ruby-bundler ruby-dev unzip wget zip && locale-gen en_US.UTF-8 && rm -rf /var/lib/apt/lists/*
 
 # Add user soup. The uid/gid are pinned rather than auto-assigned so the numeric
 # USER below cannot drift: `ubuntu:26.04` already ships an `ubuntu` user at 1000,
 # so an unpinned useradd lands on 1001 today, but that is a property of the base
 # image's account list, not a guarantee. Pinning keeps the built image identical
 # to the auto-assigned one while making the value explicit.
-RUN groupadd -g 1001 soup && useradd -m -u 1001 -g 1001 -s /bin/bash soup && echo 'soup ALL=(ALL) NOPASSWD:ALL' >>/etc/sudoers
+RUN groupadd -g 1001 soup && useradd -m -u 1001 -g 1001 -s /bin/bash soup
 
 # Copy the build context -- the exact commit this image is built from -- rather
 # than cloning the default branch at build time. The publishing workflow checks
