@@ -141,6 +141,32 @@ RSpec.describe(SOUP::PIPParser) do
   # exhausted. Before the fix that escaped fetch_package, propagated through
   # Parallel.map, and killed the whole scan with an untyped backtrace. It must
   # warn and omit just this package instead.
+  context 'when the registry returns a 200 that is not JSON' do
+    let(:requirements_content) { "requests==2.31.0\n" }
+    let(:packages) { {} }
+
+    before { stub_request(:get, 'https://pypi.org/pypi/requests/json').to_return(status: 200, body: '<html>proxy</html>') }
+
+    it 'warns and records the package as unresolved', :aggregate_failures do
+      expect { parser.parse(requirements_path, packages) }
+        .to(output(/Skipping requests==2\.31\.0: registry response is not a JSON object/).to_stderr)
+      expect(packages['Python:requests']).to(have_attributes(version: '2.31.0', license: 'NOASSERTION', unresolved: true))
+    end
+  end
+
+  context 'when the registry response has no info object' do
+    let(:requirements_content) { "requests==2.31.0\n" }
+    let(:packages) { {} }
+
+    before { stub_request(:get, 'https://pypi.org/pypi/requests/json').to_return(status: 200, body: '{"info":null}') }
+
+    it 'warns and records the package as unresolved', :aggregate_failures do
+      expect { parser.parse(requirements_path, packages) }
+        .to(output(/Skipping requests==2\.31\.0: registry response has no info object/).to_stderr)
+      expect(packages['Python:requests']).to(have_attributes(version: '2.31.0', license: 'NOASSERTION', unresolved: true))
+    end
+  end
+
   context 'when the registry times out' do
     let(:requirements_content) { "requests==2.31.0\n" }
     let(:packages) { {} }

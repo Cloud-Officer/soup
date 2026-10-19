@@ -128,6 +128,19 @@ RSpec.describe(SOUP::ImportmapParser) do
   # package name alone, because the version is only resolved from the response it
   # is still waiting on -- so its warning has no "@version" suffix (unlike the NPM
   # and Yarn parsers). This path had no spec before the extraction.
+  context 'when the registry returns a 200 that is not JSON' do
+    let(:importmap) { "pin 'marked', to: 'https://esm.sh/marked@12.0.0'\n" }
+
+    before { stub_request(:get, 'https://registry.npmjs.org/marked').to_return(status: 200, body: '<html>proxy</html>') }
+
+    it 'warns and records the package as unresolved', :aggregate_failures do
+      result = {}
+      expect { parser.parse(file, result) }
+        .to(output(/Skipping marked: registry response is not a JSON object/).to_stderr)
+      expect(result['JS:marked']).to(have_attributes(version: '12.0.0', license: 'NOASSERTION', unresolved: true))
+    end
+  end
+
   context 'when the registry times out' do
     let(:importmap) { "pin 'marked', to: 'https://esm.sh/marked@12.0.0'\n" }
 

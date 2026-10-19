@@ -92,10 +92,8 @@ module SOUP
       name = pin_repo_name(repo_path, pin['identity'] || pin['package'])
       version = pin_version(pin)
       response = github_repository_response(repo_path, label: name)
-
-      return unresolved_package(name: name, file: file, language: 'Swift', version: version, dependency: !manifest_mentions?(main_file, name)) unless response
-
-      package_details = JSON.parse(response.body)
+      package_details = response && parse_registry_json(response, label: name)
+      return unresolved_package(name: name, file: file, language: 'Swift', version: version, dependency: !manifest_mentions?(main_file, name)) unless package_details
 
       # A private repository is still a SOUP component, so it is recorded rather
       # than dropped. The lookup succeeded, so its real metadata is used.

@@ -161,6 +161,34 @@ RSpec.describe(SOUP::BundlerParser) do
     end
   end
 
+  context 'when the pinned-version response is not JSON' do
+    before do
+      stub_request(:get, 'https://api.rubygems.org/api/v2/rubygems/test-gem/versions/1.0.0.json')
+        .to_return(status: 200, body: '<html>proxy</html>')
+    end
+
+    it 'warns and records the gem as unresolved', :aggregate_failures do
+      packages = {}
+      expect { parser.parse('Gemfile.lock', packages) }
+        .to(output(/Skipping test-gem 1\.0\.0: registry response is not a JSON object/).to_stderr)
+      expect(packages['Ruby:test-gem']).to(have_attributes(version: '1.0.0', license: 'NOASSERTION', unresolved: true))
+    end
+  end
+
+  context 'when the latest-version response is not JSON' do
+    before do
+      stub_request(:get, 'https://api.rubygems.org/api/v2/rubygems/test-gem/versions/1.0.0.json').to_return(status: 404, body: 'Not Found')
+      stub_request(:get, 'https://api.rubygems.org/api/v1/versions/test-gem/latest.json').to_return(status: 200, body: '<html>proxy</html>')
+    end
+
+    it 'warns and records the gem as unresolved', :aggregate_failures do
+      packages = {}
+      expect { parser.parse('Gemfile.lock', packages) }
+        .to(output(/Skipping test-gem 1\.0\.0: registry response is not a JSON object/).to_stderr)
+      expect(packages['Ruby:test-gem']).to(have_attributes(version: '1.0.0', license: 'NOASSERTION', unresolved: true))
+    end
+  end
+
   context 'when API returns nil fields' do
     let(:packages) { {} }
 

@@ -52,9 +52,9 @@ module SOUP
     def fetch_package(file, name, version)
       # The version is only known after this response, so the warnings name the package alone.
       response = successful_registry_response(npm_registry_url(name), label: name)
-      return unresolved_package(name: name, file: file, language: 'JS', version: version, dependency: false) unless response
+      payload = response && parse_registry_json(response, label: name)
+      return unresolved_package(name: name, file: file, language: 'JS', version: version, dependency: false) unless payload
 
-      payload = JSON.parse(response.body)
       resolved_version = version || payload.dig('dist-tags', 'latest')
       package_details = lookup_npm_registry_version(payload, name: name, version: resolved_version)
       return unresolved_package(name: name, file: file, language: 'JS', version: resolved_version, dependency: false) if package_details.nil?

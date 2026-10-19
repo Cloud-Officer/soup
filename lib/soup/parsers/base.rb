@@ -261,12 +261,25 @@ module SOUP
       response
     end
 
+    def parse_registry_json(response, label:)
+      payload =
+        begin
+          JSON.parse(response.body)
+        rescue JSON::ParserError
+          nil
+        end
+      return payload if payload.is_a?(Hash)
+
+      warn("Skipping #{label}: registry response is not a JSON object (body=#{response.body.to_s.strip[0, 200]}); recorded without registry metadata")
+      nil
+    end
+
     # Resolve a lockfile-pinned npm package (NPM and Yarn), unresolved when the lookup fails or the version is absent.
     def resolve_npm_package(file:, name:, version:, dependency:)
-      response = successful_registry_response(npm_registry_url(name), label: "#{name}@#{version}")
-      return unresolved_package(name: name, file: file, language: 'JS', version: version, dependency: dependency) unless response
-
-      package_details = lookup_npm_registry_version(JSON.parse(response.body), name: name, version: version)
+      label = "#{name}@#{version}"
+      response = successful_registry_response(npm_registry_url(name), label: label)
+      payload = response && parse_registry_json(response, label: label)
+      package_details = payload && lookup_npm_registry_version(payload, name: name, version: version)
       return unresolved_package(name: name, file: file, language: 'JS', version: version, dependency: dependency) if package_details.nil?
 
       build_npm_registry_package(

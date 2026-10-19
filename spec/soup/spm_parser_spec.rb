@@ -258,6 +258,20 @@ RSpec.describe(SOUP::SPMParser) do
     end
   end
 
+  context 'when the GitHub API returns a 200 that is not JSON' do
+    before do
+      stub_request(:get, 'https://api.github.com/repos/Alamofire/Alamofire')
+        .to_return(status: 200, body: '<html>proxy</html>')
+    end
+
+    it 'warns and records the pin as unresolved', :aggregate_failures do
+      packages = {}
+      expect { parser.parse(lockfile_path, packages) }
+        .to(output(/Skipping Alamofire: registry response is not a JSON object/).to_stderr)
+      expect(packages['Swift:Alamofire']).to(have_attributes(version: '5.9.0', license: 'NOASSERTION', unresolved: true))
+    end
+  end
+
   context 'when Package.swift does not exist but Tuist Dependencies.swift does' do
     let(:manifest_name) { 'Tuist/Dependencies.swift' }
     let(:resolved_name) { 'Tuist/Package.resolved'   }
