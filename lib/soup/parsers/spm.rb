@@ -31,13 +31,13 @@ module SOUP
       dir = File.dirname(file)
       base = File.basename(file, '.*')
 
-      package_swift = path_join(dir, "#{base}.swift")
+      package_swift = sibling_file(file, "#{base}.swift")
       return File.read(package_swift) if File.exist?(package_swift)
 
       tuist_deps = tuist_dependencies_path(dir)
       return File.read(tuist_deps) if tuist_deps && File.exist?(tuist_deps)
 
-      xcodeproj = path_join(dir, "#{base}.xcodeproj/project.pbxproj")
+      xcodeproj = sibling_file(file, "#{base}.xcodeproj/project.pbxproj")
       return File.read(xcodeproj) if File.exist?(xcodeproj)
 
       enclosing_pbxproj = enclosing_xcodeproj_pbxproj(dir)
@@ -65,14 +65,6 @@ module SOUP
       end
 
       nil
-    end
-
-    # Drop the leading "./" that File.join would introduce when dir == '.' so
-    # downstream File.exist?/File.read receive the same path callers use.
-    def path_join(dir, suffix)
-      return suffix if dir.nil? || dir.empty? || dir == '.'
-
-      "#{dir}/#{suffix}"
     end
 
     # If the resolved file lives anywhere inside a Tuist/ directory, return the
