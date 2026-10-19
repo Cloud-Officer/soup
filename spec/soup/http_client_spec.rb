@@ -108,48 +108,80 @@ RSpec.describe(SOUP::HttpClient) do
     end
   end
 
-  # Regression tests for CFG-01: SOUP_HTTP_TIMEOUT and SOUP_HTTP_MAX_RETRIES
-  # are read from ENV at call time so operators can tune behavior on slow
-  # corporate proxies / rate-limited mirrors without forking.
+  def stub_http_env(timeout: nil, max_retries: nil)
+    allow(ENV).to(receive(:fetch).and_call_original)
+    allow(ENV).to(receive(:fetch).with('SOUP_HTTP_TIMEOUT', nil).and_return(timeout))
+    allow(ENV).to(receive(:fetch).with('SOUP_HTTP_MAX_RETRIES', nil).and_return(max_retries))
+  end
+
+  def configure_http_env(**env)
+    stub_http_env(**env)
+    described_class.validate_env!
+  end
+
   describe '.max_retries' do
     it 'defaults to 3 when SOUP_HTTP_MAX_RETRIES is unset' do
-      allow(ENV).to(receive(:fetch).and_call_original)
-      allow(ENV).to(receive(:fetch).with('SOUP_HTTP_MAX_RETRIES', 3).and_return(3))
+      configure_http_env
       expect(described_class.max_retries).to(eq(3))
     end
 
     it 'honors SOUP_HTTP_MAX_RETRIES when set' do
-      allow(ENV).to(receive(:fetch).and_call_original)
-      allow(ENV).to(receive(:fetch).with('SOUP_HTTP_MAX_RETRIES', 3).and_return('7'))
+      configure_http_env(max_retries: '7')
       expect(described_class.max_retries).to(eq(7))
+    end
+
+    it 'accepts zero to disable retries' do
+      configure_http_env(max_retries: '0')
+      expect(described_class.max_retries).to(eq(0))
     end
   end
 
   describe '.default_timeout' do
     it 'defaults to 5 when SOUP_HTTP_TIMEOUT is unset' do
-      allow(ENV).to(receive(:fetch).and_call_original)
-      allow(ENV).to(receive(:fetch).with('SOUP_HTTP_TIMEOUT', 5).and_return(5))
+      configure_http_env
       expect(described_class.default_timeout).to(eq(5))
     end
 
     it 'honors SOUP_HTTP_TIMEOUT when set' do
-      allow(ENV).to(receive(:fetch).and_call_original)
-      allow(ENV).to(receive(:fetch).with('SOUP_HTTP_TIMEOUT', 5).and_return('45'))
+      configure_http_env(timeout: '45')
       expect(described_class.default_timeout).to(eq(45))
+    end
+  end
+
+  describe '.validate_env!' do
+    {
+      { timeout: '5s' } => /SOUP_HTTP_TIMEOUT .*"5s"/,
+      { timeout: '' } => /SOUP_HTTP_TIMEOUT .*""/,
+      { timeout: '0' } => /SOUP_HTTP_TIMEOUT must be an integer >= 1, got "0"/,
+      { timeout: '-3' } => /SOUP_HTTP_TIMEOUT .*"-3"/,
+      { max_retries: 'three' } => /SOUP_HTTP_MAX_RETRIES .*"three"/,
+      { max_retries: '1.5' } => /SOUP_HTTP_MAX_RETRIES .*"1.5"/,
+      { max_retries: '-1' } => /SOUP_HTTP_MAX_RETRIES must be an integer >= 0, got "-1"/
+    }.each do |env, message|
+      it "raises a ConfigurationError naming the variable for #{env}" do
+        stub_http_env(**env)
+        expect { described_class.validate_env! }
+          .to(raise_error(SOUP::ConfigurationError, message))
+      end
+    end
+
+    it 'memoizes the parsed values so later ENV changes cannot break per-request reads', :aggregate_failures do
+      configure_http_env(timeout: '9', max_retries: '2')
+      stub_http_env(timeout: 'garbage', max_retries: 'garbage')
+      expect(described_class.default_timeout).to(eq(9))
+      expect(described_class.max_retries).to(eq(2))
     end
   end
 
   describe '.get with SOUP_HTTP_MAX_RETRIES env override' do
     before do
-      allow(ENV).to(receive(:fetch).and_call_original)
-      allow(ENV).to(receive(:fetch).with('SOUP_HTTP_MAX_RETRIES', 3).and_return('1'))
-      allow(ENV).to(receive(:fetch).with('SOUP_HTTP_TIMEOUT', 5).and_return(5))
+      configure_http_env(max_retries: '1')
       stub_request(:get, url).to_timeout
     end
 
     it 'uses the env-resolved max_retries as the default when no kwarg is passed', :aggregate_failures do
       expect { described_class.get(url) }
-        .to(raise_error(Net::OpenTimeout))
+        .to(raise_error(Net::OpenTimeout).and(output(/Aborting after 1 retries/).to_stderr))
       expect(WebMock).to(have_requested(:get, url).times(2))
     end
   end

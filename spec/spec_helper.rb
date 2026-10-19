@@ -50,6 +50,8 @@ RSpec.configure do |config|
 
   config.include(SoupFixtureHelpers)
 
+  config.before { SOUP::HttpClient.validate_env! }
+
   config.after do
     next unless instance_variable_defined?(:@fixture_dir) && @fixture_dir
 

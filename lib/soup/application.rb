@@ -80,6 +80,7 @@ module SOUP
       end
 
       validate_cache_file!
+      HttpClient.validate_env!
     end
 
     # The cache is optional -- absent on a first run -- so it is only checked

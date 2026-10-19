@@ -553,6 +553,21 @@ RSpec.describe(SOUP::Application) do
       end
     end
 
+    context 'when SOUP_HTTP_TIMEOUT is not an integer' do
+      before do
+        allow(ENV).to(receive(:fetch).and_call_original)
+        allow(ENV).to(receive(:fetch).with('SOUP_HTTP_TIMEOUT', nil).and_return('5s'))
+      end
+
+      it 'raises a ConfigurationError naming the variable before detecting packages', :aggregate_failures do
+        app = described_class.new(licenses_args(skip: skip_parsers_except_composer))
+        allow(app).to(receive(:detect_packages))
+        expect { app.execute }
+          .to(raise_error(SOUP::ConfigurationError, /SOUP_HTTP_TIMEOUT .*"5s"/))
+        expect(app).not_to(have_received(:detect_packages))
+      end
+    end
+
     context 'when config file has invalid JSON' do
       let(:bad_file) do
         file = Tempfile.new(['bad', '.json'])
