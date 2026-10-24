@@ -18,7 +18,7 @@
 | Ruby | nokogiri | 1.19.4 | MIT | Nokogiri (鋸) makes it easy and painless to work with XML and HTML from Ruby | <https://nokogiri.org> | 2026-05-22 | Low | Parses Maven POM XML and decodes HTML entities in package descriptions | libxml2-backed parser with XPath support, needed for POM licenses and parent lookups |
 | Ruby | optparse | 0.8.1 | Ruby | OptionParser is a class for command-line option analysis | <https://github.com/ruby/optparse> | 2026-05-22 | Low | Used to parse command line arguments. | Ruby's standard command-line option parser (default gem) |
 | Ruby | parallel | 2.3.0 | MIT | Run any kind of code in parallel processes | <https://github.com/grosser/parallel> | 2026-10-03 | Low | Used to parallelize HTTP fetches across CPU cores in each parser. | Thread-pool map (in_threads) without hand-rolled thread management |
-| Ruby | parser | 3.3.12.0 | MIT | A Ruby parser written in pure Ruby. | <https://github.com/whitequark/parser> | 2026-05-22 | Low | Dependency | Dependency |
+| Ruby | parser | 3.3.13.0 | MIT | A Ruby parser written in pure Ruby. | <https://github.com/whitequark/parser> | 2026-10-24 | Low | Dependency | Dependency |
 | Ruby | pastel | 0.8.0 | MIT | Terminal strings styling with intuitive and clean API. | <https://ttytoolkit.org> | 2026-05-22 | Low | Dependency | Dependency |
 | Ruby | prism | 1.9.0 | MIT | Prism Ruby parser | <https://github.com/ruby/prism> | 2026-05-22 | Low | Dependency | Dependency |
 | Ruby | public_suffix | 7.0.5 | MIT | PublicSuffix can parse and decompose a domain name into top level domain, domain and subdomains. | <https://simonecarletti.com/code/publicsuffix-ruby> | 2026-05-22 | Low | Dependency | Dependency |
