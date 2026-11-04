@@ -2,11 +2,11 @@
   "Ruby:addressable": {
     "language": "Ruby",
     "package": "addressable",
-    "version": "2.9.0",
+    "version": "2.9.2",
     "license": "Apache-2.0",
     "description": "Addressable is an alternative implementation to the URI implementation that is",
     "website": "https://github.com/sporkmonger/addressable",
-    "last_verified_at": "2026-05-22",
+    "last_verified_at": "2026-11-03",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -50,11 +50,11 @@
   "Ruby:csv": {
     "language": "Ruby",
     "package": "csv",
-    "version": "3.3.6",
+    "version": "3.3.7",
     "license": "Ruby",
     "description": "The CSV library provides a complete interface to CSV files and data",
     "website": "https://github.com/ruby/csv",
-    "last_verified_at": "2026-05-22",
+    "last_verified_at": "2026-11-03",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -158,11 +158,11 @@
   "Ruby:nokogiri": {
     "language": "Ruby",
     "package": "nokogiri",
-    "version": "1.19.4",
+    "version": "1.19.7",
     "license": "MIT",
     "description": "Nokogiri (鋸) makes it easy and painless to work with XML and HTML from Ruby",
     "website": "https://nokogiri.org",
-    "last_verified_at": "2026-05-22",
+    "last_verified_at": "2026-11-03",
     "risk_level": "Low",
     "requirements": "Parses Maven POM XML and decodes HTML entities in package descriptions",
     "verification_reasoning": "libxml2-backed parser with XPath support, needed for POM licenses and parent lookups"
@@ -350,11 +350,11 @@
   "Ruby:rubocop": {
     "language": "Ruby",
     "package": "rubocop",
-    "version": "1.92.1",
+    "version": "1.92.2",
     "license": "MIT",
     "description": "RuboCop is a Ruby code style checking and code formatting tool.",
     "website": "https://rubocop.org/",
-    "last_verified_at": "2026-10-22",
+    "last_verified_at": "2026-11-03",
     "risk_level": "Low",
     "requirements": "Ruby linter",
     "verification_reasoning": "Most popular gem on rubygems"
