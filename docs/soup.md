@@ -8,7 +8,7 @@
 | Ruby | crack | 1.0.1 | MIT | Really simple JSON and XML parsing, ripped from Merb and Rails. | <https://github.com/jnunemaker/crack> | 2026-05-22 | Low | Dependency | Dependency |
 | Ruby | csv | 3.3.7 | Ruby | The CSV library provides a complete interface to CSV files and data | <https://github.com/ruby/csv> | 2026-11-03 | Low | Dependency | Dependency |
 | Ruby | diff-lcs | 1.6.2 | MIT | Diff::LCS computes the difference between two Enumerable sequences using the | <https://github.com/halostatue/diff-lcs> | 2026-05-22 | Low | Dependency | Dependency |
-| Ruby | hashdiff | 1.2.1 | MIT | Hashdiff is a diff lib to compute the smallest difference between two hashes | <https://github.com/liufengyun/hashdiff> | 2026-05-22 | Low | Dependency | Dependency |
+| Ruby | hashdiff | 1.2.2 | MIT | Hashdiff is a diff lib to compute the smallest difference between two hashes | <https://github.com/liufengyun/hashdiff> | 2026-11-09 | Low | Dependency | Dependency |
 | Ruby | httparty | 0.24.3 | MIT | Makes http fun! Also, makes consuming restful web services dead easy. | <https://github.com/jnunemaker/httparty> | 2026-09-30 | Medium | HTTP client for the package registry APIs (RubyGems, npm, PyPI, Maven repositories, GitHub) | Simple GET API with per-request timeout and headers, built on Ruby's standard Net::HTTP |
 | Ruby | json | 3.1.0 | Ruby | A JSON implementation as a JRuby extension. | <https://github.com/ruby/json> | 2026-10-18 | Low | Used to read package manager and cache files. | Ruby's bundled JSON implementation (default gem) |
 | Ruby | language_server-protocol | 3.17.0.6 | MIT | A Language Server Protocol SDK | <https://github.com/mtsmfm/language_server-protocol-ruby> | 2026-05-22 | Low | Dependency | Dependency |
@@ -20,21 +20,21 @@
 | Ruby | parallel | 2.3.0 | MIT | Run any kind of code in parallel processes | <https://github.com/grosser/parallel> | 2026-10-03 | Low | Used to parallelize HTTP fetches across CPU cores in each parser. | Thread-pool map (in_threads) without hand-rolled thread management |
 | Ruby | parser | 3.3.13.0 | MIT | A Ruby parser written in pure Ruby. | <https://github.com/whitequark/parser> | 2026-10-24 | Low | Dependency | Dependency |
 | Ruby | pastel | 0.8.0 | MIT | Terminal strings styling with intuitive and clean API. | <https://ttytoolkit.org> | 2026-05-22 | Low | Dependency | Dependency |
-| Ruby | prism | 1.9.0 | MIT | Prism Ruby parser | <https://github.com/ruby/prism> | 2026-05-22 | Low | Dependency | Dependency |
+| Ruby | prism | 2.1.0 | MIT | Prism Ruby parser | <https://github.com/ruby/prism> | 2026-11-09 | Low | Dependency | Dependency |
 | Ruby | public_suffix | 7.0.5 | MIT | PublicSuffix can parse and decompose a domain name into top level domain, domain and subdomains. | <https://simonecarletti.com/code/publicsuffix-ruby> | 2026-05-22 | Low | Dependency | Dependency |
 | Ruby | racc | 1.8.1 | Ruby | Racc is an LALR(1) parser generator. | <https://github.com/ruby/racc> | 2026-05-22 | Low | Dependency | Dependency |
 | Ruby | rainbow | 3.1.1 | MIT | Colorize printed text on ANSI terminals | <https://github.com/sickill/rainbow> | 2026-05-22 | Low | Dependency | Dependency |
 | Ruby | regexp_parser | 2.13.1 | MIT | A library for tokenizing, lexing, and parsing Ruby regular expressions. | <https://github.com/ammar/regexp_parser> | 2026-09-30 | Low | Dependency | Dependency |
 | Ruby | rexml | 3.4.4 | BSD-2-Clause | An XML toolkit for Ruby | <https://github.com/ruby/rexml> | 2026-05-22 | Low | Dependency | Dependency |
 | Ruby | rspec | 3.13.2 | MIT | BDD for Ruby | <https://rspec.info> | 2026-05-22 | Low | Test framework that runs the spec suite | Behaviour-driven Ruby test framework the spec suite and rubocop-rspec rules are written for |
-| Ruby | rspec-core | 3.13.6 | MIT | BDD for Ruby | <https://rspec.info> | 2026-05-22 | Low | Dependency | Dependency |
-| Ruby | rspec-expectations | 3.13.5 | MIT | rspec-expectations provides a simple, readable API to express expected outcomes of a code example. | <https://rspec.info> | 2026-05-22 | Low | Dependency | Dependency |
-| Ruby | rspec-mocks | 3.13.8 | MIT | RSpec's 'test double' framework, with support for stubbing and mocking | <https://rspec.info> | 2026-05-22 | Low | Dependency | Dependency |
-| Ruby | rspec-support | 3.13.7 | MIT | Support utilities for RSpec gems | <https://rspec.info> | 2026-05-22 | Low | Dependency | Dependency |
+| Ruby | rspec-core | 3.13.7 | MIT | BDD for Ruby | <https://rspec.info> | 2026-11-09 | Low | Dependency | Dependency |
+| Ruby | rspec-expectations | 3.13.6 | MIT | rspec-expectations provides a simple, readable API to express expected outcomes of a code example. | <https://rspec.info> | 2026-11-09 | Low | Dependency | Dependency |
+| Ruby | rspec-mocks | 3.13.9 | MIT | RSpec's 'test double' framework, with support for stubbing and mocking | <https://rspec.info> | 2026-11-09 | Low | Dependency | Dependency |
+| Ruby | rspec-support | 3.13.8 | MIT | Support utilities for RSpec gems | <https://rspec.info> | 2026-11-09 | Low | Dependency | Dependency |
 | Ruby | rubocop | 1.92.2 | MIT | RuboCop is a Ruby code style checking and code formatting tool. | <https://rubocop.org/> | 2026-11-03 | Low | Ruby linter | Most popular gem on rubygems |
-| Ruby | rubocop-ast | 1.50.0 | MIT | RuboCop's Node and NodePattern classes. | <https://www.rubocop.org/> | 2026-05-22 | Low | Dependency | Dependency |
+| Ruby | rubocop-ast | 1.51.0 | MIT | RuboCop's Node and NodePattern classes. | <https://www.rubocop.org/> | 2026-11-09 | Low | Dependency | Dependency |
 | Ruby | rubocop-capybara | 3.1.0 | MIT | Code style checking for Capybara test files (RSpec, Cucumber, Minitest). | <https://github.com/rubocop/rubocop-capybara> | 2026-10-18 | Low | Ruby linter | Most popular gem |
-| Ruby | rubocop-graphql | 1.8.0 | MIT | A collection of RuboCop cops to improve GraphQL-related code | <https://github.com/DmitryTsepelev/rubocop-graphql> | 2026-05-22 | Low | Ruby linter | Most popular gem |
+| Ruby | rubocop-graphql | 1.9.0 | MIT | A collection of RuboCop cops to improve GraphQL-related code | <https://github.com/DmitryTsepelev/rubocop-graphql> | 2026-11-09 | Low | Ruby linter | Most popular gem |
 | Ruby | rubocop-minitest | 0.41.0 | MIT | Automatic Minitest code style checking tool. | <https://docs.rubocop.org/rubocop-minitest/> | 2026-10-03 | Low | Ruby linter | Most popular gem |
 | Ruby | rubocop-performance | 1.27.0 | MIT | A collection of RuboCop cops to check for performance optimizations | <https://docs.rubocop.org/rubocop-performance/> | 2026-05-22 | Low | A collection of RuboCop cops to check for performance optimizations in Ruby code | Most popular gem |
 | Ruby | rubocop-rspec | 3.10.2 | MIT | Code style checking for RSpec files. | <https://github.com/rubocop/rubocop-rspec> | 2026-05-22 | Low | Code style checking for RSpec files. A plugin for the RuboCop code style enforcing & linting tool | Most popular gem |
