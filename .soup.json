@@ -74,11 +74,11 @@
   "Ruby:hashdiff": {
     "language": "Ruby",
     "package": "hashdiff",
-    "version": "1.2.1",
+    "version": "1.2.2",
     "license": "MIT",
     "description": " Hashdiff is a diff lib to compute the smallest difference between two hashes",
     "website": "https://github.com/liufengyun/hashdiff",
-    "last_verified_at": "2026-05-22",
+    "last_verified_at": "2026-11-09",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -218,11 +218,11 @@
   "Ruby:prism": {
     "language": "Ruby",
     "package": "prism",
-    "version": "1.9.0",
+    "version": "2.1.0",
     "license": "MIT",
     "description": "Prism Ruby parser",
     "website": "https://github.com/ruby/prism",
-    "last_verified_at": "2026-05-22",
+    "last_verified_at": "2026-11-09",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -302,11 +302,11 @@
   "Ruby:rspec-core": {
     "language": "Ruby",
     "package": "rspec-core",
-    "version": "3.13.6",
+    "version": "3.13.7",
     "license": "MIT",
     "description": "BDD for Ruby",
     "website": "https://rspec.info",
-    "last_verified_at": "2026-05-22",
+    "last_verified_at": "2026-11-09",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -314,11 +314,11 @@
   "Ruby:rspec-expectations": {
     "language": "Ruby",
     "package": "rspec-expectations",
-    "version": "3.13.5",
+    "version": "3.13.6",
     "license": "MIT",
     "description": "rspec-expectations provides a simple, readable API to express expected outcomes of a code example.",
     "website": "https://rspec.info",
-    "last_verified_at": "2026-05-22",
+    "last_verified_at": "2026-11-09",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -326,11 +326,11 @@
   "Ruby:rspec-mocks": {
     "language": "Ruby",
     "package": "rspec-mocks",
-    "version": "3.13.8",
+    "version": "3.13.9",
     "license": "MIT",
     "description": "RSpec's 'test double' framework, with support for stubbing and mocking",
     "website": "https://rspec.info",
-    "last_verified_at": "2026-05-22",
+    "last_verified_at": "2026-11-09",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -338,11 +338,11 @@
   "Ruby:rspec-support": {
     "language": "Ruby",
     "package": "rspec-support",
-    "version": "3.13.7",
+    "version": "3.13.8",
     "license": "MIT",
     "description": "Support utilities for RSpec gems",
     "website": "https://rspec.info",
-    "last_verified_at": "2026-05-22",
+    "last_verified_at": "2026-11-09",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -362,11 +362,11 @@
   "Ruby:rubocop-ast": {
     "language": "Ruby",
     "package": "rubocop-ast",
-    "version": "1.50.0",
+    "version": "1.51.0",
     "license": "MIT",
     "description": "    RuboCop's Node and NodePattern classes.",
     "website": "https://www.rubocop.org/",
-    "last_verified_at": "2026-05-22",
+    "last_verified_at": "2026-11-09",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -386,11 +386,11 @@
   "Ruby:rubocop-graphql": {
     "language": "Ruby",
     "package": "rubocop-graphql",
-    "version": "1.8.0",
+    "version": "1.9.0",
     "license": "MIT",
     "description": "A collection of RuboCop cops to improve GraphQL-related code",
     "website": "https://github.com/DmitryTsepelev/rubocop-graphql",
-    "last_verified_at": "2026-05-22",
+    "last_verified_at": "2026-11-09",
     "risk_level": "Low",
     "requirements": "Ruby linter",
     "verification_reasoning": "Most popular gem"
