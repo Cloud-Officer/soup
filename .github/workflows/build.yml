@@ -212,6 +212,7 @@ jobs:
       with:
         ruby-bundler-cache: "${{env.RUBY-BUNDLER-CACHE}}"
         github-token: "${{github.token}}"
+        ruby-version: default
     - name: Bundler
       shell: bash
       if: "${{needs.variables.outputs.SKIP_LICENSES != '1' || needs.variables.outputs.SKIP_TESTS != '1'}}"
