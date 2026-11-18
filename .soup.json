@@ -266,11 +266,11 @@
   "Ruby:regexp_parser": {
     "language": "Ruby",
     "package": "regexp_parser",
-    "version": "2.13.2",
+    "version": "2.13.4",
     "license": "MIT",
     "description": "A library for tokenizing, lexing, and parsing Ruby regular expressions.",
     "website": "https://github.com/ammar/regexp_parser",
-    "last_verified_at": "2026-11-16",
+    "last_verified_at": "2026-11-18",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -350,11 +350,11 @@
   "Ruby:rubocop": {
     "language": "Ruby",
     "package": "rubocop",
-    "version": "1.92.2",
+    "version": "1.92.3",
     "license": "MIT",
     "description": "RuboCop is a Ruby code style checking and code formatting tool.",
     "website": "https://rubocop.org/",
-    "last_verified_at": "2026-11-03",
+    "last_verified_at": "2026-11-18",
     "risk_level": "Low",
     "requirements": "Ruby linter",
     "verification_reasoning": "Most popular gem on rubygems"
@@ -362,11 +362,11 @@
   "Ruby:rubocop-ast": {
     "language": "Ruby",
     "package": "rubocop-ast",
-    "version": "1.51.0",
+    "version": "1.52.0",
     "license": "MIT",
     "description": "    RuboCop's Node and NodePattern classes.",
     "website": "https://www.rubocop.org/",
-    "last_verified_at": "2026-11-09",
+    "last_verified_at": "2026-11-18",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -554,11 +554,11 @@
   "Ruby:webmock": {
     "language": "Ruby",
     "package": "webmock",
-    "version": "3.34.0",
+    "version": "3.35.0",
     "license": "MIT",
     "description": "WebMock allows stubbing HTTP requests and setting expectations on HTTP requests.",
     "website": "https://github.com/bblimke/webmock",
-    "last_verified_at": "2026-10-18",
+    "last_verified_at": "2026-11-18",
     "risk_level": "Low",
     "requirements": "Stubs HTTP requests so the parser specs run without network access",
     "verification_reasoning": "Intercepts HTTParty/Net::HTTP requests, letting the specs simulate registry errors and timeouts"
