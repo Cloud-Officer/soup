@@ -24,15 +24,15 @@
 | Ruby | public_suffix | 7.0.5 | MIT | PublicSuffix can parse and decompose a domain name into top level domain, domain and subdomains. | <https://simonecarletti.com/code/publicsuffix-ruby> | 2026-05-22 | Low | Dependency | Dependency |
 | Ruby | racc | 1.8.1 | Ruby | Racc is an LALR(1) parser generator. | <https://github.com/ruby/racc> | 2026-05-22 | Low | Dependency | Dependency |
 | Ruby | rainbow | 3.1.1 | MIT | Colorize printed text on ANSI terminals | <https://github.com/sickill/rainbow> | 2026-05-22 | Low | Dependency | Dependency |
-| Ruby | regexp_parser | 2.13.2 | MIT | A library for tokenizing, lexing, and parsing Ruby regular expressions. | <https://github.com/ammar/regexp_parser> | 2026-11-16 | Low | Dependency | Dependency |
+| Ruby | regexp_parser | 2.13.4 | MIT | A library for tokenizing, lexing, and parsing Ruby regular expressions. | <https://github.com/ammar/regexp_parser> | 2026-11-18 | Low | Dependency | Dependency |
 | Ruby | rexml | 3.4.4 | BSD-2-Clause | An XML toolkit for Ruby | <https://github.com/ruby/rexml> | 2026-05-22 | Low | Dependency | Dependency |
 | Ruby | rspec | 3.13.2 | MIT | BDD for Ruby | <https://rspec.info> | 2026-05-22 | Low | Test framework that runs the spec suite | Behaviour-driven Ruby test framework the spec suite and rubocop-rspec rules are written for |
 | Ruby | rspec-core | 3.13.7 | MIT | BDD for Ruby | <https://rspec.info> | 2026-11-09 | Low | Dependency | Dependency |
 | Ruby | rspec-expectations | 3.13.6 | MIT | rspec-expectations provides a simple, readable API to express expected outcomes of a code example. | <https://rspec.info> | 2026-11-09 | Low | Dependency | Dependency |
 | Ruby | rspec-mocks | 3.13.9 | MIT | RSpec's 'test double' framework, with support for stubbing and mocking | <https://rspec.info> | 2026-11-09 | Low | Dependency | Dependency |
 | Ruby | rspec-support | 3.13.8 | MIT | Support utilities for RSpec gems | <https://rspec.info> | 2026-11-09 | Low | Dependency | Dependency |
-| Ruby | rubocop | 1.92.2 | MIT | RuboCop is a Ruby code style checking and code formatting tool. | <https://rubocop.org/> | 2026-11-03 | Low | Ruby linter | Most popular gem on rubygems |
-| Ruby | rubocop-ast | 1.51.0 | MIT | RuboCop's Node and NodePattern classes. | <https://www.rubocop.org/> | 2026-11-09 | Low | Dependency | Dependency |
+| Ruby | rubocop | 1.92.3 | MIT | RuboCop is a Ruby code style checking and code formatting tool. | <https://rubocop.org/> | 2026-11-18 | Low | Ruby linter | Most popular gem on rubygems |
+| Ruby | rubocop-ast | 1.52.0 | MIT | RuboCop's Node and NodePattern classes. | <https://www.rubocop.org/> | 2026-11-18 | Low | Dependency | Dependency |
 | Ruby | rubocop-capybara | 3.1.0 | MIT | Code style checking for Capybara test files (RSpec, Cucumber, Minitest). | <https://github.com/rubocop/rubocop-capybara> | 2026-10-18 | Low | Ruby linter | Most popular gem |
 | Ruby | rubocop-graphql | 1.9.0 | MIT | A collection of RuboCop cops to improve GraphQL-related code | <https://github.com/DmitryTsepelev/rubocop-graphql> | 2026-11-09 | Low | Ruby linter | Most popular gem |
 | Ruby | rubocop-minitest | 0.41.0 | MIT | Automatic Minitest code style checking tool. | <https://docs.rubocop.org/rubocop-minitest/> | 2026-10-03 | Low | Ruby linter | Most popular gem |
@@ -48,7 +48,7 @@
 | Ruby | tty-screen | 0.8.2 | MIT | Terminal screen size detection that works on Linux, macOS and Windows systems and supports Ruby MRI, JRuby, TruffleRuby and Rubinius interpreters. | <https://ttytoolkit.org> | 2026-05-22 | Low | Dependency | Dependency |
 | Ruby | unicode-display_width | 3.3.0 | MIT | [Unicode 18.0.0] Determines the monospace display width of a string using EastAsianWidth.txt, Unicode general category, Emoji specification, and other data. | <https://github.com/janlelis/unicode-display_width> | 2026-09-21 | Low | Dependency | Dependency |
 | Ruby | unicode-emoji | 4.3.0 | MIT | [Emoji 18.0] Provides Unicode Emoji data and regexes, incorporating the latest Unicode and Emoji standards | <https://github.com/janlelis/unicode-emoji> | 2026-09-21 | Low | Dependency | Dependency |
-| Ruby | webmock | 3.34.0 | MIT | WebMock allows stubbing HTTP requests and setting expectations on HTTP requests. | <https://github.com/bblimke/webmock> | 2026-10-18 | Low | Stubs HTTP requests so the parser specs run without network access | Intercepts HTTParty/Net::HTTP requests, letting the specs simulate registry errors and timeouts |
+| Ruby | webmock | 3.35.0 | MIT | WebMock allows stubbing HTTP requests and setting expectations on HTTP requests. | <https://github.com/bblimke/webmock> | 2026-11-18 | Low | Stubs HTTP requests so the parser specs run without network access | Intercepts HTTParty/Net::HTTP requests, letting the specs simulate registry errors and timeouts |
 | Ruby | wisper | 2.0.1 | MIT | A micro library providing objects with Publish-Subscribe capabilities. | <https://github.com/krisleech/wisper> | 2026-05-22 | Low | Dependency | Dependency |
 | Ruby | yarn_lock_parser | 0.1.0 | MIT | Parser for yarn.lock files. | <https://rubygems.org/yarn_lock_parser> | 2026-05-22 | Low | Parses Yarn v1 yarn.lock files | Turns yarn.lock into name/version records, avoiding a hand-written Yarn v1 parser |
 | Ruby | bundler | 4.0.20 | MIT | Bundler manages an application's dependencies through its entire life, across many machines, systematically and repeatably | <https://bundler.io/> | 2026-09-21 | Low | Used to read Gemfile.lock files and install the gems locked in them. | Ruby's standard dependency manager, bundled with Ruby. |
