@@ -18,7 +18,7 @@
 | Ruby | nokogiri | 1.19.7 | MIT | Nokogiri (鋸) makes it easy and painless to work with XML and HTML from Ruby | <https://nokogiri.org> | 2026-11-03 | Low | Parses Maven POM XML and decodes HTML entities in package descriptions | libxml2-backed parser with XPath support, needed for POM licenses and parent lookups |
 | Ruby | optparse | 0.8.1 | Ruby | OptionParser is a class for command-line option analysis | <https://github.com/ruby/optparse> | 2026-05-22 | Low | Used to parse command line arguments. | Ruby's standard command-line option parser (default gem) |
 | Ruby | parallel | 2.3.0 | MIT | Run any kind of code in parallel processes | <https://github.com/grosser/parallel> | 2026-10-03 | Low | Used to parallelize HTTP fetches across CPU cores in each parser. | Thread-pool map (in_threads) without hand-rolled thread management |
-| Ruby | parser | 3.3.13.0 | MIT | A Ruby parser written in pure Ruby. | <https://github.com/whitequark/parser> | 2026-10-24 | Low | Dependency | Dependency |
+| Ruby | parser | 3.3.14.0 | MIT | A Ruby parser written in pure Ruby. | <https://github.com/whitequark/parser> | 2026-11-19 | Low | Dependency | Dependency |
 | Ruby | pastel | 0.8.0 | MIT | Terminal strings styling with intuitive and clean API. | <https://ttytoolkit.org> | 2026-05-22 | Low | Dependency | Dependency |
 | Ruby | prism | 2.1.0 | MIT | Prism Ruby parser | <https://github.com/ruby/prism> | 2026-11-09 | Low | Dependency | Dependency |
 | Ruby | public_suffix | 7.0.5 | MIT | PublicSuffix can parse and decompose a domain name into top level domain, domain and subdomains. | <https://simonecarletti.com/code/publicsuffix-ruby> | 2026-05-22 | Low | Dependency | Dependency |
@@ -32,7 +32,7 @@
 | Ruby | rspec-mocks | 3.13.9 | MIT | RSpec's 'test double' framework, with support for stubbing and mocking | <https://rspec.info> | 2026-11-09 | Low | Dependency | Dependency |
 | Ruby | rspec-support | 3.13.8 | MIT | Support utilities for RSpec gems | <https://rspec.info> | 2026-11-09 | Low | Dependency | Dependency |
 | Ruby | rubocop | 1.92.3 | MIT | RuboCop is a Ruby code style checking and code formatting tool. | <https://rubocop.org/> | 2026-11-18 | Low | Ruby linter | Most popular gem on rubygems |
-| Ruby | rubocop-ast | 1.52.0 | MIT | RuboCop's Node and NodePattern classes. | <https://www.rubocop.org/> | 2026-11-18 | Low | Dependency | Dependency |
+| Ruby | rubocop-ast | 1.53.0 | MIT | RuboCop's Node and NodePattern classes. | <https://www.rubocop.org/> | 2026-11-19 | Low | Dependency | Dependency |
 | Ruby | rubocop-capybara | 3.1.0 | MIT | Code style checking for Capybara test files (RSpec, Cucumber, Minitest). | <https://github.com/rubocop/rubocop-capybara> | 2026-10-18 | Low | Ruby linter | Most popular gem |
 | Ruby | rubocop-graphql | 1.9.0 | MIT | A collection of RuboCop cops to improve GraphQL-related code | <https://github.com/DmitryTsepelev/rubocop-graphql> | 2026-11-09 | Low | Ruby linter | Most popular gem |
 | Ruby | rubocop-minitest | 0.41.0 | MIT | Automatic Minitest code style checking tool. | <https://docs.rubocop.org/rubocop-minitest/> | 2026-10-03 | Low | Ruby linter | Most popular gem |
