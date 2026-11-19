@@ -194,11 +194,11 @@
   "Ruby:parser": {
     "language": "Ruby",
     "package": "parser",
-    "version": "3.3.13.0",
+    "version": "3.3.14.0",
     "license": "MIT",
     "description": "A Ruby parser written in pure Ruby.",
     "website": "https://github.com/whitequark/parser",
-    "last_verified_at": "2026-10-24",
+    "last_verified_at": "2026-11-19",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -362,11 +362,11 @@
   "Ruby:rubocop-ast": {
     "language": "Ruby",
     "package": "rubocop-ast",
-    "version": "1.52.0",
+    "version": "1.53.0",
     "license": "MIT",
     "description": "    RuboCop's Node and NodePattern classes.",
     "website": "https://www.rubocop.org/",
-    "last_verified_at": "2026-11-18",
+    "last_verified_at": "2026-11-19",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
