@@ -2,11 +2,11 @@
   "Ruby:addressable": {
     "language": "Ruby",
     "package": "addressable",
-    "version": "2.9.2",
+    "version": "2.10.0",
     "license": "Apache-2.0",
     "description": "Addressable is an alternative implementation to the URI implementation that is",
     "website": "https://github.com/sporkmonger/addressable",
-    "last_verified_at": "2026-11-03",
+    "last_verified_at": "2026-11-23",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -74,11 +74,11 @@
   "Ruby:hashdiff": {
     "language": "Ruby",
     "package": "hashdiff",
-    "version": "1.2.2",
+    "version": "1.3.0",
     "license": "MIT",
     "description": " Hashdiff is a diff lib to compute the smallest difference between two hashes",
     "website": "https://github.com/liufengyun/hashdiff",
-    "last_verified_at": "2026-11-09",
+    "last_verified_at": "2026-11-23",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -86,11 +86,11 @@
   "Ruby:httparty": {
     "language": "Ruby",
     "package": "httparty",
-    "version": "0.24.3",
+    "version": "0.25.1",
     "license": "MIT",
     "description": "Makes http fun! Also, makes consuming restful web services dead easy.",
     "website": "https://github.com/jnunemaker/httparty",
-    "last_verified_at": "2026-09-30",
+    "last_verified_at": "2026-11-23",
     "risk_level": "Medium",
     "requirements": "HTTP client for the package registry APIs (RubyGems, npm, PyPI, Maven repositories, GitHub)",
     "verification_reasoning": "Simple GET API with per-request timeout and headers, built on Ruby's standard Net::HTTP"
@@ -356,8 +356,8 @@
     "website": "https://rubocop.org/",
     "last_verified_at": "2026-11-18",
     "risk_level": "Low",
-    "requirements": "Ruby linter",
-    "verification_reasoning": "Most popular gem on rubygems"
+    "requirements": "Ruby linter and formatter run in CI and locally against the codebase",
+    "verification_reasoning": "Standard Ruby static analyzer; the plugin cops listed in .rubocop.yml all extend it"
   },
   "Ruby:rubocop-ast": {
     "language": "Ruby",
@@ -380,8 +380,8 @@
     "website": "https://github.com/rubocop/rubocop-capybara",
     "last_verified_at": "2026-10-18",
     "risk_level": "Low",
-    "requirements": "Ruby linter",
-    "verification_reasoning": "Most popular gem"
+    "requirements": "RuboCop plugin enabled in .rubocop.yml for Capybara cops",
+    "verification_reasoning": "Official RuboCop plugin maintained by the rubocop organization"
   },
   "Ruby:rubocop-graphql": {
     "language": "Ruby",
@@ -392,8 +392,8 @@
     "website": "https://github.com/DmitryTsepelev/rubocop-graphql",
     "last_verified_at": "2026-11-09",
     "risk_level": "Low",
-    "requirements": "Ruby linter",
-    "verification_reasoning": "Most popular gem"
+    "requirements": "RuboCop plugin enabled in .rubocop.yml for GraphQL cops",
+    "verification_reasoning": "Maintained RuboCop extension for graphql-ruby code"
   },
   "Ruby:rubocop-minitest": {
     "language": "Ruby",
@@ -404,8 +404,8 @@
     "website": "https://docs.rubocop.org/rubocop-minitest/",
     "last_verified_at": "2026-10-03",
     "risk_level": "Low",
-    "requirements": "Ruby linter",
-    "verification_reasoning": "Most popular gem"
+    "requirements": "RuboCop plugin enabled in .rubocop.yml for Minitest cops",
+    "verification_reasoning": "Official RuboCop plugin maintained by the rubocop organization"
   },
   "Ruby:rubocop-performance": {
     "language": "Ruby",
@@ -416,8 +416,8 @@
     "website": "https://docs.rubocop.org/rubocop-performance/",
     "last_verified_at": "2026-05-22",
     "risk_level": "Low",
-    "requirements": "A collection of RuboCop cops to check for performance optimizations in Ruby code",
-    "verification_reasoning": "Most popular gem"
+    "requirements": "RuboCop plugin enabled in .rubocop.yml for performance cops",
+    "verification_reasoning": "Official RuboCop plugin maintained by the rubocop organization"
   },
   "Ruby:rubocop-rspec": {
     "language": "Ruby",
@@ -428,8 +428,8 @@
     "website": "https://github.com/rubocop/rubocop-rspec",
     "last_verified_at": "2026-05-22",
     "risk_level": "Low",
-    "requirements": "Code style checking for RSpec files. A plugin for the RuboCop code style enforcing & linting tool",
-    "verification_reasoning": "Most popular gem"
+    "requirements": "RuboCop plugin enabled in .rubocop.yml to lint the RSpec suite",
+    "verification_reasoning": "Official RuboCop plugin maintained by the rubocop organization"
   },
   "Ruby:rubocop-thread_safety": {
     "language": "Ruby",
@@ -440,8 +440,8 @@
     "website": "https://github.com/rubocop/rubocop-thread_safety",
     "last_verified_at": "2026-09-14",
     "risk_level": "Low",
-    "requirements": "Ruby linter",
-    "verification_reasoning": "Most popular gem"
+    "requirements": "RuboCop plugin enabled in .rubocop.yml to flag thread-unsafe code in the Parallel-threaded parsers",
+    "verification_reasoning": "Only RuboCop extension dedicated to thread-safety checks"
   },
   "Ruby:ruby-progressbar": {
     "language": "Ruby",
@@ -554,11 +554,11 @@
   "Ruby:webmock": {
     "language": "Ruby",
     "package": "webmock",
-    "version": "3.35.0",
+    "version": "3.39.0",
     "license": "MIT",
     "description": "WebMock allows stubbing HTTP requests and setting expectations on HTTP requests.",
     "website": "https://github.com/bblimke/webmock",
-    "last_verified_at": "2026-11-18",
+    "last_verified_at": "2026-11-23",
     "risk_level": "Low",
     "requirements": "Stubs HTTP requests so the parser specs run without network access",
     "verification_reasoning": "Intercepts HTTParty/Net::HTTP requests, letting the specs simulate registry errors and timeouts"
