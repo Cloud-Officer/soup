@@ -98,11 +98,11 @@
   "Ruby:json": {
     "language": "Ruby",
     "package": "json",
-    "version": "3.1.0",
+    "version": "3.2.0",
     "license": "Ruby",
     "description": "A JSON implementation as a JRuby extension.",
     "website": "https://github.com/ruby/json",
-    "last_verified_at": "2026-10-18",
+    "last_verified_at": "2026-11-26",
     "risk_level": "Low",
     "requirements": "Used to read package manager and cache files.",
     "verification_reasoning": "Ruby's bundled JSON implementation (default gem)"
@@ -350,11 +350,11 @@
   "Ruby:rubocop": {
     "language": "Ruby",
     "package": "rubocop",
-    "version": "1.92.3",
+    "version": "1.93.0",
     "license": "MIT",
     "description": "RuboCop is a Ruby code style checking and code formatting tool.",
     "website": "https://rubocop.org/",
-    "last_verified_at": "2026-11-18",
+    "last_verified_at": "2026-11-26",
     "risk_level": "Low",
     "requirements": "Ruby linter and formatter run in CI and locally against the codebase",
     "verification_reasoning": "Standard Ruby static analyzer; the plugin cops listed in .rubocop.yml all extend it"
@@ -362,11 +362,11 @@
   "Ruby:rubocop-ast": {
     "language": "Ruby",
     "package": "rubocop-ast",
-    "version": "1.53.0",
+    "version": "1.54.0",
     "license": "MIT",
     "description": "    RuboCop's Node and NodePattern classes.",
     "website": "https://www.rubocop.org/",
-    "last_verified_at": "2026-11-19",
+    "last_verified_at": "2026-11-26",
     "risk_level": "Low",
     "requirements": "Dependency",
     "verification_reasoning": "Dependency"
@@ -554,11 +554,11 @@
   "Ruby:webmock": {
     "language": "Ruby",
     "package": "webmock",
-    "version": "3.39.0",
+    "version": "3.41.0",
     "license": "MIT",
     "description": "WebMock allows stubbing HTTP requests and setting expectations on HTTP requests.",
     "website": "https://github.com/bblimke/webmock",
-    "last_verified_at": "2026-11-23",
+    "last_verified_at": "2026-11-26",
     "risk_level": "Low",
     "requirements": "Stubs HTTP requests so the parser specs run without network access",
     "verification_reasoning": "Intercepts HTTParty/Net::HTTP requests, letting the specs simulate registry errors and timeouts"
