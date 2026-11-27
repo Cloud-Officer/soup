@@ -422,11 +422,11 @@
   "Ruby:rubocop-rspec": {
     "language": "Ruby",
     "package": "rubocop-rspec",
-    "version": "3.10.2",
+    "version": "3.11.0",
     "license": "MIT",
     "description": "Code style checking for RSpec files.",
     "website": "https://github.com/rubocop/rubocop-rspec",
-    "last_verified_at": "2026-05-22",
+    "last_verified_at": "2026-11-27",
     "risk_level": "Low",
     "requirements": "RuboCop plugin enabled in .rubocop.yml to lint the RSpec suite",
     "verification_reasoning": "Official RuboCop plugin maintained by the rubocop organization"
@@ -554,11 +554,11 @@
   "Ruby:webmock": {
     "language": "Ruby",
     "package": "webmock",
-    "version": "3.41.0",
+    "version": "3.42.0",
     "license": "MIT",
     "description": "WebMock allows stubbing HTTP requests and setting expectations on HTTP requests.",
     "website": "https://github.com/bblimke/webmock",
-    "last_verified_at": "2026-11-26",
+    "last_verified_at": "2026-11-27",
     "risk_level": "Low",
     "requirements": "Stubs HTTP requests so the parser specs run without network access",
     "verification_reasoning": "Intercepts HTTParty/Net::HTTP requests, letting the specs simulate registry errors and timeouts"
